@@ -1,0 +1,139 @@
+package com.skyd.anivu.ui.fragment.feed
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.divider.MaterialDividerItemDecoration
+import com.skyd.anivu.R
+import com.skyd.anivu.base.BaseFragment
+import com.skyd.anivu.databinding.FragmentFeedBinding
+import com.skyd.anivu.ext.collectIn
+import com.skyd.anivu.ext.gone
+import com.skyd.anivu.ext.startWith
+import com.skyd.anivu.ui.adapter.variety.AniSpanSize
+import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
+import com.skyd.anivu.ui.adapter.variety.proxy.Feed1Proxy
+import com.skyd.anivu.ui.component.dialog.InputDialogBuilder
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+
+@AndroidEntryPoint
+class FeedFragment : BaseFragment<FragmentFeedBinding>() {
+    private val feedViewModel by viewModels<FeedViewModel>()
+    private val intents = Channel<FeedIntent>()
+
+    private var waitingDialog: AlertDialog? = null
+    private val adapter = VarietyAdapter(
+        mutableListOf(Feed1Proxy(
+            onRemove = { intents.trySend(FeedIntent.RemoveFeed(it.url)) }
+        ))
+    )
+
+    private fun updateState(feedState: FeedState) {
+        if (feedState.loadingDialog) {
+            if (waitingDialog == null || !waitingDialog!!.isShowing) {
+                waitingDialog = MaterialAlertDialogBuilder(requireContext())
+                    .setIcon(R.drawable.ic_info_24)
+                    .setTitle(R.string.waiting)
+                    .setCancelable(false)
+                    .setView(R.layout.layout_waiting_dialog)
+                    .show()
+                    .apply { findViewById<TextView>(R.id.tv_message)?.gone() }
+            } else if (waitingDialog!!.isShowing) {
+                waitingDialog?.show()
+            }
+        } else {
+            waitingDialog?.dismiss()
+            waitingDialog = null
+        }
+        when (val feedListState = feedState.feedListState) {
+            is FeedListState.Failed -> {}
+            FeedListState.Init -> {}
+            FeedListState.Loading -> {}
+            is FeedListState.Success -> {
+                adapter.dataList = feedListState.feedList
+            }
+        }
+    }
+
+    private fun showEvent(feedEvent: FeedEvent) {
+        when (feedEvent) {
+            is FeedEvent.InitFeetListResultEvent.Failed -> {
+                showSnackbar(text = feedEvent.msg)
+            }
+
+            is FeedEvent.RemoveFeedResultEvent.Failed -> {
+                showSnackbar(text = feedEvent.msg)
+            }
+
+            is FeedEvent.AddFeedResultEvent.Failed -> {
+                showSnackbar(text = feedEvent.msg)
+            }
+
+            FeedEvent.RemoveFeedResultEvent.Success,
+            FeedEvent.AddFeedResultEvent.Success -> Unit
+
+        }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        intents
+            .consumeAsFlow()
+            .startWith(FeedIntent.Init)
+            .onEach(feedViewModel::processIntent)
+            .launchIn(lifecycleScope)
+
+        feedViewModel.viewState.collectIn(this) { updateState(it) }
+        feedViewModel.singleEvent.collectIn(this) { showEvent(it) }
+    }
+
+    override fun FragmentFeedBinding.initView() {
+        rvFeedFragment.layoutManager = GridLayoutManager(
+            requireContext(),
+            AniSpanSize.MAX_SPAN_SIZE
+        ).apply {
+            spanSizeLookup = AniSpanSize(adapter)
+        }
+
+        val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
+        divider.isLastItemDecorated = false
+        rvFeedFragment.addItemDecoration(divider)
+        rvFeedFragment.adapter = adapter
+        registerForContextMenu(rvFeedFragment)
+
+        binding.fabFeedFragment.setOnClickListener {
+            InputDialogBuilder(requireContext())
+                .setPositiveButton { _, _, text ->
+                    if (text.isNotBlank()) {
+                        intents.trySend(FeedIntent.AddFeed(text))
+                    }
+                }
+                .setIcon(
+                    AppCompatResources.getDrawable(
+                        requireActivity(),
+                        R.drawable.ic_rss_feed_24
+                    )
+                )
+                .setTitle(R.string.add)
+                .setNegativeButton(R.string.cancel) { _, _ -> }
+                .show()
+        }
+    }
+
+    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =
+        FragmentFeedBinding.inflate(inflater, container, false)
+}

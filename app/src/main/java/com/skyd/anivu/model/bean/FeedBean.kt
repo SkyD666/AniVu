@@ -1,0 +1,36 @@
+package com.skyd.anivu.model.bean
+
+import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.skyd.anivu.base.BaseBean
+import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+
+const val FEED_TABLE_NAME = "Feed"
+
+@Parcelize
+@Serializable
+@Entity(tableName = FEED_TABLE_NAME)
+data class FeedBean(
+    @PrimaryKey
+    @ColumnInfo(name = URL_COLUMN)
+    val url: String,
+    @ColumnInfo(name = TITLE_COLUMN)
+    val title: String? = null,
+    @ColumnInfo(name = DESCRIPTION_COLUMN)
+    val description: String? = null,
+    @ColumnInfo(name = LINK_COLUMN)
+    var link: String? = null,
+    @ColumnInfo(name = ICON_COLUMN)
+    var icon: String? = null,
+) : BaseBean, Parcelable {
+    companion object {
+        const val URL_COLUMN = "url"
+        const val TITLE_COLUMN = "title"
+        const val DESCRIPTION_COLUMN = "description"
+        const val LINK_COLUMN = "link"
+        const val ICON_COLUMN = "icon"
+    }
+}

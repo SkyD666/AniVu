@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/main_fragment">
+
+    <fragment
+        android:id="@+id/main_fragment"
+        android:name="com.skyd.anivu.ui.fragment.MainFragment"
+        android:label="@string/main_fragment_name"
+        tools:layout="@layout/fragment_main" />
+    <action
+        android:id="@+id/action_to_article_fragment"
+        app:destination="@id/article_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/article_fragment"
+        android:name="com.skyd.anivu.ui.fragment.article.ArticleFragment"
+        android:label="@string/article_fragment_name"
+        tools:layout="@layout/fragment_article">
+
+        <argument
+            android:name="feedUrl"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+</navigation>

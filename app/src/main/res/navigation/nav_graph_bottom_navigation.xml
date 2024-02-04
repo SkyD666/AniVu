@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/item_bottom_navigation_feed">
+
+    <fragment
+        android:id="@+id/item_bottom_navigation_feed"
+        android:name="com.skyd.anivu.ui.fragment.feed.FeedFragment"
+        android:label="@string/feed_fragment_name"
+        tools:layout="@layout/fragment_feed" />
+    <fragment
+        android:id="@+id/item_bottom_navigation_video"
+        android:name="com.skyd.anivu.ui.fragment.video.VideoFragment"
+        android:label="@string/video_fragment_name"
+        tools:layout="@layout/fragment_video" />
+    <fragment
+        android:id="@+id/item_bottom_navigation_more"
+        android:name="com.skyd.anivu.ui.fragment.more.MoreFragment"
+        android:label="@string/more_fragment_name"
+        tools:layout="@layout/fragment_more" />
+
+    <action
+        android:id="@+id/action_feed_fragment"
+        app:destination="@id/item_bottom_navigation_feed"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/item_bottom_navigation_feed"
+        app:popUpToInclusive="true"
+        app:popUpToSaveState="true"
+        app:restoreState="true" />
+    <action
+        android:id="@+id/action_video_fragment"
+        app:destination="@id/item_bottom_navigation_video"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/item_bottom_navigation_video"
+        app:popUpToInclusive="true"
+        app:popUpToSaveState="true"
+        app:restoreState="true" />
+    <action
+        android:id="@+id/action_more_fragment"
+        app:destination="@id/item_bottom_navigation_more"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:launchSingleTop="true"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim"
+        app:popUpTo="@id/item_bottom_navigation_more"
+        app:popUpToInclusive="true"
+        app:popUpToSaveState="true"
+        app:restoreState="true" />
+</navigation>

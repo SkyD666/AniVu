@@ -1,0 +1,18 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.AniVu" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="materialAlertDialogTheme">@style/AniVuMaterialAlertDialog</item>
+    </style>
+
+    <style name="Theme.AniVu" parent="Base.Theme.AniVu" />
+
+    <style name="AniVuMaterialAlertDialog" parent="@style/ThemeOverlay.Material3.MaterialAlertDialog.Centered">
+        <item name="materialAlertDialogTitleIconStyle">@style/DialogIconTint</item>
+    </style>
+
+    <style name="DialogIconTint" parent="@style/MaterialAlertDialog.Material3.Title.Icon.CenterStacked">
+        <item name="android:tint">?attr/colorSecondary</item>
+    </style>
+</resources>

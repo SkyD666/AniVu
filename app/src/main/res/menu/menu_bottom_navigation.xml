@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/item_bottom_navigation_feed"
+        android:enabled="true"
+        android:icon="@drawable/selector_bottom_navigation_feed"
+        android:title="@string/feed_fragment_name" />
+    <item
+        android:id="@+id/item_bottom_navigation_video"
+        android:enabled="true"
+        android:icon="@drawable/selector_bottom_navigation_video"
+        android:title="@string/video_fragment_name" />
+    <item
+        android:id="@+id/item_bottom_navigation_more"
+        android:enabled="true"
+        android:icon="@drawable/selector_bottom_navigation_more"
+        android:title="@string/more_fragment_name" />
+</menu>
