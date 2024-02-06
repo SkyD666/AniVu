@@ -1,26 +1,21 @@
-package com.skyd.anivu.ui
+package com.skyd.anivu.ui.activity
 
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.navigation.fragment.NavHostFragment
+import com.skyd.anivu.base.BaseActivity
 import com.skyd.anivu.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
-
+class MainActivity : BaseActivity<ActivityMainBinding>() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
 //        setSystemBarsColor(
 //            view = findViewById(android.R.id.content),
@@ -29,6 +24,8 @@ class MainActivity : AppCompatActivity() {
 
         binding.navHostFragmentMain.getFragment<NavHostFragment>().navController
     }
+
+    override fun getViewBinding() = ActivityMainBinding.inflate(layoutInflater)
 
     fun isInDark(value: Int) = when (value) {
         AppCompatDelegate.MODE_NIGHT_YES -> true

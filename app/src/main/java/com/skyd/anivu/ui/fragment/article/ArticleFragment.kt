@@ -59,9 +59,18 @@ class ArticleFragment : BaseFragment<FragmentArticleBinding>() {
             waitingDialog = null
         }
         when (val feedListState = articleState.articleListState) {
-            is ArticleListState.Failed -> {}
-            ArticleListState.Init -> {}
-            ArticleListState.Loading -> {}
+            is ArticleListState.Failed -> {
+                adapter.dataList = emptyList()
+            }
+
+            ArticleListState.Init -> {
+                adapter.dataList = emptyList()
+            }
+
+            ArticleListState.Loading -> {
+                adapter.dataList = emptyList()
+            }
+
             is ArticleListState.Success -> {
                 adapter.dataList = feedListState.articleList
             }
@@ -83,26 +92,20 @@ class ArticleFragment : BaseFragment<FragmentArticleBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (feedUrl.isNullOrBlank()) {
-            MaterialAlertDialogBuilder(requireContext())
-                .setIcon(R.drawable.ic_warning_24)
-                .setTitle(R.string.warning)
-                .setMessage(R.string.article_fragment_feed_url_illegal)
-                .setCancelable(false)
-                .setPositiveButton(R.string.exit) { _, _ ->
-                    findNavController().popBackStackWithLifecycle()
-                }
-                .show()
-        } else {
-            intents
-                .consumeAsFlow()
-                .startWith(ArticleIntent.Init(feedUrl!!))
-                .onEach(feedViewModel::processIntent)
-                .launchIn(lifecycleScope)
+        checkArgument(
+            messageRes = R.string.article_fragment_feed_url_illegal,
+            action = { !feedUrl.isNullOrBlank() },
+            onSuccess = {
+                intents
+                    .consumeAsFlow()
+                    .startWith(ArticleIntent.Init(feedUrl!!))
+                    .onEach(feedViewModel::processIntent)
+                    .launchIn(lifecycleScope)
 
-            feedViewModel.viewState.collectIn(this) { updateState(it) }
-            feedViewModel.singleEvent.collectIn(this) { showEvent(it) }
-        }
+                feedViewModel.viewState.collectIn(this) { updateState(it) }
+                feedViewModel.singleEvent.collectIn(this) { showEvent(it) }
+            }
+        )
     }
 
     override fun FragmentArticleBinding.initView() {

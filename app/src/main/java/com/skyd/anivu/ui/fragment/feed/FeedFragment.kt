@@ -59,9 +59,18 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
             waitingDialog = null
         }
         when (val feedListState = feedState.feedListState) {
-            is FeedListState.Failed -> {}
-            FeedListState.Init -> {}
-            FeedListState.Loading -> {}
+            is FeedListState.Failed -> {
+                adapter.dataList = emptyList()
+            }
+
+            FeedListState.Init -> {
+                adapter.dataList = emptyList()
+            }
+
+            FeedListState.Loading -> {
+                adapter.dataList = emptyList()
+            }
+
             is FeedListState.Success -> {
                 adapter.dataList = feedListState.feedList
             }

@@ -42,7 +42,7 @@ class Feed1Proxy(
                     true
                 }
             }
-        };
+        }
         holder.itemView.setOnClickListener {
             val bundle = Bundle().apply {
                 putString(ArticleFragment.FEED_URL_KEY, data.url)

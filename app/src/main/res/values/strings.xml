@@ -23,4 +23,13 @@
     <string name="article_fragment_name">Article</string>
     <string name="article_fragment_feed_url_illegal">Feed URL is illegal</string>
     <string name="back">Back</string>
+    <string name="read_fragment_name">Read</string>
+    <string name="read_fragment_enclosures">Enclosures</string>
+    <string name="bottom_sheet_enclosure_title">Enclosures</string>
+    <string name="download">Download</string>
+    <string name="download_torrent_title">Downloading torrents…</string>
+    <string name="download_fragment_name">Download task</string>
+    <string name="download_pause">Pause</string>
+    <string name="parent_dir">…</string>
+    <string name="player_fragment_name">Player</string>
 </resources>

@@ -1,6 +1,9 @@
 package com.skyd.anivu.ext
 
 import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.net.Uri
 import android.text.Html
 import android.text.Spanned
@@ -21,3 +24,12 @@ fun String.toRemoveHtml(): String {
 
 fun String.readable(): String =
     Readability4JExtended("", this).parse().textContent?.trim().orEmpty()
+
+fun String.copy(context: Context) {
+    try {
+        val systemService = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        systemService.setPrimaryClip(ClipData.newPlainText("text", this))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
+}

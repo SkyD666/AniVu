@@ -7,17 +7,30 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
+import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.ArticleBean
+import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.db.APP_DATA_BASE_FILE_NAME
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ArticleDao {
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface ArticleDaoEntryPoint {
+        val enclosureDao: EnclosureDao
+    }
+
     @Query(
         """
-        SELECT * from article 
+        SELECT * from $ARTICLE_TABLE_NAME 
         WHERE ${ArticleBean.LINK_COLUMN} = :link
         AND ${ArticleBean.FEED_URL_COLUMN} = :feedUrl
         """
@@ -36,15 +49,18 @@ interface ArticleDao {
     suspend fun innerUpdateArticle(articleBeanList: List<ArticleBean>)
 
     @Transaction
-    suspend fun insertListIfNotExist(articleBeanList: List<ArticleBean>) {
-        articleBeanList.mapNotNull {
+    suspend fun insertListIfNotExist(articleWithEnclosureList: List<ArticleWithEnclosureBean>) {
+        val hiltEntryPoint =
+            EntryPointAccessors.fromApplication(appContext, ArticleDaoEntryPoint::class.java)
+        articleWithEnclosureList.forEach {
             if (queryArticleByLink(
-                    link = it.link,
-                    feedUrl = it.feedUrl,
+                    link = it.article.link,
+                    feedUrl = it.article.feedUrl,
                 ) == null
-            ) it else null
-        }.also {
-            innerUpdateArticle(it)
+            ) {
+                innerUpdateArticle(it.article)
+            }
+            hiltEntryPoint.enclosureDao.insertListIfNotExist(it.enclosures)
         }
     }
 
@@ -66,10 +82,19 @@ interface ArticleDao {
     )
     fun getArticleList(feedUrl: String): Flow<List<ArticleBean>>
 
+    @Transaction
+    @Query(
+        """
+        SELECT * FROM $ARTICLE_TABLE_NAME 
+        WHERE ${ArticleBean.ARTICLE_ID_COLUMN} LIKE :articleId
+        """
+    )
+    fun getArticleWithEnclosures(articleId: String): Flow<ArticleWithEnclosureBean>
+
     @RewriteQueriesToDropUnusedColumns
     @Query(
         """
-        SELECT *
+        SELECT a.*
         FROM $ARTICLE_TABLE_NAME AS a LEFT JOIN $FEED_TABLE_NAME AS f 
         ON a.${ArticleBean.FEED_URL_COLUMN} = f.${FeedBean.URL_COLUMN}
         WHERE a.${ArticleBean.FEED_URL_COLUMN} = :feedUrl 

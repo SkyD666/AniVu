@@ -1,12 +1,14 @@
 package com.skyd.anivu.model.repository
 
 import android.content.Context
-import android.text.Html
 import android.util.Log
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
+import com.skyd.anivu.ext.toEncodedUrl
 import com.skyd.anivu.model.bean.ArticleBean
+import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedWithArticleBean
 import com.skyd.anivu.model.db.dao.FeedDao
@@ -47,7 +49,7 @@ class RssHelper @Inject constructor(
     suspend fun queryRssXml(
         feed: FeedBean,
         latestLink: String?,        // 日期最新的文章链接，更新时不会take比这个文章更旧的文章
-    ): List<ArticleBean> =
+    ): List<ArticleWithEnclosureBean> =
         try {
             inputStream(okHttpClient, feed.url).use { inputStream ->
                 SyndFeedInput().apply { isPreserveWireFeed = true }
@@ -67,7 +69,7 @@ class RssHelper @Inject constructor(
     private fun article(
         feed: FeedBean,
         syndEntry: SyndEntry,
-    ): ArticleBean {
+    ): ArticleWithEnclosureBean {
         val desc = syndEntry.description?.value
         val content = syndEntry.contents
             .takeIf { it.isNotEmpty() }
@@ -82,17 +84,28 @@ class RssHelper @Inject constructor(
                     "desc: ${desc}\n" +
                     "content: ${content}\n"
         )
-        return ArticleBean(
-            articleId = UUID.randomUUID().toString(),
-            feedUrl = feed.url,
-            date = (syndEntry.publishedDate ?: syndEntry.updatedDate ?: Date()).time,
-            title = syndEntry.title.toString(),
-            author = syndEntry.author,
-            description = content ?: desc,
-            content = content,
-            image = findImg((content ?: desc) ?: ""),
-            link = syndEntry.link ?: "",
-            updateAt = Date().time,
+        val articleId = UUID.randomUUID().toString()
+        return ArticleWithEnclosureBean(
+            article = ArticleBean(
+                articleId = articleId,
+                feedUrl = feed.url,
+                date = (syndEntry.publishedDate ?: syndEntry.updatedDate ?: Date()).time,
+                title = syndEntry.title.toString(),
+                author = syndEntry.author,
+                description = content ?: desc,
+                content = content,
+                image = findImg((content ?: desc) ?: ""),
+                link = syndEntry.link ?: "",
+                updateAt = Date().time,
+            ),
+            enclosures = syndEntry.enclosures.map {
+                EnclosureBean(
+                    articleId = articleId,
+                    url = it.url.orEmpty().toEncodedUrl(),
+                    length = it.length,
+                    type = it.type,
+                )
+            }
         )
     }
 

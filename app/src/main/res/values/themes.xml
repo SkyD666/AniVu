@@ -15,4 +15,11 @@
     <style name="DialogIconTint" parent="@style/MaterialAlertDialog.Material3.Title.Icon.CenterStacked">
         <item name="android:tint">?attr/colorSecondary</item>
     </style>
+
+    <style name="Theme.AniVu.Player" parent="Base.Theme.AniVu">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
 </resources>

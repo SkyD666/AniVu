@@ -3,7 +3,10 @@ package com.skyd.anivu.di
 import android.content.Context
 import com.skyd.anivu.model.db.AppDatabase
 import com.skyd.anivu.model.db.dao.ArticleDao
+import com.skyd.anivu.model.db.dao.DownloadInfoDao
+import com.skyd.anivu.model.db.dao.EnclosureDao
 import com.skyd.anivu.model.db.dao.FeedDao
+import com.skyd.anivu.model.db.dao.SessionParamsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,4 +30,17 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideArticleDao(database: AppDatabase): ArticleDao = database.articleDao()
+
+    @Provides
+    @Singleton
+    fun provideEnclosureDao(database: AppDatabase): EnclosureDao = database.enclosureDao()
+
+    @Provides
+    @Singleton
+    fun provideDownloadInfoDao(database: AppDatabase): DownloadInfoDao = database.downloadInfoDao()
+
+    @Provides
+    @Singleton
+    fun provideSessionParamsDao(database: AppDatabase): SessionParamsDao =
+        database.sessionParamsDao()
 }

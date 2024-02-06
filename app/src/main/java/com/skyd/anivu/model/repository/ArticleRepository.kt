@@ -6,11 +6,8 @@ import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.zip
 import javax.inject.Inject
 
 class ArticleRepository @Inject constructor(
@@ -29,9 +26,12 @@ class ArticleRepository @Inject constructor(
                 feed = feedDao.getFeed(feedUrl),
                 latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link
             )
-            emit(articleDao.insertListIfNotExist(articleBeanList.map {
-                if (it.feedUrl != feedUrl) it.copy(feedUrl = feedUrl)
-                else it
+            emit(articleDao.insertListIfNotExist(articleBeanList.map { articleWithEnclosure ->
+                if (articleWithEnclosure.article.feedUrl != feedUrl) {
+                    articleWithEnclosure.copy(
+                        article = articleWithEnclosure.article.copy(feedUrl = feedUrl)
+                    )
+                } else articleWithEnclosure
             }))
         }.flowOn(Dispatchers.IO)
     }

@@ -34,10 +34,23 @@ interface FeedDao {
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(appContext, FeedDaoEntryPoint::class.java)
         val feedUrl = feedWithArticleBean.feed.url
-        hiltEntryPoint.articleDao.insertListIfNotExist(feedWithArticleBean.articles.map {
-            if (it.feedUrl != feedUrl) it.copy(feedUrl = feedUrl)
-            else it
-        })
+        hiltEntryPoint.articleDao.insertListIfNotExist(
+            feedWithArticleBean.articles.map { articleWithEnclosure ->
+                // Enclosure
+                val articleId = articleWithEnclosure.article.articleId
+
+                // Add ArticleWithEnclosure
+                if (articleWithEnclosure.article.feedUrl != feedUrl) {
+                    articleWithEnclosure.copy(
+                        article = articleWithEnclosure.article.copy(feedUrl = feedUrl),
+                        enclosures = articleWithEnclosure.enclosures.map {
+                            if (it.articleId != articleId) it.copy(articleId = articleId)
+                            else it
+                        }
+                    )
+                } else articleWithEnclosure
+            }
+        )
     }
 
     @Transaction

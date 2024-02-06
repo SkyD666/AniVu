@@ -13,5 +13,5 @@ data class FeedWithArticleBean(
         parentColumn = FeedBean.URL_COLUMN,
         entityColumn = ArticleBean.FEED_URL_COLUMN,
     )
-    var articles: List<ArticleBean>,
+    var articles: List<ArticleWithEnclosureBean>,
 )

@@ -4,6 +4,7 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.skyd.anivu.base.BaseBean
 import kotlinx.parcelize.Parcelize
@@ -22,6 +23,10 @@ const val ARTICLE_TABLE_NAME = "Article"
             childColumns = [ArticleBean.FEED_URL_COLUMN],
             onDelete = ForeignKey.CASCADE
         )
+    ],
+    indices = [
+        Index(ArticleBean.ARTICLE_ID_COLUMN),
+        Index(ArticleBean.FEED_URL_COLUMN),
     ]
 )
 data class ArticleBean(
