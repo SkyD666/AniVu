@@ -2,12 +2,14 @@ package com.skyd.anivu.ui.adapter.variety.proxy
 
 
 import android.view.LayoutInflater
+import android.view.MenuInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.toDateTimeString
+import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.Video1ViewHolder
@@ -17,6 +19,7 @@ class Video1Proxy(
     private val adapter: VarietyAdapter,
     private val onPlay: (VideoBean) -> Unit,
     private val onOpenDir: (VideoBean) -> Unit,
+    private val onRemove: (VideoBean) -> Unit,
 ) : VarietyAdapter.Proxy<VideoBean, Video1ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         val holder = Video1ViewHolder(
@@ -35,6 +38,17 @@ class Video1Proxy(
                 onOpenDir(data)
             } else if (data.isMedia(parent.context)) {
                 onPlay(data)
+            }
+        }
+        holder.itemView.setOnCreateContextMenuListener { menu, _, _ ->
+            MenuInflater(holder.itemView.context).inflate(R.menu.menu_video_item, menu)
+            menu?.findItem(R.id.action_video_item_remove)?.apply {
+                setOnMenuItemClickListener {
+                    val data = adapter.dataList.getOrNull(holder.bindingAdapterPosition)
+                    if (data !is VideoBean) return@setOnMenuItemClickListener false
+                    onRemove(data)
+                    true
+                }
             }
         }
         return holder

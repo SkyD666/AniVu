@@ -22,13 +22,12 @@ class DownloadRepository @Inject constructor(
     }
 
     suspend fun deleteDownloadTaskInfo(
-        articleId: String,
         link: String,
         downloadingDirName: String,
     ): Flow<Unit> {
         return flow {
-            downloadInfoDao.deleteDownloadInfo(articleId, link)
-            sessionParamsDao.deleteSessionParams(articleId, link)
+            downloadInfoDao.deleteDownloadInfo(link)
+            sessionParamsDao.deleteSessionParams(link)
             File(Const.DOWNLOADING_VIDEO_DIR, downloadingDirName).deleteRecursively()
             emit(Unit)
         }.flowOn(Dispatchers.IO)

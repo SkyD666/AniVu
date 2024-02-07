@@ -28,7 +28,6 @@ class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureB
             waitingDownloadList.removeIf {
                 DownloadTorrentWorker.startWorker(
                     context = requireContext(),
-                    articleId = it.articleId,
                     torrentLink = it.url
                 )
                 true
@@ -52,7 +51,7 @@ class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureB
                 )
             } else {
                 DownloadTorrentWorker.startWorker(
-                    context = requireContext(), articleId = it.articleId, torrentLink = it.url
+                    context = requireContext(), torrentLink = it.url
                 )
             }
         }))

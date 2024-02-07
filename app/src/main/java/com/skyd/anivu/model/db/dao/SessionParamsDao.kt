@@ -23,12 +23,10 @@ interface SessionParamsDao {
     @Query(
         """
         DELETE FROM $SESSION_PARAMS_TABLE_NAME
-        WHERE ${SessionParamsBean.ARTICLE_ID_COLUMN} = :articleId
-        AND ${SessionParamsBean.LINK_COLUMN} = :link
+        WHERE ${SessionParamsBean.LINK_COLUMN} = :link
         """
     )
     fun deleteSessionParams(
-        articleId: String,
         link: String,
     ): Int
 
@@ -36,12 +34,10 @@ interface SessionParamsDao {
     @Query(
         """
         SELECT * FROM $SESSION_PARAMS_TABLE_NAME
-        WHERE ${SessionParamsBean.ARTICLE_ID_COLUMN} = :articleId
-        AND ${SessionParamsBean.LINK_COLUMN} = :link
+        WHERE ${SessionParamsBean.LINK_COLUMN} = :link
         """
     )
     fun getSessionParams(
-        articleId: String,
         link: String,
     ): SessionParamsBean?
 }

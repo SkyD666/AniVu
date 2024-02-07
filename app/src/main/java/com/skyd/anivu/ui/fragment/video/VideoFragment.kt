@@ -67,6 +67,9 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
                         }
                     )
                 },
+                onRemove = {
+                    intents.trySend(VideoIntent.Delete(it.file))
+                },
             )
         )
         addProxy(ParentDir1Proxy(
@@ -168,6 +171,7 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
         divider.isLastItemDecorated = false
         rvVideoFragment.addItemDecoration(divider)
         rvVideoFragment.adapter = adapter
+        registerForContextMenu(rvVideoFragment)
     }
 
     private fun List<Any>.addHeader() = if (hasParentDir) this + parentDirBean else this

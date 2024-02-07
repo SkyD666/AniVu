@@ -70,7 +70,6 @@ import kotlin.random.Random
 class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     CoroutineWorker(context, parameters) {
     private lateinit var torrentLink: String
-    private lateinit var articleId: String
     private var progress: Float = 0f
         set(value) {
             field = value
@@ -95,26 +94,18 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 }
             }
             torrentLink = inputData.getString(TORRENT_LINK) ?: return@withContext Result.failure()
-            articleId = inputData.getString(ARTICLE_ID) ?: return@withContext Result.failure()
-            name = hiltEntryPoint.downloadInfoDao.getDownloadName(
-                articleId = articleId,
-                link = torrentLink,
-            )
-            tempDownloadingDirName = hiltEntryPoint.downloadInfoDao.getDownloadingDirName(
-                articleId = articleId,
-                link = torrentLink,
-            ).ifNullOfBlank { "${System.currentTimeMillis()}_${Random.nextLong()}" }
+            name = hiltEntryPoint.downloadInfoDao.getDownloadName(link = torrentLink)
+            tempDownloadingDirName = hiltEntryPoint.downloadInfoDao
+                .getDownloadingDirName(link = torrentLink)
+                .ifNullOfBlank { "${System.currentTimeMillis()}_${Random.nextLong()}" }
             updateNotification()
             updateAllDownloadVideoInfoToDb()
             workerDownload()
         }
         return Result.success(
             workDataOf(
-                STATE to (hiltEntryPoint.downloadInfoDao.getDownloadState(
-                    articleId = articleId,
-                    link = torrentLink
-                )?.ordinal ?: 0),
-                ARTICLE_ID to articleId,
+                STATE to (hiltEntryPoint.downloadInfoDao
+                    .getDownloadState(link = torrentLink)?.ordinal ?: 0),
                 TORRENT_LINK to torrentLink,
             )
         )
@@ -155,31 +146,20 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun howToDownload(continuation: CancellableContinuation<Unit>, saveDir: File) {
         sessionManager.apply {
-            val lastSessionParams = hiltEntryPoint.sessionParamsDao.getSessionParams(
-                articleId = articleId,
-                link = torrentLink,
-            )
+            val lastSessionParams = hiltEntryPoint.sessionParamsDao
+                .getSessionParams(link = torrentLink)
             val sessionParams = if (lastSessionParams == null) SessionParams()
             else SessionParams(lastSessionParams.data)
 
             start(sessionParams)
 
-            if (hiltEntryPoint.downloadInfoDao.containsDownloadInfo(
-                    articleId = articleId,
-                    link = torrentLink
-                ) > 0
-            ) {
+            if (hiltEntryPoint.downloadInfoDao.containsDownloadInfo(link = torrentLink) > 0) {
                 hiltEntryPoint.downloadInfoDao.updateDownloadInfoRequestId(
-                    articleId = articleId,
                     link = torrentLink,
                     downloadRequestId = id.toString(),
                 )
             }
-            val state = hiltEntryPoint.downloadInfoDao.getDownloadState(
-                articleId = articleId,
-                link = torrentLink,
-            )
-            when (state) {
+            when (hiltEntryPoint.downloadInfoDao.getDownloadState(link = torrentLink)) {
                 null,
                 DownloadInfoBean.DownloadState.Init -> {
                     downloadByMagnetOrTorrent(torrentLink, saveDir)
@@ -366,31 +346,28 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         try {
             hiltEntryPoint.sessionParamsDao.updateSessionParams(
                 SessionParamsBean(
-                    articleId = articleId,
                     link = torrentLink,
                     data = sessionManager.saveState() ?: byteArrayOf()
                 )
             )
             hiltEntryPoint.downloadInfoDao.updateDownloadState(
-                articleId = articleId,
                 link = torrentLink,
                 downloadState = downloadState,
             )
         } catch (e: SQLiteConstraintException) {
-            // 捕获articleId和link外键约束异常
+            // 捕获link外键约束异常
             e.printStackTrace()
         }
     }
 
     private fun updateNameInfoToDb() {
         hiltEntryPoint.downloadInfoDao.apply {
-            val lastName = getDownloadName(articleId = articleId, link = torrentLink)
+            val lastName = getDownloadName(link = torrentLink)
             if (lastName == null) {
                 updateAllDownloadVideoInfoToDb()
             } else {
                 if (lastName != name) {
                     updateDownloadName(
-                        articleId = articleId,
                         link = torrentLink,
                         name = name.ifNullOfBlank { lastName },
                     ).apply { setProgressAsync(workDataOf("data" to progress)) }
@@ -401,14 +378,13 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun updateSizeInfoToDb() {
         hiltEntryPoint.downloadInfoDao.apply {
-            val lastSize = getDownloadSize(articleId = articleId, link = torrentLink)
+            val lastSize = getDownloadSize(link = torrentLink)
             if (lastSize == null) {
                 updateAllDownloadVideoInfoToDb()
             } else {
                 val size = sessionManager.stats().totalDownload()
                 if (size != lastSize) {
                     updateDownloadSize(
-                        articleId = articleId,
                         link = torrentLink,
                         size = size,
                     )
@@ -419,13 +395,12 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun updateProgressInfoToDb() {
         hiltEntryPoint.downloadInfoDao.apply {
-            val lastProgress = getDownloadProgress(articleId = articleId, link = torrentLink)
+            val lastProgress = getDownloadProgress(link = torrentLink)
             if (lastProgress == null) {
                 updateAllDownloadVideoInfoToDb()
             } else {
                 if (lastProgress != progress) {
                     updateDownloadProgress(
-                        articleId = articleId,
                         link = torrentLink,
                         progress = progress,
                     ).apply { setProgressAsync(workDataOf("data" to progress)) }
@@ -436,15 +411,14 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun updateDescriptionInfoToDb() {
         hiltEntryPoint.downloadInfoDao.apply {
-            val lastDescription = getDownloadDescription(articleId = articleId, link = torrentLink)
+            val lastDescription = getDownloadDescription(link = torrentLink)
             if (lastDescription == null &&
-                getDownloadInfo(articleId = articleId, link = torrentLink) == null
+                getDownloadInfo(link = torrentLink) == null
             ) {
                 updateAllDownloadVideoInfoToDb()
             } else {
                 if (lastDescription != description) {
                     updateDownloadDescription(
-                        articleId = articleId,
                         link = torrentLink,
                         description = description,
                     )
@@ -455,10 +429,9 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun updateAllDownloadVideoInfoToDb() {
         hiltEntryPoint.downloadInfoDao.apply {
-            val video = getDownloadInfo(articleId = articleId, link = torrentLink)
+            val video = getDownloadInfo(link = torrentLink)
             if (video != null) {
                 updateDownloadInfo(
-                    articleId = articleId,
                     link = torrentLink,
                     name = name.ifNullOfBlank {
                         torrentLink.substringAfterLast('/')
@@ -471,7 +444,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             } else {
                 updateDownloadInfo(
                     DownloadInfoBean(
-                        articleId = articleId,
                         link = torrentLink,
                         name = name.ifNullOfBlank {
                             torrentLink.substringAfterLast('/')
@@ -492,7 +464,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     companion object {
         const val STATE = "state"
         const val TORRENT_LINK = "torrentLink"
-        const val ARTICLE_ID = "articleId"
         const val CHANNEL_ID = "downloadTorrent"
         const val CHANNEL_NAME = "downloadMessage"
 
@@ -511,15 +482,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             appContext, WorkerEntryPoint::class.java
         )
 
-        fun startWorker(context: Context, torrentLink: String, articleId: String) {
+        fun startWorker(context: Context, torrentLink: String) {
             val sendLogsWorkRequest = OneTimeWorkRequestBuilder<DownloadTorrentWorker>()
                 .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .setInputData(
-                    workDataOf(
-                        TORRENT_LINK to torrentLink,
-                        ARTICLE_ID to articleId,
-                    )
-                )
+                .setInputData(workDataOf(TORRENT_LINK to torrentLink))
                 .build()
             WorkManager.getInstance(context).enqueueUniqueWork(
                 torrentLink,
@@ -536,7 +502,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         fun cancel(
             context: Context,
             requestId: String,
-            articleId: String,
             link: String,
             downloadingDirName: String
         ) {
@@ -548,7 +513,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     .flatMapConcat {
                         delay(2000)
                         hiltEntryPoint.downloadRepository.deleteDownloadTaskInfo(
-                            articleId = articleId,
                             link = link,
                             downloadingDirName = downloadingDirName,
                         )

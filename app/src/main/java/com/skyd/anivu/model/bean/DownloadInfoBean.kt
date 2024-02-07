@@ -17,25 +17,13 @@ const val DOWNLOAD_INFO_TABLE_NAME = "DownloadInfo"
 @Entity(
     tableName = DOWNLOAD_INFO_TABLE_NAME,
     primaryKeys = [
-        DownloadInfoBean.ARTICLE_ID_COLUMN,
         DownloadInfoBean.LINK_COLUMN
     ],
-    foreignKeys = [
-        ForeignKey(
-            entity = ArticleBean::class,
-            parentColumns = [ArticleBean.ARTICLE_ID_COLUMN],
-            childColumns = [DownloadInfoBean.ARTICLE_ID_COLUMN],
-            onDelete = ForeignKey.CASCADE
-        )
-    ],
     indices = [
-        Index(DownloadInfoBean.ARTICLE_ID_COLUMN, unique = true),
         Index(DownloadInfoBean.LINK_COLUMN, unique = true),
     ]
 )
 data class DownloadInfoBean(
-    @ColumnInfo(name = ARTICLE_ID_COLUMN)
-    val articleId: String,
     @ColumnInfo(name = LINK_COLUMN)
     val link: String,
     @ColumnInfo(name = NAME_COLUMN)
@@ -61,7 +49,6 @@ data class DownloadInfoBean(
 
 
     companion object {
-        const val ARTICLE_ID_COLUMN = "articleId"
         const val LINK_COLUMN = "link"
         const val NAME_COLUMN = "name"
         const val DOWNLOADING_DIR_NAME_COLUMN = "downloadingDirName"
@@ -81,7 +68,7 @@ data class DownloadInfoBean(
     }
 
     override fun sameAs(o: Any?): Boolean {
-        return o is DownloadInfoBean && articleId == o.articleId && link == o.link
+        return o is DownloadInfoBean && link == o.link
     }
 
     override fun contentSameAs(o: Any?): Boolean {

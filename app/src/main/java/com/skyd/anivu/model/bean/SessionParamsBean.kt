@@ -16,16 +16,9 @@ const val SESSION_PARAMS_TABLE_NAME = "SessionParams"
 @Entity(
     tableName = SESSION_PARAMS_TABLE_NAME,
     primaryKeys = [
-        DownloadInfoBean.ARTICLE_ID_COLUMN,
         DownloadInfoBean.LINK_COLUMN
     ],
     foreignKeys = [
-        ForeignKey(
-            entity = DownloadInfoBean::class,
-            parentColumns = [DownloadInfoBean.ARTICLE_ID_COLUMN],
-            childColumns = [SessionParamsBean.ARTICLE_ID_COLUMN],
-            onDelete = ForeignKey.CASCADE
-        ),
         ForeignKey(
             entity = DownloadInfoBean::class,
             parentColumns = [DownloadInfoBean.LINK_COLUMN],
@@ -34,20 +27,16 @@ const val SESSION_PARAMS_TABLE_NAME = "SessionParams"
         )
     ],
     indices = [
-        Index(SessionParamsBean.ARTICLE_ID_COLUMN),
         Index(SessionParamsBean.LINK_COLUMN),
     ]
 )
 data class SessionParamsBean(
-    @ColumnInfo(name = ARTICLE_ID_COLUMN)
-    val articleId: String,
     @ColumnInfo(name = LINK_COLUMN)
     val link: String,
     @ColumnInfo(name = DATA_COLUMN, typeAffinity = ColumnInfo.BLOB)
     val data: ByteArray,
 ) : BaseBean, Parcelable {
     companion object {
-        const val ARTICLE_ID_COLUMN = "articleId"
         const val LINK_COLUMN = "link"
         const val DATA_COLUMN = "data"
     }
@@ -58,14 +47,12 @@ data class SessionParamsBean(
 
         other as SessionParamsBean
 
-        if (articleId != other.articleId) return false
         if (link != other.link) return false
         return data.contentEquals(other.data)
     }
 
     override fun hashCode(): Int {
-        var result = articleId.hashCode()
-        result = 31 * result + link.hashCode()
+        var result = link.hashCode()
         result = 31 * result + data.contentHashCode()
         return result
     }
