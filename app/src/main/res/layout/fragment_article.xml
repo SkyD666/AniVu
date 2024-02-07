@@ -18,7 +18,9 @@
             android:minHeight="?attr/actionBarSize"
             app:navigationContentDescription="@string/back"
             app:navigationIcon="@drawable/ic_arrow_back_24"
-            app:title="@string/article_fragment_name" />
+            app:subtitleCentered="true"
+            app:title="@string/article_fragment_name"
+            app:titleCentered="true" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

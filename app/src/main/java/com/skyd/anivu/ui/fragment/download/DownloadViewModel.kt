@@ -55,16 +55,6 @@ class DownloadViewModel @Inject constructor(
                 }.startWith(DownloadPartialStateChange.DownloadListResult.Loading)
                     .catchMap { DownloadPartialStateChange.DownloadListResult.Failed(it.message.toString()) }
             },
-            filterIsInstance<DownloadIntent.DeleteDownloadTaskInfo>().flatMapConcat { intent ->
-                downloadRepo.deleteDownloadTaskInfo(
-                    articleId = intent.articleId,
-                    link = intent.link,
-                    file = intent.file,
-                ).map {
-                    DownloadPartialStateChange.DeleteDownloadTaskInfoResult.Success
-                }.startWith(DownloadPartialStateChange.LoadingDialog.Show)
-                    .catchMap { DownloadPartialStateChange.DeleteDownloadTaskInfoResult.Failed(it.message.toString()) }
-            },
         )
     }
 }

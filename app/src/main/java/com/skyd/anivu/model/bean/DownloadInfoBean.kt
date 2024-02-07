@@ -40,14 +40,16 @@ data class DownloadInfoBean(
     val link: String,
     @ColumnInfo(name = NAME_COLUMN)
     val name: String,
-    @ColumnInfo(name = FILE_COLUMN)
-    var file: String?,
+    @ColumnInfo(name = DOWNLOADING_DIR_NAME_COLUMN)
+    var downloadingDirName: String,
     @ColumnInfo(name = DOWNLOAD_DATE_COLUMN)
     var downloadDate: Long,
     @ColumnInfo(name = SIZE_COLUMN)
     val size: Long,
     @ColumnInfo(name = PROGRESS_COLUMN)
     val progress: Float,
+    @ColumnInfo(name = DESCRIPTION_COLUMN)
+    val description: String? = null,
     @ColumnInfo(name = DOWNLOAD_STATE_COLUMN)
     val downloadState: DownloadState = DownloadState.Init,
     @ColumnInfo(name = DOWNLOAD_REQUEST_ID_COLUMN)
@@ -62,17 +64,19 @@ data class DownloadInfoBean(
         const val ARTICLE_ID_COLUMN = "articleId"
         const val LINK_COLUMN = "link"
         const val NAME_COLUMN = "name"
-        const val FILE_COLUMN = "file"
+        const val DOWNLOADING_DIR_NAME_COLUMN = "downloadingDirName"
         const val DOWNLOAD_DATE_COLUMN = "downloadDate"
         const val SIZE_COLUMN = "size"
         const val PROGRESS_COLUMN = "progress"
+        const val DESCRIPTION_COLUMN = "description"
         const val DOWNLOAD_STATE_COLUMN = "downloadState"
         const val DOWNLOAD_REQUEST_ID_COLUMN = "downloadRequestId"
 
         const val PAYLOAD_PROGRESS = "progress"
+        const val PAYLOAD_DESCRIPTION = "description"
         const val PAYLOAD_DOWNLOAD_STATE = "downloadState"
         const val PAYLOAD_NAME = "name"
-        const val PAYLOAD_FILE = "file"
+        const val PAYLOAD_DOWNLOADING_DIR_NAME = "downloadingDirName"
         const val PAYLOAD_SIZE = "size"
     }
 
@@ -89,9 +93,10 @@ data class DownloadInfoBean(
 
         val list: MutableList<Any> = mutableListOf()
         if (progress != o.progress) list += PAYLOAD_PROGRESS
+        if (description != o.description) list += PAYLOAD_DESCRIPTION
         if (downloadState != o.downloadState) list += PAYLOAD_DOWNLOAD_STATE
         if (name != o.name) list += PAYLOAD_NAME
-        if (file != o.file) list += PAYLOAD_FILE
+        if (downloadingDirName != o.downloadingDirName) list += PAYLOAD_DOWNLOADING_DIR_NAME
         if (size != o.size) list += PAYLOAD_SIZE
         return list.ifEmpty { null }
     }

@@ -3,8 +3,6 @@ package com.skyd.anivu.ui.activity
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsets
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -37,7 +35,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
         // Add a listener to update the behavior of the toggle fullscreen button when
         // the system bars are hidden or revealed.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             window.decorView.setOnApplyWindowInsetsListener { view, windowInsets ->
                 // You can hide the caption bar even when the other system bars are visible.
                 // To account for this, explicitly check the visibility of navigationBars()
@@ -79,6 +77,18 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
         binding.playerView.player?.stop()
         binding.playerView.player?.release()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        binding.playerView.player?.play()
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        binding.playerView.player?.pause()
     }
 
     override fun getViewBinding() = ActivityPlayBinding.inflate(layoutInflater)

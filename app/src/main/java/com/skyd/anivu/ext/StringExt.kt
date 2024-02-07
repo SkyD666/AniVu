@@ -14,6 +14,10 @@ fun String.toEncodedUrl(): String {
     return Uri.encode(this, ":/-![].,%?&=")
 }
 
+fun String.toDecodedUrl(): String {
+    return Uri.decode(this)
+}
+
 fun String.toHtml(@SuppressLint("InlinedApi") flag: Int = Html.FROM_HTML_MODE_LEGACY): Spanned {
     return Html.fromHtml(this, flag)
 }
@@ -33,3 +37,33 @@ fun String.copy(context: Context) {
         e.printStackTrace()
     }
 }
+
+fun String.validateFileName(maxFilenameLength: Int = 255): String {
+    if (isEmpty()) {
+        return ""
+    }
+
+    // 获取文件名和后缀名
+    var name: String = this
+    var extension = ""
+    val dotIndex = lastIndexOf(".")
+    if (dotIndex != -1) {
+        name = substring(0, dotIndex)
+        extension = substring(dotIndex)
+    }
+
+    // 检查文件名长度
+    if (length > maxFilenameLength) {
+        // 如果文件名过长，则截断后半部分
+        name = name.substring(0, maxFilenameLength - extension.length)
+    }
+
+    // 去除文件名中的非法字符
+    name = name.replace("[\\\\/:*?\"<>|]".toRegex(), "")
+
+    // 返回合法的文件名和后缀名
+    return name + extension
+}
+
+fun <C : CharSequence> C?.ifNullOfBlank(defaultValue: () -> C): C =
+    if (!isNullOrBlank()) this else defaultValue()

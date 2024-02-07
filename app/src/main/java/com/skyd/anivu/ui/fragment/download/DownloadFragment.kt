@@ -9,14 +9,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.work.WorkManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentDownloadBinding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.startWith
-import com.skyd.anivu.model.worker.DownloadTorrentWorker
+import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.Download1Proxy
@@ -25,7 +24,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import java.util.UUID
 
 @AndroidEntryPoint
 class DownloadFragment : BaseFragment<FragmentDownloadBinding>() {
@@ -49,20 +47,12 @@ class DownloadFragment : BaseFragment<FragmentDownloadBinding>() {
                     )
                 },
                 onCancel = { video ->
-                    WorkManager.getInstance(requireContext())
-                        .getWorkInfoByIdFlow(UUID.fromString(video.downloadRequestId))
-                        .collectIn(viewLifecycleOwner) {
-                            intents.trySend(
-                                DownloadIntent.DeleteDownloadTaskInfo(
-                                    articleId = video.articleId,
-                                    link = video.link,
-                                    file = video.file,
-                                )
-                            )
-                        }
-                    DownloadTorrentWorker.pause(
+                    DownloadTorrentWorker.cancel(
                         context = requireContext(),
                         requestId = video.downloadRequestId,
+                        articleId = video.articleId,
+                        link = video.link,
+                        downloadingDirName = video.downloadingDirName,
                     )
                 },
             )

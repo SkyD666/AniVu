@@ -40,6 +40,9 @@ class Download1Proxy(
             if (data !is DownloadInfoBean) return@setOnClickListener
 
             onCancel(data)
+
+            it.disable()
+            holder.btnDownload1Pause.disable()
         }
 
         return holder
@@ -51,9 +54,10 @@ class Download1Proxy(
         index: Int,
         action: ((Any?) -> Unit)?
     ) {
-        holder.tvDownload1Name.text = data.name
+        updateName(holder, data)
         updateProgress(holder, data)
-        updateButtonState(holder, data)
+        updateDescription(holder, data)
+        updateButtonProgressStateAndDescription(holder, data)
     }
 
     override fun onBindViewHolder(
@@ -75,15 +79,19 @@ class Download1Proxy(
                             updateProgress(holder, data)
                         }
 
+                        DownloadInfoBean.PAYLOAD_DESCRIPTION -> {
+                            updateDescription(holder, data)
+                        }
+
                         DownloadInfoBean.PAYLOAD_DOWNLOAD_STATE -> {
-                            updateButtonState(holder, data)
+                            updateButtonProgressStateAndDescription(holder, data)
                         }
 
                         DownloadInfoBean.PAYLOAD_NAME -> {
-                            holder.tvDownload1Name.text = data.name
+                            updateName(holder, data)
                         }
 
-                        DownloadInfoBean.PAYLOAD_FILE -> {
+                        DownloadInfoBean.PAYLOAD_DOWNLOADING_DIR_NAME -> {
                         }
 
                         DownloadInfoBean.PAYLOAD_SIZE -> {
@@ -117,7 +125,23 @@ class Download1Proxy(
         }
     }
 
-    private fun updateButtonState(
+    private fun updateName(
+        holder: Download1ViewHolder,
+        data: DownloadInfoBean,
+    ) {
+        holder.tvDownload1Name.text = data.name
+    }
+
+    private fun updateDescription(
+        holder: Download1ViewHolder,
+        data: DownloadInfoBean,
+    ) {
+        if (data.downloadState == DownloadInfoBean.DownloadState.Downloading) {
+            holder.tvDownload1Description.text = data.description
+        }
+    }
+
+    private fun updateButtonProgressStateAndDescription(
         holder: Download1ViewHolder,
         data: DownloadInfoBean,
     ) {
@@ -126,19 +150,35 @@ class Download1Proxy(
                 holder.btnDownload1Pause.enable()
                 holder.btnDownload1Pause.setIconResource(R.drawable.ic_pause_24)
                 holder.btnDownload1Cancel.enable()
+                holder.tvDownload1Description.text = data.description
+                holder.lpDownload1.isIndeterminate = false
             }
 
             DownloadInfoBean.DownloadState.Paused -> {
                 holder.btnDownload1Pause.enable()
                 holder.btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
                 holder.btnDownload1Cancel.enable()
+                holder.tvDownload1Description.text =
+                    holder.itemView.context.getString(R.string.download_paused)
+                holder.lpDownload1.isIndeterminate = false
             }
 
-            DownloadInfoBean.DownloadState.Init,
+            DownloadInfoBean.DownloadState.Init -> {
+                holder.btnDownload1Pause.disable()
+                holder.btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
+                holder.btnDownload1Cancel.enable()
+                holder.tvDownload1Description.text =
+                    holder.itemView.context.getString(R.string.download_initializing)
+                holder.lpDownload1.isIndeterminate = true
+            }
+
             DownloadInfoBean.DownloadState.Completed -> {
                 holder.btnDownload1Pause.disable()
                 holder.btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
-                holder.btnDownload1Cancel.disable()
+                holder.btnDownload1Cancel.enable()
+                holder.tvDownload1Description.text =
+                    holder.itemView.context.getString(R.string.download_completed)
+                holder.lpDownload1.isIndeterminate = false
             }
         }
     }

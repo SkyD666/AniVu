@@ -10,11 +10,11 @@
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tv_article_1_title"
-        style="?attr/textAppearanceTitleMedium"
+        style="?attr/textAppearanceTitleSmall"
         android:layout_width="0px"
         android:layout_height="wrap_content"
         android:ellipsize="end"
-        android:maxLines="2"
+        android:maxLines="3"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toStartOf="@id/cv_article_1_image"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
         android:ellipsize="end"
-        android:maxLines="3"
+        android:maxLines="2"
         app:layout_constrainedWidth="true"
         app:layout_constraintEnd_toEndOf="@id/tv_article_1_title"
         app:layout_constraintStart_toStartOf="parent"

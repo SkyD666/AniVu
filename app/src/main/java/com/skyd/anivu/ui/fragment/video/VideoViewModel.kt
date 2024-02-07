@@ -64,12 +64,12 @@ class VideoViewModel @Inject constructor(
     private fun SharedFlow<VideoIntent>.toVideoPartialStateChangeFlow(): Flow<VideoPartialStateChange> {
         return merge(
             merge(
-                filterIsInstance<VideoIntent.Init>(),
-                filterIsInstance<VideoIntent.Refresh>(),
+                filterIsInstance<VideoIntent.Init>().filterNot { it.path.isNullOrBlank() },
+                filterIsInstance<VideoIntent.Refresh>().filterNot { it.path.isNullOrBlank() },
             ).flatMapConcat { intent ->
                 val path = if (intent is VideoIntent.Init) intent.path
                 else (intent as VideoIntent.Refresh).path
-                videoRepo.requestVideos(path = path).map {
+                videoRepo.requestVideos(path = path!!).map {
                     VideoPartialStateChange.VideoListResult.Success(videoList = it)
                 }.startWith(VideoPartialStateChange.VideoListResult.Loading)
             },

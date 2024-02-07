@@ -130,7 +130,6 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
             onSuccess = {
                 intents
                     .consumeAsFlow()
-                    .startWith(VideoIntent.Init(path))
                     .onEach(viewModel::processIntent)
                     .launchIn(lifecycleScope)
 
@@ -172,6 +171,14 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
     }
 
     private fun List<Any>.addHeader() = if (hasParentDir) this + parentDirBean else this
+
+    override fun onResume() {
+        super.onResume()
+
+        if (!path.isNullOrBlank()) {
+            intents.trySend(VideoIntent.Refresh(path))
+        }
+    }
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentVideoBinding.inflate(inflater, container, false)

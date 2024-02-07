@@ -33,6 +33,7 @@ class Enclosure1ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
 class Download1ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val tvDownload1Name: TextView = view.findViewById(R.id.tv_download_1_name)
+    val tvDownload1Description: TextView = view.findViewById(R.id.tv_download_1_description)
     val tvDownload1Progress: TextView = view.findViewById(R.id.tv_download_1_progress)
     val lpDownload1: LinearProgressIndicator = view.findViewById(R.id.lp_download_1)
     val btnDownload1Pause: MaterialButton = view.findViewById(R.id.btn_download_1_pause)

@@ -10,6 +10,8 @@ plugins {
     id("com.google.dagger.hilt.android")
 }
 
+apply(from = "../secret.gradle.kts")
+
 android {
     namespace = "com.skyd.anivu"
     compileSdk = 34
@@ -28,13 +30,51 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            // You need to specify either an absolute path or include the
+            // keystore file in the same directory as the build.gradle file.
+            @Suppress("UNCHECKED_CAST")
+            val sign = ((extra["secret"] as Map<*, *>)["sign"] as Map<String, String>)
+            storeFile = file("../key.jks")
+            storePassword = sign["RELEASE_STORE_PASSWORD"]
+            keyAlias = sign["RELEASE_KEY_ALIAS"]
+            keyPassword = sign["RELEASE_KEY_PASSWORD"]
+        }
+    }
+
+    flavorDimensions += "version"
+    productFlavors {
+        create("GitHub") {
+            dimension = "version"
+        }
+    }
+
     buildTypes {
-        release {
+        debug {
             isMinifyEnabled = false
+            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            applicationIdSuffix = ".debug"    // 一台手机debug release共存
+            ndk {
+                abiFilters += mutableSetOf("armeabi", "x86", "x86_64", "arm64-v8a")
+            }
+        }
+        release {
+            signingConfig = signingConfigs.getByName("release")    //签名
+            isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            ndk {
+                //noinspection ChromeOsAbiSupport
+                abiFilters += "arm64-v8a"
+            }
         }
     }
     compileOptions {

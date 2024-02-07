@@ -1,7 +1,9 @@
 package com.skyd.anivu.ui.fragment.read
 
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
@@ -9,7 +11,7 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseBottomSheetDialogFragment
 import com.skyd.anivu.databinding.BottomSheetEnclosureBinding
 import com.skyd.anivu.model.bean.EnclosureBean
-import com.skyd.anivu.model.worker.DownloadTorrentWorker
+import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.Enclosure1Proxy
@@ -19,11 +21,40 @@ class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureB
         const val TAG = "ModalBottomSheet"
     }
 
+    private val registerPostNotificationPermission = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { resultMap ->
+        if (!resultMap.containsValue(false)) {
+            waitingDownloadList.removeIf {
+                DownloadTorrentWorker.startWorker(
+                    context = requireContext(),
+                    articleId = it.articleId,
+                    torrentLink = it.url
+                )
+                true
+            }
+        }
+    }
+
+    private val waitingDownloadList = mutableListOf<EnclosureBean>()
+
     private val adapter = VarietyAdapter(
         mutableListOf(Enclosure1Proxy(onDownload = {
-            DownloadTorrentWorker.startWorker(
-                context = requireContext(), articleId = it.articleId, torrentLink = it.url
-            )
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                waitingDownloadList += it
+                registerPostNotificationPermission.launch(
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                        arrayOf(
+                            android.Manifest.permission.POST_NOTIFICATIONS,
+                            android.Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE,
+                        )
+                    } else arrayOf(android.Manifest.permission.POST_NOTIFICATIONS)
+                )
+            } else {
+                DownloadTorrentWorker.startWorker(
+                    context = requireContext(), articleId = it.articleId, torrentLink = it.url
+                )
+            }
         }))
     )
 
