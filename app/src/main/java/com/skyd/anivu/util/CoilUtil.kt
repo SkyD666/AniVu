@@ -8,14 +8,12 @@ import coil.ImageLoader
 import coil.imageLoader
 import coil.load
 import coil.request.ImageRequest
-import coil.util.DebugLogger
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import okhttp3.OkHttpClient
 import java.net.URL
 
 
@@ -23,20 +21,14 @@ object CoilUtil {
     @EntryPoint
     @InstallIn(SingletonComponent::class)
     interface CoilUtilEntryPoint {
-        val okHttpClient: OkHttpClient
+        val imageLoader: ImageLoader
     }
 
     private val hiltEntryPoint =
         EntryPointAccessors.fromApplication(appContext, CoilUtilEntryPoint::class.java)
 
-    private val imageLoader: ImageLoader = ImageLoader.Builder(appContext)
-        .okHttpClient(hiltEntryPoint.okHttpClient)
-        .crossfade(400)
-        .apply { debug { logger(DebugLogger()) } }
-        .build()
-
     init {
-        Coil.setImageLoader(imageLoader)
+        Coil.setImageLoader(hiltEntryPoint.imageLoader)
     }
 
     fun ImageView.loadImage(

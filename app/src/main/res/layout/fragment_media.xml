@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.fragment.video.VideoFragment">
+    tools:context=".ui.fragment.media.MediaFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -18,7 +18,7 @@
             android:minHeight="?attr/actionBarSize"
             app:navigationContentDescription="@string/back"
             app:subtitleCentered="true"
-            app:title="@string/video_fragment_name"
+            app:title="@string/media_fragment_name"
             app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -36,9 +36,12 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
 
     private var waitingDialog: AlertDialog? = null
     private val adapter = VarietyAdapter(
-        mutableListOf(Feed1Proxy(
-            onRemove = { intents.trySend(FeedIntent.RemoveFeed(it.url)) }
-        ))
+        mutableListOf(
+            Feed1Proxy(
+                onRemove = { intents.trySend(FeedIntent.RemoveFeed(it.url)) },
+                onEdit = {},
+            )
+        )
     )
 
     private fun updateState(feedState: FeedState) {
@@ -122,7 +125,6 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
         divider.isLastItemDecorated = false
         rvFeedFragment.addItemDecoration(divider)
         rvFeedFragment.adapter = adapter
-        registerForContextMenu(rvFeedFragment)
 
         binding.fabFeedFragment.setOnClickListener {
             InputDialogBuilder(requireContext())

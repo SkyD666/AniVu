@@ -9,8 +9,8 @@ import kotlinx.coroutines.flow.flowOn
 import java.io.File
 import javax.inject.Inject
 
-class VideoRepository @Inject constructor() : BaseRepository() {
-    fun requestVideos(path: String): Flow<List<VideoBean>> {
+class MediaRepository @Inject constructor() : BaseRepository() {
+    fun requestMedias(path: String): Flow<List<VideoBean>> {
         return flow {
             val fileList = File(path).listFiles()
                 .orEmpty()

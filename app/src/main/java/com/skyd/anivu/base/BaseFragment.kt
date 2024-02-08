@@ -54,7 +54,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         onActionClick: (View) -> Unit? = {},
     ) {
         Snackbar.make(
-            requireActivity().findViewById(android.R.id.content),
+            binding.root,
             text,
             duration
         ).run {

@@ -63,7 +63,7 @@ class RssHelper @Inject constructor(
         } catch (e: Exception) {
             e.printStackTrace()
             Log.e("RLog", "queryRssXml[${feed.title}]: ${e.message}")
-            listOf()
+            throw e
         }
 
     private fun article(

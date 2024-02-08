@@ -58,15 +58,15 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            applicationIdSuffix = ".debug"    // 一台手机debug release共存
+            applicationIdSuffix = ".debug"
             ndk {
                 abiFilters += mutableSetOf("armeabi", "x86", "x86_64", "arm64-v8a")
             }
         }
         release {
-            signingConfig = signingConfigs.getByName("release")    //签名
-            isMinifyEnabled = false
-            isShrinkResources = false
+            signingConfig = signingConfigs.getByName("release")    // signing
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -87,6 +87,9 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+    }
+    packaging {
+        resources.excludes += "DebugProbesKt.bin"
     }
 }
 
@@ -133,7 +136,6 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-dash:1.2.1")
     implementation("androidx.media3:media3-ui:1.2.1")
     implementation("org.libtorrent4j:libtorrent4j-android-arm64:2.1.0-31")
-//    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

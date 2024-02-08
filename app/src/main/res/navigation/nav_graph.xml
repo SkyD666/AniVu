@@ -64,9 +64,9 @@
 
     <fragment
         android:id="@+id/video_fragment"
-        android:name="com.skyd.anivu.ui.fragment.video.VideoFragment"
-        android:label="@string/video_fragment_name"
-        tools:layout="@layout/fragment_video">
+        android:name="com.skyd.anivu.ui.fragment.media.MediaFragment"
+        android:label="@string/media_fragment_name"
+        tools:layout="@layout/fragment_media">
 
         <argument
             android:name="path"

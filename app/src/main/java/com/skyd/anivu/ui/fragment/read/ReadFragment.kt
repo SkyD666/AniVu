@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.fragment.read
 
 import android.os.Bundle
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +12,11 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentReadBinding
 import com.skyd.anivu.ext.collectIn
+import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.startWith
+import com.skyd.anivu.ext.toHtml
+import com.skyd.anivu.util.html.ImageGetter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -46,7 +50,24 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
             }
 
             is ArticleState.Success -> {
-                enclosureBottomSheet?.updateData(articleState.article.enclosures)
+                val article = articleState.article
+                binding.tvReadFragmentContent.post {
+                    binding.tvReadFragmentContent.text = article.article.content
+                        .ifNullOfBlank { article.article.description.orEmpty() }
+                        .toHtml(
+                            imageGetter = ImageGetter(
+                                context = requireContext(),
+                                maxWidth = { binding.tvReadFragmentContent.width },
+                                onSuccess = { _, _ ->
+                                    binding.tvReadFragmentContent.text =
+                                        binding.tvReadFragmentContent.text
+                                }
+                            ),
+                            tagHandler = null,
+                        )
+                }
+
+                enclosureBottomSheet?.updateData(article.enclosures)
             }
         }
     }
@@ -71,6 +92,9 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
 
     override fun FragmentReadBinding.initView() {
         topAppBar.setNavigationOnClickListener { findNavController().popBackStackWithLifecycle() }
+
+        tvReadFragmentContent.movementMethod = LinkMovementMethod.getInstance()
+
         fabReadFragment.setOnClickListener {
             enclosureBottomSheet = EnclosureBottomSheet()
             enclosureBottomSheet?.show(

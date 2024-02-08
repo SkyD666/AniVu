@@ -58,16 +58,14 @@ class ArticleFragment : BaseFragment<FragmentArticleBinding>() {
             waitingDialog?.dismiss()
             waitingDialog = null
         }
-        when (val feedListState = articleState.articleListState) {
+        when (val feedListState = articleState.articleListState.apply {
+            binding.srlArticleFragment.isRefreshing = loading
+        }) {
             is ArticleListState.Failed -> {
                 adapter.dataList = emptyList()
             }
 
             ArticleListState.Init -> {
-                adapter.dataList = emptyList()
-            }
-
-            ArticleListState.Loading -> {
                 adapter.dataList = emptyList()
             }
 
@@ -110,6 +108,10 @@ class ArticleFragment : BaseFragment<FragmentArticleBinding>() {
 
     override fun FragmentArticleBinding.initView() {
         topAppBar.setNavigationOnClickListener { findNavController().popBackStackWithLifecycle() }
+
+        srlArticleFragment.setOnRefreshListener {
+            intents.trySend(ArticleIntent.Refresh(feedUrl!!))
+        }
 
         rvArticleFragment.layoutManager = GridLayoutManager(
             requireContext(),

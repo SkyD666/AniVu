@@ -3,8 +3,8 @@ package com.skyd.anivu.ui.adapter.variety.proxy
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
 import com.skyd.anivu.R
+import com.skyd.anivu.databinding.ItemDownload1Binding
 import com.skyd.anivu.ext.disable
 import com.skyd.anivu.ext.enable
 import com.skyd.anivu.model.bean.DownloadInfoBean
@@ -18,14 +18,14 @@ class Download1Proxy(
     private val onPause: (DownloadInfoBean) -> Unit,
     private val onResume: (DownloadInfoBean) -> Unit,
     private val onCancel: (DownloadInfoBean) -> Unit,
-) : VarietyAdapter.Proxy<DownloadInfoBean, Download1ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+) : VarietyAdapter.Proxy<DownloadInfoBean, ItemDownload1Binding, Download1ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Download1ViewHolder {
         val holder = Download1ViewHolder(
-            view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_download_1, parent, false),
+            ItemDownload1Binding
+                .inflate(LayoutInflater.from(parent.context), parent, false),
         )
 
-        holder.btnDownload1Pause.setOnClickListener {
+        holder.binding.btnDownload1Pause.setOnClickListener {
             val data = adapter.dataList.getOrNull(holder.bindingAdapterPosition)
             if (data !is DownloadInfoBean) return@setOnClickListener
 
@@ -35,14 +35,14 @@ class Download1Proxy(
                 else -> Unit
             }
         }
-        holder.btnDownload1Cancel.setOnClickListener {
+        holder.binding.btnDownload1Cancel.setOnClickListener {
             val data = adapter.dataList.getOrNull(holder.bindingAdapterPosition)
             if (data !is DownloadInfoBean) return@setOnClickListener
 
             onCancel(data)
 
             it.disable()
-            holder.btnDownload1Pause.disable()
+            holder.binding.btnDownload1Pause.disable()
         }
 
         return holder
@@ -106,21 +106,23 @@ class Download1Proxy(
         holder: Download1ViewHolder,
         data: DownloadInfoBean,
     ) {
-        holder.tvDownload1Progress.text = floatToPercentage(data.progress)
-        when (data.downloadState) {
-            DownloadInfoBean.DownloadState.Downloading,
-            DownloadInfoBean.DownloadState.Paused -> {
-                holder.lpDownload1.isIndeterminate = false
-                holder.lpDownload1.progress = (data.progress * 100).toInt()
-            }
+        holder.binding.apply {
+            tvDownload1Progress.text = floatToPercentage(data.progress)
+            when (data.downloadState) {
+                DownloadInfoBean.DownloadState.Downloading,
+                DownloadInfoBean.DownloadState.Paused -> {
+                    lpDownload1.isIndeterminate = false
+                    lpDownload1.progress = (data.progress * 100).toInt()
+                }
 
-            DownloadInfoBean.DownloadState.Init -> {
-                holder.lpDownload1.isIndeterminate = true
-            }
+                DownloadInfoBean.DownloadState.Init -> {
+                    lpDownload1.isIndeterminate = true
+                }
 
-            DownloadInfoBean.DownloadState.Completed -> {
-                holder.lpDownload1.isIndeterminate = false
-                holder.lpDownload1.progress = 100
+                DownloadInfoBean.DownloadState.Completed -> {
+                    lpDownload1.isIndeterminate = false
+                    lpDownload1.progress = 100
+                }
             }
         }
     }
@@ -129,7 +131,7 @@ class Download1Proxy(
         holder: Download1ViewHolder,
         data: DownloadInfoBean,
     ) {
-        holder.tvDownload1Name.text = data.name
+        holder.binding.tvDownload1Name.text = data.name
     }
 
     private fun updateDescription(
@@ -137,7 +139,7 @@ class Download1Proxy(
         data: DownloadInfoBean,
     ) {
         if (data.downloadState == DownloadInfoBean.DownloadState.Downloading) {
-            holder.tvDownload1Description.text = data.description
+            holder.binding.tvDownload1Description.text = data.description
         }
     }
 
@@ -145,40 +147,42 @@ class Download1Proxy(
         holder: Download1ViewHolder,
         data: DownloadInfoBean,
     ) {
-        when (data.downloadState) {
-            DownloadInfoBean.DownloadState.Downloading -> {
-                holder.btnDownload1Pause.enable()
-                holder.btnDownload1Pause.setIconResource(R.drawable.ic_pause_24)
-                holder.btnDownload1Cancel.enable()
-                holder.tvDownload1Description.text = data.description
-                holder.lpDownload1.isIndeterminate = false
-            }
+        holder.binding.apply {
+            when (data.downloadState) {
+                DownloadInfoBean.DownloadState.Downloading -> {
+                    btnDownload1Pause.enable()
+                    btnDownload1Pause.setIconResource(R.drawable.ic_pause_24)
+                    btnDownload1Cancel.enable()
+                    tvDownload1Description.text = data.description
+                    lpDownload1.isIndeterminate = false
+                }
 
-            DownloadInfoBean.DownloadState.Paused -> {
-                holder.btnDownload1Pause.enable()
-                holder.btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
-                holder.btnDownload1Cancel.enable()
-                holder.tvDownload1Description.text =
-                    holder.itemView.context.getString(R.string.download_paused)
-                holder.lpDownload1.isIndeterminate = false
-            }
+                DownloadInfoBean.DownloadState.Paused -> {
+                    btnDownload1Pause.enable()
+                    btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
+                    btnDownload1Cancel.enable()
+                    tvDownload1Description.text =
+                        holder.itemView.context.getString(R.string.download_paused)
+                    lpDownload1.isIndeterminate = false
+                }
 
-            DownloadInfoBean.DownloadState.Init -> {
-                holder.btnDownload1Pause.disable()
-                holder.btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
-                holder.btnDownload1Cancel.enable()
-                holder.tvDownload1Description.text =
-                    holder.itemView.context.getString(R.string.download_initializing)
-                holder.lpDownload1.isIndeterminate = true
-            }
+                DownloadInfoBean.DownloadState.Init -> {
+                    btnDownload1Pause.disable()
+                    btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
+                    btnDownload1Cancel.enable()
+                    tvDownload1Description.text =
+                        holder.itemView.context.getString(R.string.download_initializing)
+                    lpDownload1.isIndeterminate = true
+                }
 
-            DownloadInfoBean.DownloadState.Completed -> {
-                holder.btnDownload1Pause.disable()
-                holder.btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
-                holder.btnDownload1Cancel.enable()
-                holder.tvDownload1Description.text =
-                    holder.itemView.context.getString(R.string.download_completed)
-                holder.lpDownload1.isIndeterminate = false
+                DownloadInfoBean.DownloadState.Completed -> {
+                    btnDownload1Pause.disable()
+                    btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
+                    btnDownload1Cancel.enable()
+                    tvDownload1Description.text =
+                        holder.itemView.context.getString(R.string.download_completed)
+                    lpDownload1.isIndeterminate = false
+                }
             }
         }
     }

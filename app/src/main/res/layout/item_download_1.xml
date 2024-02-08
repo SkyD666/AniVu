@@ -64,7 +64,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_download_1_description"
             tools:text="123 MB" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_download_1_pause"
             style="?attr/materialIconButtonStyle"
             android:layout_width="wrap_content"
@@ -75,7 +75,7 @@
             app:layout_constraintEnd_toStartOf="@+id/btn_download_1_cancel"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_download_1_cancel"
             style="?attr/materialIconButtonStyle"
             android:layout_width="wrap_content"

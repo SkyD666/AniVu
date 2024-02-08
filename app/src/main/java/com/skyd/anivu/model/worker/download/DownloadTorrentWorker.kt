@@ -161,6 +161,11 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             }
             when (hiltEntryPoint.downloadInfoDao.getDownloadState(link = torrentLink)) {
                 null,
+                    // 重新下载
+                DownloadInfoBean.DownloadState.Completed,/* -> {
+                    stop()
+                    continuation.resume(Unit, null)
+                }*/
                 DownloadInfoBean.DownloadState.Init -> {
                     downloadByMagnetOrTorrent(torrentLink, saveDir)
                     updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Downloading)
@@ -170,11 +175,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 DownloadInfoBean.DownloadState.Paused -> {
                     downloadByMagnetOrTorrent(torrentLink, saveDir)
                     updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Downloading)
-                }
-
-                DownloadInfoBean.DownloadState.Completed -> {
-                    stop()
-                    continuation.resume(Unit, null)
                 }
             }
         }

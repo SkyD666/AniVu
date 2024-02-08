@@ -15,9 +15,8 @@ data class ArticleState(
     }
 }
 
-sealed interface ArticleListState {
-    data class Success(val articleList: List<ArticleBean>) : ArticleListState
-    data object Init : ArticleListState
-    data object Loading : ArticleListState
-    data class Failed(val msg: String) : ArticleListState
+sealed class ArticleListState(var loading: Boolean = false) {
+    class Success(val articleList: List<ArticleBean>) : ArticleListState()
+    data object Init : ArticleListState()
+    data class Failed(val msg: String) : ArticleListState()
 }

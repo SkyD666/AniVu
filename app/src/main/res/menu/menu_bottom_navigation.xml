@@ -9,7 +9,7 @@
         android:id="@+id/item_bottom_navigation_video"
         android:enabled="true"
         android:icon="@drawable/selector_bottom_navigation_video"
-        android:title="@string/video_fragment_name" />
+        android:title="@string/media_fragment_name" />
     <item
         android:id="@+id/item_bottom_navigation_more"
         android:enabled="true"

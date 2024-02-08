@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
@@ -22,7 +20,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -72,12 +69,6 @@ class ArticleViewModel @Inject constructor(
     private fun SharedFlow<ArticleIntent>.toArticlePartialStateChangeFlow(): Flow<ArticlePartialStateChange> {
         return merge(
             filterIsInstance<ArticleIntent.Init>().flatMapConcat { intent ->
-                // 异步同步文章
-                viewModelScope.launch {
-                    articleRepo.refreshArticleList(intent.url)
-                        .catch { }
-                        .collect()
-                }
                 articleRepo.requestArticleList(intent.url).onStart {
                 }.map {
                     ArticlePartialStateChange.ArticleList.Success(articleList = it)
@@ -88,7 +79,7 @@ class ArticleViewModel @Inject constructor(
             filterIsInstance<ArticleIntent.Refresh>().flatMapConcat { intent ->
                 articleRepo.refreshArticleList(intent.url).map {
                     ArticlePartialStateChange.RefreshArticleList.Success
-                }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
+                }.startWith(ArticlePartialStateChange.RefreshArticleList.Loading).catchMap {
                     ArticlePartialStateChange.RefreshArticleList.Failed(it.message.toString())
                 }
             },

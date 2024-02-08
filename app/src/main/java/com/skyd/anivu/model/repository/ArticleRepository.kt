@@ -25,7 +25,10 @@ class ArticleRepository @Inject constructor(
             val articleBeanList = rssHelper.queryRssXml(
                 feed = feedDao.getFeed(feedUrl),
                 latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link
-            )
+            ).ifEmpty {
+                emit(Unit)
+                return@flow
+            }
             emit(articleDao.insertListIfNotExist(articleBeanList.map { articleWithEnclosure ->
                 if (articleWithEnclosure.article.feedUrl != feedUrl) {
                     articleWithEnclosure.copy(

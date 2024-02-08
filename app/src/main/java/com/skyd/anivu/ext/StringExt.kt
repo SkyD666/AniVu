@@ -22,6 +22,14 @@ fun String.toHtml(@SuppressLint("InlinedApi") flag: Int = Html.FROM_HTML_MODE_LE
     return Html.fromHtml(this, flag)
 }
 
+fun String.toHtml(
+    @SuppressLint("InlinedApi") flag: Int = Html.FROM_HTML_MODE_LEGACY,
+    imageGetter: Html.ImageGetter,
+    tagHandler: Html.TagHandler?,
+): Spanned {
+    return Html.fromHtml(this, flag, imageGetter, tagHandler)
+}
+
 fun String.toRemoveHtml(): String {
     return Html.fromHtml(this, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
 }

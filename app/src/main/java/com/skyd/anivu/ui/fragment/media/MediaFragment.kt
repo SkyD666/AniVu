@@ -1,4 +1,4 @@
-package com.skyd.anivu.ui.fragment.video
+package com.skyd.anivu.ui.fragment.media
 
 import android.content.Intent
 import android.os.Bundle
@@ -16,18 +16,17 @@ import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.config.Const
-import com.skyd.anivu.databinding.FragmentVideoBinding
+import com.skyd.anivu.databinding.FragmentMediaBinding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.popBackStackWithLifecycle
-import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.ParentDirBean
 import com.skyd.anivu.ui.activity.PlayActivity
 import com.skyd.anivu.ui.activity.PlayActivity.Companion.VIDEO_URI_KEY
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
+import com.skyd.anivu.ui.adapter.variety.proxy.Media1Proxy
 import com.skyd.anivu.ui.adapter.variety.proxy.ParentDir1Proxy
-import com.skyd.anivu.ui.adapter.variety.proxy.Video1Proxy
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -35,21 +34,21 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
-class VideoFragment : BaseFragment<FragmentVideoBinding>() {
+class MediaFragment : BaseFragment<FragmentMediaBinding>() {
     companion object {
         const val PATH_KEY = "path"
         const val HAS_PARENT_DIR_KEY = "hasParentDir"
     }
 
-    private val viewModel by viewModels<VideoViewModel>()
+    private val viewModel by viewModels<MediaViewModel>()
     private val path by lazy { arguments?.getString(PATH_KEY) ?: Const.VIDEO_DIR.path }
     private val hasParentDir by lazy { arguments?.getBoolean(HAS_PARENT_DIR_KEY) ?: false }
-    private val intents = Channel<VideoIntent>()
+    private val intents = Channel<MediaIntent>()
 
     private var waitingDialog: AlertDialog? = null
     private val adapter = VarietyAdapter(mutableListOf()).apply {
         addProxy(
-            Video1Proxy(
+            Media1Proxy(
                 adapter = this,
                 onPlay = {
                     startActivity(
@@ -68,7 +67,7 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
                     )
                 },
                 onRemove = {
-                    intents.trySend(VideoIntent.Delete(it.file))
+                    intents.trySend(MediaIntent.Delete(it.file))
                 },
             )
         )
@@ -78,8 +77,8 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
     }
     private val parentDirBean = ParentDirBean()
 
-    private fun updateState(videoState: VideoState) {
-        if (videoState.loadingDialog) {
+    private fun updateState(mediaState: MediaState) {
+        if (mediaState.loadingDialog) {
             if (waitingDialog == null || !waitingDialog!!.isShowing) {
                 waitingDialog = MaterialAlertDialogBuilder(requireContext())
                     .setIcon(R.drawable.ic_info_24)
@@ -94,32 +93,27 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
             waitingDialog?.dismiss()
             waitingDialog = null
         }
-        when (val videoListState = videoState.videoListState) {
-            is VideoListState.Failed -> {
-                binding.srlVideoFragment.isRefreshing = false
+        when (val videoListState = mediaState.mediaListState.apply {
+            binding.srlVideoFragment.isRefreshing = loading
+        }) {
+            is MediaListState.Failed -> {
                 adapter.dataList = emptyList<Any>().addHeader()
             }
 
-            VideoListState.Init -> {
-                binding.srlVideoFragment.isRefreshing = true
+            MediaListState.Init -> {
                 adapter.dataList = emptyList<Any>().addHeader()
             }
 
-            VideoListState.Loading -> {
-                binding.srlVideoFragment.isRefreshing = true
-            }
-
-            is VideoListState.Success -> {
-                binding.srlVideoFragment.isRefreshing = false
-                adapter.dataList = videoListState.videoList.addHeader()
+            is MediaListState.Success -> {
+                adapter.dataList = videoListState.list.addHeader()
             }
         }
     }
 
-    private fun showEvent(videoEvent: VideoEvent) {
-        when (videoEvent) {
-            is VideoEvent.DeleteUriResultEvent.Failed -> {
-                showSnackbar(text = videoEvent.msg)
+    private fun showEvent(mediaEvent: MediaEvent) {
+        when (mediaEvent) {
+            is MediaEvent.DeleteUriResultEvent.Failed -> {
+                showSnackbar(text = mediaEvent.msg)
             }
         }
     }
@@ -142,7 +136,7 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
         )
     }
 
-    override fun FragmentVideoBinding.initView() {
+    override fun FragmentMediaBinding.initView() {
         if (hasParentDir) {
             topAppBar.setNavigationIcon(R.drawable.ic_arrow_back_24)
             topAppBar.setNavigationOnClickListener {
@@ -157,7 +151,7 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
         }
 
         srlVideoFragment.setOnRefreshListener {
-            intents.trySend(VideoIntent.Refresh(path))
+            intents.trySend(MediaIntent.Refresh(path))
         }
 
         rvVideoFragment.layoutManager = GridLayoutManager(
@@ -171,7 +165,6 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
         divider.isLastItemDecorated = false
         rvVideoFragment.addItemDecoration(divider)
         rvVideoFragment.adapter = adapter
-        registerForContextMenu(rvVideoFragment)
     }
 
     private fun List<Any>.addHeader() = if (hasParentDir) this + parentDirBean else this
@@ -180,10 +173,10 @@ class VideoFragment : BaseFragment<FragmentVideoBinding>() {
         super.onResume()
 
         if (!path.isNullOrBlank()) {
-            intents.trySend(VideoIntent.Refresh(path))
+            intents.trySend(MediaIntent.Refresh(path))
         }
     }
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =
-        FragmentVideoBinding.inflate(inflater, container, false)
+        FragmentMediaBinding.inflate(inflater, container, false)
 }

@@ -3,8 +3,7 @@ package com.skyd.anivu.ui.adapter.variety.proxy
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
-import com.skyd.anivu.R
+import com.skyd.anivu.databinding.ItemParentDir1Binding
 import com.skyd.anivu.model.bean.ParentDirBean
 import com.skyd.anivu.ui.adapter.variety.ParentDir1ViewHolder
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
@@ -12,11 +11,11 @@ import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 
 class ParentDir1Proxy(
     private val onClick: () -> Unit,
-) : VarietyAdapter.Proxy<ParentDirBean, ParentDir1ViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+) : VarietyAdapter.Proxy<ParentDirBean, ItemParentDir1Binding, ParentDir1ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParentDir1ViewHolder {
         val holder = ParentDir1ViewHolder(
-            view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.item_parent_dir_1, parent, false),
+            ItemParentDir1Binding
+                .inflate(LayoutInflater.from(parent.context), parent, false),
         )
         holder.itemView.setOnClickListener {
             onClick()

@@ -12,9 +12,9 @@
         tools:layout="@layout/fragment_feed" />
     <fragment
         android:id="@+id/item_bottom_navigation_video"
-        android:name="com.skyd.anivu.ui.fragment.video.VideoFragment"
-        android:label="@string/video_fragment_name"
-        tools:layout="@layout/fragment_video" />
+        android:name="com.skyd.anivu.ui.fragment.media.MediaFragment"
+        android:label="@string/media_fragment_name"
+        tools:layout="@layout/fragment_media" />
     <fragment
         android:id="@+id/item_bottom_navigation_more"
         android:name="com.skyd.anivu.ui.fragment.more.MoreFragment"

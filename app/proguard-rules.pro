@@ -20,6 +20,10 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
 
 -keep,allowobfuscation @interface androidx.annotation.Keep
 -keep @androidx.annotation.Keep class * {*;}
@@ -86,9 +90,12 @@ public static final ** CREATOR;
 # ksoap2 XmlPullParser confusion
 -dontwarn org.xmlpull.v1.XmlPullParser
 -dontwarn org.xmlpull.v1.XmlSerializer
--keep class org.xmlpull.v1.* {*;}
+-keep class org.xmlpull.v1.* { *; }
 
 # Rome
 -keep class com.rometools.** { *; }
 
- -keep,allowobfuscation,allowshrinking class com.skyd.anivu.ui.adapter.variety.VarietyAdapter$Proxy
+# VarietyAdapter
+-keep class * extends com.skyd.anivu.ui.adapter.variety.VarietyAdapter$Proxy
+-keep class com.skyd.anivu.ui.adapter.variety.VarietyAdapter$Proxy { *; }
+-keep class com.skyd.anivu.ui.adapter.variety.AsyncListDiffer { *; }
