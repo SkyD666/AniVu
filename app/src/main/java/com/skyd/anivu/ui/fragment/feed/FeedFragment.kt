@@ -16,6 +16,9 @@ import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentFeedBinding
+import com.skyd.anivu.ext.addFabBottomPaddingHook
+import com.skyd.anivu.ext.addInsetsByMargin
+import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.startWith
@@ -39,7 +42,26 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
         mutableListOf(
             Feed1Proxy(
                 onRemove = { intents.trySend(FeedIntent.RemoveFeed(it.url)) },
-                onEdit = {},
+                onEdit = {
+                    InputDialogBuilder(requireContext())
+                        .setInitInputText(it.url)
+                        .setPositiveButton { _, _, text ->
+                            if (text.isNotBlank()) {
+                                intents.trySend(
+                                    FeedIntent.EditFeed(oldUrl = it.url, newUrl = text)
+                                )
+                            }
+                        }
+                        .setIcon(
+                            AppCompatResources.getDrawable(
+                                requireActivity(),
+                                R.drawable.ic_rss_feed_24
+                            )
+                        )
+                        .setTitle(R.string.edit)
+                        .setNegativeButton(R.string.cancel) { _, _ -> }
+                        .show()
+                },
             )
         )
     )
@@ -94,9 +116,13 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
                 showSnackbar(text = feedEvent.msg)
             }
 
+            is FeedEvent.EditFeedResultEvent.Failed -> {
+                showSnackbar(text = feedEvent.msg)
+            }
+
+            FeedEvent.EditFeedResultEvent.Success,
             FeedEvent.RemoveFeedResultEvent.Success,
             FeedEvent.AddFeedResultEvent.Success -> Unit
-
         }
     }
 
@@ -126,7 +152,7 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
         rvFeedFragment.addItemDecoration(divider)
         rvFeedFragment.adapter = adapter
 
-        binding.fabFeedFragment.setOnClickListener {
+        fabFeedFragment.setOnClickListener {
             InputDialogBuilder(requireContext())
                 .setPositiveButton { _, _, text ->
                     if (text.isNotBlank()) {
@@ -143,6 +169,16 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
                 .setNegativeButton(R.string.cancel) { _, _ -> }
                 .show()
         }
+    }
+
+    override fun FragmentFeedBinding.setWindowInsets() {
+        ablFeedFragment.addInsetsByPadding(top = true, left = true, right = true)
+        fabFeedFragment.addInsetsByMargin(left = true, right = true)
+        rvFeedFragment.addInsetsByPadding(
+            left = true,
+            right = true,
+            hook = ::addFabBottomPaddingHook,
+        )
     }
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =

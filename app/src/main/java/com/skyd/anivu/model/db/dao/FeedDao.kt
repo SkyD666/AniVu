@@ -58,7 +58,7 @@ interface FeedDao {
     suspend fun removeFeed(feedBean: FeedBean): Int
 
     @Transaction
-    @Query("DELETE FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} LIKE :url")
+    @Query("DELETE FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} = :url")
     suspend fun removeFeed(url: String): Int
 
     @Transaction
@@ -66,6 +66,6 @@ interface FeedDao {
     fun getFeedList(): Flow<List<FeedBean>>
 
     @Transaction
-    @Query("SELECT * FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} LIKE :feedUrl")
+    @Query("SELECT * FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} = :feedUrl")
     suspend fun getFeed(feedUrl: String): FeedBean
 }

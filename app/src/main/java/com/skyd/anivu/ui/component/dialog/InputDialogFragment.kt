@@ -10,6 +10,7 @@ import androidx.core.content.ContextCompat.getSystemService
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout
 import com.skyd.anivu.R
+import com.skyd.anivu.ext.showSoftKeyboard
 
 @SuppressLint("InflateParams")
 open class InputDialogBuilder(
@@ -40,14 +41,25 @@ open class InputDialogBuilder(
     fun setPositiveButton(
         textId: Int = R.string.ok,
         listener: (dialog: DialogInterface, which: Int, text: String) -> Unit,
-    ): MaterialAlertDialogBuilder {
+    ): InputDialogBuilder {
         return super.setPositiveButton(textId) { dialog, which ->
             listener(dialog, which, textField.editText?.text.toString())
-        }
+        } as InputDialogBuilder
+    }
+
+    fun setInitInputText(
+        text: String,
+    ): InputDialogBuilder {
+        textField.editText?.setText(text)
+        return this
     }
 
     override fun show(): AlertDialog {
         setView(textField)
-        return super.show()
+        return super.show().apply {
+            textField.editText?.post {
+                textField.editText?.showSoftKeyboard(window ?: return@post)
+            }
+        }
     }
 }

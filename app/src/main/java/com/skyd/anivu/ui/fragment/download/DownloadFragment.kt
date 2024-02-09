@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentDownloadBinding
+import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.startWith
@@ -102,6 +103,11 @@ class DownloadFragment : BaseFragment<FragmentDownloadBinding>() {
         divider.isLastItemDecorated = false
         rvDownloadFragment.addItemDecoration(divider)
         rvDownloadFragment.adapter = adapter
+    }
+
+    override fun FragmentDownloadBinding.setWindowInsets() {
+        ablDownloadFragment.addInsetsByPadding(top = true, left = true, right = true)
+        rvDownloadFragment.addInsetsByPadding(bottom = true, left = true, right = true)
     }
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =

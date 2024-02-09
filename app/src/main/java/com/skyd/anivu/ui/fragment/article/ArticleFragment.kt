@@ -15,6 +15,7 @@ import com.google.android.material.divider.MaterialDividerItemDecoration
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentArticleBinding
+import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.startWith
@@ -124,6 +125,11 @@ class ArticleFragment : BaseFragment<FragmentArticleBinding>() {
         divider.isLastItemDecorated = false
         rvArticleFragment.addItemDecoration(divider)
         rvArticleFragment.adapter = adapter
+    }
+
+    override fun FragmentArticleBinding.setWindowInsets() {
+        ablArticleFragment.addInsetsByPadding(top = true, left = true, right = true)
+        rvArticleFragment.addInsetsByPadding(bottom = true, left = true, right = true)
     }
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =

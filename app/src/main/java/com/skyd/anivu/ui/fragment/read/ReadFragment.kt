@@ -11,6 +11,9 @@ import androidx.navigation.fragment.findNavController
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentReadBinding
+import com.skyd.anivu.ext.addFabBottomPaddingHook
+import com.skyd.anivu.ext.addInsetsByMargin
+import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.popBackStackWithLifecycle
@@ -22,6 +25,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+
 
 @AndroidEntryPoint
 class ReadFragment : BaseFragment<FragmentReadBinding>() {
@@ -106,6 +110,14 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
                 enclosureBottomSheet?.updateData(articleState.article.enclosures)
             }
         }
+    }
+
+    override fun FragmentReadBinding.setWindowInsets() {
+        ablReadFragment.addInsetsByPadding(top = true, left = true, right = true)
+        fabReadFragment.addInsetsByMargin(bottom = true, right = true)
+        tvReadFragmentContent.addInsetsByPadding(
+            bottom = true, left = true, right = true, hook = ::addFabBottomPaddingHook
+        )
     }
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =

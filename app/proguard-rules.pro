@@ -66,7 +66,7 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
--keep class * implements android.os.Parcelable { *;}
+-keep class * implements android.os.Parcelable { *; }
 -keepnames class * implements android.os.Parcelable {
 public static final ** CREATOR;
 }
@@ -95,7 +95,13 @@ public static final ** CREATOR;
 # Rome
 -keep class com.rometools.** { *; }
 
+# libtorrent4j
+-keep class org.libtorrent4j.** { *; }
+
 # VarietyAdapter
 -keep class * extends com.skyd.anivu.ui.adapter.variety.VarietyAdapter$Proxy
 -keep class com.skyd.anivu.ui.adapter.variety.VarietyAdapter$Proxy { *; }
 -keep class com.skyd.anivu.ui.adapter.variety.AsyncListDiffer { *; }
+
+# Retrofit
+-keep, allowobfuscation, allowshrinking interface retrofit2.Call

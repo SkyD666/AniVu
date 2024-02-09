@@ -1,6 +1,7 @@
 package com.skyd.anivu.base
 
 import android.os.Bundle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 
@@ -10,8 +11,8 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     protected abstract fun getViewBinding(): T
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-
         binding = getViewBinding()
 
         beforeSetContentView()

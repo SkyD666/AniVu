@@ -31,6 +31,16 @@ class FeedRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
+    suspend fun editFeed(oldUrl: String, newUrl: String): Flow<Unit> {
+        return flow {
+            val feedWithArticleBean = rssHelper.searchFeed(url = newUrl)
+            if (oldUrl != newUrl) {
+                feedDao.removeFeed(oldUrl)
+            }
+            emit(feedDao.setFeedWithArticle(feedWithArticleBean))
+        }.flowOn(Dispatchers.IO)
+    }
+
     suspend fun removeFeed(url: String): Flow<Int> {
         return flowOf(feedDao.removeFeed(url))
             .flowOn(Dispatchers.IO)

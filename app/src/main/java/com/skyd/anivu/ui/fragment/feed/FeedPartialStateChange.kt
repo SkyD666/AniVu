@@ -33,6 +33,23 @@ internal sealed interface FeedPartialStateChange {
         data class Failed(val msg: String) : AddFeed
     }
 
+    sealed interface EditFeed : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : EditFeed
+        data class Failed(val msg: String) : EditFeed
+    }
+
     sealed interface RemoveFeed : FeedPartialStateChange {
         override fun reduce(oldState: FeedState): FeedState {
             return when (this) {

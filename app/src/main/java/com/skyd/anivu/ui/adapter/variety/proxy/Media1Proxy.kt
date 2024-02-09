@@ -1,19 +1,25 @@
 package com.skyd.anivu.ui.adapter.variety.proxy
 
 
+import android.media.MediaMetadataRetriever
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
+import coil.load
 import com.skyd.anivu.R
 import com.skyd.anivu.databinding.ItemMedia1Binding
 import com.skyd.anivu.ext.fileSize
+import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.tryAddIcon
+import com.skyd.anivu.ext.visible
 import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.adapter.variety.Media1ViewHolder
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
+import com.skyd.anivu.util.CoilUtil.loadImage
+import kotlin.random.Random
 
 
 class Media1Proxy(
@@ -22,6 +28,7 @@ class Media1Proxy(
     private val onOpenDir: (VideoBean) -> Unit,
     private val onRemove: (VideoBean) -> Unit,
 ) : VarietyAdapter.Proxy<VideoBean, ItemMedia1Binding, Media1ViewHolder>() {
+    private val retriever: MediaMetadataRetriever by lazy { MediaMetadataRetriever() }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Media1ViewHolder {
         val holder = Media1ViewHolder(
             ItemMedia1Binding.inflate(LayoutInflater.from(parent.context), parent, false),
@@ -71,6 +78,20 @@ class Media1Proxy(
             tvMedia1Date.text = data.date.toDateTimeString()
             tvMedia1Size.text = data.size.fileSize(context)
             ivMedia1IsVideo.isVisible = data.isMedia(context)
+            if (data.isMedia(context)) {
+                cvMedia1Preview.visible()
+                retriever.setDataSource(data.file.path)
+                val duration = retriever
+                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                    ?.toLongOrNull() ?: 0
+                val bitmap = retriever.getFrameAtTime(
+                    Random.nextLong(duration) * 1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC
+                )
+
+                ivMedia1Preview.load(bitmap)
+            } else {
+                cvMedia1Preview.gone()
+            }
         }
     }
 }

@@ -35,9 +35,12 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.initView()
+        binding.setWindowInsets()
     }
 
     protected open fun T.initView() {}
+
+    protected open fun T.setWindowInsets() {}
 
     override fun onDestroyView() {
         super.onDestroyView()

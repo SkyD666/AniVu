@@ -59,6 +59,14 @@ class FeedViewModel @Inject constructor(
                     FeedEvent.AddFeedResultEvent.Failed(change.msg)
                 }
 
+                is FeedPartialStateChange.EditFeed.Success -> {
+                    FeedEvent.EditFeedResultEvent.Success
+                }
+
+                is FeedPartialStateChange.EditFeed.Failed -> {
+                    FeedEvent.EditFeedResultEvent.Failed(change.msg)
+                }
+
                 is FeedPartialStateChange.RemoveFeed.Success -> {
                     FeedEvent.RemoveFeedResultEvent.Success
                 }
@@ -89,6 +97,12 @@ class FeedViewModel @Inject constructor(
                     FeedPartialStateChange.AddFeed.Success
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.AddFeed.Failed(it.message.toString()) }
+            },
+            filterIsInstance<FeedIntent.EditFeed>().flatMapConcat { intent ->
+                feedRepo.editFeed(intent.oldUrl, intent.newUrl).map {
+                    FeedPartialStateChange.EditFeed.Success
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.RemoveFeed>().flatMapConcat { intent ->
                 feedRepo.removeFeed(intent.url).map {

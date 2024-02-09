@@ -17,6 +17,9 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.databinding.FragmentMediaBinding
+import com.skyd.anivu.ext.addFabBottomPaddingHook
+import com.skyd.anivu.ext.addInsetsByMargin
+import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.toUri
@@ -94,7 +97,7 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
             waitingDialog = null
         }
         when (val videoListState = mediaState.mediaListState.apply {
-            binding.srlVideoFragment.isRefreshing = loading
+            binding.srlMediaFragment.isRefreshing = loading
         }) {
             is MediaListState.Failed -> {
                 adapter.dataList = emptyList<Any>().addHeader()
@@ -146,15 +149,15 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
             topAppBar.navigationIcon = null
         }
 
-        fabVideoFragment.setOnClickListener {
+        fabMediaFragment.setOnClickListener {
             findMainNavController().navigate(R.id.action_to_download_fragment)
         }
 
-        srlVideoFragment.setOnRefreshListener {
+        srlMediaFragment.setOnRefreshListener {
             intents.trySend(MediaIntent.Refresh(path))
         }
 
-        rvVideoFragment.layoutManager = GridLayoutManager(
+        rvMediaFragment.layoutManager = GridLayoutManager(
             requireContext(),
             AniSpanSize.MAX_SPAN_SIZE
         ).apply {
@@ -163,8 +166,18 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
 
         val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
         divider.isLastItemDecorated = false
-        rvVideoFragment.addItemDecoration(divider)
-        rvVideoFragment.adapter = adapter
+        rvMediaFragment.addItemDecoration(divider)
+        rvMediaFragment.adapter = adapter
+    }
+
+    override fun FragmentMediaBinding.setWindowInsets() {
+        ablMediaFragment.addInsetsByPadding(top = true, left = true, right = true)
+        fabMediaFragment.addInsetsByMargin(left = true, right = true)
+        rvMediaFragment.addInsetsByPadding(
+            left = true,
+            right = true,
+            hook = ::addFabBottomPaddingHook,
+        )
     }
 
     private fun List<Any>.addHeader() = if (hasParentDir) this + parentDirBean else this

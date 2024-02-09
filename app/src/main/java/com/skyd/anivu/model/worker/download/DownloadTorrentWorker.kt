@@ -186,7 +186,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     ) {
         if (link.startsWith("magnet:")) {
             sessionManager.download(link, saveDir, torrent_flags_t())
-        } else if (link.startsWith("http:") || link.startsWith("https:")) {
+        } else if (
+            (link.startsWith("http:") || link.startsWith("https:")) &&
+            link.endsWith(".torrent")
+        ) {
             val tempTorrentFile = File(
                 Const.TEMP_TORRENT_DIR,
                 link.substringAfterLast('/').toDecodedUrl().validateFileName()

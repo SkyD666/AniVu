@@ -47,9 +47,9 @@ class Article1Proxy : VarietyAdapter.Proxy<ArticleBean, ItemArticle1Binding, Art
                 }
             }
             if (data.image.isNullOrBlank()) {
-                ivArticle1Image.gone()
+                cvArticle1Image.gone()
             } else {
-                ivArticle1Image.visible()
+                cvArticle1Image.visible()
                 ivArticle1Image.loadImage(data.image)
             }
         }

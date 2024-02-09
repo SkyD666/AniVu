@@ -12,6 +12,11 @@ sealed interface FeedEvent : MviSingleEvent {
         data class Failed(val msg: String) : AddFeedResultEvent
     }
 
+    sealed interface EditFeedResultEvent : FeedEvent {
+        data object Success : EditFeedResultEvent
+        data class Failed(val msg: String) : EditFeedResultEvent
+    }
+
     sealed interface RemoveFeedResultEvent : FeedEvent {
         data object Success : RemoveFeedResultEvent
         data class Failed(val msg: String) : RemoveFeedResultEvent
