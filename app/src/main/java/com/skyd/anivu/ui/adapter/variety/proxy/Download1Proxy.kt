@@ -110,6 +110,7 @@ class Download1Proxy(
             tvDownload1Progress.text = floatToPercentage(data.progress)
             when (data.downloadState) {
                 DownloadInfoBean.DownloadState.Downloading,
+                DownloadInfoBean.DownloadState.ErrorPaused,
                 DownloadInfoBean.DownloadState.Paused -> {
                     lpDownload1.isIndeterminate = false
                     lpDownload1.progress = (data.progress * 100).toInt()
@@ -123,6 +124,7 @@ class Download1Proxy(
                     lpDownload1.isIndeterminate = false
                     lpDownload1.progress = 100
                 }
+
             }
         }
     }
@@ -154,6 +156,15 @@ class Download1Proxy(
                     btnDownload1Pause.setIconResource(R.drawable.ic_pause_24)
                     btnDownload1Cancel.enable()
                     tvDownload1Description.text = data.description
+                    lpDownload1.isIndeterminate = false
+                }
+
+                DownloadInfoBean.DownloadState.ErrorPaused -> {
+                    btnDownload1Pause.enable()
+                    btnDownload1Pause.setIconResource(R.drawable.ic_refresh_24)
+                    btnDownload1Cancel.enable()
+                    tvDownload1Description.text =
+                        holder.itemView.context.getString(R.string.download_error_paused)
                     lpDownload1.isIndeterminate = false
                 }
 

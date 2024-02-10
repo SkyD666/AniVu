@@ -89,7 +89,13 @@ android {
         buildConfig = true
     }
     packaging {
-        resources.excludes += "DebugProbesKt.bin"
+        resources.excludes += mutableSetOf(
+            "DebugProbesKt.bin",
+            "META-INF/CHANGES",
+            "META-INF/README.md",
+            "kotlin-tooling-metadata.json",
+            "okhttp3/internal/publicsuffix/NOTICE",
+        )
     }
 }
 
@@ -99,10 +105,12 @@ kapt {
 
 tasks.withType(KotlinCompile::class.java).configureEach {
     kotlinOptions {
-        freeCompilerArgs += "-opt-in=coil.annotation.ExperimentalCoilApi"
-        freeCompilerArgs += "-opt-in=kotlinx.coroutines.FlowPreview"
-        freeCompilerArgs += "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
-        freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += listOf(
+            "-opt-in=coil.annotation.ExperimentalCoilApi",
+            "-opt-in=kotlinx.coroutines.FlowPreview",
+            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+            "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+        )
     }
 }
 
@@ -112,8 +120,8 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.6")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.6")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.dagger:hilt-android:2.50")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
@@ -132,6 +140,7 @@ dependencies {
     implementation("net.dankito.readability4j:readability4j:1.0.8")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+    implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.media3:media3-exoplayer:1.2.1")
     implementation("androidx.media3:media3-exoplayer-dash:1.2.1")
     implementation("androidx.media3:media3-ui:1.2.1")

@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
@@ -172,6 +173,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 }
 
                 DownloadInfoBean.DownloadState.Downloading,
+                DownloadInfoBean.DownloadState.ErrorPaused,
                 DownloadInfoBean.DownloadState.Paused -> {
                     downloadByMagnetOrTorrent(torrentLink, saveDir)
                     updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Downloading)
@@ -223,8 +225,12 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             applicationContext.getString(R.string.downloading)
         }
         // This PendingIntent can be used to cancel the worker
-        val intent = WorkManager.getInstance(applicationContext)
+        val cancelIntent = WorkManager.getInstance(applicationContext)
             .createCancelPendingIntent(id)
+        val contentIntent = NavDeepLinkBuilder(applicationContext)
+            .setGraph(R.navigation.nav_graph)
+            .setDestination(R.id.download_fragment)
+            .createPendingIntent()
 
         // Create a Notification channel if necessary
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -238,13 +244,13 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             .setSmallIcon(R.drawable.ic_launcher_background)
             .setOngoing(true)
             .setProgress(100, (progress * 100).toInt(), false)
-            // Add the cancel action to the notification which can
-            // be used to cancel the worker
+            // Add the cancel action to the notification which can be used to cancel the worker
             .addAction(
                 R.drawable.ic_pause_24,
                 applicationContext.getString(R.string.download_pause),
-                intent,
+                cancelIntent,
             )
+            .setContentIntent(contentIntent)
             .build()
 
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -270,7 +276,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         when (alert) {
             is TorrentErrorAlert -> {
                 // 下载错误更新
-                this@DownloadTorrentWorker.pause(handle = alert.handle())
+                this@DownloadTorrentWorker.pause(
+                    handle = alert.handle(),
+                    state = DownloadInfoBean.DownloadState.ErrorPaused,
+                )
                 continuation.resumeWithException(RuntimeException(alert.message()))
             }
 
@@ -320,12 +329,15 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         }
     }
 
-    private fun pause(handle: TorrentHandle?) {
+    private fun pause(
+        handle: TorrentHandle?,
+        state: DownloadInfoBean.DownloadState = DownloadInfoBean.DownloadState.Paused
+    ) {
         if (!sessionManager.isRunning || sessionIsStopping) {
             return
         }
         sessionIsStopping = true
-        updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Paused)
+        updateDownloadStateAndSessionParams(state)
         if (handle != null) {
             handle.saveResumeData()
             sessionManager.remove(handle)

@@ -29,8 +29,7 @@
         <activity
             android:name=".ui.activity.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.AniVu"
+            android:theme="@style/Theme.AniVu.NoActionBar.Splash"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -41,6 +40,7 @@
 
         <activity
             android:name=".ui.activity.PlayActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="true"
             android:screenOrientation="landscape"
             android:theme="@style/Theme.AniVu.Player" />

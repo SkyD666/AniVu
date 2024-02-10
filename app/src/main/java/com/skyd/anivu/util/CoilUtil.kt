@@ -1,13 +1,12 @@
 package com.skyd.anivu.util
 
-import android.util.Log
+import android.graphics.Bitmap
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import coil.Coil
 import coil.ImageLoader
 import coil.imageLoader
 import coil.load
-import coil.request.ImageRequest
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
 import dagger.hilt.EntryPoint
@@ -32,49 +31,35 @@ object CoilUtil {
     }
 
     fun ImageView.loadImage(
-        url: String?,
-        builder: ImageRequest.Builder.() -> Unit = {},
-    ) {
-        if (url.isNullOrBlank()) {
-            Log.e("loadImage", "Image url must not be null or empty")
-            return
-        }
-
-        this.load(url, builder = builder)
+        res: Int,
+        @DrawableRes placeholder: Int = 0,
+        @DrawableRes error: Int = R.drawable.ic_image_load_error_24,
+    ) = load(res, imageLoader = hiltEntryPoint.imageLoader) {
+        placeholder(placeholder)
+        error(error)
     }
 
-    fun ImageView.loadImage(res: Int) = loadImage(res.toString())
+    fun ImageView.loadImage(
+        bitmap: Bitmap,
+        @DrawableRes placeholder: Int = 0,
+        @DrawableRes error: Int = R.drawable.ic_image_load_error_24,
+    ) = load(bitmap, imageLoader = hiltEntryPoint.imageLoader) {
+        placeholder(placeholder)
+        error(error)
+    }
 
     fun ImageView.loadImage(
-        url: String?,
+        url: String,
         @DrawableRes placeholder: Int = 0,
-        @DrawableRes error: Int = R.drawable.ic_error_24,
+        @DrawableRes error: Int = R.drawable.ic_image_load_error_24,
     ) {
-        if (url.isNullOrBlank()) {
-            Log.e("loadImage", "Image url must not be null or empty")
-            return
-        }
-
-        // 是本地drawable
-        url.toIntOrNull()?.let { drawableResId ->
-            load(drawableResId) {
-                placeholder(placeholder)
-                error(error)
-            }
-            return
-        }
-
-        runCatching {
-            loadImage(url) {
-                placeholder(placeholder)
-                error(error)
-                addHeader("Host", URL(url).host)
-                addHeader("Accept", "*/*")
-                addHeader("Accept-Encoding", "gzip, deflate")
-                addHeader("Connection", "keep-alive")
-            }
-        }.onFailure {
-            it.printStackTrace()
+        load(url) {
+            placeholder(placeholder)
+            error(error)
+            addHeader("Host", URL(url).host)
+            addHeader("Accept", "*/*")
+            addHeader("Accept-Encoding", "gzip, deflate")
+            addHeader("Connection", "keep-alive")
         }
     }
 

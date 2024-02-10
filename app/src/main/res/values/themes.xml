@@ -1,18 +1,19 @@
-<resources>
-    <!-- Base application theme. -->
+<resources xmlns:tools="http://schemas.android.com/tools">
+
     <style name="Base.Theme.AniVu" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="materialAlertDialogTheme">@style/AniVuMaterialAlertDialog</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">
+            shortEdges
+        </item>
+    </style>
+
+    <style name="Theme.AniVu.NoActionBar.Splash" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.AniVu</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
     </style>
 
     <style name="Theme.AniVu" parent="Base.Theme.AniVu" />
-
-    <style name="AniVuMaterialAlertDialog" parent="@style/ThemeOverlay.Material3.MaterialAlertDialog.Centered">
-        <item name="materialAlertDialogTitleIconStyle">@style/DialogIconTint</item>
-    </style>
-
-    <style name="DialogIconTint" parent="@style/MaterialAlertDialog.Material3.Title.Icon.CenterStacked">
-        <item name="android:tint">?attr/colorSecondary</item>
-    </style>
 
     <style name="Theme.AniVu.Player" parent="Base.Theme.AniVu">
         <item name="android:windowNoTitle">true</item>

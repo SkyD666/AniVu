@@ -72,6 +72,7 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
                 onRemove = {
                     intents.trySend(MediaIntent.Delete(it.file))
                 },
+                coroutineScope = lifecycleScope,
             )
         )
         addProxy(ParentDir1Proxy(

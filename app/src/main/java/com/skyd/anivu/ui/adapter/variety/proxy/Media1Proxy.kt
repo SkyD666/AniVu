@@ -7,7 +7,6 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.isVisible
-import coil.load
 import com.skyd.anivu.R
 import com.skyd.anivu.databinding.ItemMedia1Binding
 import com.skyd.anivu.ext.fileSize
@@ -19,6 +18,10 @@ import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.adapter.variety.Media1ViewHolder
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.util.CoilUtil.loadImage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 
@@ -27,6 +30,7 @@ class Media1Proxy(
     private val onPlay: (VideoBean) -> Unit,
     private val onOpenDir: (VideoBean) -> Unit,
     private val onRemove: (VideoBean) -> Unit,
+    private val coroutineScope: CoroutineScope,
 ) : VarietyAdapter.Proxy<VideoBean, ItemMedia1Binding, Media1ViewHolder>() {
     private val retriever: MediaMetadataRetriever by lazy { MediaMetadataRetriever() }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): Media1ViewHolder {
@@ -80,15 +84,22 @@ class Media1Proxy(
             ivMedia1IsVideo.isVisible = data.isMedia(context)
             if (data.isMedia(context)) {
                 cvMedia1Preview.visible()
-                retriever.setDataSource(data.file.path)
-                val duration = retriever
-                    .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                    ?.toLongOrNull() ?: 0
-                val bitmap = retriever.getFrameAtTime(
-                    Random.nextLong(duration) * 1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC
-                )
-
-                ivMedia1Preview.load(bitmap)
+                ivMedia1Preview.setTag(R.id.image_view_tag_2, data.file.path)
+                coroutineScope.launch(Dispatchers.IO) {
+                    retriever.setDataSource(data.file.path)
+                    val duration = retriever
+                        .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                        ?.toLongOrNull() ?: 0
+                    val bitmap = retriever.getFrameAtTime(
+                        Random.nextLong(duration) * 1000,
+                        MediaMetadataRetriever.OPTION_CLOSEST_SYNC,
+                    ) ?: return@launch
+                    withContext(Dispatchers.Main) {
+                        if (ivMedia1Preview.getTag(R.id.image_view_tag_2) == data.file.path) {
+                            ivMedia1Preview.loadImage(bitmap)
+                        }
+                    }
+                }
             } else {
                 cvMedia1Preview.gone()
             }

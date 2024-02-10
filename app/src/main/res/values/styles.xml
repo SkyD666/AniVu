@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="PrivateResource">
+
+    <style name="AniVuMaterialAlertDialog" parent="@style/ThemeOverlay.Material3.MaterialAlertDialog.Centered">
+        <item name="materialAlertDialogTitleIconStyle">@style/DialogIconTint</item>
+    </style>
+
+    <style name="DialogIconTint" parent="@style/MaterialAlertDialog.Material3.Title.Icon.CenterStacked">
+        <item name="android:tint">?attr/colorSecondary</item>
+    </style>
+
+    <!--  ExoPlayer  -->
+    <style name="AniVuStyledControls.Button.Center.PlayPause" parent="ExoStyledControls.Button.Center.PlayPause">
+        <item name="android:padding">10dp</item>
+        <item name="android:tint">#FFFFFF</item>
+        <item name="android:layout_marginStart">0dp</item>
+        <item name="android:layout_marginEnd">0dp</item>
+    </style>
+
+    <style name="AniVuStyledControls.Button.Center.Next" parent="ExoStyledControls.Button.Center.Next">
+        <item name="android:padding">10dp</item>
+        <item name="android:tint">#FFFFFF</item>
+        <item name="android:layout_width">43dp</item>
+        <item name="android:layout_marginStart">0dp</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:layout_marginEnd">0dp</item>
+    </style>
+
+    <style name="AniVuStyledControls.Button.Top.Settings" parent="ExoStyledControls.Button.Bottom.Settings">
+        <item name="android:tint">#FFFFFF</item>
+        <item name="android:padding">17dp</item>
+        <item name="android:layout_width">@dimen/exo_top_icon_width</item>
+        <item name="android:layout_height">@dimen/exo_top_icon_height</item>
+    </style>
+
+    <style name="AniVuStyledControls.Button.Top.Back" parent="AniVuStyledControls.Button.Center.PlayPause">
+        <item name="android:src">@drawable/ic_arrow_back_ios_new_24</item>
+        <item name="android:contentDescription">@string/back</item>
+        <item name="android:tint">#FFFFFF</item>
+        <item name="android:padding">17dp</item>
+        <item name="android:layout_width">@dimen/exo_top_icon_width</item>
+        <item name="android:layout_height">@dimen/exo_top_icon_height</item>
+    </style>
+
+    <style name="ExoStyledControls.TitleText">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_gravity">center_vertical</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">22sp</item>
+        <item name="android:gravity">left</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:marqueeRepeatLimit">marquee_forever</item>
+        <item name="android:textColor">@color/exo_white</item>
+    </style>
+</resources>

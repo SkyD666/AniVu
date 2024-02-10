@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="image_view_tag" type="id" />
+    <item name="image_view_tag_2" type="id" />
     <item name="view_add_fab_bottom_padding_tag" type="id" />
 
     <item name="view_add_insets_padding_top_tag" type="id" />
@@ -12,4 +13,9 @@
     <item name="view_add_insets_margin_bottom_tag" type="id" />
     <item name="view_add_insets_margin_left_tag" type="id" />
     <item name="view_add_insets_margin_right_tag" type="id" />
+
+    <item name="view_player_insets_tag_1" type="id" />
+    <item name="view_player_insets_tag_2" type="id" />
+    <item name="view_player_insets_tag_3" type="id" />
+    <item name="view_player_insets_tag_4" type="id" />
 </resources>

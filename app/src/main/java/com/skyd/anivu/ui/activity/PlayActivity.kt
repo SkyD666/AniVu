@@ -33,28 +33,9 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
         windowInsetsController.systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
 
-        // Add a listener to update the behavior of the toggle fullscreen button when
-        // the system bars are hidden or revealed.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            window.decorView.setOnApplyWindowInsetsListener { view, windowInsets ->
-                // You can hide the caption bar even when the other system bars are visible.
-                // To account for this, explicitly check the visibility of navigationBars()
-                // and statusBars() rather than checking the visibility of systemBars().
-                if (windowInsets.isVisible(WindowInsetsCompat.Type.navigationBars())
-                    || windowInsets.isVisible(WindowInsetsCompat.Type.statusBars())
-                ) {
-                    binding.playerView.setOnClickListener {
-                        windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-                    }
-                } else {
-                    binding.playerView.setOnClickListener {
-                        windowInsetsController.show(WindowInsetsCompat.Type.systemBars())
-                    }
-                }
-                view.onApplyWindowInsets(windowInsets)
-            }
-        } else {
+        window.decorView.setOnApplyWindowInsetsListener { view, windowInsets ->
             windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
+            view.onApplyWindowInsets(windowInsets)
         }
     }
 
@@ -63,6 +44,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             return
         }
         val player = ExoPlayer.Builder(this@PlayActivity).build()
+        playerView.setOnBackButtonClickListener { finish() }
         // Attach player to the view.
         playerView.player = player
         // Set the media item to be played.

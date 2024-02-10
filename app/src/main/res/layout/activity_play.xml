@@ -6,11 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".ui.activity.PlayActivity">
 
-    <androidx.media3.ui.PlayerView
+    <com.skyd.anivu.ui.player.PlayerView
         android:id="@+id/player_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:controller_layout_id="@layout/player_control_view"
         app:show_buffering="when_playing"
-        app:show_shuffle_button="true" />
+        app:use_controller="true" />
 
 </FrameLayout>

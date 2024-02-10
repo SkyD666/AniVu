@@ -44,7 +44,7 @@ data class DownloadInfoBean(
     val downloadRequestId: String,
 ) : BaseBean, Parcelable, Diff {
     enum class DownloadState {
-        Init, Downloading, Paused, Completed
+        Init, Downloading, Paused, Completed, ErrorPaused
     }
 
 

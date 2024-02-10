@@ -16,6 +16,10 @@ fun Uri.copyTo(target: File): File {
     return appContext.contentResolver.openInputStream(this)!!.use { it.saveTo(target) }
 }
 
+fun Uri.fileName(): String? {
+    return path?.substringAfterLast("/")?.toDecodedUrl()
+}
+
 fun InputStream.saveTo(target: File): File {
     val parentFile = target.parentFile
     if (parentFile?.exists() == false) {

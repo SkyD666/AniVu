@@ -1,8 +1,10 @@
 package com.skyd.anivu.ext
 
+import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.graphics.Rect
+import android.view.DisplayCutout
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -56,6 +58,9 @@ fun View.clickScale(scale: Float = 0.75f, duration: Long = 100) {
 
 val View.activity: Activity
     get() = context.activity
+
+val View.tryActivity: Activity?
+    get() = context.tryActivity
 
 fun View.showKeyboard() {
     isFocusable = true
@@ -145,7 +150,8 @@ fun View.addInsetsByMargin(
             val newBottomMargin = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
             v.setTag(R.id.view_add_insets_margin_bottom_tag, newBottomMargin)
             (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { layoutParams ->
-                layoutParams.bottomMargin = layoutParams.bottomMargin - lastBottomMargin + newBottomMargin
+                layoutParams.bottomMargin =
+                    layoutParams.bottomMargin - lastBottomMargin + newBottomMargin
                 v.layoutParams = layoutParams
             }
         }
@@ -196,4 +202,54 @@ fun View.showSoftKeyboard(window: Window) {
     if (requestFocus()) {
         WindowCompat.getInsetsController(window, this).show(WindowInsetsCompat.Type.ime())
     }
+}
+
+@TargetApi(28)
+fun View.updateSafeInset(displayCutout: DisplayCutout) {
+    val location = IntArray(2)
+    getLocationOnScreen(location)
+    val left = location[0]
+    val right = location[0] + width
+    val top = location[1]
+    val bottom = location[1] + height
+
+    var leftSolved = false
+    var rightSolved = false
+
+    updatePadding(left = 0, right = 0, top = 0, bottom = 0)
+    if (!inSafeInset(displayCutout)) {
+        // left
+        if (left + paddingLeft < displayCutout.safeInsetLeft) {
+            updatePadding(left = displayCutout.safeInsetLeft)
+            leftSolved = true
+        }
+
+        // right
+        if (right - paddingRight > context.screenWidth(true) - displayCutout.safeInsetRight) {
+            updatePadding(right = displayCutout.safeInsetRight)
+            rightSolved = true
+        }
+
+        // top
+        if (top + paddingTop < displayCutout.safeInsetTop) {
+            if (!leftSolved && !rightSolved) {
+                updatePadding(top = displayCutout.safeInsetTop)
+            }
+        }
+
+        // bottom
+        if (bottom - paddingBottom > context.screenHeight(true) - displayCutout.safeInsetBottom) {
+            if (!leftSolved && !rightSolved) {
+                updatePadding(bottom = displayCutout.safeInsetBottom)
+            }
+        }
+    }
+}
+
+@TargetApi(28)
+fun View.inSafeInset(displayCutout: DisplayCutout): Boolean {
+    displayCutout.boundingRects.forEach {
+        if (overlap(it)) return false
+    }
+    return true
 }
