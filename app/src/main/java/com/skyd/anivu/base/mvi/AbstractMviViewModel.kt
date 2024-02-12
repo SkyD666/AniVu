@@ -8,6 +8,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.skyd.anivu.BuildConfig
+import com.skyd.anivu.util.debug
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.onFailure
@@ -98,9 +99,9 @@ abstract class AbstractMviViewModel<I : MviIntent, S : MviViewState, E : MviSing
         debugCheckImmediateMainDispatcher()
 
         eventChannel.trySend(event)
-            .onSuccess { Log.i(logTag, "sendEvent: event=$event") }
+            .onSuccess { debug { Log.i(logTag, "sendEvent: event=$event") } }
             .onFailure {
-                Log.e(logTag, "$it. Failed to send event: $event")
+                debug { Log.e(logTag, "$it. Failed to send event: $event") }
             }
             .getOrThrow()
     }

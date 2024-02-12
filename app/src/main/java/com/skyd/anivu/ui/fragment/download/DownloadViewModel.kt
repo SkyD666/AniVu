@@ -37,9 +37,9 @@ class DownloadViewModel @Inject constructor(
         )
             .shareWhileSubscribed()
             .toReadPartialStateChangeFlow()
-            .debugLog("DownloadPartialStateChange")
+//            .debugLog("DownloadPartialStateChange")
             .scan(initialVS) { vs, change -> change.reduce(vs) }
-            .debugLog("ViewState")
+//            .debugLog("ViewState")
             .stateIn(
                 viewModelScope,
                 SharingStarted.Eagerly,

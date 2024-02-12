@@ -219,8 +219,16 @@ interface DownloadInfoDao {
     ): Int
 
     @Transaction
-    @Query("SELECT * FROM $DOWNLOAD_INFO_TABLE_NAME WHERE ${DownloadInfoBean.PROGRESS_COLUMN} < 1")
-    fun getDownloadingListFlow(): Flow<List<DownloadInfoBean>>
+    @Query(
+        """
+        SELECT * FROM $DOWNLOAD_INFO_TABLE_NAME
+        WHERE ${DownloadInfoBean.PROGRESS_COLUMN} < 1
+        AND ${DownloadInfoBean.DOWNLOAD_STATE_COLUMN} <> :completedState
+        """
+    )
+    fun getDownloadingListFlow(
+        completedState: String = DownloadInfoBean.DownloadState.Completed.name
+    ): Flow<List<DownloadInfoBean>>
 
     @Transaction
     @Query("SELECT * FROM $DOWNLOAD_INFO_TABLE_NAME WHERE ${DownloadInfoBean.PROGRESS_COLUMN} < 1")

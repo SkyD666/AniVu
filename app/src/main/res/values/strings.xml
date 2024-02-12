@@ -41,4 +41,20 @@
     <string name="torrent_status_checking_resume_data">Checking resume data…</string>
     <string name="options">Options</string>
     <string name="video">Video</string>
+    <string name="player_reset_zoom">Reset</string>
+    <string name="about_fragment_name">About</string>
+    <string name="app_short_description">An all-in-one tool for RSS anime subscription and updates, bit torrent downloads, and video playback.</string>
+    <string name="app_tech_stack_description">AniVu utilizes the MVI architecture and fully adopts the Material You design style. All pages are developed using Android View.</string>
+    <string name="about_fragment_visit_github">GitHub repository</string>
+    <string name="about_fragment_join_telegram">Telegram group</string>
+    <string name="about_fragment_join_discord">Discord server</string>
+    <string name="about_fragment_other_works">Other works</string>
+    <string name="about_fragment_other_works_rays_name" translatable="false">Rays (Record All Your Stickers)</string>
+    <string name="about_fragment_other_works_rays_description">A tool to record, search and manage stickers on your phone. Are you still struggling with too many stickers on your phone and having trouble finding the ones you want? This tool will help you manage your stickers! \uD83D\uDE0B</string>
+    <string name="about_fragment_other_works_raca_name" translatable="false">Raca (Record All Classic Articles)</string>
+    <string name="about_fragment_other_works_raca_description">A tool to record and search abstract passages and mini-essays in the comments section locally. 🤗 Are you still having trouble remembering the content of your mini-essay and facing the embarrassing situation of forgetting the front, middle and back? Using this tool will help you record the mini-essays you come across and never worry about forgetting them again! 😋</string>
+    <string name="about_fragment_other_works_night_screen_name" translatable="false">Night Screen</string>
+    <string name="about_fragment_other_works_night_screen_description">When you use your phone at night 🌙, Night Screen can help you reduce the brightness of the screen and reduce the damage to your eyes.</string>
+    <string name="no_browser_found">Can\'t find the browser! Link: %s</string>
+    <string name="license_fragment_name">License</string>
 </resources>

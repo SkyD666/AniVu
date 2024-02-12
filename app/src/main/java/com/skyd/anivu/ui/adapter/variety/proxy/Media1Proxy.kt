@@ -89,7 +89,7 @@ class Media1Proxy(
                     retriever.setDataSource(data.file.path)
                     val duration = retriever
                         .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                        ?.toLongOrNull() ?: 0
+                        ?.toLongOrNull() ?: return@launch
                     val bitmap = retriever.getFrameAtTime(
                         Random.nextLong(duration) * 1000,
                         MediaMetadataRetriever.OPTION_CLOSEST_SYNC,

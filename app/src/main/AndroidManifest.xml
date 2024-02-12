@@ -42,7 +42,7 @@
             android:name=".ui.activity.PlayActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="true"
-            android:screenOrientation="landscape"
+            android:screenOrientation="userLandscape"
             android:theme="@style/Theme.AniVu.Player" />
 
         <provider

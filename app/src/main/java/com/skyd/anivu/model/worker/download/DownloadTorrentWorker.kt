@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
@@ -54,6 +55,7 @@ import org.libtorrent4j.SessionParams
 import org.libtorrent4j.TorrentHandle
 import org.libtorrent4j.TorrentInfo
 import org.libtorrent4j.alerts.Alert
+import org.libtorrent4j.alerts.FileErrorAlert
 import org.libtorrent4j.alerts.MetadataReceivedAlert
 import org.libtorrent4j.alerts.StateChangedAlert
 import org.libtorrent4j.alerts.TorrentAlert
@@ -241,7 +243,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             .setContentTitle(title)
             .setTicker(title)
             .setContentText(notificationContentText)
-            .setSmallIcon(R.drawable.ic_launcher_background)
+            .setSmallIcon(R.drawable.ic_icon_24)
             .setOngoing(true)
             .setProgress(100, (progress * 100).toInt(), false)
             // Add the cancel action to the notification which can be used to cancel the worker
@@ -282,6 +284,16 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 )
                 continuation.resumeWithException(RuntimeException(alert.message()))
             }
+            // If the storage fails to read or write files that it needs access to,
+            // this alert is generated and the torrent is paused.
+            is FileErrorAlert -> {
+                // 文件错误，例如存储空间已满
+                this@DownloadTorrentWorker.pause(
+                    handle = alert.handle(),
+                    state = DownloadInfoBean.DownloadState.ErrorPaused,
+                )
+                continuation.resumeWithException(RuntimeException(alert.message()))
+            }
 
             is TorrentFinishedAlert -> {
                 // 下载完成更新
@@ -315,6 +327,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             }
 
             is TorrentAlert<*> -> {
+                Log.e("TAG", "onAlert: ${alert}")
                 // 下载进度更新
                 val handle = alert.handle()
                 if (handle.isValid) {
@@ -524,7 +537,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 .getWorkInfoByIdFlow(UUID.fromString(requestId))
             // 在worker结束后删除数据库中的下载任务信息
             coroutineScope.launch {
-                flow.filter { it.state.isFinished }
+                flow.filter { it == null || it.state.isFinished }
                     .flatMapConcat {
                         delay(2000)
                         hiltEntryPoint.downloadRepository.deleteDownloadTaskInfo(

@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.skyd.anivu.ui.fragment.about.AboutFragment">
+    <item
+        android:id="@+id/action_about_fragment_license"
+        android:icon="@drawable/ic_balance_24"
+        android:title="@string/license_fragment_name"
+        app:showAsAction="ifRoom" />
+</menu>

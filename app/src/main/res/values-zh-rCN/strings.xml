@@ -41,4 +41,17 @@
     <string name="torrent_status_checking_resume_data">检查恢复数据中…</string>
     <string name="options">选项</string>
     <string name="video">视频</string>
+    <string name="player_reset_zoom">还原屏幕</string>
+    <string name="about_fragment_name">关于</string>
+    <string name="app_short_description">一个集 RSS 番剧订阅与更新、比特洪流下载、视频播放为一体的工具。</string>
+    <string name="app_tech_stack_description">AniVu 使用 MVI 架构，完全采用 Material You 设计风格。所有页面均使用 Android View 开发。</string>
+    <string name="about_fragment_visit_github">访问 GitHub 仓库</string>
+    <string name="about_fragment_join_telegram">加入 Telegram 群组</string>
+    <string name="about_fragment_join_discord">加入 Discord 服务器</string>
+    <string name="about_fragment_other_works">其他作品</string>
+    <string name="about_fragment_other_works_rays_description">一个在本地记录、查找、管理表情包的工具。您还在为手机中的表情包太多，找不到想要的表情包而苦恼吗？使用这款工具将帮助您管理您存储的表情包，再也不因为找不到表情包而烦恼！\uD83D\uDE0B</string>
+    <string name="about_fragment_other_works_raca_description">一个在本地记录、查找抽象段落/评论区小作文的工具。🤗 您还在为记不住小作文内容，面临前面、中间、后面都忘了的尴尬处境吗？使用这款工具将帮助您记录您所遇到的小作文，再也不因为忘记而烦恼！😋</string>
+    <string name="about_fragment_other_works_night_screen_description">当您在夜间🌙使用手机时，Night Screen 可以帮助您减少屏幕亮度，减少对眼睛的伤害。</string>
+    <string name="no_browser_found">找不到浏览器！网址：%s</string>
+    <string name="license_fragment_name">开源许可证</string>
 </resources>

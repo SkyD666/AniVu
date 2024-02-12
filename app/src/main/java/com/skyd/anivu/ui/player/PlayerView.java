@@ -78,6 +78,8 @@ import androidx.media3.ui.DefaultTimeBar;
 import androidx.media3.ui.SubtitleView;
 
 import com.google.common.collect.ImmutableList;
+import com.skyd.anivu.R;
+import com.skyd.anivu.ui.component.ZoomView;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -283,6 +285,10 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
 
     private final ComponentListener componentListener;
     @Nullable
+    private final ZoomView zoomView;
+    @Nullable
+    private final LargeContentFrame largeContentFrame;
+    @Nullable
     private final AspectRatioFrameLayout contentFrame;
     @Nullable
     private final View shutterView;
@@ -315,9 +321,6 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
     @SuppressWarnings("deprecation")
     @Nullable
     private PlayerControlView.VisibilityListener legacyControllerVisibilityListener;
-
-    @Nullable
-    private OnClickListener onBackButtonClickListener;
 
     @Nullable
     private FullscreenButtonClickListener fullscreenButtonClickListener;
@@ -354,7 +357,9 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
         componentListener = new ComponentListener();
 
         if (isInEditMode()) {
+            zoomView = null;
             contentFrame = null;
+            largeContentFrame = null;
             shutterView = null;
             surfaceView = null;
             surfaceViewIgnoresVideoAspectRatio = false;
@@ -426,11 +431,16 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
         LayoutInflater.from(context).inflate(playerLayoutId, this);
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
 
+        zoomView = findViewById(R.id.exo_zoom_view);
+
         // Content frame.
         contentFrame = findViewById(androidx.media3.ui.R.id.exo_content_frame);
         if (contentFrame != null) {
             setResizeModeRaw(contentFrame, resizeMode);
         }
+
+        // Large Content frame.
+        largeContentFrame = findViewById(R.id.exo_large_content_frame);
 
         // Shutter view.
         shutterView = findViewById(androidx.media3.ui.R.id.exo_shutter);
@@ -484,6 +494,12 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
             surfaceView.setOnClickListener(componentListener);
             surfaceView.setClickable(false);
             contentFrame.addView(surfaceView, 0);
+            // We don't want zoomView to be clickable separately to the PlayerView itself, but we
+            // do want to register as an OnClickListener so that zoomView implementations can propagate
+            // click events up to the PlayerView by calling their own performClick method.
+            if (zoomView != null) {
+                zoomView.setOnClickListener(componentListener);
+            }
         } else {
             surfaceView = null;
         }
@@ -550,11 +566,36 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
         if (controller != null) {
             controller.hideImmediately();
             controller.addVisibilityListener(/* listener= */ componentListener);
+
+            controller.onZoomStateChanged(false);
+            if (zoomView != null) {
+                controller.setOnResetZoomButtonClickListener((v) -> zoomView.restore());
+                zoomView.setOnZoomListener(controller::onZoomStateChanged);
+            }
+        }
+
+        if (largeContentFrame != null) {
+            largeContentFrame.setOnDoubleClickListener(() -> {
+                if (controller != null) {
+                    controller.playOrPause();
+                }
+                return kotlin.Unit.INSTANCE;
+            });
+//            ViewExtKt.setOnDoubleTapListener(
+//                    largeContentFrame, () -> {
+//                        if (controller != null) {
+//                            controller.playOrPause();
+//                        }
+//                        return kotlin.Unit.INSTANCE;
+//                    }
+//            );
         }
         if (useController) {
             setClickable(true);
         }
         updateContentDescription();
+
+
     }
 
     /**
@@ -1071,7 +1112,6 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
 
     public void setOnBackButtonClickListener(@Nullable View.OnClickListener listener) {
         Assertions.checkStateNotNull(controller);
-        this.onBackButtonClickListener = listener;
         controller.setOnBackButtonClickListener(listener);
     }
 
@@ -1616,7 +1656,6 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
                 contentFrame, surfaceViewIgnoresVideoAspectRatio ? 0 : videoAspectRatio);
     }
 
-    @RequiresApi(23)
     private static void configureEditModeLogoV23(
             Context context, Resources resources, ImageView logo) {
         logo.setImageDrawable(getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_edit_mode_logo));

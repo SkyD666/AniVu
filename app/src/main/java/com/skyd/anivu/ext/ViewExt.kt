@@ -4,7 +4,10 @@ import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.graphics.Rect
+import android.os.Build
 import android.view.DisplayCutout
+import android.view.GestureDetector
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -16,6 +19,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.marginBottom
+import androidx.core.view.marginLeft
+import androidx.core.view.marginRight
+import androidx.core.view.marginTop
 import androidx.core.view.updatePadding
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
@@ -88,6 +95,20 @@ fun View.overlap(rect: Rect): Boolean {
     val right = location[0] + width
     val top = location[1]
     val bottom = location[1] + height
+    return !(left > rect.right || right < rect.left || top > rect.bottom || bottom < rect.top)
+}
+
+/**
+ * 判断不包括padding的View和给定的Rect是否重叠（边和点不计入）
+ * @return true if overlap
+ */
+fun View.overlapConsiderPaddingMargin(rect: Rect): Boolean {
+    val location = IntArray(2)
+    getLocationOnScreen(location)
+    val left = location[0] + paddingLeft + marginLeft
+    val right = location[0] + width - paddingRight - marginRight
+    val top = location[1] + paddingTop + marginTop
+    val bottom = location[1] + height - paddingBottom - marginBottom
     return !(left > rect.right || right < rect.left || top > rect.bottom || bottom < rect.top)
 }
 
@@ -216,31 +237,49 @@ fun View.updateSafeInset(displayCutout: DisplayCutout) {
     var leftSolved = false
     var rightSolved = false
 
-    updatePadding(left = 0, right = 0, top = 0, bottom = 0)
+    val lastInsetPaddingLeft = getTag(R.id.view_player_insets_tag_left) as? Int ?: 0
+    val lastInsetPaddingRight = getTag(R.id.view_player_insets_tag_right) as? Int ?: 0
+    val lastInsetPaddingTop = getTag(R.id.view_player_insets_tag_top) as? Int ?: 0
+    val lastInsetPaddingBottom = getTag(R.id.view_player_insets_tag_bottom) as? Int ?: 0
+
+    updatePadding(
+        left = paddingLeft - lastInsetPaddingLeft,
+        right = paddingRight - lastInsetPaddingRight,
+        top = paddingTop - lastInsetPaddingTop,
+        bottom = paddingBottom - lastInsetPaddingBottom,
+    )
     if (!inSafeInset(displayCutout)) {
         // left
         if (left + paddingLeft < displayCutout.safeInsetLeft) {
-            updatePadding(left = displayCutout.safeInsetLeft)
+            val newPaddingLeft = paddingLeft + displayCutout.safeInsetLeft
+            setTag(R.id.view_player_insets_tag_left, newPaddingLeft)
+            updatePadding(left = newPaddingLeft)
             leftSolved = true
         }
 
         // right
         if (right - paddingRight > context.screenWidth(true) - displayCutout.safeInsetRight) {
-            updatePadding(right = displayCutout.safeInsetRight)
+            val newPaddingRight = paddingRight + displayCutout.safeInsetRight
+            setTag(R.id.view_player_insets_tag_right, newPaddingRight)
+            updatePadding(right = newPaddingRight)
             rightSolved = true
         }
 
         // top
         if (top + paddingTop < displayCutout.safeInsetTop) {
             if (!leftSolved && !rightSolved) {
-                updatePadding(top = displayCutout.safeInsetTop)
+                val newPaddingTop = paddingTop + displayCutout.safeInsetTop
+                setTag(R.id.view_player_insets_tag_top, newPaddingTop)
+                updatePadding(top = newPaddingTop)
             }
         }
 
         // bottom
         if (bottom - paddingBottom > context.screenHeight(true) - displayCutout.safeInsetBottom) {
             if (!leftSolved && !rightSolved) {
-                updatePadding(bottom = displayCutout.safeInsetBottom)
+                val newPaddingBottom = paddingBottom + displayCutout.safeInsetBottom
+                setTag(R.id.view_player_insets_tag_bottom, newPaddingBottom)
+                updatePadding(bottom = newPaddingBottom)
             }
         }
     }
@@ -249,7 +288,34 @@ fun View.updateSafeInset(displayCutout: DisplayCutout) {
 @TargetApi(28)
 fun View.inSafeInset(displayCutout: DisplayCutout): Boolean {
     displayCutout.boundingRects.forEach {
-        if (overlap(it)) return false
+        if (overlapConsiderPaddingMargin(it)) return false
     }
     return true
+}
+
+fun View.setOnDoubleTapListener(onDoubleTap: () -> Unit) {
+    isClickable = true
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        focusable = View.FOCUSABLE
+    }
+    val doubleTapListener = DoubleTapListener(context, onDoubleTap)
+    setOnTouchListener { v, event ->
+        v.performClick()
+        doubleTapListener.onTouchEvent(event)
+    }
+}
+
+class DoubleTapListener(context: Context, private val onDoubleTap: () -> Unit) :
+    GestureDetector.SimpleOnGestureListener() {
+
+    private val gestureDetector = GestureDetector(context, this)
+
+    fun onTouchEvent(event: MotionEvent): Boolean {
+        return gestureDetector.onTouchEvent(event)
+    }
+
+    override fun onDoubleTap(e: MotionEvent): Boolean {
+        onDoubleTap.invoke()
+        return true
+    }
 }

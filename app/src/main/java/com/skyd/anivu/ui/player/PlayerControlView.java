@@ -52,6 +52,7 @@ import static androidx.media3.common.util.Util.msToUs;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
@@ -94,13 +95,13 @@ import androidx.media3.common.util.UnstableApi;
 import androidx.media3.common.util.Util;
 import androidx.media3.ui.DefaultTimeBar;
 import androidx.media3.ui.DefaultTrackNameProvider;
+import androidx.media3.ui.R;
 import androidx.media3.ui.TimeBar;
 import androidx.media3.ui.TrackNameProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.common.collect.ImmutableList;
-import com.skyd.anivu.R;
 import com.skyd.anivu.ext.IOExtKt;
 import com.skyd.anivu.ext.ViewExtKt;
 
@@ -352,6 +353,8 @@ public class PlayerControlView extends FrameLayout {
     @Nullable
     private final View backButton;
     @Nullable
+    private final View resetZoomView;
+    @Nullable
     private final View playbackSpeedButton;
     @Nullable
     private final View audioTrackButton;
@@ -395,6 +398,8 @@ public class PlayerControlView extends FrameLayout {
 
     @Nullable
     private OnClickListener onBackButtonClickListener;
+    @Nullable
+    private OnClickListener onResetZoomButtonClickListener;
 
     @Nullable
     private OnFullScreenModeChangedListener onFullScreenModeChangedListener;
@@ -414,6 +419,8 @@ public class PlayerControlView extends FrameLayout {
     private long currentWindowOffset;
 
     private boolean needToHideBars;
+
+    private boolean isZoom;
 
     public PlayerControlView(Context context) {
         this(context, /* attrs= */ null);
@@ -442,7 +449,7 @@ public class PlayerControlView extends FrameLayout {
             int defStyleAttr,
             @Nullable AttributeSet playbackAttrs) {
         super(context, attrs, defStyleAttr);
-        int controllerLayoutId = androidx.media3.ui.R.layout.exo_player_control_view;
+        int controllerLayoutId = R.layout.exo_player_control_view;
         showPlayButtonIfSuppressed = true;
         showTimeoutMs = DEFAULT_SHOW_TIMEOUT_MS;
         repeatToggleModes = DEFAULT_REPEAT_TOGGLE_MODES;
@@ -461,32 +468,32 @@ public class PlayerControlView extends FrameLayout {
                     context
                             .getTheme()
                             .obtainStyledAttributes(
-                                    playbackAttrs, androidx.media3.ui.R.styleable.PlayerControlView, defStyleAttr, /* defStyleRes= */ 0);
+                                    playbackAttrs, R.styleable.PlayerControlView, defStyleAttr, /* defStyleRes= */ 0);
             try {
                 controllerLayoutId =
-                        a.getResourceId(androidx.media3.ui.R.styleable.PlayerControlView_controller_layout_id, controllerLayoutId);
-                showTimeoutMs = a.getInt(androidx.media3.ui.R.styleable.PlayerControlView_show_timeout, showTimeoutMs);
+                        a.getResourceId(R.styleable.PlayerControlView_controller_layout_id, controllerLayoutId);
+                showTimeoutMs = a.getInt(R.styleable.PlayerControlView_show_timeout, showTimeoutMs);
                 repeatToggleModes = getRepeatToggleModes(a, repeatToggleModes);
                 showRewindButton =
-                        a.getBoolean(androidx.media3.ui.R.styleable.PlayerControlView_show_rewind_button, showRewindButton);
+                        a.getBoolean(R.styleable.PlayerControlView_show_rewind_button, showRewindButton);
                 showFastForwardButton =
                         a.getBoolean(
-                                androidx.media3.ui.R.styleable.PlayerControlView_show_fastforward_button, showFastForwardButton);
+                                R.styleable.PlayerControlView_show_fastforward_button, showFastForwardButton);
                 showPreviousButton =
-                        a.getBoolean(androidx.media3.ui.R.styleable.PlayerControlView_show_previous_button, showPreviousButton);
+                        a.getBoolean(R.styleable.PlayerControlView_show_previous_button, showPreviousButton);
                 showNextButton =
-                        a.getBoolean(androidx.media3.ui.R.styleable.PlayerControlView_show_next_button, showNextButton);
+                        a.getBoolean(R.styleable.PlayerControlView_show_next_button, showNextButton);
                 showShuffleButton =
-                        a.getBoolean(androidx.media3.ui.R.styleable.PlayerControlView_show_shuffle_button, showShuffleButton);
+                        a.getBoolean(R.styleable.PlayerControlView_show_shuffle_button, showShuffleButton);
                 showSubtitleButton =
-                        a.getBoolean(androidx.media3.ui.R.styleable.PlayerControlView_show_subtitle_button, showSubtitleButton);
-                showVrButton = a.getBoolean(androidx.media3.ui.R.styleable.PlayerControlView_show_vr_button, showVrButton);
+                        a.getBoolean(R.styleable.PlayerControlView_show_subtitle_button, showSubtitleButton);
+                showVrButton = a.getBoolean(R.styleable.PlayerControlView_show_vr_button, showVrButton);
                 setTimeBarMinUpdateInterval(
                         a.getInt(
-                                androidx.media3.ui.R.styleable.PlayerControlView_time_bar_min_update_interval,
+                                R.styleable.PlayerControlView_time_bar_min_update_interval,
                                 timeBarMinUpdateIntervalMs));
                 animationEnabled =
-                        a.getBoolean(androidx.media3.ui.R.styleable.PlayerControlView_animation_enabled, animationEnabled);
+                        a.getBoolean(R.styleable.PlayerControlView_animation_enabled, animationEnabled);
             } finally {
                 a.recycle();
             }
@@ -507,51 +514,58 @@ public class PlayerControlView extends FrameLayout {
         extraPlayedAdGroups = new boolean[0];
         updateProgressAction = this::updateProgress;
 
-        durationView = findViewById(androidx.media3.ui.R.id.exo_duration);
-        positionView = findViewById(androidx.media3.ui.R.id.exo_position);
+        durationView = findViewById(R.id.exo_duration);
+        positionView = findViewById(R.id.exo_position);
 
-        subtitleButton = findViewById(androidx.media3.ui.R.id.exo_subtitle);
+        subtitleButton = findViewById(R.id.exo_subtitle);
         if (subtitleButton != null) {
             subtitleButton.setOnClickListener(componentListener);
         }
 
-        fullScreenButton = findViewById(androidx.media3.ui.R.id.exo_fullscreen);
+        fullScreenButton = findViewById(R.id.exo_fullscreen);
         initializeFullScreenButton(fullScreenButton, this::onFullScreenButtonClicked);
-        minimalFullScreenButton = findViewById(androidx.media3.ui.R.id.exo_minimal_fullscreen);
+        minimalFullScreenButton = findViewById(R.id.exo_minimal_fullscreen);
         initializeFullScreenButton(minimalFullScreenButton, this::onFullScreenButtonClicked);
 
-        settingsButton = findViewById(androidx.media3.ui.R.id.exo_settings);
+        settingsButton = findViewById(R.id.exo_settings);
         if (settingsButton != null) {
             settingsButton.setOnClickListener(componentListener);
         }
 
         titleView = findViewById(com.skyd.anivu.R.id.exo_title);
+        titleView.setSelected(true);
 
         backButton = findViewById(com.skyd.anivu.R.id.exo_back);
         if (backButton != null) {
             backButton.setOnClickListener(onBackButtonClickListener);
         }
 
-        playbackSpeedButton = findViewById(androidx.media3.ui.R.id.exo_playback_speed);
+        resetZoomView = findViewById(com.skyd.anivu.R.id.exo_reset_zoom);
+        if (resetZoomView != null) {
+            resetZoomView.setOnClickListener(onResetZoomButtonClickListener);
+        }
+        isZoom = false;
+
+        playbackSpeedButton = findViewById(R.id.exo_playback_speed);
         if (playbackSpeedButton != null) {
             playbackSpeedButton.setOnClickListener(componentListener);
         }
 
-        audioTrackButton = findViewById(androidx.media3.ui.R.id.exo_audio_track);
+        audioTrackButton = findViewById(R.id.exo_audio_track);
         if (audioTrackButton != null) {
             audioTrackButton.setOnClickListener(componentListener);
         }
 
-        TimeBar customTimeBar = findViewById(androidx.media3.ui.R.id.exo_progress);
-        View timeBarPlaceholder = findViewById(androidx.media3.ui.R.id.exo_progress_placeholder);
+        TimeBar customTimeBar = findViewById(R.id.exo_progress);
+        View timeBarPlaceholder = findViewById(R.id.exo_progress_placeholder);
         if (customTimeBar != null) {
             timeBar = customTimeBar;
         } else if (timeBarPlaceholder != null) {
             // Propagate playbackAttrs as timebarAttrs so that DefaultTimeBar's custom attributes are
             // transferred, but standard attributes (e.g. background) are not.
             DefaultTimeBar defaultTimeBar =
-                    new DefaultTimeBar(context, null, 0, playbackAttrs, androidx.media3.ui.R.style.ExoStyledControls_TimeBar);
-            defaultTimeBar.setId(androidx.media3.ui.R.id.exo_progress);
+                    new DefaultTimeBar(context, null, 0, playbackAttrs, R.style.ExoStyledControls_TimeBar);
+            defaultTimeBar.setId(R.id.exo_progress);
             defaultTimeBar.setLayoutParams(timeBarPlaceholder.getLayoutParams());
             ViewGroup parent = ((ViewGroup) timeBarPlaceholder.getParent());
             int timeBarIndex = parent.indexOfChild(timeBarPlaceholder);
@@ -565,21 +579,21 @@ public class PlayerControlView extends FrameLayout {
             timeBar.addListener(componentListener);
         }
 
-        playPauseButton = findViewById(androidx.media3.ui.R.id.exo_play_pause);
+        playPauseButton = findViewById(R.id.exo_play_pause);
         if (playPauseButton != null) {
             playPauseButton.setOnClickListener(componentListener);
         }
-        previousButton = findViewById(androidx.media3.ui.R.id.exo_prev);
+        previousButton = findViewById(R.id.exo_prev);
         if (previousButton != null) {
             previousButton.setOnClickListener(componentListener);
         }
-        nextButton = findViewById(androidx.media3.ui.R.id.exo_next);
+        nextButton = findViewById(R.id.exo_next);
         if (nextButton != null) {
             nextButton.setOnClickListener(componentListener);
         }
-        Typeface typeface = ResourcesCompat.getFont(context, androidx.media3.ui.R.font.roboto_medium_numbers);
-        View rewButton = findViewById(androidx.media3.ui.R.id.exo_rew);
-        rewindButtonTextView = rewButton == null ? findViewById(androidx.media3.ui.R.id.exo_rew_with_amount) : null;
+        Typeface typeface = ResourcesCompat.getFont(context, R.font.roboto_medium_numbers);
+        View rewButton = findViewById(R.id.exo_rew);
+        rewindButtonTextView = rewButton == null ? findViewById(R.id.exo_rew_with_amount) : null;
         if (rewindButtonTextView != null) {
             rewindButtonTextView.setTypeface(typeface);
         }
@@ -587,8 +601,8 @@ public class PlayerControlView extends FrameLayout {
         if (rewindButton != null) {
             rewindButton.setOnClickListener(componentListener);
         }
-        View ffwdButton = findViewById(androidx.media3.ui.R.id.exo_ffwd);
-        fastForwardButtonTextView = ffwdButton == null ? findViewById(androidx.media3.ui.R.id.exo_ffwd_with_amount) : null;
+        View ffwdButton = findViewById(R.id.exo_ffwd);
+        fastForwardButtonTextView = ffwdButton == null ? findViewById(R.id.exo_ffwd_with_amount) : null;
         if (fastForwardButtonTextView != null) {
             fastForwardButtonTextView.setTypeface(typeface);
         }
@@ -596,22 +610,22 @@ public class PlayerControlView extends FrameLayout {
         if (fastForwardButton != null) {
             fastForwardButton.setOnClickListener(componentListener);
         }
-        repeatToggleButton = findViewById(androidx.media3.ui.R.id.exo_repeat_toggle);
+        repeatToggleButton = findViewById(R.id.exo_repeat_toggle);
         if (repeatToggleButton != null) {
             repeatToggleButton.setOnClickListener(componentListener);
         }
-        shuffleButton = findViewById(androidx.media3.ui.R.id.exo_shuffle);
+        shuffleButton = findViewById(R.id.exo_shuffle);
         if (shuffleButton != null) {
             shuffleButton.setOnClickListener(componentListener);
         }
 
         resources = context.getResources();
         buttonAlphaEnabled =
-                (float) resources.getInteger(androidx.media3.ui.R.integer.exo_media_button_opacity_percentage_enabled) / 100;
+                (float) resources.getInteger(R.integer.exo_media_button_opacity_percentage_enabled) / 100;
         buttonAlphaDisabled =
-                (float) resources.getInteger(androidx.media3.ui.R.integer.exo_media_button_opacity_percentage_disabled) / 100;
+                (float) resources.getInteger(R.integer.exo_media_button_opacity_percentage_disabled) / 100;
 
-        vrButton = findViewById(androidx.media3.ui.R.id.exo_vr);
+        vrButton = findViewById(R.id.exo_vr);
         if (vrButton != null) {
             updateButton(/* enabled= */ false, vrButton);
         }
@@ -622,19 +636,19 @@ public class PlayerControlView extends FrameLayout {
         String[] settingTexts = new String[2];
         Drawable[] settingIcons = new Drawable[2];
         settingTexts[SETTINGS_PLAYBACK_SPEED_POSITION] =
-                resources.getString(androidx.media3.ui.R.string.exo_controls_playback_speed);
+                resources.getString(R.string.exo_controls_playback_speed);
         settingIcons[SETTINGS_PLAYBACK_SPEED_POSITION] =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_speed);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_speed);
         settingTexts[SETTINGS_AUDIO_TRACK_SELECTION_POSITION] =
-                resources.getString(androidx.media3.ui.R.string.exo_track_selection_title_audio);
+                resources.getString(R.string.exo_track_selection_title_audio);
         settingIcons[SETTINGS_AUDIO_TRACK_SELECTION_POSITION] =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_audiotrack);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_audiotrack);
         settingsAdapter = new SettingsAdapter(settingTexts, settingIcons);
-        settingsWindowMargin = resources.getDimensionPixelSize(androidx.media3.ui.R.dimen.exo_settings_offset);
+        settingsWindowMargin = resources.getDimensionPixelSize(R.dimen.exo_settings_offset);
         settingsView =
                 (RecyclerView)
                         LayoutInflater.from(context)
-                                .inflate(androidx.media3.ui.R.layout.exo_styled_settings_list, /* root= */ null);
+                                .inflate(R.layout.exo_styled_settings_list, /* root= */ null);
         settingsView.setAdapter(settingsAdapter);
         settingsView.setLayoutManager(new LinearLayoutManager(getContext()));
         settingsWindow =
@@ -649,49 +663,49 @@ public class PlayerControlView extends FrameLayout {
 
         trackNameProvider = new DefaultTrackNameProvider(getResources());
         subtitleOnButtonDrawable =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_subtitle_on);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_subtitle_on);
         subtitleOffButtonDrawable =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_subtitle_off);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_subtitle_off);
         subtitleOnContentDescription =
-                resources.getString(androidx.media3.ui.R.string.exo_controls_cc_enabled_description);
+                resources.getString(R.string.exo_controls_cc_enabled_description);
         subtitleOffContentDescription =
-                resources.getString(androidx.media3.ui.R.string.exo_controls_cc_disabled_description);
+                resources.getString(R.string.exo_controls_cc_disabled_description);
         textTrackSelectionAdapter = new TextTrackSelectionAdapter();
         audioTrackSelectionAdapter = new AudioTrackSelectionAdapter();
         playbackSpeedAdapter =
                 new PlaybackSpeedAdapter(
-                        resources.getStringArray(androidx.media3.ui.R.array.exo_controls_playback_speeds), PLAYBACK_SPEEDS);
+                        resources.getStringArray(R.array.exo_controls_playback_speeds), PLAYBACK_SPEEDS);
 
         fullScreenExitDrawable =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_fullscreen_exit);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_fullscreen_exit);
         fullScreenEnterDrawable =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_fullscreen_enter);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_fullscreen_enter);
         repeatOffButtonDrawable =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_repeat_off);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_repeat_off);
         repeatOneButtonDrawable =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_repeat_one);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_repeat_one);
         repeatAllButtonDrawable =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_repeat_all);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_repeat_all);
         shuffleOnButtonDrawable =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_shuffle_on);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_shuffle_on);
         shuffleOffButtonDrawable =
-                getDrawable(context, resources, androidx.media3.ui.R.drawable.exo_styled_controls_shuffle_off);
+                getDrawable(context, resources, R.drawable.exo_styled_controls_shuffle_off);
         fullScreenExitContentDescription =
-                resources.getString(androidx.media3.ui.R.string.exo_controls_fullscreen_exit_description);
+                resources.getString(R.string.exo_controls_fullscreen_exit_description);
         fullScreenEnterContentDescription =
-                resources.getString(androidx.media3.ui.R.string.exo_controls_fullscreen_enter_description);
+                resources.getString(R.string.exo_controls_fullscreen_enter_description);
         repeatOffButtonContentDescription =
-                resources.getString(androidx.media3.ui.R.string.exo_controls_repeat_off_description);
+                resources.getString(R.string.exo_controls_repeat_off_description);
         repeatOneButtonContentDescription =
-                resources.getString(androidx.media3.ui.R.string.exo_controls_repeat_one_description);
+                resources.getString(R.string.exo_controls_repeat_one_description);
         repeatAllButtonContentDescription =
-                resources.getString(androidx.media3.ui.R.string.exo_controls_repeat_all_description);
-        shuffleOnContentDescription = resources.getString(androidx.media3.ui.R.string.exo_controls_shuffle_on_description);
+                resources.getString(R.string.exo_controls_repeat_all_description);
+        shuffleOnContentDescription = resources.getString(R.string.exo_controls_shuffle_on_description);
         shuffleOffContentDescription =
-                resources.getString(androidx.media3.ui.R.string.exo_controls_shuffle_off_description);
+                resources.getString(R.string.exo_controls_shuffle_off_description);
 
         // TODO(insun) : Make showing bottomBar configurable. (ex. show_bottom_bar attribute).
-        bottomBar = findViewById(androidx.media3.ui.R.id.exo_bottom_bar);
+        bottomBar = findViewById(R.id.exo_bottom_bar);
         controlViewLayoutManager.setShowButton(bottomBar, true);
         controlViewLayoutManager.setShowButton(fastForwardButton, showFastForwardButton);
         controlViewLayoutManager.setShowButton(rewindButton, showRewindButton);
@@ -1036,6 +1050,21 @@ public class PlayerControlView extends FrameLayout {
         backButton.setOnClickListener(onBackButtonClickListener);
     }
 
+    public void setOnResetZoomButtonClickListener(
+            @Nullable View.OnClickListener listener) {
+        onResetZoomButtonClickListener = listener;
+        resetZoomView.setOnClickListener(onResetZoomButtonClickListener);
+    }
+
+    public void onZoomStateChanged(boolean isZoom) {
+        this.isZoom = isZoom;
+        if (isZoom) {
+            resetZoomView.setVisibility(View.VISIBLE);
+        } else {
+            resetZoomView.setVisibility(View.GONE);
+        }
+    }
+
     /**
      * Shows the playback controls. If {@link #getShowTimeoutMs()} is positive then the controls will
      * be automatically hidden after this duration of time has elapsed without user input.
@@ -1100,13 +1129,13 @@ public class PlayerControlView extends FrameLayout {
             @DrawableRes
             int drawableRes =
                     shouldShowPlayButton
-                            ? androidx.media3.ui.R.drawable.exo_styled_controls_play
-                            : androidx.media3.ui.R.drawable.exo_styled_controls_pause;
+                            ? R.drawable.exo_styled_controls_play
+                            : R.drawable.exo_styled_controls_pause;
             @StringRes
             int stringRes =
                     shouldShowPlayButton
-                            ? androidx.media3.ui.R.string.exo_controls_play_description
-                            : androidx.media3.ui.R.string.exo_controls_pause_description;
+                            ? R.string.exo_controls_play_description
+                            : R.string.exo_controls_pause_description;
             ((ImageView) playPauseButton)
                     .setImageDrawable(getDrawable(getContext(), resources, drawableRes));
             playPauseButton.setContentDescription(resources.getString(stringRes));
@@ -1164,7 +1193,7 @@ public class PlayerControlView extends FrameLayout {
         if (rewindButton != null) {
             rewindButton.setContentDescription(
                     resources.getQuantityString(
-                            androidx.media3.ui.R.plurals.exo_controls_rewind_by_amount_description, rewindSec, rewindSec));
+                            R.plurals.exo_controls_rewind_by_amount_description, rewindSec, rewindSec));
         }
     }
 
@@ -1178,7 +1207,7 @@ public class PlayerControlView extends FrameLayout {
         if (fastForwardButton != null) {
             fastForwardButton.setContentDescription(
                     resources.getQuantityString(
-                            androidx.media3.ui.R.plurals.exo_controls_fastforward_by_amount_description,
+                            R.plurals.exo_controls_fastforward_by_amount_description,
                             fastForwardSec,
                             fastForwardSec));
         }
@@ -1560,6 +1589,10 @@ public class PlayerControlView extends FrameLayout {
         }
     }
 
+    public void playOrPause() {
+        Util.handlePlayPauseButtonAction(player, showPlayButtonIfSuppressed);
+    }
+
     private void supportDisplayCutouts() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             Activity activity = ViewExtKt.getTryActivity(this);
@@ -1567,21 +1600,29 @@ public class PlayerControlView extends FrameLayout {
                 View decorView = activity.getWindow().getDecorView();
                 decorView.post(() -> {
                     DisplayCutout displayCutout = decorView.getRootWindowInsets().getDisplayCutout();
-                    View v = findViewById(R.id.layout_custom_control_view);
-                    if (v != null && displayCutout != null) {
-                        ViewExtKt.updateSafeInset(v, displayCutout);
+                    if (displayCutout == null) {
+                        return;
                     }
-//                    if (topBar != null) {
-//                        ViewExtKt.updateSafeInset(topBar, displayCutout);
-//                    }
-//                    if (bottomBar != null) {
-//                        ViewExtKt.updateSafeInset(bottomBar, displayCutout);
-//                    }
-//                    if (timeBar != null && timeBar instanceof View) {
-//                        ViewExtKt.updateSafeInset((View) timeBar, displayCutout);
-//                    }
+                    if (topBar != null) {
+                        ViewExtKt.updateSafeInset(topBar, displayCutout);
+                    }
+                    if (bottomBar != null) {
+                        ViewExtKt.updateSafeInset(bottomBar, displayCutout);
+                    }
+                    if (timeBar != null && timeBar instanceof View) {
+                        ViewExtKt.updateSafeInset((View) timeBar, displayCutout);
+                    }
                 });
             }
+        }
+    }
+
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE ||
+                newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            supportDisplayCutouts();
         }
     }
 
@@ -1764,7 +1805,7 @@ public class PlayerControlView extends FrameLayout {
     @SuppressWarnings("ResourceType")
     private static @RepeatModeUtil.RepeatToggleModes int getRepeatToggleModes(
             TypedArray a, @RepeatModeUtil.RepeatToggleModes int defaultValue) {
-        return a.getInt(androidx.media3.ui.R.styleable.PlayerControlView_repeat_toggle_modes, defaultValue);
+        return a.getInt(R.styleable.PlayerControlView_repeat_toggle_modes, defaultValue);
     }
 
     private final class ComponentListener
@@ -1919,7 +1960,7 @@ public class PlayerControlView extends FrameLayout {
         public SettingViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v =
                     LayoutInflater.from(getContext())
-                            .inflate(androidx.media3.ui.R.layout.exo_styled_settings_list_item, parent, /* attachToRoot= */ false);
+                            .inflate(R.layout.exo_styled_settings_list_item, parent, /* attachToRoot= */ false);
             return new SettingViewHolder(v);
         }
 
@@ -1995,9 +2036,9 @@ public class PlayerControlView extends FrameLayout {
                 // Workaround for https://github.com/google/ExoPlayer/issues/9061.
                 itemView.setFocusable(true);
             }
-            mainTextView = itemView.findViewById(androidx.media3.ui.R.id.exo_main_text);
-            subTextView = itemView.findViewById(androidx.media3.ui.R.id.exo_sub_text);
-            iconView = itemView.findViewById(androidx.media3.ui.R.id.exo_icon);
+            mainTextView = itemView.findViewById(R.id.exo_main_text);
+            subTextView = itemView.findViewById(R.id.exo_sub_text);
+            iconView = itemView.findViewById(R.id.exo_icon);
             itemView.setOnClickListener(v -> onSettingViewClicked(getAdapterPosition()));
         }
     }
@@ -2035,7 +2076,7 @@ public class PlayerControlView extends FrameLayout {
             View v =
                     LayoutInflater.from(getContext())
                             .inflate(
-                                    androidx.media3.ui.R.layout.exo_styled_sub_settings_list_item, parent, /* attachToRoot= */ false);
+                                    R.layout.exo_styled_sub_settings_list_item, parent, /* attachToRoot= */ false);
             return new SubSettingViewHolder(v);
         }
 
@@ -2106,7 +2147,7 @@ public class PlayerControlView extends FrameLayout {
         @Override
         public void onBindViewHolderAtZeroPosition(SubSettingViewHolder holder) {
             // CC options include "Off" at the first position, which disables text rendering.
-            holder.textView.setText(androidx.media3.ui.R.string.exo_track_selection_none);
+            holder.textView.setText(R.string.exo_track_selection_none);
             boolean isTrackSelectionOff = true;
             for (int i = 0; i < tracks.size(); i++) {
                 if (tracks.get(i).isSelected()) {
@@ -2152,7 +2193,7 @@ public class PlayerControlView extends FrameLayout {
         @Override
         public void onBindViewHolderAtZeroPosition(SubSettingViewHolder holder) {
             // Audio track selection option includes "Auto" at the top.
-            holder.textView.setText(androidx.media3.ui.R.string.exo_track_selection_auto);
+            holder.textView.setText(R.string.exo_track_selection_auto);
             // hasSelectionOverride is true means there is an explicit track selection, not "Auto".
             TrackSelectionParameters parameters = checkNotNull(player).getTrackSelectionParameters();
             boolean hasSelectionOverride = hasSelectionOverride(parameters);
@@ -2174,7 +2215,7 @@ public class PlayerControlView extends FrameLayout {
                                                 .build());
                         settingsAdapter.setSubTextAtPosition(
                                 SETTINGS_AUDIO_TRACK_SELECTION_POSITION,
-                                getResources().getString(androidx.media3.ui.R.string.exo_track_selection_auto));
+                                getResources().getString(R.string.exo_track_selection_auto));
                         settingsWindow.dismiss();
                     });
         }
@@ -2202,13 +2243,13 @@ public class PlayerControlView extends FrameLayout {
             if (trackInformations.isEmpty()) {
                 settingsAdapter.setSubTextAtPosition(
                         SETTINGS_AUDIO_TRACK_SELECTION_POSITION,
-                        getResources().getString(androidx.media3.ui.R.string.exo_track_selection_none));
+                        getResources().getString(R.string.exo_track_selection_none));
                 // TODO(insun) : Make the audio item in main settings (settingsAdapater)
                 //  to be non-clickable.
             } else if (!hasSelectionOverride(params)) {
                 settingsAdapter.setSubTextAtPosition(
                         SETTINGS_AUDIO_TRACK_SELECTION_POSITION,
-                        getResources().getString(androidx.media3.ui.R.string.exo_track_selection_auto));
+                        getResources().getString(R.string.exo_track_selection_auto));
             } else {
                 for (int i = 0; i < trackInformations.size(); i++) {
                     TrackInformation track = trackInformations.get(i);
@@ -2237,7 +2278,7 @@ public class PlayerControlView extends FrameLayout {
             View v =
                     LayoutInflater.from(getContext())
                             .inflate(
-                                    androidx.media3.ui.R.layout.exo_styled_sub_settings_list_item, parent, /* attachToRoot= */ false);
+                                    R.layout.exo_styled_sub_settings_list_item, parent, /* attachToRoot= */ false);
             return new SubSettingViewHolder(v);
         }
 
@@ -2303,8 +2344,8 @@ public class PlayerControlView extends FrameLayout {
                 // Workaround for https://github.com/google/ExoPlayer/issues/9061.
                 itemView.setFocusable(true);
             }
-            textView = itemView.findViewById(androidx.media3.ui.R.id.exo_text);
-            checkView = itemView.findViewById(androidx.media3.ui.R.id.exo_check);
+            textView = itemView.findViewById(R.id.exo_text);
+            checkView = itemView.findViewById(R.id.exo_check);
         }
     }
 }

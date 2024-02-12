@@ -14,8 +14,8 @@
     <item name="view_add_insets_margin_left_tag" type="id" />
     <item name="view_add_insets_margin_right_tag" type="id" />
 
-    <item name="view_player_insets_tag_1" type="id" />
-    <item name="view_player_insets_tag_2" type="id" />
-    <item name="view_player_insets_tag_3" type="id" />
-    <item name="view_player_insets_tag_4" type="id" />
+    <item name="view_player_insets_tag_left" type="id" />
+    <item name="view_player_insets_tag_right" type="id" />
+    <item name="view_player_insets_tag_top" type="id" />
+    <item name="view_player_insets_tag_bottom" type="id" />
 </resources>

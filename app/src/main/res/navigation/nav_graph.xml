@@ -84,4 +84,30 @@
         app:exitAnim="@anim/nav_default_exit_anim"
         app:popEnterAnim="@anim/nav_default_pop_enter_anim"
         app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/about_fragment"
+        android:name="com.skyd.anivu.ui.fragment.about.AboutFragment"
+        android:label="@string/about_fragment_name"
+        tools:layout="@layout/fragment_about" />
+    <action
+        android:id="@+id/action_to_about_fragment"
+        app:destination="@id/about_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/license_fragment"
+        android:name="com.skyd.anivu.ui.fragment.license.LicenseFragment"
+        android:label="@string/license_fragment_name"
+        tools:layout="@layout/fragment_license" />
+    <action
+        android:id="@+id/action_to_license_fragment"
+        app:destination="@id/license_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 </navigation>

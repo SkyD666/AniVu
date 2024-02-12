@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.skyd.anivu.appContext
 import com.skyd.anivu.ext.screenIsLand
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.MoreBean
 
 class AniSpanSize(
     private val adapter: VarietyAdapter,
@@ -17,11 +18,13 @@ class AniSpanSize(
         return if (enableLandScape && appContext.screenIsLand) {
             when (adapter.dataList[position]) {
                 is FeedBean -> MAX_SPAN_SIZE
+                is MoreBean -> MAX_SPAN_SIZE / 3
                 else -> MAX_SPAN_SIZE
             }
         } else {
             when (adapter.dataList[position]) {
                 is FeedBean -> MAX_SPAN_SIZE
+                is MoreBean -> MAX_SPAN_SIZE / 2
                 else -> MAX_SPAN_SIZE
             }
         }

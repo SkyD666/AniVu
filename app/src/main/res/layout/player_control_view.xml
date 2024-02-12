@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_custom_control_view"
@@ -17,10 +17,10 @@
         android:id="@+id/exo_top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
         android:background="@drawable/shape_gray_transparent_angle_270"
         android:layoutDirection="ltr"
-        android:paddingBottom="@dimen/exo_styled_top_bar_padding_bottom">
+        android:paddingBottom="@dimen/exo_styled_top_bar_padding_bottom"
+        app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
             android:id="@+id/exo_back"
@@ -49,7 +49,7 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@id/exo_bottom_bar"
         android:layout_width="match_parent"
         android:layout_height="@dimen/exo_styled_bottom_bar_height"
@@ -57,12 +57,14 @@
         android:layout_marginTop="@dimen/exo_styled_bottom_bar_margin_top"
         android:background="@drawable/shape_gray_transparent_angle_90"
         android:layoutDirection="ltr"
-        android:paddingTop="@dimen/exo_styled_bottom_bar_padding_top">
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
+            android:id="@+id/exo_basic_controls_left"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|start">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
 
             <ImageButton
                 android:id="@id/exo_play_pause"
@@ -102,8 +104,9 @@
             android:id="@id/exo_basic_controls"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical|end"
-            android:layoutDirection="ltr">
+            android:layoutDirection="ltr"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <ImageButton
                 android:id="@id/exo_vr"
@@ -128,15 +131,22 @@
             <ImageButton
                 android:id="@id/exo_overflow_show"
                 style="@style/ExoStyledControls.Button.Bottom.OverflowShow" />
-
         </LinearLayout>
+
+        <View
+            android:id="@id/exo_progress_placeholder"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/exo_styled_progress_layout_height"
+            app:layout_constraintBottom_toTopOf="@id/exo_basic_controls_left" />
 
         <HorizontalScrollView
             android:id="@id/exo_extra_controls_scroll_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical|end"
-            android:visibility="invisible">
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
 
             <LinearLayout
                 android:id="@id/exo_extra_controls"
@@ -147,34 +157,30 @@
                 <ImageButton
                     android:id="@id/exo_overflow_hide"
                     style="@style/ExoStyledControls.Button.Bottom.OverflowHide" />
-
             </LinearLayout>
-
         </HorizontalScrollView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </FrameLayout>
-
-    <View
-        android:id="@id/exo_progress_placeholder"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/exo_styled_progress_layout_height"
-        android:layout_gravity="bottom"
-        android:layout_marginBottom="@dimen/exo_styled_progress_margin_bottom" />
+    <TextView
+        android:id="@+id/exo_reset_zoom"
+        style="@style/AniVuStyledControls.Button.ResetZoom"
+        app:layout_constraintBottom_toTopOf="@id/exo_bottom_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
         android:id="@id/exo_minimal_controls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
         android:layout_marginBottom="@dimen/exo_styled_minimal_controls_margin_bottom"
         android:gravity="center_vertical"
         android:layoutDirection="ltr"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageButton
             android:id="@id/exo_minimal_fullscreen"
             style="@style/ExoStyledControls.Button.Bottom.FullScreen" />
-
     </LinearLayout>
-
-</FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

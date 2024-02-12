@@ -32,6 +32,8 @@ import android.view.animation.LinearInterpolator;
 import androidx.annotation.Nullable;
 import androidx.media3.ui.DefaultTimeBar;
 
+import com.skyd.anivu.R;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,6 +65,8 @@ import java.util.List;
     private final ViewGroup bottomBar;
     @Nullable
     private final ViewGroup topBar;
+    @Nullable
+    private final View resetZoomButton;
     @Nullable
     private final ViewGroup minimalControls;
     @Nullable
@@ -125,6 +129,9 @@ import java.util.List;
 
         // Relating to Top Bar View
         topBar = playerControlView.findViewById(com.skyd.anivu.R.id.exo_top_bar);
+
+        // Relating to Reset Zoom View
+        resetZoomButton = playerControlView.findViewById(R.id.exo_reset_zoom);
 
         // Relating to Bottom Bar Left View
         timeView = playerControlView.findViewById(androidx.media3.ui.R.id.exo_time);
@@ -241,7 +248,8 @@ import java.util.List;
                 .play(fadeOutAnimator)
                 .with(ofAlpha(1, 0, timeBar))
                 .with(ofAlpha(1, 0, bottomBar))
-                .with(ofAlpha(1, 0, topBar));
+                .with(ofAlpha(1, 0, topBar))
+                .with(ofAlpha(1, 0, resetZoomButton));
 
         hideProgressBarAnimator = new AnimatorSet();
         hideProgressBarAnimator.setDuration(DURATION_FOR_HIDING_ANIMATION_MS);
@@ -264,7 +272,8 @@ import java.util.List;
         hideProgressBarAnimator
                 .play(ofAlpha(1, 0, timeBar))
                 .with(ofAlpha(1, 0, bottomBar))
-                .with(ofAlpha(1, 0, topBar));
+                .with(ofAlpha(1, 0, topBar))
+                .with(ofAlpha(1, 0, resetZoomButton));
 
         hideAllBarsAnimator = new AnimatorSet();
         hideAllBarsAnimator.setDuration(DURATION_FOR_HIDING_ANIMATION_MS);
@@ -288,7 +297,8 @@ import java.util.List;
                 .play(fadeOutAnimator)
                 .with(ofAlpha(1, 0, timeBar))
                 .with(ofAlpha(1, 0, bottomBar))
-                .with(ofAlpha(1, 0, topBar));
+                .with(ofAlpha(1, 0, topBar))
+                .with(ofAlpha(1, 0, resetZoomButton));
 
         showMainBarAnimator = new AnimatorSet();
         showMainBarAnimator.setDuration(DURATION_FOR_SHOWING_ANIMATION_MS);
@@ -308,7 +318,8 @@ import java.util.List;
                 .play(fadeInAnimator)
                 .with(ofAlpha(0, 1, timeBar))
                 .with(ofAlpha(0, 1, bottomBar))
-                .with(ofAlpha(0, 1, topBar));
+                .with(ofAlpha(0, 1, topBar))
+                .with(ofAlpha(0, 1, resetZoomButton));
 
         showAllBarsAnimator = new AnimatorSet();
         showAllBarsAnimator.setDuration(DURATION_FOR_SHOWING_ANIMATION_MS);
@@ -328,7 +339,8 @@ import java.util.List;
                 .play(fadeInAnimator)
                 .with(ofAlpha(0, 1, timeBar))
                 .with(ofAlpha(0, 1, bottomBar))
-                .with(ofAlpha(0, 1, topBar));
+                .with(ofAlpha(0, 1, topBar))
+                .with(ofAlpha(0, 1, resetZoomButton));
 
         overflowShowAnimator = ValueAnimator.ofFloat(0.0f, 1.0f);
         overflowShowAnimator.setDuration(DURATION_FOR_SHOWING_ANIMATION_MS);

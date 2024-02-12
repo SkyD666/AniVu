@@ -12,6 +12,7 @@
         android:layout_height="match_parent"
         app:controller_layout_id="@layout/player_control_view"
         app:show_buffering="when_playing"
+        app:surface_type="texture_view"
         app:use_controller="true" />
 
 </FrameLayout>

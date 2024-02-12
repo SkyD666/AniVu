@@ -32,6 +32,7 @@ class Download1Proxy(
             when (data.downloadState) {
                 DownloadInfoBean.DownloadState.Downloading -> onPause(data)
                 DownloadInfoBean.DownloadState.Paused -> onResume(data)
+                DownloadInfoBean.DownloadState.ErrorPaused -> onResume(data)
                 else -> Unit
             }
         }
