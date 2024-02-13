@@ -48,7 +48,7 @@
 5. Support **dark mode**
 6. ......
 
-## 🚧Todo
+## 🚧 Todo
 
 1. **Long press** on the video screen for variable playback **speed**
 2. **Swipe** on the video screen to **adjust volume**, screen brightness, and **playback position**

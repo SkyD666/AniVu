@@ -12,48 +12,42 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<com.skyd.anivu.ui.player.LargeContentFrame xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/exo_large_content_frame"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
-    android:clickable="true"
-    android:focusable="true"
     tools:ignore="PrivateResource">
 
-    <com.skyd.anivu.ui.component.ZoomView
-        android:id="@+id/exo_zoom_view"
+    <!-- 不应该相应触摸 -->
+    <androidx.media3.ui.AspectRatioFrameLayout
+        android:id="@id/exo_content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center">
 
-        <androidx.media3.ui.AspectRatioFrameLayout
-            android:id="@id/exo_content_frame"
+        <!-- Video surface will be inserted as the first child of the content frame. -->
+
+        <!-- 不应该相应触摸 -->
+        <View
+            android:id="@id/exo_shutter"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_gravity="center">
+            android:background="@android:color/black" />
 
-            <!-- Video surface will be inserted as the first child of the content frame. -->
+        <!-- 不应该相应触摸 -->
+        <ImageView
+            android:id="@id/exo_artwork"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY" />
 
-            <View
-                android:id="@id/exo_shutter"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="@android:color/black" />
-
-            <ImageView
-                android:id="@id/exo_artwork"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitXY" />
-
-            <androidx.media3.ui.SubtitleView
-                android:id="@id/exo_subtitles"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-        </androidx.media3.ui.AspectRatioFrameLayout>
-    </com.skyd.anivu.ui.component.ZoomView>
+        <!-- 不应该相应触摸 -->
+        <androidx.media3.ui.SubtitleView
+            android:id="@id/exo_subtitles"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </androidx.media3.ui.AspectRatioFrameLayout>
 
     <ProgressBar
         android:id="@id/exo_buffering"
@@ -92,4 +86,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</com.skyd.anivu.ui.player.LargeContentFrame>
+</FrameLayout>

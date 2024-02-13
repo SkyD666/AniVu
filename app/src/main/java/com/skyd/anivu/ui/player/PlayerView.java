@@ -38,6 +38,7 @@ import android.graphics.drawable.Drawable;
 import android.opengl.GLSurfaceView;
 import android.os.Looper;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -52,6 +53,7 @@ import android.widget.TextView;
 import androidx.annotation.ColorInt;
 import androidx.annotation.DoNotInline;
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.content.ContextCompat;
@@ -78,8 +80,7 @@ import androidx.media3.ui.DefaultTimeBar;
 import androidx.media3.ui.SubtitleView;
 
 import com.google.common.collect.ImmutableList;
-import com.skyd.anivu.R;
-import com.skyd.anivu.ui.component.ZoomView;
+import com.skyd.anivu.ui.component.ScaleRotateGestureDetector;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -285,10 +286,6 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
 
     private final ComponentListener componentListener;
     @Nullable
-    private final ZoomView zoomView;
-    @Nullable
-    private final LargeContentFrame largeContentFrame;
-    @Nullable
     private final AspectRatioFrameLayout contentFrame;
     @Nullable
     private final View shutterView;
@@ -342,6 +339,48 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
     private int textureViewRotation;
     private boolean isTouching;
 
+    private final ScaleRotateGestureDetector scaleRotateGestureDetector = new ScaleRotateGestureDetector(
+            new ScaleRotateGestureDetector.OnScaleRotateGestureListener() {
+                @Override
+                public boolean onUpdate(@NonNull ScaleRotateGestureDetector rotationDetector) {
+                    if (contentFrame != null) {
+                        contentFrame.setRotation(rotationDetector.getRotation());
+                        contentFrame.setScaleX(rotationDetector.getScale());
+                        contentFrame.setScaleY(rotationDetector.getScale());
+                        contentFrame.setTranslationX(rotationDetector.getTranslationX());
+                        contentFrame.setTranslationY(rotationDetector.getTranslationY());
+                    }
+                    return true;
+                }
+
+                @Override
+                public void isZoomChanged(boolean isZoom) {
+                    if (controller != null) {
+                        controller.onZoomStateChanged(isZoom);
+                    }
+                }
+            }
+    );
+
+    private final GestureDetector gestureDetector = new GestureDetector(
+            getContext(), new GestureDetector.SimpleOnGestureListener() {
+        @Override
+        public boolean onDoubleTap(@NonNull MotionEvent e) {
+            if (controller != null) {
+                controller.playOrPause();
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
+            toggleControllerVisibility();
+            return true;
+        }
+    });
+
     public PlayerView(Context context) {
         this(context, /* attrs= */ null);
     }
@@ -357,9 +396,7 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
         componentListener = new ComponentListener();
 
         if (isInEditMode()) {
-            zoomView = null;
             contentFrame = null;
-            largeContentFrame = null;
             shutterView = null;
             surfaceView = null;
             surfaceViewIgnoresVideoAspectRatio = false;
@@ -431,16 +468,11 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
         LayoutInflater.from(context).inflate(playerLayoutId, this);
         setDescendantFocusability(FOCUS_AFTER_DESCENDANTS);
 
-        zoomView = findViewById(R.id.exo_zoom_view);
-
         // Content frame.
         contentFrame = findViewById(androidx.media3.ui.R.id.exo_content_frame);
         if (contentFrame != null) {
             setResizeModeRaw(contentFrame, resizeMode);
         }
-
-        // Large Content frame.
-        largeContentFrame = findViewById(R.id.exo_large_content_frame);
 
         // Shutter view.
         shutterView = findViewById(androidx.media3.ui.R.id.exo_shutter);
@@ -494,12 +526,6 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
             surfaceView.setOnClickListener(componentListener);
             surfaceView.setClickable(false);
             contentFrame.addView(surfaceView, 0);
-            // We don't want zoomView to be clickable separately to the PlayerView itself, but we
-            // do want to register as an OnClickListener so that zoomView implementations can propagate
-            // click events up to the PlayerView by calling their own performClick method.
-            if (zoomView != null) {
-                zoomView.setOnClickListener(componentListener);
-            }
         } else {
             surfaceView = null;
         }
@@ -568,34 +594,13 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
             controller.addVisibilityListener(/* listener= */ componentListener);
 
             controller.onZoomStateChanged(false);
-            if (zoomView != null) {
-                controller.setOnResetZoomButtonClickListener((v) -> zoomView.restore());
-                zoomView.setOnZoomListener(controller::onZoomStateChanged);
-            }
-        }
-
-        if (largeContentFrame != null) {
-            largeContentFrame.setOnDoubleClickListener(() -> {
-                if (controller != null) {
-                    controller.playOrPause();
-                }
-                return kotlin.Unit.INSTANCE;
-            });
-//            ViewExtKt.setOnDoubleTapListener(
-//                    largeContentFrame, () -> {
-//                        if (controller != null) {
-//                            controller.playOrPause();
-//                        }
-//                        return kotlin.Unit.INSTANCE;
-//                    }
-//            );
+            controller.setOnResetZoomButtonClickListener((v) -> scaleRotateGestureDetector.restore(contentFrame));
         }
         if (useController) {
             setClickable(true);
         }
+
         updateContentDescription();
-
-
     }
 
     /**
@@ -1328,11 +1333,11 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
         return subtitleView;
     }
 
-    @Override
-    public boolean performClick() {
-        toggleControllerVisibility();
-        return super.performClick();
-    }
+//    @Override
+//    public boolean performClick() {
+//        toggleControllerVisibility();
+//        return super.performClick();
+//    }
 
     @Override
     public boolean onTrackballEvent(MotionEvent ev) {
@@ -1710,8 +1715,15 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
                 || keyCode == KeyEvent.KEYCODE_DPAD_CENTER;
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return gestureDetector.onTouchEvent(event)
+                || scaleRotateGestureDetector.onTouchEvent(event)
+                || super.onTouchEvent(event);
+    }
+
     // Implementing the deprecated PlayerControlView.VisibilityListener and
-    // PlayerControlView.OnFullScreenModeChangedListener for now.
+// PlayerControlView.OnFullScreenModeChangedListener for now.
     @SuppressWarnings("deprecation")
     private final class ComponentListener
             implements Player.Listener,

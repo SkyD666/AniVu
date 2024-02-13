@@ -1,6 +1,6 @@
 <div align="center">
     <div>
-        <img src="../image/Anivu.svg" style="height: 210px"/>
+        <img src="../image/AniVu.svg" style="height: 210px"/>
     </div>
     <h1>🥰 AniVu</h1>
     <p>
@@ -107,6 +107,7 @@
   </tr>
 </tbody>
 </table>
+
 ## 📃许可证
 
 使用此软件代码需**遵循以下许可证协议**

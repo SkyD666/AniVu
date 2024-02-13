@@ -300,7 +300,7 @@ fun View.setOnDoubleTapListener(onDoubleTap: () -> Unit) {
     }
     val doubleTapListener = DoubleTapListener(context, onDoubleTap)
     setOnTouchListener { v, event ->
-        v.performClick()
+//        v.performClick()
         doubleTapListener.onTouchEvent(event)
     }
 }
