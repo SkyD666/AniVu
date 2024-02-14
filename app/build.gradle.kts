@@ -5,7 +5,6 @@ plugins {
     id("org.jetbrains.kotlin.android")
     id("kotlinx-serialization")
     id("kotlin-parcelize")
-    kotlin("kapt")
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
 }
@@ -60,7 +59,7 @@ android {
             )
             applicationIdSuffix = ".debug"
             ndk {
-                abiFilters += mutableSetOf("armeabi", "x86", "x86_64", "arm64-v8a")
+                abiFilters += mutableSetOf("armeabi-v7a", "x86", "x86_64", "arm64-v8a")
             }
         }
         release {
@@ -99,10 +98,6 @@ android {
     }
 }
 
-kapt {
-    correctErrorTypes = true
-}
-
 tasks.withType(KotlinCompile::class.java).configureEach {
     kotlinOptions {
         freeCompilerArgs += listOf(
@@ -125,7 +120,7 @@ dependencies {
     implementation("com.google.android.material:material:1.11.0")
     implementation("com.google.dagger:hilt-android:2.50")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
-    kapt("com.google.dagger:hilt-android-compiler:2.50")
+    ksp("com.google.dagger:hilt-android-compiler:2.50")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:okhttp-coroutines-jvm:5.0.0-alpha.12")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")

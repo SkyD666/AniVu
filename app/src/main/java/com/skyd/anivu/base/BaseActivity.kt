@@ -11,8 +11,14 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     protected abstract fun getViewBinding(): T
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
+        enableEdgeToEdge()
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//            window.isStatusBarContrastEnforced = false
+//            window.isNavigationBarContrastEnforced = false
+//        }
+
         binding = getViewBinding()
 
         beforeSetContentView()

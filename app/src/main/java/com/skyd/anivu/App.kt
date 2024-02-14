@@ -2,6 +2,7 @@ package com.skyd.anivu
 
 import android.app.Application
 import android.content.Context
+import com.google.android.material.color.DynamicColors
 import dagger.hilt.android.HiltAndroidApp
 
 
@@ -11,6 +12,7 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
         appContext = this
+        DynamicColors.applyToActivitiesIfAvailable(this)
     }
 }
 
