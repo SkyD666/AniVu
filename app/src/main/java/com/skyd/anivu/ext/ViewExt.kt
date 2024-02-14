@@ -122,13 +122,13 @@ fun View.addInsetsByPadding(
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, ins ->
         if (top) {
             val lastTopPadding = v.getTag(R.id.view_add_insets_padding_top_tag) as? Int ?: 0
-            val newTopPadding = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            val newTopPadding = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top + ins.getInsets(WindowInsetsCompat.Type.captionBar()).top
             v.setTag(R.id.view_add_insets_padding_top_tag, newTopPadding)
             v.updatePadding(top = v.paddingTop - lastTopPadding + newTopPadding)
         }
         if (bottom) {
             val lastBottomPadding = v.getTag(R.id.view_add_insets_padding_bottom_tag) as? Int ?: 0
-            val newBottomPadding = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            val newBottomPadding = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom + ins.getInsets(WindowInsetsCompat.Type.captionBar()).bottom
             v.setTag(R.id.view_add_insets_padding_bottom_tag, newBottomPadding)
             v.updatePadding(bottom = v.paddingBottom - lastBottomPadding + newBottomPadding)
         }
@@ -159,7 +159,7 @@ fun View.addInsetsByMargin(
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, ins ->
         if (top) {
             val lastTopMargin = v.getTag(R.id.view_add_insets_margin_top_tag) as? Int ?: 0
-            val newTopMargin = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top
+            val newTopMargin = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top + ins.getInsets(WindowInsetsCompat.Type.captionBar()).top
             v.setTag(R.id.view_add_insets_margin_top_tag, newTopMargin)
             (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { layoutParams ->
                 layoutParams.topMargin = layoutParams.topMargin - lastTopMargin + newTopMargin
@@ -168,7 +168,7 @@ fun View.addInsetsByMargin(
         }
         if (bottom) {
             val lastBottomMargin = v.getTag(R.id.view_add_insets_margin_bottom_tag) as? Int ?: 0
-            val newBottomMargin = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom
+            val newBottomMargin = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom + ins.getInsets(WindowInsetsCompat.Type.captionBar()).bottom
             v.setTag(R.id.view_add_insets_margin_bottom_tag, newBottomMargin)
             (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { layoutParams ->
                 layoutParams.bottomMargin =

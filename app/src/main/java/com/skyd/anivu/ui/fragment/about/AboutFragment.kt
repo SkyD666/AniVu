@@ -103,7 +103,7 @@ class AboutFragment : BaseFragment<FragmentAboutBinding>() {
         ablAboutFragment.addInsetsByPadding(top = true, left = true, right = true)
         // Fix: https://github.com/material-components/material-components-android/issues/1310
         ViewCompat.setOnApplyWindowInsetsListener(ctlAboutFragment, null)
-        rvAboutFragment.addInsetsByPadding(bottom = true, left = true, right = true)
+        nsvAboutFragment.addInsetsByPadding(bottom = true, left = true, right = true)
     }
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =
