@@ -353,6 +353,8 @@ public class PlayerControlView extends FrameLayout {
     @Nullable
     private final View backButton;
     @Nullable
+    private final TextView seekPreviewView;
+    @Nullable
     private final View resetZoomView;
     @Nullable
     private final View playbackSpeedButton;
@@ -545,6 +547,11 @@ public class PlayerControlView extends FrameLayout {
             resetZoomView.setOnClickListener(onResetZoomButtonClickListener);
         }
         isZoom = false;
+
+        seekPreviewView = findViewById(com.skyd.anivu.R.id.exo_seek_preview);
+        if (seekPreviewView != null) {
+            seekPreviewView.setVisibility(View.GONE);
+        }
 
         playbackSpeedButton = findViewById(R.id.exo_playback_speed);
         if (playbackSpeedButton != null) {
@@ -1065,6 +1072,24 @@ public class PlayerControlView extends FrameLayout {
         }
     }
 
+    public boolean updateSeekPreview(long newPositionPos) {
+        if (seekPreviewView != null && player != null) {
+            newPositionPos = Math.min(Math.max(newPositionPos, 0), player.getContentDuration());
+            seekPreviewView.setText(
+                    Util.getStringForTime(formatBuilder, formatter, newPositionPos) + " / " +
+                            Util.getStringForTime(formatBuilder, formatter, player.getContentDuration())
+            );
+            return true;
+        }
+        return false;
+    }
+
+    public void setSeekPreviewVisibility(int visibility) {
+        if (seekPreviewView != null) {
+            seekPreviewView.setVisibility(visibility);
+        }
+    }
+
     /**
      * Shows the playback controls. If {@link #getShowTimeoutMs()} is positive then the controls will
      * be automatically hidden after this duration of time has elapsed without user input.
@@ -1095,10 +1120,11 @@ public class PlayerControlView extends FrameLayout {
     }
 
     /**
-     * Returns whether the controller is currently visible.
+     * Returns whether the auto hidden controller is currently visible.
      */
-    public boolean isVisible() {
-        return getVisibility() == VISIBLE;
+    public boolean isAutoHiddenControllerVisible() {
+        return findViewById(com.skyd.anivu.R.id.exo_auto_hidden_control_view).getVisibility()
+                == VISIBLE;
     }
 
     @SuppressWarnings("deprecation")
@@ -1121,7 +1147,7 @@ public class PlayerControlView extends FrameLayout {
     }
 
     private void updatePlayPauseButton() {
-        if (!isVisible() || !isAttachedToWindow) {
+        if (!isAutoHiddenControllerVisible() || !isAttachedToWindow) {
             return;
         }
         if (playPauseButton != null) {
@@ -1146,7 +1172,7 @@ public class PlayerControlView extends FrameLayout {
     }
 
     private void updateNavigation() {
-        if (!isVisible() || !isAttachedToWindow) {
+        if (!isAutoHiddenControllerVisible() || !isAttachedToWindow) {
             return;
         }
 
@@ -1214,7 +1240,7 @@ public class PlayerControlView extends FrameLayout {
     }
 
     private void updateRepeatModeButton() {
-        if (!isVisible() || !isAttachedToWindow || repeatToggleButton == null) {
+        if (!isAutoHiddenControllerVisible() || !isAttachedToWindow || repeatToggleButton == null) {
             return;
         }
 
@@ -1251,7 +1277,7 @@ public class PlayerControlView extends FrameLayout {
     }
 
     private void updateShuffleButton() {
-        if (!isVisible() || !isAttachedToWindow || shuffleButton == null) {
+        if (!isAutoHiddenControllerVisible() || !isAttachedToWindow || shuffleButton == null) {
             return;
         }
 
@@ -1416,7 +1442,7 @@ public class PlayerControlView extends FrameLayout {
     }
 
     private void updateProgress() {
-        if (!isVisible() || !isAttachedToWindow) {
+        if (!isAutoHiddenControllerVisible() || !isAttachedToWindow) {
             return;
         }
         @Nullable Player player = this.player;

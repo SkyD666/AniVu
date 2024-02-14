@@ -80,7 +80,7 @@ import androidx.media3.ui.DefaultTimeBar;
 import androidx.media3.ui.SubtitleView;
 
 import com.google.common.collect.ImmutableList;
-import com.skyd.anivu.ui.component.ScaleRotateGestureDetector;
+import com.skyd.anivu.ext.NumberExtKt;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -339,16 +339,62 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
     private int textureViewRotation;
     private boolean isTouching;
 
-    private final ScaleRotateGestureDetector scaleRotateGestureDetector = new ScaleRotateGestureDetector(
-            new ScaleRotateGestureDetector.OnScaleRotateGestureListener() {
+    private final PlayerGestureDetector playerGestureDetector = new PlayerGestureDetector(
+            new PlayerGestureDetector.PlayerGestureListener() {
+                // 只有在第一次显示SeekPreview前会限制deltaX和deltaY的比例和大小等
+                // 在本次Touch已经显示过SeekPreview后，不会再限制
+
+                private long startMovingVideoPos = -1;   // 负数表示还没开始移动
+
                 @Override
-                public boolean onUpdate(@NonNull ScaleRotateGestureDetector rotationDetector) {
+                public boolean onSingleMoved(float deltaX, float deltaY, float x, float y) {
+                    // 这里集中隐藏提示View，例如快进、亮度、声音等
+                    if (controller != null) {
+                        controller.setSeekPreviewVisibility(View.GONE);
+                    }
+
+                    float absDeltaX = Math.abs(deltaX);
+                    float absDeltaY = Math.abs(deltaY);
+                    // seekTo
+                    // 在记录过 seek起始点 或者符合约束时执行seek
+                    if (startMovingVideoPos >= 0 || absDeltaX > absDeltaY) {
+                        if (player != null) {
+                            player.seekTo(startMovingVideoPos
+                                    + (long) (NumberExtKt.getDp(deltaX) * 13));
+                            startMovingVideoPos = -1;
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public boolean onSingleMoving(float deltaX, float deltaY, float x, float y) {
+                    float absDeltaX = Math.abs(deltaX);
+                    float absDeltaY = Math.abs(deltaY);
+                    // seekTo
+                    // 在记录过 seek起始点 或者符合约束时更新SeekPreview
+                    if (startMovingVideoPos >= 0 || absDeltaX > absDeltaY) {
+                        if (startMovingVideoPos < 0) {
+                            startMovingVideoPos = player.getCurrentPosition();
+                        }
+                        if (controller != null) {
+                            controller.setSeekPreviewVisibility(View.VISIBLE);
+                            return controller.updateSeekPreview(startMovingVideoPos
+                                    + (long) (NumberExtKt.getDp(deltaX) * 13));
+                        }
+                    }
+                    return false;
+                }
+
+                @Override
+                public boolean onZoomUpdate(@NonNull PlayerGestureDetector detector) {
                     if (contentFrame != null) {
-                        contentFrame.setRotation(rotationDetector.getRotation());
-                        contentFrame.setScaleX(rotationDetector.getScale());
-                        contentFrame.setScaleY(rotationDetector.getScale());
-                        contentFrame.setTranslationX(rotationDetector.getTranslationX());
-                        contentFrame.setTranslationY(rotationDetector.getTranslationY());
+                        contentFrame.setRotation(detector.getRotation());
+                        contentFrame.setScaleX(detector.getScale());
+                        contentFrame.setScaleY(detector.getScale());
+                        contentFrame.setTranslationX(detector.getTranslationX());
+                        contentFrame.setTranslationY(detector.getTranslationY());
                     }
                     return true;
                 }
@@ -594,7 +640,9 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
             controller.addVisibilityListener(/* listener= */ componentListener);
 
             controller.onZoomStateChanged(false);
-            controller.setOnResetZoomButtonClickListener((v) -> scaleRotateGestureDetector.restore(contentFrame));
+            controller.setOnResetZoomButtonClickListener((v) -> {
+                playerGestureDetector.restoreZoom(contentFrame);
+            });
         }
         if (useController) {
             setClickable(true);
@@ -1718,7 +1766,7 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return gestureDetector.onTouchEvent(event)
-                || scaleRotateGestureDetector.onTouchEvent(event)
+                || playerGestureDetector.onTouchEvent(event)
                 || super.onTouchEvent(event);
     }
 

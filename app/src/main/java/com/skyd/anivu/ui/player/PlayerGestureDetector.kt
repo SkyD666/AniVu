@@ -1,11 +1,10 @@
-package com.skyd.anivu.ui.component
+package com.skyd.anivu.ui.player
 
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.os.Build
-import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.DecelerateInterpolator
@@ -14,32 +13,40 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
-class ScaleRotateGestureDetector(
-    private val mListener: OnScaleRotateGestureListener
-) {
-    private var isZoom = false
 
+class PlayerGestureDetector(
+    private val mListener: PlayerGestureListener
+) {
+    // ================================================= 双指操作的变量
+    private var isZoom = false
     var useAnimate: Boolean = true
 
-    var scale = 1f      // 伸缩比例
-    var translationX = 0f // 移动X
-    var translationY = 0f // 移动Y
-    var rotation = 0f // 旋转角度
+    var scale = 1f          // 伸缩比例
+    var translationX = 0f   // 移动X
+    var translationY = 0f   // 移动Y
+    var rotation = 0f       // 旋转角度
 
-    var lastScale = 1f      // 上次松开触摸前的伸缩比例
-    var lastTranslationX = 0f // 上次松开触摸前的移动X
-    var lastTranslationY = 0f // 上次松开触摸前的移动Y
-    var lastRotation = 0f // 上次松开触摸前的旋转角度
+    private var lastScale = 1f          // 上次松开触摸前的伸缩比例
+    private var lastTranslationX = 0f   // 上次松开触摸前的移动X
+    private var lastTranslationY = 0f   // 上次松开触摸前的移动Y
+    private var lastRotation = 0f       // 上次松开触摸前的旋转角度
 
     // 移动过程中临时变量
     private var actionX = 0f
     private var actionY = 0f
     private var spacing = 0f
     private var degree = 0f
-    private var moveType = 0 // 0=未选择，2=缩放
+    private var doublePointer = 0
+    // =================================================
 
-    // 恢复初始
-    fun restore(targetView: View? = null) {
+    // ================================================= 单指移动的变量
+    private var singleMoveDownX = 0f
+    private var singleMoveDownY = 0f
+    private var singleMove = 0      // 0：已抬起、1：按下、2：已移动并且移动距离超过阈值
+    // =================================================
+
+    // 恢复初始Zoom状态
+    fun restoreZoom(targetView: View? = null) {
         val animators: Array<Animator>
         if (targetView == null) {
             animators = arrayOf(
@@ -75,8 +82,8 @@ class ScaleRotateGestureDetector(
                 actionY = 0f
                 spacing = 0f
                 degree = 0f
-                moveType = 0
-                mListener.onUpdate(this@ScaleRotateGestureDetector)
+                doublePointer = 0
+                mListener.onZoomUpdate(this@PlayerGestureDetector)
             })
             start()
         }
@@ -87,11 +94,24 @@ class ScaleRotateGestureDetector(
 
     fun onTouchEvent(event: MotionEvent): Boolean {
         var handled = false
+        val x = event.x
+        val y = event.y
 
-        if (event.pointerCount > 1) {
-            when (event.actionMasked) {
-                MotionEvent.ACTION_POINTER_DOWN -> {
-                    moveType = 1
+        when (event.actionMasked) {
+            MotionEvent.ACTION_DOWN -> {
+                if (event.pointerCount == 1) {
+                    singleMove = 1
+//                    Log.e("TAG", "onTouchEvent: move down")
+                    singleMoveDownX = x
+                    singleMoveDownY = y
+                    handled = true
+                }
+            }
+
+            MotionEvent.ACTION_POINTER_DOWN -> {
+                if (singleMove != 2 && event.pointerCount == 2) {
+//                    Log.e("TAG", "onTouchEvent: scale down")
+                    doublePointer = 1
                     val centerX = getCenterX(event)
                     val centerY = getCenterY(event)
                     actionX = centerX
@@ -99,10 +119,25 @@ class ScaleRotateGestureDetector(
                     spacing = getSpacing(event)
                     degree = getDegree(event)
 
-                    handled = false
+                    handled = true
                 }
+            }
 
-                MotionEvent.ACTION_MOVE -> if (moveType == 1 && event.pointerCount > 1) {
+            MotionEvent.ACTION_MOVE -> {
+                if (singleMove > 0 && event.pointerCount == 1) {
+                    doublePointer = 0
+//                    Log.e("TAG", "onTouchEvent: move move")
+                    val deltaX = x - singleMoveDownX
+                    val deltaY = y - singleMoveDownY
+                    val absDeltaX = abs(deltaX)
+                    val absDeltaY = abs(deltaY)
+                    handled = if (singleMove == 2 || absDeltaX > 50 || absDeltaY > 50) {
+                        singleMove = 2
+                        mListener.onSingleMoving(deltaX, deltaY, x, y)
+                    } else false
+                } else if (doublePointer == 1 && event.pointerCount == 2) {
+                    singleMove = 0
+//                    Log.e("TAG", "onTouchEvent: scale move")
                     val centerX = getCenterX(event)
                     val centerY = getCenterY(event)
                     translationX = lastTranslationX + centerX - actionX
@@ -112,7 +147,8 @@ class ScaleRotateGestureDetector(
 
                     scale = lastScale * getSpacing(event) / spacing
                     rotation = lastRotation + getDegree(event) - degree
-                    rotation = (rotation / abs(rotation)) * (abs(rotation) % 360)
+                    // 把rotation限制在[-359, 359]
+                    rotation %= 360
 
                     if (!isZoom &&
                         (translationX != 0f || translationY != 0f || scale != 1f || rotation != 0f)
@@ -121,18 +157,31 @@ class ScaleRotateGestureDetector(
                         mListener.isZoomChanged(true)
                     }
 
-                    handled = mListener.onUpdate(this)
+                    handled = mListener.onZoomUpdate(this)
+                } else {
+                    doublePointer = 0
                 }
+            }
 
-                MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> if (event.pointerCount > 1) {
-                    moveType = 0
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> {
+                // 单指滑动了一段距离，第二个手指又落下滑动，然后两个手指抬起
+                // 这时候应该只响应单指滑动，因为它先产生的。
+                // 所以这时event.pointerCount可能不1，所以不能加&& event.pointerCount == 1
+                if (singleMove > 0/* && event.pointerCount == 1*/) {
+                    val deltaX = x - singleMoveDownX
+                    val deltaY = y - singleMoveDownY
+                    handled = mListener.onSingleMoved(deltaX, deltaY, x, y)
+                } else if (doublePointer == 1 && event.pointerCount == 2) {
+                    doublePointer = 0
                     lastScale = scale
                     lastTranslationX = translationX
                     lastTranslationY = translationY
                     lastRotation = rotation
 
-                    handled = false
+                    handled = true
                 }
+                singleMove = 0
+                doublePointer = 0
             }
         }
         return handled
@@ -173,9 +222,10 @@ class ScaleRotateGestureDetector(
         return Math.toDegrees(radians).toFloat()
     }
 
-    interface OnScaleRotateGestureListener {
-        fun onUpdate(rotationDetector: ScaleRotateGestureDetector): Boolean = false
-
+    interface PlayerGestureListener {
+        fun onZoomUpdate(detector: PlayerGestureDetector): Boolean = false
+        fun onSingleMoving(deltaX: Float, deltaY: Float, x: Float, y: Float): Boolean = false
+        fun onSingleMoved(deltaX: Float, deltaY: Float, x: Float, y: Float): Boolean = false
         fun isZoomChanged(isZoom: Boolean) {}
     }
 

@@ -57,6 +57,7 @@ import java.util.List;
 
     private final PlayerControlView playerControlView;
 
+    private final ViewGroup autoHiddenControllerView;
     @Nullable
     private final View controlsBackground;
     @Nullable
@@ -116,6 +117,9 @@ import java.util.List;
         animationEnabled = true;
         uxState = UX_STATE_ALL_VISIBLE;
         shownButtons = new ArrayList<>();
+
+        // 可以自动隐藏的ViewGroup
+        autoHiddenControllerView = playerControlView.findViewById(com.skyd.anivu.R.id.exo_auto_hidden_control_view);
 
         // Relating to Center View
         controlsBackground = playerControlView.findViewById(androidx.media3.ui.R.id.exo_controls_background);
@@ -388,8 +392,8 @@ import java.util.List;
     }
 
     public void show() {
-        if (!playerControlView.isVisible()) {
-            playerControlView.setVisibility(View.VISIBLE);
+        if (!playerControlView.isAutoHiddenControllerVisible()) {
+            autoHiddenControllerView.setVisibility(View.VISIBLE);
             playerControlView.updateAll();
             playerControlView.requestPlayPauseFocus();
         }
@@ -459,7 +463,7 @@ import java.util.List;
     }
 
     public boolean isFullyVisible() {
-        return uxState == UX_STATE_ALL_VISIBLE && playerControlView.isVisible();
+        return uxState == UX_STATE_ALL_VISIBLE && playerControlView.isAutoHiddenControllerVisible();
     }
 
     public void setShowButton(@Nullable View button, boolean showButton) {
@@ -487,9 +491,9 @@ import java.util.List;
         int prevUxState = this.uxState;
         this.uxState = uxState;
         if (uxState == UX_STATE_NONE_VISIBLE) {
-            playerControlView.setVisibility(View.GONE);
+            autoHiddenControllerView.setVisibility(View.GONE);
         } else if (prevUxState == UX_STATE_NONE_VISIBLE) {
-            playerControlView.setVisibility(View.VISIBLE);
+            autoHiddenControllerView.setVisibility(View.VISIBLE);
         }
         // TODO(insun): Notify specific uxState. Currently reuses legacy visibility listener for API
         //  compatibility.

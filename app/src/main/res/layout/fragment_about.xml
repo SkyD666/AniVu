@@ -40,15 +40,13 @@
             android:id="@+id/ll_about_fragment_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
+            android:layout_marginTop="25dp"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
             <ImageView
                 android:layout_width="120dp"
                 android:layout_height="120dp"
-                android:background="@drawable/ic_icon_background_24"
-                android:backgroundTint="?attr/colorPrimaryContainer"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_icon_foreground_24"
                 app:tint="?attr/colorOnPrimaryContainer" />

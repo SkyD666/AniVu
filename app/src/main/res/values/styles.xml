@@ -42,11 +42,10 @@
         <item name="android:layout_height">@dimen/exo_top_icon_height</item>
     </style>
 
-    <style name="AniVuStyledControls.Button.ResetZoom" parent="ExoStyledControls">
+    <style name="AniVuStyledControls.Button.FloatButton" parent="ExoStyledControls">
         <item name="android:tint">#FFFFFF</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:text">@string/player_reset_zoom</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textColor">@color/exo_white</item>
         <item name="android:background">@drawable/shape_fill_circle_corner_6</item>
@@ -54,6 +53,12 @@
         <item name="android:paddingEnd">16dp</item>
         <item name="android:paddingTop">10dp</item>
         <item name="android:paddingBottom">10dp</item>
+    </style>
+
+    <style name="AniVuStyledControls.Button.FloatButton.SeekPreview" parent="AniVuStyledControls.Button.FloatButton" />
+
+    <style name="AniVuStyledControls.Button.FloatButton.ResetZoom" parent="AniVuStyledControls.Button.FloatButton">
+        <item name="android:text">@string/player_reset_zoom</item>
     </style>
 
     <style name="ExoStyledControls.TitleText">
