@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
@@ -36,6 +37,8 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         binding.initView()
         binding.setWindowInsets()
+        // Fix https://github.com/material-components/material-components-android/issues/1984#issuecomment-1089710991
+        view.setBackgroundColor(MaterialColors.getColor(view, android.R.attr.colorBackground))
     }
 
     protected open fun T.initView() {}
