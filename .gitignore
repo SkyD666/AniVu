@@ -1,0 +1,15 @@
+*.iml
+.gradle
+.idea
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/app/build
+/app/release
+/app/debug
+secret.gradle.kts
+/app/GitHub
+/app/schemas

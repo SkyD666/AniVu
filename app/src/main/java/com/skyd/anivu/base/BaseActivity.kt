@@ -13,6 +13,7 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
         binding = getViewBinding()
 
         beforeSetContentView()
