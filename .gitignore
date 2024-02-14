@@ -10,3 +10,6 @@ local.properties
 /app/build
 /app/release
 /app/debug
+secret.gradle.kts
+/app/GitHub
+/app/schemas
