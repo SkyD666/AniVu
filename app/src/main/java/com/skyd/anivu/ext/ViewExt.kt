@@ -4,10 +4,7 @@ import android.annotation.TargetApi
 import android.app.Activity
 import android.content.Context
 import android.graphics.Rect
-import android.os.Build
 import android.view.DisplayCutout
-import android.view.GestureDetector
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
@@ -122,13 +119,15 @@ fun View.addInsetsByPadding(
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, ins ->
         if (top) {
             val lastTopPadding = v.getTag(R.id.view_add_insets_padding_top_tag) as? Int ?: 0
-            val newTopPadding = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top + ins.getInsets(WindowInsetsCompat.Type.captionBar()).top
+            val newTopPadding = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top +
+                    ins.getInsets(WindowInsetsCompat.Type.captionBar()).top
             v.setTag(R.id.view_add_insets_padding_top_tag, newTopPadding)
             v.updatePadding(top = v.paddingTop - lastTopPadding + newTopPadding)
         }
         if (bottom) {
             val lastBottomPadding = v.getTag(R.id.view_add_insets_padding_bottom_tag) as? Int ?: 0
-            val newBottomPadding = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom + ins.getInsets(WindowInsetsCompat.Type.captionBar()).bottom
+            val newBottomPadding = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom +
+                    ins.getInsets(WindowInsetsCompat.Type.captionBar()).bottom
             v.setTag(R.id.view_add_insets_padding_bottom_tag, newBottomPadding)
             v.updatePadding(bottom = v.paddingBottom - lastBottomPadding + newBottomPadding)
         }
@@ -159,7 +158,8 @@ fun View.addInsetsByMargin(
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, ins ->
         if (top) {
             val lastTopMargin = v.getTag(R.id.view_add_insets_margin_top_tag) as? Int ?: 0
-            val newTopMargin = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top + ins.getInsets(WindowInsetsCompat.Type.captionBar()).top
+            val newTopMargin = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top +
+                    ins.getInsets(WindowInsetsCompat.Type.captionBar()).top
             v.setTag(R.id.view_add_insets_margin_top_tag, newTopMargin)
             (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { layoutParams ->
                 layoutParams.topMargin = layoutParams.topMargin - lastTopMargin + newTopMargin
@@ -168,7 +168,8 @@ fun View.addInsetsByMargin(
         }
         if (bottom) {
             val lastBottomMargin = v.getTag(R.id.view_add_insets_margin_bottom_tag) as? Int ?: 0
-            val newBottomMargin = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom + ins.getInsets(WindowInsetsCompat.Type.captionBar()).bottom
+            val newBottomMargin = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom +
+                    ins.getInsets(WindowInsetsCompat.Type.captionBar()).bottom
             v.setTag(R.id.view_add_insets_margin_bottom_tag, newBottomMargin)
             (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { layoutParams ->
                 layoutParams.bottomMargin =
@@ -291,31 +292,4 @@ fun View.inSafeInset(displayCutout: DisplayCutout): Boolean {
         if (overlapConsiderPaddingMargin(it)) return false
     }
     return true
-}
-
-fun View.setOnDoubleTapListener(onDoubleTap: () -> Unit) {
-    isClickable = true
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        focusable = View.FOCUSABLE
-    }
-    val doubleTapListener = DoubleTapListener(context, onDoubleTap)
-    setOnTouchListener { v, event ->
-//        v.performClick()
-        doubleTapListener.onTouchEvent(event)
-    }
-}
-
-class DoubleTapListener(context: Context, private val onDoubleTap: () -> Unit) :
-    GestureDetector.SimpleOnGestureListener() {
-
-    private val gestureDetector = GestureDetector(context, this)
-
-    fun onTouchEvent(event: MotionEvent): Boolean {
-        return gestureDetector.onTouchEvent(event)
-    }
-
-    override fun onDoubleTap(e: MotionEvent): Boolean {
-        onDoubleTap.invoke()
-        return true
-    }
 }

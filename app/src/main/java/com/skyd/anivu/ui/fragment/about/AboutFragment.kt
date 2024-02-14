@@ -71,6 +71,7 @@ class AboutFragment : BaseFragment<FragmentAboutBinding>() {
                     findNavController().navigate(R.id.action_to_license_fragment)
                     true
                 }
+
                 else -> false
             }
         }

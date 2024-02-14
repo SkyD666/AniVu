@@ -10,13 +10,6 @@ on:
       - '**.md'
       - 'doc/**'
       - 'image/**'
-  pull_request:
-    branches:
-      - 'master'
-    paths-ignore:
-      - '**.md'
-      - 'doc/**'
-      - 'image/**'
 
 jobs:
   build:
