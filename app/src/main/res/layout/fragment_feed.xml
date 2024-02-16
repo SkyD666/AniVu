@@ -9,13 +9,16 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/abl_feed_fragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:liftOnScroll="true"
+        app:liftOnScrollTargetViewId="@+id/rv_feed_fragment">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
+            app:menu="@menu/menu_feed"
             app:subtitleCentered="true"
             app:title="@string/feed_fragment_name"
             app:titleCentered="true" />

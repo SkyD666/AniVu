@@ -20,6 +20,7 @@
     <string name="edit">编辑</string>
     <string name="article_fragment_name">文章</string>
     <string name="article_fragment_feed_url_illegal">RSS 订阅链接格式错误</string>
+    <string name="search_fragment_hint">搜索</string>
     <string name="back">返回</string>
     <string name="read_fragment_name">详情</string>
     <string name="bottom_sheet_enclosure_title">附件</string>
@@ -54,4 +55,8 @@
     <string name="about_fragment_other_works_night_screen_description">当您在夜间🌙使用手机时，Night Screen 可以帮助您减少屏幕亮度，减少对眼睛的伤害。</string>
     <string name="no_browser_found">找不到浏览器！网址：%s</string>
     <string name="license_fragment_name">开源许可证</string>
+    <string name="search_fragment_name">搜索</string>
+    <string name="clear_input_text">清除</string>
+    <string name="article_fragment_search_article">搜索文章</string>
+    <string name="feed_fragment_search_feed">搜索订阅</string>
 </resources>

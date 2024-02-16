@@ -9,7 +9,9 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/abl_download_fragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:liftOnScroll="true"
+        app:liftOnScrollTargetViewId="@+id/rv_download_fragment">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
@@ -19,6 +21,7 @@
             app:navigationContentDescription="@string/back"
             app:navigationIcon="@drawable/ic_arrow_back_24"
             app:subtitleCentered="true"
+            app:layout_scrollFlags="scroll|enterAlways"
             app:title="@string/download_fragment_name"
             app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>

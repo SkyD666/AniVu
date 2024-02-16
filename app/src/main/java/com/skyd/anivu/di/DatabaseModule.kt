@@ -2,10 +2,12 @@ package com.skyd.anivu.di
 
 import android.content.Context
 import com.skyd.anivu.model.db.AppDatabase
+import com.skyd.anivu.model.db.SearchDomainDatabase
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.EnclosureDao
 import com.skyd.anivu.model.db.dao.FeedDao
+import com.skyd.anivu.model.db.dao.SearchDomainDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
 import dagger.Module
 import dagger.Provides
@@ -43,4 +45,16 @@ object DatabaseModule {
     @Singleton
     fun provideSessionParamsDao(database: AppDatabase): SessionParamsDao =
         database.sessionParamsDao()
+
+
+    @Provides
+    @Singleton
+    fun provideSearchDomainDatabase(@ApplicationContext context: Context): SearchDomainDatabase =
+        SearchDomainDatabase.getInstance(context)
+
+    @Provides
+    @Singleton
+    fun provideSearchDomain(database: SearchDomainDatabase): SearchDomainDao =
+        database.searchDomainDao()
+
 }

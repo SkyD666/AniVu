@@ -20,6 +20,7 @@
     <string name="edit">Edit</string>
     <string name="article_fragment_name">Article</string>
     <string name="article_fragment_feed_url_illegal">Feed URL is illegal</string>
+    <string name="search_fragment_hint">Search</string>
     <string name="back">Back</string>
     <string name="read_fragment_name">Read</string>
     <string name="bottom_sheet_enclosure_title">Enclosures</string>
@@ -57,4 +58,8 @@
     <string name="about_fragment_other_works_night_screen_description">When you use your phone at night 🌙, Night Screen can help you reduce the brightness of the screen and reduce the damage to your eyes.</string>
     <string name="no_browser_found">Can\'t find the browser! Link: %s</string>
     <string name="license_fragment_name">License</string>
+    <string name="search_fragment_name">Search</string>
+    <string name="clear_input_text">Clear</string>
+    <string name="article_fragment_search_article">Search articles</string>
+    <string name="feed_fragment_search_feed">Search feeds</string>
 </resources>

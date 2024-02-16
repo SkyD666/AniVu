@@ -110,4 +110,17 @@
         app:exitAnim="@anim/nav_default_exit_anim"
         app:popEnterAnim="@anim/nav_default_pop_enter_anim"
         app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/search_fragment"
+        android:name="com.skyd.anivu.ui.fragment.search.SearchFragment"
+        android:label="@string/search_fragment_name"
+        tools:layout="@layout/fragment_search" />
+    <action
+        android:id="@+id/action_to_search_fragment"
+        app:destination="@id/search_fragment"
+        app:enterAnim="@anim/nav_default_enter_anim"
+        app:exitAnim="@anim/nav_default_exit_anim"
+        app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+        app:popExitAnim="@anim/nav_default_pop_exit_anim" />
 </navigation>

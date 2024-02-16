@@ -5,7 +5,9 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
 import androidx.room.Transaction
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
@@ -68,4 +70,8 @@ interface FeedDao {
     @Transaction
     @Query("SELECT * FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} = :feedUrl")
     suspend fun getFeed(feedUrl: String): FeedBean
+
+    @Transaction
+    @RawQuery(observedEntities = [FeedBean::class])
+    fun getFeedList(sql: SupportSQLiteQuery): Flow<List<FeedBean>>
 }

@@ -22,6 +22,7 @@ import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.Article1Proxy
+import com.skyd.anivu.ui.fragment.search.SearchFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -109,6 +110,24 @@ class ArticleFragment : BaseFragment<FragmentArticleBinding>() {
 
     override fun FragmentArticleBinding.initView() {
         topAppBar.setNavigationOnClickListener { findNavController().popBackStackWithLifecycle() }
+        topAppBar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_to_search_fragment -> {
+                    findNavController().navigate(
+                        resId = R.id.action_to_search_fragment,
+                        args = Bundle().apply {
+                            putSerializable(
+                                SearchFragment.SEARCH_DOMAIN_KEY,
+                                SearchFragment.SearchDomain.Article(feedUrl),
+                            )
+                        }
+                    )
+                    true
+                }
+
+                else -> false
+            }
+        }
 
         srlArticleFragment.setOnRefreshListener {
             intents.trySend(ArticleIntent.Refresh(feedUrl!!))

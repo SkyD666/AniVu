@@ -9,6 +9,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -26,6 +27,7 @@ import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.Feed1Proxy
 import com.skyd.anivu.ui.component.dialog.InputDialogBuilder
+import com.skyd.anivu.ui.fragment.search.SearchFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -140,6 +142,26 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
     }
 
     override fun FragmentFeedBinding.initView() {
+        topAppBar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_to_search_fragment -> {
+                    Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_main)
+                        .navigate(
+                            resId = R.id.action_to_search_fragment,
+                            args = Bundle().apply {
+                                putSerializable(
+                                    SearchFragment.SEARCH_DOMAIN_KEY,
+                                    SearchFragment.SearchDomain.Feed,
+                                )
+                            }
+                        )
+                    true
+                }
+
+                else -> false
+            }
+        }
+
         rvFeedFragment.layoutManager = GridLayoutManager(
             requireContext(),
             AniSpanSize.MAX_SPAN_SIZE

@@ -5,15 +5,16 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
+import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.db.APP_DATA_BASE_FILE_NAME
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -76,11 +77,15 @@ interface ArticleDao {
     @Query(
         """
         SELECT * FROM $ARTICLE_TABLE_NAME 
-        WHERE ${ArticleBean.FEED_URL_COLUMN} LIKE :feedUrl
+        WHERE ${ArticleBean.FEED_URL_COLUMN} = :feedUrl
         ORDER BY ${ArticleBean.DATE_COLUMN} DESC
         """
     )
     fun getArticleList(feedUrl: String): Flow<List<ArticleBean>>
+
+    @Transaction
+    @RawQuery(observedEntities = [ArticleBean::class])
+    fun getArticleList(sql: SupportSQLiteQuery): Flow<List<ArticleBean>>
 
     @Transaction
     @Query(

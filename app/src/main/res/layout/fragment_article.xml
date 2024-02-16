@@ -9,13 +9,16 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/abl_article_fragment"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:liftOnScroll="true"
+        app:liftOnScrollTargetViewId="@+id/rv_article_fragment">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/topAppBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="?attr/actionBarSize"
+            app:menu="@menu/menu_article"
             app:navigationContentDescription="@string/back"
             app:navigationIcon="@drawable/ic_arrow_back_24"
             app:subtitleCentered="true"

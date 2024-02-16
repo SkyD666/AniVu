@@ -7,15 +7,15 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import com.skyd.anivu.model.bean.ArticleBean
+import com.skyd.anivu.model.bean.DownloadInfoBean
 import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.SessionParamsBean
-import com.skyd.anivu.model.bean.DownloadInfoBean
 import com.skyd.anivu.model.db.dao.ArticleDao
+import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.EnclosureDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
-import com.skyd.anivu.model.db.dao.DownloadInfoDao
 
 const val APP_DATA_BASE_FILE_NAME = "app.db"
 

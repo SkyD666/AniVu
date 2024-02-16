@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.preference
+package com.skyd.anivu.base
 
 import androidx.datastore.preferences.core.Preferences
 
