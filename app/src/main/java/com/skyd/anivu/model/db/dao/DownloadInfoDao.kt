@@ -7,7 +7,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.skyd.anivu.model.bean.DOWNLOAD_INFO_TABLE_NAME
+import com.skyd.anivu.model.bean.DOWNLOAD_LINK_UUID_MAP_TABLE_NAME
 import com.skyd.anivu.model.bean.DownloadInfoBean
+import com.skyd.anivu.model.bean.DownloadLinkUuidMapBean
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -237,4 +239,26 @@ interface DownloadInfoDao {
     @Transaction
     @Query("SELECT * FROM $DOWNLOAD_INFO_TABLE_NAME WHERE ${DownloadInfoBean.PROGRESS_COLUMN} == 1")
     fun getDownloadedList(): Flow<List<DownloadInfoBean>>
+
+    @Transaction
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun setDownloadLinkUuidMap(bean: DownloadLinkUuidMapBean)
+
+    @Transaction
+    @Query(
+        """
+        SELECT ${DownloadLinkUuidMapBean.LINK_COLUMN} FROM $DOWNLOAD_LINK_UUID_MAP_TABLE_NAME
+        WHERE ${DownloadLinkUuidMapBean.UUID_COLUMN} == :uuid
+        """
+    )
+    fun getDownloadLinkByUuid(uuid: String): String?
+
+    @Transaction
+    @Query(
+        """
+        DELETE FROM $DOWNLOAD_LINK_UUID_MAP_TABLE_NAME
+        WHERE ${DownloadLinkUuidMapBean.UUID_COLUMN} == :uuid
+        """
+    )
+    fun removeDownloadLinkByUuid(uuid: String): Int
 }

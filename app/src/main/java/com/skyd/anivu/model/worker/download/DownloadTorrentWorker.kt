@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
@@ -27,6 +26,7 @@ import com.skyd.anivu.ext.saveTo
 import com.skyd.anivu.ext.toDecodedUrl
 import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.DownloadInfoBean
+import com.skyd.anivu.model.bean.DownloadLinkUuidMapBean
 import com.skyd.anivu.model.bean.SessionParamsBean
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
@@ -72,6 +72,7 @@ import kotlin.random.Random
 
 class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     CoroutineWorker(context, parameters) {
+    private lateinit var torrentLinkUuid: String
     private lateinit var torrentLink: String
     private var progress: Float = 0f
         set(value) {
@@ -96,7 +97,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     this@DownloadTorrentWorker.pause(handle = null)
                 }
             }
-            torrentLink = inputData.getString(TORRENT_LINK) ?: return@withContext Result.failure()
+            torrentLinkUuid =
+                inputData.getString(TORRENT_LINK_UUID) ?: return@withContext Result.failure()
+            torrentLink = hiltEntryPoint.downloadInfoDao.getDownloadLinkByUuid(torrentLinkUuid)
+                ?: return@withContext Result.failure()
             name = hiltEntryPoint.downloadInfoDao.getDownloadName(link = torrentLink)
             tempDownloadingDirName = hiltEntryPoint.downloadInfoDao
                 .getDownloadingDirName(link = torrentLink)
@@ -105,11 +109,12 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             updateAllDownloadVideoInfoToDb()
             workerDownload()
         }
+        hiltEntryPoint.downloadInfoDao.removeDownloadLinkByUuid(torrentLinkUuid)
         return Result.success(
             workDataOf(
                 STATE to (hiltEntryPoint.downloadInfoDao
                     .getDownloadState(link = torrentLink)?.ordinal ?: 0),
-                TORRENT_LINK to torrentLink,
+                TORRENT_LINK_UUID to torrentLinkUuid,
             )
         )
     }
@@ -327,7 +332,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             }
 
             is TorrentAlert<*> -> {
-                Log.e("TAG", "onAlert: ${alert}")
+//                Log.e("TAG", "onAlert: ${alert}")
                 // 下载进度更新
                 val handle = alert.handle()
                 if (handle.isValid) {
@@ -491,7 +496,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     companion object {
         const val STATE = "state"
-        const val TORRENT_LINK = "torrentLink"
+        const val TORRENT_LINK_UUID = "torrentLinkUuid"
         const val CHANNEL_ID = "downloadTorrent"
         const val CHANNEL_NAME = "downloadMessage"
 
@@ -511,15 +516,24 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         )
 
         fun startWorker(context: Context, torrentLink: String) {
-            val sendLogsWorkRequest = OneTimeWorkRequestBuilder<DownloadTorrentWorker>()
-                .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                .setInputData(workDataOf(TORRENT_LINK to torrentLink))
-                .build()
-            WorkManager.getInstance(context).enqueueUniqueWork(
-                torrentLink,
-                ExistingWorkPolicy.KEEP,
-                sendLogsWorkRequest
-            )
+            val torrentLinkUuid = UUID.randomUUID().toString()
+            coroutineScope.launch {
+                hiltEntryPoint.downloadInfoDao.setDownloadLinkUuidMap(
+                    DownloadLinkUuidMapBean(
+                        link = torrentLink,
+                        uuid = torrentLinkUuid,
+                    )
+                )
+                val sendLogsWorkRequest = OneTimeWorkRequestBuilder<DownloadTorrentWorker>()
+                    .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                    .setInputData(workDataOf(TORRENT_LINK_UUID to torrentLinkUuid))
+                    .build()
+                WorkManager.getInstance(context).enqueueUniqueWork(
+                    torrentLinkUuid,
+                    ExistingWorkPolicy.KEEP,
+                    sendLogsWorkRequest
+                )
+            }
         }
 
         fun pause(context: Context, requestId: String) {
