@@ -5,8 +5,11 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewConfiguration
 import android.view.animation.DecelerateInterpolator
 import androidx.core.animation.addListener
 import kotlin.math.abs
@@ -92,6 +95,13 @@ class PlayerGestureDetector(
         mListener.isZoomChanged(false)
     }
 
+    private var longPressed = false
+    private val longPressHandler: Handler = Handler(Looper.getMainLooper())
+    private var longPressedRunnable = Runnable {
+        longPressed = true
+        mListener.onLongPress()
+    }
+
     fun onTouchEvent(event: MotionEvent): Boolean {
         var handled = false
         val x = event.x
@@ -104,12 +114,18 @@ class PlayerGestureDetector(
 //                    Log.e("TAG", "onTouchEvent: move down")
                     singleMoveDownX = x
                     singleMoveDownY = y
+
+                    longPressHandler.postDelayed(
+                        longPressedRunnable,
+                        ViewConfiguration.getLongPressTimeout().toLong()
+                    )
+
                     handled = true
                 }
             }
 
             MotionEvent.ACTION_POINTER_DOWN -> {
-                if (singleMove != 2 && event.pointerCount == 2) {
+                if (!longPressed && singleMove != 2 && event.pointerCount == 2) {
 //                    Log.e("TAG", "onTouchEvent: scale down")
                     doublePointer = 1
                     val centerX = getCenterX(event)
@@ -124,7 +140,11 @@ class PlayerGestureDetector(
             }
 
             MotionEvent.ACTION_MOVE -> {
-                if (singleMove > 0 && event.pointerCount == 1) {
+                if (longPressed) {      // 长按后，即使手指移动，也不再响应其他事件
+                    doublePointer = 0
+                    singleMove = 0
+                    handled = true
+                } else if (singleMove > 0 && event.pointerCount == 1) {
                     doublePointer = 0
 //                    Log.e("TAG", "onTouchEvent: move move")
                     val deltaX = x - singleMoveDownX
@@ -132,10 +152,12 @@ class PlayerGestureDetector(
                     val absDeltaX = abs(deltaX)
                     val absDeltaY = abs(deltaY)
                     handled = if (singleMove == 2 || absDeltaX > 50 || absDeltaY > 50) {
+                        longPressHandler.removeCallbacks(longPressedRunnable)   // 取消长按监听
                         singleMove = 2
                         mListener.onSingleMoving(deltaX, deltaY, x, y)
                     } else false
                 } else if (doublePointer == 1 && event.pointerCount == 2) {
+                    longPressHandler.removeCallbacks(longPressedRunnable)       // 取消长按监听
                     singleMove = 0
 //                    Log.e("TAG", "onTouchEvent: scale move")
                     val centerX = getCenterX(event)
@@ -164,10 +186,14 @@ class PlayerGestureDetector(
             }
 
             MotionEvent.ACTION_UP, MotionEvent.ACTION_POINTER_UP -> {
-                // 单指滑动了一段距离，第二个手指又落下滑动，然后两个手指抬起
-                // 这时候应该只响应单指滑动，因为它先产生的。
-                // 所以这时event.pointerCount可能不1，所以不能加&& event.pointerCount == 1
-                if (singleMove > 0/* && event.pointerCount == 1*/) {
+                longPressHandler.removeCallbacks(longPressedRunnable)           // 取消长按监听
+                if (longPressed && event.pointerCount == 1) {
+                    handled = mListener.onLongPressUp()
+                    longPressed = false
+                } else if (singleMove > 0/* && event.pointerCount == 1*/) {
+                    // 单指滑动了一段距离，第二个手指又落下滑动，然后两个手指抬起
+                    // 这时候应该只响应单指滑动，因为它先产生的。
+                    // 所以这时event.pointerCount可能不1，所以不能加&& event.pointerCount == 1
                     val deltaX = x - singleMoveDownX
                     val deltaY = y - singleMoveDownY
                     handled = mListener.onSingleMoved(deltaX, deltaY, x, y)
@@ -227,6 +253,8 @@ class PlayerGestureDetector(
         fun onSingleMoving(deltaX: Float, deltaY: Float, x: Float, y: Float): Boolean = false
         fun onSingleMoved(deltaX: Float, deltaY: Float, x: Float, y: Float): Boolean = false
         fun isZoomChanged(isZoom: Boolean) {}
+        fun onLongPressUp(): Boolean = false
+        fun onLongPress() {}
     }
 
     companion object {

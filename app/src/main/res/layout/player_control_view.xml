@@ -193,6 +193,15 @@
     <!--        android:background="@color/exo_black_opacity_60" />-->
 
     <TextView
+        android:id="@+id/exo_long_press_playback_speed"
+        style="@style/AniVuStyledControls.Button.FloatButton.LongPressPlaybackSpeed"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.25" />
+
+    <TextView
         android:id="@+id/exo_seek_preview"
         style="@style/AniVuStyledControls.Button.FloatButton.SeekPreview"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -200,4 +209,58 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="00:03 / 7:50" />
+
+    <LinearLayout
+        android:id="@+id/exo_brightness_controls"
+        style="@style/AniVuStyledControls.Button.FloatButton.BrightnessVolume"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/exo_brightness_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_brightness_low_24"
+            app:tint="@android:color/white" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/exo_brightness_progress"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="3dp"
+            android:max="100" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/exo_volume_controls"
+        style="@style/AniVuStyledControls.Button.FloatButton.BrightnessVolume"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/exo_volume_icon"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_volume_up_24"
+            app:tint="@android:color/white" />
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/exo_volume_progress"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="3dp"
+            android:max="100" />
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

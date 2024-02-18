@@ -23,9 +23,12 @@ import static androidx.media3.common.Player.COMMAND_GET_TRACKS;
 import static androidx.media3.common.Player.COMMAND_SET_VIDEO_SURFACE;
 import static androidx.media3.common.util.Assertions.checkNotNull;
 import static androidx.media3.common.util.Util.getDrawable;
+import static com.google.common.primitives.Floats.max;
+import static java.lang.Math.min;
 import static java.lang.annotation.ElementType.TYPE_USE;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
@@ -35,8 +38,11 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Looper;
+import android.os.Vibrator;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.KeyEvent;
@@ -46,6 +52,7 @@ import android.view.SurfaceView;
 import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -80,7 +87,10 @@ import androidx.media3.ui.DefaultTimeBar;
 import androidx.media3.ui.SubtitleView;
 
 import com.google.common.collect.ImmutableList;
+import com.skyd.anivu.ext.ActivityExtKt;
+import com.skyd.anivu.ext.ContextExtKt;
 import com.skyd.anivu.ext.NumberExtKt;
+import com.skyd.anivu.ext.VibratorExtKt;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -341,40 +351,83 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
 
     private final PlayerGestureDetector playerGestureDetector = new PlayerGestureDetector(
             new PlayerGestureDetector.PlayerGestureListener() {
+                // 全屏手动滑动下拉状态栏的起始偏移位置
+                private final int statusBarOffset = 50;
+                // 全屏手动滑动右滑左侧的起始偏移位置
+                private final int horizontalOffset = 50;
+
                 // 只有在第一次显示SeekPreview前会限制deltaX和deltaY的比例和大小等
                 // 在本次Touch已经显示过SeekPreview后，不会再限制
 
-                private long startMovingVideoPos = -1;   // 负数表示还没开始移动
+                private long startMovingVideoPos = -1;          // 负数表示还没开始移动
+                private float startMovingBrightnessPos = -1f;   // 负数表示还没开始移动
+                private float startMovingVolumePos = -1f;       // 负数表示还没开始移动
+
+                private boolean isSeekMoving(float deltaX, float deltaY, float x) {
+                    float absDeltaX = Math.abs(deltaX);
+                    float absDeltaY = Math.abs(deltaY);
+                    return startMovingBrightnessPos < 0 && startMovingVolumePos < 0 &&
+                            (startMovingVideoPos >= 0 || absDeltaX > absDeltaY) &&
+                            // 确保在屏幕水平边界不会触发
+                            x - deltaX > NumberExtKt.getDp(horizontalOffset) &&
+                            x - deltaX < getWidth() - NumberExtKt.getDp(horizontalOffset);
+                }
+
+                private boolean isBrightnessMoving(float deltaX, float deltaY, float x, float y) {
+                    float absDeltaX = Math.abs(deltaX);
+                    float absDeltaY = Math.abs(deltaY);
+                    return startMovingVideoPos < 0 && startMovingVolumePos < 0 &&
+                            (startMovingBrightnessPos >= 0 ||
+                                    (absDeltaX < absDeltaY && x - deltaX < getWidth() / 3.0f)) &&
+                            // 确保在状态栏处不会触发
+                            y - deltaY > NumberExtKt.getDp(statusBarOffset);
+                }
+
+                private boolean isVolumeMoving(float deltaX, float deltaY, float x, float y) {
+                    float absDeltaX = Math.abs(deltaX);
+                    float absDeltaY = Math.abs(deltaY);
+                    return startMovingVideoPos < 0 && startMovingBrightnessPos < 0 &&
+                            (startMovingVolumePos >= 0 ||
+                                    (absDeltaX < absDeltaY && x - deltaX > getWidth() * 2 / 3.0f)) &&
+                            // 确保在状态栏处不会触发
+                            y - deltaY > NumberExtKt.getDp(statusBarOffset);
+                }
 
                 @Override
                 public boolean onSingleMoved(float deltaX, float deltaY, float x, float y) {
                     // 这里集中隐藏提示View，例如快进、亮度、声音等
                     if (controller != null) {
                         controller.setSeekPreviewVisibility(View.GONE);
+                        controller.setBrightnessControlsVisibility(View.GONE);
+                        controller.setVolumeControlsVisibility(View.GONE);
                     }
 
-                    float absDeltaX = Math.abs(deltaX);
-                    float absDeltaY = Math.abs(deltaY);
                     // seekTo
                     // 在记录过 seek起始点 或者符合约束时执行seek
-                    if (startMovingVideoPos >= 0 || absDeltaX > absDeltaY) {
+                    if (isSeekMoving(deltaX, deltaY, x)) {
                         if (player != null) {
                             player.seekTo(startMovingVideoPos
                                     + (long) (NumberExtKt.getDp(deltaX) * 13));
                             startMovingVideoPos = -1;
                             return true;
                         }
+                    } else if (isBrightnessMoving(deltaX, deltaY, x, y)) {
+                        // Brightness
+                        startMovingBrightnessPos = -1f;
+                        return true;
+                    } else if (isVolumeMoving(deltaX, deltaY, x, y)) {
+                        // Volume
+                        startMovingVolumePos = -1f;
+                        return true;
                     }
                     return false;
                 }
 
                 @Override
                 public boolean onSingleMoving(float deltaX, float deltaY, float x, float y) {
-                    float absDeltaX = Math.abs(deltaX);
-                    float absDeltaY = Math.abs(deltaY);
                     // seekTo
                     // 在记录过 seek起始点 或者符合约束时更新SeekPreview
-                    if (startMovingVideoPos >= 0 || absDeltaX > absDeltaY) {
+                    if (isSeekMoving(deltaX, deltaY, x)) {
                         if (startMovingVideoPos < 0) {
                             startMovingVideoPos = player.getCurrentPosition();
                         }
@@ -382,6 +435,48 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
                             controller.setSeekPreviewVisibility(View.VISIBLE);
                             return controller.updateSeekPreview(startMovingVideoPos
                                     + (long) (NumberExtKt.getDp(deltaX) * 13));
+                        }
+                    } else if (isBrightnessMoving(deltaX, deltaY, x, y)) {
+                        // Brightness
+                        Activity activity = ContextExtKt.tryActivity(getContext());
+                        if (activity == null) return false;
+                        WindowManager.LayoutParams layoutParams = activity.getWindow().getAttributes();
+                        if (startMovingBrightnessPos < 0) {
+                            // 设置亮度默认值
+                            if (layoutParams.screenBrightness <= 0.00f) {
+                                Integer brightness = ActivityExtKt.getScreenBrightness(activity);
+                                if (brightness != null) {
+                                    layoutParams.screenBrightness = brightness / 255.0f;
+                                    activity.getWindow().setAttributes(layoutParams);
+                                }
+                            }
+                            // 记录亮度起始值
+                            startMovingBrightnessPos = layoutParams.screenBrightness;
+                        }
+                        if (controller != null) {
+                            // 设置屏幕亮度值，使用起始值作为基准，根据手势移动的距离计算新的亮度值
+                            layoutParams.screenBrightness = max(0.01f, min(
+                                    1f, startMovingBrightnessPos - deltaY / getHeight()
+                            ));
+                            activity.getWindow().setAttributes(layoutParams);
+                            controller.setBrightnessControlsVisibility(View.VISIBLE);
+                            controller.updateBrightnessProgress((int) (layoutParams.screenBrightness * 100));
+                        }
+                    } else if (isVolumeMoving(deltaX, deltaY, x, y)) {
+                        // Volume
+                        AudioManager audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
+                        if (startMovingVolumePos < 0) {
+                            startMovingVolumePos = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+                        }
+                        if (controller != null) {
+                            int desiredVolume = (int) (startMovingVolumePos - deltaY / getHeight() * 20);
+                            audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, desiredVolume, 0);
+                            controller.setMaxVolume(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                controller.setMinVolume(audioManager.getStreamMinVolume(AudioManager.STREAM_MUSIC));
+                            }
+                            controller.setVolumeControlsVisibility(View.VISIBLE);
+                            controller.updateVolumeProgress(desiredVolume);
                         }
                     }
                     return false;
@@ -405,11 +500,46 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
                         controller.onZoomStateChanged(isZoom);
                     }
                 }
+
+                private boolean isLongPress = false;
+                private float beforeLongPressSpeed = 1.0f;
+                final Vibrator vibrator = (Vibrator) getContext().getSystemService(Context.VIBRATOR_SERVICE);
+
+                @Override
+                public void onLongPress() {
+                    if (player != null) {
+                        VibratorExtKt.tickVibrate(vibrator, 35);
+                        isLongPress = true;
+                        beforeLongPressSpeed = player.getPlaybackParameters().speed;
+                        player.setPlaybackSpeed(3.0f);
+                        if (controller != null) {
+                            controller.setLongPressPlaybackSpeedVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+
+                @Override
+                public boolean onLongPressUp() {
+                    boolean handled = false;
+
+                    if (isLongPress) {
+                        if (player != null) {
+                            isLongPress = false;
+                            player.setPlaybackSpeed(beforeLongPressSpeed);
+                            if (controller != null) {
+                                controller.setLongPressPlaybackSpeedVisibility(View.GONE);
+                            }
+                            handled = true;
+                        }
+                    }
+                    return handled;
+                }
             }
     );
 
     private final GestureDetector gestureDetector = new GestureDetector(
             getContext(), new GestureDetector.SimpleOnGestureListener() {
+
         @Override
         public boolean onDoubleTap(@NonNull MotionEvent e) {
             if (controller != null) {

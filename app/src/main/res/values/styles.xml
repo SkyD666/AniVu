@@ -71,11 +71,17 @@
         <item name="android:paddingBottom">10dp</item>
     </style>
 
+    <style name="AniVuStyledControls.Button.FloatButton.LongPressPlaybackSpeed" parent="AniVuStyledControls.Button.FloatButton">
+        <item name="android:text">@string/player_long_press_playback_speed</item>
+    </style>
+
     <style name="AniVuStyledControls.Button.FloatButton.SeekPreview" parent="AniVuStyledControls.Button.FloatButton" />
 
     <style name="AniVuStyledControls.Button.FloatButton.ResetZoom" parent="AniVuStyledControls.Button.FloatButton">
         <item name="android:text">@string/player_reset_zoom</item>
     </style>
+
+    <style name="AniVuStyledControls.Button.FloatButton.BrightnessVolume" parent="AniVuStyledControls.Button.FloatButton" />
 
     <style name="ExoStyledControls.TitleText">
         <item name="android:layout_width">wrap_content</item>

@@ -22,6 +22,7 @@ val Context.activity: Activity
         return tryActivity ?: error("can't find activity: $this")
     }
 
+@get:JvmName("tryActivity")
 val Context.tryActivity: Activity?
     get() {
         var ctx = this

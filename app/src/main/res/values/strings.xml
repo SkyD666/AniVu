@@ -43,6 +43,7 @@
     <string name="options">Options</string>
     <string name="video">Video</string>
     <string name="player_reset_zoom">Reset</string>
+    <string name="player_long_press_playback_speed"><![CDATA[>> Fast forwarding…]]></string>
     <string name="about_fragment_name">About</string>
     <string name="app_short_description">An all-in-one tool for RSS anime subscription and updates, bit torrent downloads, and video playback.</string>
     <string name="app_tech_stack_description">AniVu utilizes the MVI architecture and fully adopts the Material You design style. All pages are developed using Android View.</string>

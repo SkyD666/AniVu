@@ -101,6 +101,7 @@ import androidx.media3.ui.TrackNameProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.common.collect.ImmutableList;
 import com.skyd.anivu.ext.IOExtKt;
 import com.skyd.anivu.ext.ViewExtKt;
@@ -353,9 +354,19 @@ public class PlayerControlView extends FrameLayout {
     @Nullable
     private final View backButton;
     @Nullable
+    private final TextView longPressPlaybackSpeedView;
+    @Nullable
     private final TextView seekPreviewView;
     @Nullable
     private final View resetZoomView;
+    @Nullable
+    private final ViewGroup brightnessControlsView;
+    @Nullable
+    private final LinearProgressIndicator brightnessProgressView;
+    @Nullable
+    private final ViewGroup volumeControlsView;
+    @Nullable
+    private final LinearProgressIndicator volumeProgressView;
     @Nullable
     private final View playbackSpeedButton;
     @Nullable
@@ -548,6 +559,11 @@ public class PlayerControlView extends FrameLayout {
         }
         isZoom = false;
 
+        longPressPlaybackSpeedView = findViewById(com.skyd.anivu.R.id.exo_long_press_playback_speed);
+        if (longPressPlaybackSpeedView != null) {
+            longPressPlaybackSpeedView.setVisibility(View.GONE);
+        }
+
         seekPreviewView = findViewById(com.skyd.anivu.R.id.exo_seek_preview);
         if (seekPreviewView != null) {
             seekPreviewView.setVisibility(View.GONE);
@@ -557,6 +573,18 @@ public class PlayerControlView extends FrameLayout {
         if (playbackSpeedButton != null) {
             playbackSpeedButton.setOnClickListener(componentListener);
         }
+
+        brightnessControlsView = findViewById(com.skyd.anivu.R.id.exo_brightness_controls);
+        if (brightnessControlsView != null) {
+            brightnessControlsView.setVisibility(View.GONE);
+        }
+        brightnessProgressView = findViewById(com.skyd.anivu.R.id.exo_brightness_progress);
+
+        volumeControlsView = findViewById(com.skyd.anivu.R.id.exo_volume_controls);
+        if (volumeControlsView != null) {
+            volumeControlsView.setVisibility(View.GONE);
+        }
+        volumeProgressView = findViewById(com.skyd.anivu.R.id.exo_volume_progress);
 
         audioTrackButton = findViewById(R.id.exo_audio_track);
         if (audioTrackButton != null) {
@@ -1072,6 +1100,12 @@ public class PlayerControlView extends FrameLayout {
         }
     }
 
+    public void setLongPressPlaybackSpeedVisibility(int visibility) {
+        if (longPressPlaybackSpeedView != null) {
+            longPressPlaybackSpeedView.setVisibility(visibility);
+        }
+    }
+
     public boolean updateSeekPreview(long newPositionPos) {
         if (seekPreviewView != null && player != null) {
             newPositionPos = Math.min(Math.max(newPositionPos, 0), player.getContentDuration());
@@ -1087,6 +1121,94 @@ public class PlayerControlView extends FrameLayout {
     public void setSeekPreviewVisibility(int visibility) {
         if (seekPreviewView != null) {
             seekPreviewView.setVisibility(visibility);
+        }
+    }
+
+    public boolean updateBrightnessProgress(int progress) {
+        if (brightnessProgressView != null) {
+            ImageView icon = findViewById(com.skyd.anivu.R.id.exo_brightness_icon);
+            if (icon != null) {
+                if (progress <= 20) {
+                    icon.setImageResource(com.skyd.anivu.R.drawable.ic_brightness_low_24);
+                } else if (progress > 20 && progress <= 60) {
+                    icon.setImageResource(com.skyd.anivu.R.drawable.ic_brightness_medium_24);
+                } else {
+                    icon.setImageResource(com.skyd.anivu.R.drawable.ic_brightness_high_24);
+                }
+            }
+            brightnessProgressView.setProgressCompat(progress, false);
+            return true;
+        }
+        return false;
+    }
+
+    private Runnable setBrightnessControlsGoneRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (brightnessControlsView != null) {
+                brightnessControlsView.setVisibility(GONE);
+            }
+        }
+    };
+
+    public void setBrightnessControlsVisibility(int visibility) {
+        if (brightnessControlsView != null) {
+            removeCallbacks(setBrightnessControlsGoneRunnable);
+            if (visibility == VISIBLE) {
+                brightnessControlsView.setVisibility(VISIBLE);
+            } else {
+                postDelayed(setBrightnessControlsGoneRunnable, 220);
+            }
+        }
+    }
+
+    public void setMaxVolume(int max) {
+        if (volumeProgressView != null) {
+            volumeProgressView.setMax(max);
+        }
+    }
+
+    public void setMinVolume(int min) {
+        if (volumeProgressView != null) {
+            volumeProgressView.setMin(min);
+        }
+    }
+
+    public boolean updateVolumeProgress(int progress) {
+        if (volumeProgressView != null) {
+            ImageView icon = findViewById(com.skyd.anivu.R.id.exo_volume_icon);
+            if (icon != null) {
+                if (progress <= 0) {
+                    icon.setImageResource(com.skyd.anivu.R.drawable.ic_volume_mute_24);
+                } else if (progress > 0 && progress <= volumeProgressView.getMax() / 2) {
+                    icon.setImageResource(com.skyd.anivu.R.drawable.ic_volume_down_24);
+                } else {
+                    icon.setImageResource(com.skyd.anivu.R.drawable.ic_volume_up_24);
+                }
+            }
+            volumeProgressView.setProgressCompat(progress, false);
+            return true;
+        }
+        return false;
+    }
+
+    private Runnable setVolumeControlsGoneRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (volumeControlsView != null) {
+                volumeControlsView.setVisibility(GONE);
+            }
+        }
+    };
+
+    public void setVolumeControlsVisibility(int visibility) {
+        if (volumeControlsView != null) {
+            removeCallbacks(setVolumeControlsGoneRunnable);
+            if (visibility == VISIBLE) {
+                volumeControlsView.setVisibility(VISIBLE);
+            } else {
+                postDelayed(setVolumeControlsGoneRunnable, 220);
+            }
         }
     }
 
