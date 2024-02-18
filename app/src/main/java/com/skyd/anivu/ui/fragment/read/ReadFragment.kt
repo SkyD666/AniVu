@@ -16,6 +16,7 @@ import com.skyd.anivu.ext.addInsetsByMargin
 import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.ifNullOfBlank
+import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.toHtml
@@ -43,17 +44,25 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
         when (val articleState = readState.articleState) {
             is ArticleState.Failed -> {
                 enclosureBottomSheet?.updateData(emptyList())
+                binding.topAppBar.menu?.findItem(R.id.action_read_fragment_open_in_browser)
+                    ?.isEnabled = false
             }
 
             ArticleState.Init -> {
                 enclosureBottomSheet?.updateData(emptyList())
+                binding.topAppBar.menu?.findItem(R.id.action_read_fragment_open_in_browser)
+                    ?.isEnabled = false
             }
 
             ArticleState.Loading -> {
                 enclosureBottomSheet?.updateData(emptyList())
+                binding.topAppBar.menu?.findItem(R.id.action_read_fragment_open_in_browser)
+                    ?.isEnabled = false
             }
 
             is ArticleState.Success -> {
+                binding.topAppBar.menu?.findItem(R.id.action_read_fragment_open_in_browser)
+                    ?.isEnabled = true
                 val article = articleState.article
                 binding.tvReadFragmentContent.post {
                     binding.tvReadFragmentContent.text = article.article.content
@@ -96,7 +105,22 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
 
     override fun FragmentReadBinding.initView() {
         topAppBar.setNavigationOnClickListener { findNavController().popBackStackWithLifecycle() }
+        topAppBar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.action_read_fragment_open_in_browser -> {
+                    val articleState = feedViewModel.viewState.value.articleState
+                    if (articleState is ArticleState.Success) {
+                        val link = articleState.article.article.link
+                        if (!link.isNullOrBlank()) {
+                            requireContext().openBrowser(link)
+                        }
+                    }
+                    true
+                }
 
+                else -> false
+            }
+        }
         tvReadFragmentContent.movementMethod = LinkMovementMethod.getInstance()
 
         fabReadFragment.setOnClickListener {

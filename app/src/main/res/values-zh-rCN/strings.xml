@@ -60,4 +60,5 @@
     <string name="clear_input_text">清除</string>
     <string name="article_fragment_search_article">搜索文章</string>
     <string name="feed_fragment_search_feed">搜索订阅</string>
+    <string name="read_fragment_open_browser">在浏览器中打开</string>
 </resources>

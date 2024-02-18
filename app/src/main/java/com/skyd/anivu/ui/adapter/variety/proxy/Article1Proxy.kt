@@ -42,8 +42,19 @@ class Article1Proxy : VarietyAdapter.Proxy<ArticleBean, ItemArticle1Binding, Art
                 }
             }
             data.date?.toDateTimeString().let { dateTime ->
-                if (!dateTime.isNullOrBlank()) {
+                if (dateTime.isNullOrBlank()) {
+                    tvArticle1Date.gone()
+                } else {
+                    tvArticle1Date.visible()
                     tvArticle1Date.text = dateTime
+                }
+            }
+            data.author.let { author ->
+                if (author.isNullOrBlank()) {
+                    tvArticle1Author.gone()
+                } else {
+                    tvArticle1Author.visible()
+                    tvArticle1Author.text = author
                 }
             }
             if (data.image.isNullOrBlank()) {

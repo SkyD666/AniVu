@@ -80,6 +80,7 @@ class ArticleViewModel @Inject constructor(
                 articleRepo.refreshArticleList(intent.url).map {
                     ArticlePartialStateChange.RefreshArticleList.Success
                 }.startWith(ArticlePartialStateChange.RefreshArticleList.Loading).catchMap {
+                    it.printStackTrace()
                     ArticlePartialStateChange.RefreshArticleList.Failed(it.message.toString())
                 }
             },

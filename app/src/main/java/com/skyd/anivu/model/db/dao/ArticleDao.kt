@@ -54,14 +54,23 @@ interface ArticleDao {
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(appContext, ArticleDaoEntryPoint::class.java)
         articleWithEnclosureList.forEach {
-            if (queryArticleByLink(
-                    link = it.article.link,
-                    feedUrl = it.article.feedUrl,
-                ) == null
-            ) {
+            // 可能会出现link、feedUrl都一样，但是uuid不一样的情况
+            var newArticle = queryArticleByLink(
+                link = it.article.link,
+                feedUrl = it.article.feedUrl,
+            )
+            if (newArticle == null) {
                 innerUpdateArticle(it.article)
+                newArticle = it.article
+            } else {
+                // 除了uuid，其他的字段都更新
+                newArticle = it.article.copy(articleId = newArticle.articleId)
+                innerUpdateArticle(newArticle)
             }
-            hiltEntryPoint.enclosureDao.insertListIfNotExist(it.enclosures)
+
+            hiltEntryPoint.enclosureDao.insertListIfNotExist(
+                it.enclosures.map { enclosure -> enclosure.copy(articleId = newArticle.articleId) }
+            )
         }
     }
 
