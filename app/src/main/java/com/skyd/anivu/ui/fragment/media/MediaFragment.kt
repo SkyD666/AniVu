@@ -43,6 +43,8 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
         const val HAS_PARENT_DIR_KEY = "hasParentDir"
     }
 
+    override fun enabledOnBackPressedCallback() = hasParentDir
+
     private val viewModel by viewModels<MediaViewModel>()
     private val path by lazy { arguments?.getString(PATH_KEY) ?: Const.VIDEO_DIR.path }
     private val hasParentDir by lazy { arguments?.getBoolean(HAS_PARENT_DIR_KEY) ?: false }
@@ -181,9 +183,11 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
         )
     }
 
-    private fun List<Any>.addHeader() = if (hasParentDir) this + parentDirBean else this
+    private fun List<Any>.addHeader() = if (hasParentDir) {
+        toMutableList().apply { add(0, parentDirBean) }
+    } else this
 
-    override fun onResume() {
+    override fun onResume() {9
         super.onResume()
 
         if (!path.isNullOrBlank()) {

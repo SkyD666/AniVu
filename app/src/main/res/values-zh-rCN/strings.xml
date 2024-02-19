@@ -43,7 +43,7 @@
     <string name="options">选项</string>
     <string name="video">视频</string>
     <string name="player_reset_zoom">还原屏幕</string>
-    <string name="player_long_press_playback_speed"><![CDATA[>> 倍速播放中…]]></string>
+    <string name="player_long_press_playback_speed">倍速播放中…</string>
     <string name="about_fragment_name">关于</string>
     <string name="app_short_description">一个集 RSS 番剧订阅与更新、比特洪流下载、视频播放为一体的工具。</string>
     <string name="app_tech_stack_description">AniVu 使用 MVI 架构，完全采用 Material You 设计风格。所有页面均使用 Android View 开发。</string>
@@ -61,4 +61,5 @@
     <string name="article_fragment_search_article">搜索文章</string>
     <string name="feed_fragment_search_feed">搜索订阅</string>
     <string name="read_fragment_open_browser">在浏览器中打开</string>
+    <string name="play_activity_label">播放</string>
 </resources>

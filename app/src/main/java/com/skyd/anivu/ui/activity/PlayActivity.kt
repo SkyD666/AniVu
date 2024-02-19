@@ -1,9 +1,10 @@
 package com.skyd.anivu.ui.activity
 
-import android.content.res.Configuration
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -17,13 +18,8 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
         const val VIDEO_URI_KEY = "videoUri"
     }
 
-    private val videoUri by lazy {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.extras?.getParcelable(VIDEO_URI_KEY, Uri::class.java)
-        } else {
-            intent.extras?.getParcelable(VIDEO_URI_KEY)
-        }
-    }
+    private val player: ExoPlayer by lazy { ExoPlayer.Builder(this@PlayActivity).build() }
+    private var videoUri: Uri? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,21 +34,49 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
             windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
             view.onApplyWindowInsets(windowInsets)
         }
+        // Keep screen on
+        window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+
+        val data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent?.extras?.getParcelable(VIDEO_URI_KEY, Uri::class.java)
+        } else {
+            intent?.extras?.getParcelable(VIDEO_URI_KEY)
+        } ?: intent?.data
+        if (data != null) {
+            videoUri = data
+            play()
+        }
     }
 
     override fun ActivityPlayBinding.initView() {
-        if (videoUri == null) {
-            return
+        videoUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent.extras?.getParcelable(VIDEO_URI_KEY, Uri::class.java)
+        } else {
+            intent.extras?.getParcelable(VIDEO_URI_KEY)
+        } ?: intent.data
+
+        if (videoUri != null) {
+            playerView.setOnBackButtonClickListener { finish() }
+            // Attach player to the view.
+            playerView.player = player
+            play()
         }
-        val player = ExoPlayer.Builder(this@PlayActivity).build()
-        playerView.setOnBackButtonClickListener { finish() }
-        // Attach player to the view.
-        playerView.player = player
+    }
+
+    private fun play(): Boolean {
+        if (videoUri == null) {
+            return false
+        }
         // Set the media item to be played.
         player.setMediaItem(MediaItem.fromUri(videoUri!!))
         // Prepare the player.
         player.prepare()
         player.play()
+        return true
     }
 
     override fun onDestroy() {

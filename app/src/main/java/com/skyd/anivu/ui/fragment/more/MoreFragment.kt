@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.navigation.Navigation
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
@@ -21,6 +20,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MoreFragment : BaseFragment<FragmentMoreBinding>() {
+    override fun enabledOnBackPressedCallback() = false
+
     private val adapter = VarietyAdapter(mutableListOf())
 
     override fun onCreate(savedInstanceState: Bundle?) {

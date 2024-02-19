@@ -12,6 +12,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainFragment : BaseFragment<FragmentMainBinding>() {
+    override fun enabledOnBackPressedCallback() = false
+
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =
         FragmentMainBinding.inflate(inflater, container, false)
 

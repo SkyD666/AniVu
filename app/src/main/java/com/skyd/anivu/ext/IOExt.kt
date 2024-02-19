@@ -1,6 +1,7 @@
 package com.skyd.anivu.ext
 
 import android.net.Uri
+import android.provider.OpenableColumns
 import com.skyd.anivu.appContext
 import java.io.File
 import java.io.FileInputStream
@@ -17,7 +18,22 @@ fun Uri.copyTo(target: File): File {
 }
 
 fun Uri.fileName(): String? {
-    return path?.substringAfterLast("/")?.toDecodedUrl()
+    var name: String? = null
+    runCatching {
+        appContext.contentResolver.query(
+            this, null, null, null, null
+        )?.use { cursor ->
+            /*
+             * Get the column indexes of the data in the Cursor,
+             * move to the first row in the Cursor, get the data.
+             */
+            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            cursor.moveToFirst()
+            name = cursor.getString(nameIndex)
+        }
+    }.onFailure { it.printStackTrace() }
+
+    return name ?: path?.substringAfterLast("/")?.toDecodedUrl()
 }
 
 fun InputStream.saveTo(target: File): File {

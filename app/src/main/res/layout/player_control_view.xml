@@ -192,14 +192,28 @@
     <!--        android:layout_height="0dp"-->
     <!--        android:background="@color/exo_black_opacity_60" />-->
 
-    <TextView
+    <LinearLayout
         android:id="@+id/exo_long_press_playback_speed"
         style="@style/AniVuStyledControls.Button.FloatButton.LongPressPlaybackSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.25" />
+        app:layout_constraintVertical_bias="0.25">
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginEnd="10dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_fast_forward_24"
+            app:tint="@android:color/white" />
+
+        <TextView style="@style/AniVuStyledControls.Button.FloatButton.LongPressPlaybackSpeedText" />
+    </LinearLayout>
 
     <TextView
         android:id="@+id/exo_seek_preview"
@@ -213,7 +227,6 @@
     <LinearLayout
         android:id="@+id/exo_brightness_controls"
         style="@style/AniVuStyledControls.Button.FloatButton.BrightnessVolume"
-        android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -240,7 +253,6 @@
     <LinearLayout
         android:id="@+id/exo_volume_controls"
         style="@style/AniVuStyledControls.Button.FloatButton.BrightnessVolume"
-        android:gravity="center_vertical"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

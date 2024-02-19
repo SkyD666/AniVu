@@ -35,6 +35,49 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        /*returnTransition = AutoTransition()
+        reenterTransition = AutoTransition()
+        enterTransition = AutoTransition()
+        sharedElementEnterTransition = AutoTransition()
+        val windowWidth = requireContext().screenWidth(includeVirtualKey = true)
+        val maxXShift = windowWidth / 20
+        val predictiveBackCallback = object : OnBackPressedCallback(
+            enabled = enabledOnBackPressedCallback()
+        ) {
+            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
+                binding.root.apply {
+                    when (backEvent.swipeEdge) {
+                        BackEventCompat.EDGE_LEFT -> {
+                            translationX = backEvent.progress * maxXShift
+                        }
+
+                        BackEventCompat.EDGE_RIGHT -> {
+                            translationX = -(backEvent.progress * maxXShift)
+                        }
+                    }
+                    scaleX = 1F - (0.1F * backEvent.progress)
+                    scaleY = 1F - (0.1F * backEvent.progress)
+                }
+            }
+
+            override fun handleOnBackPressed() {
+                findMainNavController().popBackStackWithLifecycle()
+            }
+
+            override fun handleOnBackCancelled() {
+                binding.root.apply {
+                    scaleX = 1F
+                    scaleY = 1F
+                    translationX = 0F
+                }
+            }
+        }
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this.viewLifecycleOwner,
+            predictiveBackCallback
+        )*/
+
         binding.initView()
         binding.setWindowInsets()
         // Fix https://github.com/material-components/material-components-android/issues/1984#issuecomment-1089710991
@@ -49,6 +92,8 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         super.onDestroyView()
         _binding = null
     }
+
+    protected open fun enabledOnBackPressedCallback(): Boolean = true
 
     protected fun findMainNavController() =
         Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_main)

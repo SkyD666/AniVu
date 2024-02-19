@@ -354,7 +354,7 @@ public class PlayerControlView extends FrameLayout {
     @Nullable
     private final View backButton;
     @Nullable
-    private final TextView longPressPlaybackSpeedView;
+    private final View longPressPlaybackSpeedView;
     @Nullable
     private final TextView seekPreviewView;
     @Nullable
@@ -1558,8 +1558,9 @@ public class PlayerControlView extends FrameLayout {
         } else {
             MediaItem currentMediaItem = player.getCurrentMediaItem();
             if (currentMediaItem != null && currentMediaItem.localConfiguration != null
-                    && currentMediaItem.localConfiguration.uri != null)
+                    && currentMediaItem.localConfiguration.uri != null) {
                 titleView.setText(IOExtKt.fileName(currentMediaItem.localConfiguration.uri));
+            } else titleView.setText("");
         }
     }
 

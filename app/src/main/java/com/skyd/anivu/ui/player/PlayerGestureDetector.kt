@@ -164,8 +164,6 @@ class PlayerGestureDetector(
                     val centerY = getCenterY(event)
                     translationX = lastTranslationX + centerX - actionX
                     translationY = lastTranslationY + centerY - actionY
-                    actionX = centerX
-                    actionY = centerY
 
                     scale = lastScale * getSpacing(event) / spacing
                     rotation = lastRotation + getDegree(event) - degree

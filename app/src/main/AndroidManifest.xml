@@ -45,8 +45,22 @@
             android:name=".ui.activity.PlayActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="true"
+            android:label="@string/play_activity_label"
+            android:launchMode="singleTask"
             android:screenOrientation="userLandscape"
-            android:theme="@style/Theme.AniVu.Player" />
+            android:theme="@style/Theme.AniVu.Player">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:mimeType="video/*" />
+                <data android:mimeType="audio/*" />
+            </intent-filter>
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
