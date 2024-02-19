@@ -1157,7 +1157,7 @@ public class PlayerControlView extends FrameLayout {
             if (visibility == VISIBLE) {
                 brightnessControlsView.setVisibility(VISIBLE);
             } else {
-                postDelayed(setBrightnessControlsGoneRunnable, 220);
+                postDelayed(setBrightnessControlsGoneRunnable, 300);
             }
         }
     }
@@ -1207,7 +1207,7 @@ public class PlayerControlView extends FrameLayout {
             if (visibility == VISIBLE) {
                 volumeControlsView.setVisibility(VISIBLE);
             } else {
-                postDelayed(setVolumeControlsGoneRunnable, 220);
+                postDelayed(setVolumeControlsGoneRunnable, 300);
             }
         }
     }

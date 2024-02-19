@@ -20,6 +20,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
     private val player: ExoPlayer by lazy { ExoPlayer.Builder(this@PlayActivity).build() }
     private var videoUri: Uri? = null
+    private var beforePauseIsPlaying = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -89,13 +90,19 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     override fun onResume() {
         super.onResume()
 
-        binding.playerView.player?.play()
+        if (beforePauseIsPlaying) {
+            beforePauseIsPlaying = false
+            player.play()
+        }
     }
 
     override fun onPause() {
         super.onPause()
 
-        binding.playerView.player?.pause()
+        if (player.isPlaying) {
+            beforePauseIsPlaying = true
+            player.pause()
+        }
     }
 
     override fun getViewBinding() = ActivityPlayBinding.inflate(layoutInflater)

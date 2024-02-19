@@ -469,9 +469,14 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
                             startMovingVolumePos = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
                         }
                         if (controller != null) {
-                            int desiredVolume = (int) (startMovingVolumePos - deltaY / getHeight() * 20);
+                            int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+                            controller.setMaxVolume(maxVolume);
+                            int minVolume = 0;
+                            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+                                minVolume = audioManager.getStreamMinVolume(AudioManager.STREAM_MUSIC);
+                            }
+                            int desiredVolume = (int) (startMovingVolumePos - deltaY / getHeight() * 1.2f * (maxVolume - minVolume));
                             audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, desiredVolume, 0);
-                            controller.setMaxVolume(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                                 controller.setMinVolume(audioManager.getStreamMinVolume(AudioManager.STREAM_MUSIC));
                             }
