@@ -233,6 +233,22 @@ interface DownloadInfoDao {
     ): Flow<List<DownloadInfoBean>>
 
     @Transaction
+    @Query(
+        """
+        SELECT * FROM $DOWNLOAD_INFO_TABLE_NAME
+        """
+    )
+    fun getAllDownloadListFlow(): Flow<List<DownloadInfoBean>>
+
+    @Transaction
+    @Query(
+        """
+        SELECT ${DownloadInfoBean.DOWNLOAD_REQUEST_ID_COLUMN} FROM $DOWNLOAD_INFO_TABLE_NAME
+        """
+    )
+    fun getAllDownloadRequestIdFlow(): Flow<List<String>>
+
+    @Transaction
     @Query("SELECT * FROM $DOWNLOAD_INFO_TABLE_NAME WHERE ${DownloadInfoBean.PROGRESS_COLUMN} < 1")
     fun getDownloadingList(): List<DownloadInfoBean>
 
@@ -256,9 +272,27 @@ interface DownloadInfoDao {
     @Transaction
     @Query(
         """
+        SELECT ${DownloadLinkUuidMapBean.UUID_COLUMN} FROM $DOWNLOAD_LINK_UUID_MAP_TABLE_NAME
+        WHERE ${DownloadLinkUuidMapBean.LINK_COLUMN} == :link
+        """
+    )
+    fun getDownloadUuidByLink(link: String): String?
+
+    @Transaction
+    @Query(
+        """
         DELETE FROM $DOWNLOAD_LINK_UUID_MAP_TABLE_NAME
         WHERE ${DownloadLinkUuidMapBean.UUID_COLUMN} == :uuid
         """
     )
     fun removeDownloadLinkByUuid(uuid: String): Int
+
+    @Transaction
+    @Query(
+        """
+        DELETE FROM $DOWNLOAD_LINK_UUID_MAP_TABLE_NAME
+        WHERE ${DownloadLinkUuidMapBean.LINK_COLUMN} == :link
+        """
+    )
+    fun removeDownloadLinkByLink(link: String): Int
 }

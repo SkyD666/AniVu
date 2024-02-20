@@ -32,6 +32,7 @@
     <string name="download_paused">已暂停</string>
     <string name="download_initializing">初始化中…</string>
     <string name="download_completed">已完成</string>
+    <string name="download_peer_count">用户：%d</string>
     <string name="parent_dir">…</string>
     <string name="player_fragment_name">播放器</string>
     <string name="torrent_status_checking_files">检查文件中…</string>

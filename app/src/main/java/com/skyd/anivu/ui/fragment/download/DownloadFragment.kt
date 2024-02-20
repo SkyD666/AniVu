@@ -38,12 +38,14 @@ class DownloadFragment : BaseFragment<FragmentDownloadBinding>() {
                     DownloadTorrentWorker.pause(
                         context = requireContext(),
                         requestId = it.downloadRequestId,
+                        link = it.link,
                     )
                 },
                 onResume = { video ->
                     DownloadTorrentWorker.startWorker(
                         context = requireContext(),
                         torrentLink = video.link,
+                        requestId = video.downloadRequestId,
                     )
                 },
                 onCancel = { video ->

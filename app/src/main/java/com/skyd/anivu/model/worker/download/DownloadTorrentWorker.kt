@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.database.sqlite.SQLiteConstraintException
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
@@ -21,18 +22,23 @@ import com.skyd.anivu.BuildConfig
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
 import com.skyd.anivu.config.Const
+import com.skyd.anivu.ext.getAppName
+import com.skyd.anivu.ext.getAppVersionName
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.saveTo
 import com.skyd.anivu.ext.toDecodedUrl
 import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.DownloadInfoBean
 import com.skyd.anivu.model.bean.DownloadLinkUuidMapBean
+import com.skyd.anivu.model.bean.PeerInfoBean
 import com.skyd.anivu.model.bean.SessionParamsBean
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
 import com.skyd.anivu.model.repository.DownloadRepository
 import com.skyd.anivu.model.service.HttpService
 import com.skyd.anivu.util.floatToPercentage
+import com.skyd.anivu.util.torrent.readResumeData
+import com.skyd.anivu.util.torrent.serializeResumeData
 import com.skyd.anivu.util.uniqueInt
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -43,31 +49,41 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.libtorrent4j.AlertListener
+import org.libtorrent4j.MoveFlags
 import org.libtorrent4j.SessionManager
 import org.libtorrent4j.SessionParams
 import org.libtorrent4j.TorrentHandle
 import org.libtorrent4j.TorrentInfo
+import org.libtorrent4j.TorrentStatus
 import org.libtorrent4j.alerts.Alert
 import org.libtorrent4j.alerts.FileErrorAlert
 import org.libtorrent4j.alerts.MetadataReceivedAlert
+import org.libtorrent4j.alerts.PeerConnectAlert
+import org.libtorrent4j.alerts.PeerDisconnectedAlert
+import org.libtorrent4j.alerts.PeerInfoAlert
+import org.libtorrent4j.alerts.SaveResumeDataAlert
 import org.libtorrent4j.alerts.StateChangedAlert
+import org.libtorrent4j.alerts.StorageMovedAlert
+import org.libtorrent4j.alerts.StorageMovedFailedAlert
 import org.libtorrent4j.alerts.TorrentAlert
 import org.libtorrent4j.alerts.TorrentErrorAlert
 import org.libtorrent4j.alerts.TorrentFinishedAlert
+import org.libtorrent4j.swig.settings_pack
 import org.libtorrent4j.swig.torrent_flags_t
 import retrofit2.Retrofit
 import java.io.File
 import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resumeWithException
-import kotlin.random.Random
 
 
 class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
@@ -81,8 +97,9 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         }
     private var notificationContentText: String = "Starting Download"
     private var name: String? = null
-    private lateinit var tempDownloadingDirName: String
+    private var tempDownloadingDirName: String? = null
     private var description: String? = null
+    private var peerInfoList: MutableList<PeerInfoBean> = mutableListOf()
 
     private val notificationManager =
         context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -95,21 +112,23 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             coroutineContext.job.invokeOnCompletion {
                 if (it is CancellationException) {
                     this@DownloadTorrentWorker.pause(handle = null)
+                    removeWorkerFromFlow(id.toString())
                 }
             }
             torrentLinkUuid =
                 inputData.getString(TORRENT_LINK_UUID) ?: return@withContext Result.failure()
-            torrentLink = hiltEntryPoint.downloadInfoDao.getDownloadLinkByUuid(torrentLinkUuid)
+            val downloadInfoDao = hiltEntryPoint.downloadInfoDao
+            torrentLink = downloadInfoDao.getDownloadLinkByUuid(torrentLinkUuid)
                 ?: return@withContext Result.failure()
-            name = hiltEntryPoint.downloadInfoDao.getDownloadName(link = torrentLink)
-            tempDownloadingDirName = hiltEntryPoint.downloadInfoDao
-                .getDownloadingDirName(link = torrentLink)
-                .ifNullOfBlank { "${System.currentTimeMillis()}_${Random.nextLong()}" }
+            name = downloadInfoDao.getDownloadName(link = torrentLink)
+            tempDownloadingDirName = downloadInfoDao.getDownloadingDirName(link = torrentLink)
+            progress = downloadInfoDao.getDownloadProgress(link = torrentLink) ?: 0f
             updateNotification()
             updateAllDownloadVideoInfoToDb()
             workerDownload()
         }
         hiltEntryPoint.downloadInfoDao.removeDownloadLinkByUuid(torrentLinkUuid)
+        removeWorkerFromFlow(id.toString())
         return Result.success(
             workDataOf(
                 STATE to (hiltEntryPoint.downloadInfoDao
@@ -121,7 +140,8 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private var sessionIsStopping: Boolean = false
     private suspend fun workerDownload(
-        saveDir: File = File(Const.DOWNLOADING_VIDEO_DIR, tempDownloadingDirName)
+        saveDir: File = if (tempDownloadingDirName.isNullOrBlank()) Const.DOWNLOADING_VIDEO_DIR
+        else File(Const.DOWNLOADING_VIDEO_DIR, tempDownloadingDirName!!)
     ) = suspendCancellableCoroutine { continuation ->
         if (!saveDir.exists() && !saveDir.mkdirs()) {
             continuation.resumeWithException(RuntimeException("Mkdirs failed: $saveDir"))
@@ -159,7 +179,13 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             val sessionParams = if (lastSessionParams == null) SessionParams()
             else SessionParams(lastSessionParams.data)
 
+            sessionParams.settings = sessionParams.settings.setString(
+                settings_pack.string_types.user_agent.swigValue(),
+                "${applicationContext.getAppName() ?: "AniVu"}/${applicationContext.getAppVersionName()}"
+            )
+
             start(sessionParams)
+            startDht()
 
             if (hiltEntryPoint.downloadInfoDao.containsDownloadInfo(link = torrentLink) > 0) {
                 hiltEntryPoint.downloadInfoDao.updateDownloadInfoRequestId(
@@ -170,10 +196,16 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             when (hiltEntryPoint.downloadInfoDao.getDownloadState(link = torrentLink)) {
                 null,
                     // 重新下载
-                DownloadInfoBean.DownloadState.Completed,/* -> {
-                    stop()
-                    continuation.resume(Unit, null)
-                }*/
+                DownloadInfoBean.DownloadState.Seeding,
+                DownloadInfoBean.DownloadState.SeedingPaused,
+                DownloadInfoBean.DownloadState.Completed -> {
+                    val resumeData = readResumeData(id.toString())
+                    if (resumeData != null) {
+                        swig().async_add_torrent(resumeData)
+                    }
+                    updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Seeding)
+                }
+
                 DownloadInfoBean.DownloadState.Init -> {
                     downloadByMagnetOrTorrent(torrentLink, saveDir)
                     updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Downloading)
@@ -181,6 +213,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
                 DownloadInfoBean.DownloadState.Downloading,
                 DownloadInfoBean.DownloadState.ErrorPaused,
+                DownloadInfoBean.DownloadState.StorageMovedFailed,
                 DownloadInfoBean.DownloadState.Paused -> {
                     downloadByMagnetOrTorrent(torrentLink, saveDir)
                     updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Downloading)
@@ -192,9 +225,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     private fun downloadByMagnetOrTorrent(
         link: String,
         saveDir: File,
+        flags: torrent_flags_t = torrent_flags_t(),
     ) {
         if (link.startsWith("magnet:")) {
-            sessionManager.download(link, saveDir, torrent_flags_t())
+            sessionManager.download(link, saveDir, flags)
         } else if (
             (link.startsWith("http:") || link.startsWith("https:")) &&
             link.endsWith(".torrent")
@@ -206,7 +240,11 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             hiltEntryPoint.retrofit.create(HttpService::class.java)
                 .requestGetResponseBody(link).execute().body()!!.byteStream()
                 .use { it.saveTo(tempTorrentFile) }
-            sessionManager.download(TorrentInfo(tempTorrentFile), saveDir)
+            sessionManager.download(
+                TorrentInfo(tempTorrentFile), saveDir,
+                null, null, null,
+                flags
+            )
         } else {
             error("Unsupported link: $link")
         }
@@ -281,6 +319,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun onAlert(continuation: CancellableContinuation<Unit>, alert: Alert<*>) {
         when (alert) {
+            is SaveResumeDataAlert -> {
+                serializeResumeData(id.toString(), alert)
+            }
+
             is TorrentErrorAlert -> {
                 // 下载错误更新
                 this@DownloadTorrentWorker.pause(
@@ -300,15 +342,30 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 continuation.resumeWithException(RuntimeException(alert.message()))
             }
 
+            is StorageMovedAlert -> {
+                alert.handle().saveResumeData()
+                updateNotificationAsync()     // 更新Notification
+                updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Seeding)
+            }
+
+            is StorageMovedFailedAlert -> {
+                // 文件移动，例如存储空间已满
+                alert.handle().saveResumeData()
+                this@DownloadTorrentWorker.pause(
+                    handle = alert.handle(),
+                    state = DownloadInfoBean.DownloadState.StorageMovedFailed,
+                )
+            }
+
             is TorrentFinishedAlert -> {
                 // 下载完成更新
                 val handle = alert.handle()
                 progress = 1f
                 name = handle.name
+                handle.saveResumeData()
                 updateNotificationAsync()     // 更新Notification
+                moveFromDownloadingDirToVideoDir(handle = handle)
                 updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Completed)
-                moveFromDownloadingDirToVideoDir()
-                continuation.resume(Unit, null)
             }
 
             is MetadataReceivedAlert -> {
@@ -321,6 +378,9 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
             is StateChangedAlert -> {
                 // 下载状态更新
+                if (alert.state == TorrentStatus.State.SEEDING) {
+                    updateDownloadStateAndSessionParams(DownloadInfoBean.DownloadState.Seeding)
+                }
                 description = alert.state.toDisplayString(context = applicationContext)
                 updateDescriptionInfoToDb()
                 val handle = alert.handle()
@@ -331,11 +391,27 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 }
             }
 
+            is PeerConnectAlert,
+            is PeerDisconnectedAlert,
+            is PeerInfoAlert -> {
+                val peerInfo = (alert as? TorrentAlert<*>)
+                    ?.handle()?.peerInfo()?.map { PeerInfoBean.from(it) }
+                Log.e("TAG", "onAlert: ${peerInfo?.size}")
+                if (!peerInfo.isNullOrEmpty()) {
+                    peerInfoMapFlow.tryEmit(peerInfoMapFlow.value.toMutableMap().apply {
+                        put(id.toString(), peerInfo)
+                    })
+                }
+            }
+
             is TorrentAlert<*> -> {
 //                Log.e("TAG", "onAlert: ${alert}")
                 // 下载进度更新
                 val handle = alert.handle()
                 if (handle.isValid) {
+                    torrentStatusMapFlow.tryEmit(torrentStatusMapFlow.value.toMutableMap().apply {
+                        put(id.toString(), handle.status())
+                    })
                     if (progress != handle.status().progress()) {
                         progress = handle.status().progress()
                         updateNotificationAsync()     // 更新Notification
@@ -349,12 +425,20 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun pause(
         handle: TorrentHandle?,
-        state: DownloadInfoBean.DownloadState = DownloadInfoBean.DownloadState.Paused
+        state: DownloadInfoBean.DownloadState = hiltEntryPoint.downloadInfoDao
+            .getDownloadState(link = torrentLink).let {
+                if (it == DownloadInfoBean.DownloadState.Seeding ||
+                    it == DownloadInfoBean.DownloadState.Completed ||
+                    it == DownloadInfoBean.DownloadState.SeedingPaused
+                ) DownloadInfoBean.DownloadState.Completed
+                else DownloadInfoBean.DownloadState.Paused
+            }
     ) {
         if (!sessionManager.isRunning || sessionIsStopping) {
             return
         }
         sessionIsStopping = true
+        updateSizeInfoToDb()
         updateDownloadStateAndSessionParams(state)
         if (handle != null) {
             handle.saveResumeData()
@@ -366,13 +450,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         sessionManager.stop()
     }
 
-    private fun moveFromDownloadingDirToVideoDir() {
-        val downloadingDir = File(Const.DOWNLOADING_VIDEO_DIR, tempDownloadingDirName)
-        downloadingDir.listFiles()?.forEach {
-            it.copyRecursively(File(Const.VIDEO_DIR, it.name), true)
-            it.deleteRecursively()
+    private fun moveFromDownloadingDirToVideoDir(handle: TorrentHandle) {
+        if (handle.savePath() != Const.VIDEO_DIR.path && File(handle.savePath()).exists()) {
+            handle.moveStorage(Const.VIDEO_DIR.path, MoveFlags.ALWAYS_REPLACE_FILES)
         }
-        downloadingDir.deleteRecursively()
     }
 
     private fun updateDownloadStateAndSessionParams(downloadState: DownloadInfoBean.DownloadState) {
@@ -483,7 +564,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                                 .toDecodedUrl()
                                 .validateFileName()
                         },
-                        downloadingDirName = tempDownloadingDirName,
+                        downloadingDirName = tempDownloadingDirName.orEmpty(),
                         downloadDate = System.currentTimeMillis(),
                         size = sessionManager.stats().totalDownload(),
                         progress = progress,
@@ -502,6 +583,18 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
         private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
+        val peerInfoMapFlow = MutableStateFlow(mutableMapOf<String, List<PeerInfoBean>>())
+        val torrentStatusMapFlow = MutableStateFlow(mutableMapOf<String, TorrentStatus>())
+
+        private fun removeWorkerFromFlow(requestId: String) {
+            peerInfoMapFlow.tryEmit(
+                peerInfoMapFlow.value.toMutableMap().apply { remove(requestId) }
+            )
+            torrentStatusMapFlow.tryEmit(
+                torrentStatusMapFlow.value.toMutableMap().apply { remove(requestId) }
+            )
+        }
+
         @EntryPoint
         @InstallIn(SingletonComponent::class)
         interface WorkerEntryPoint {
@@ -515,16 +608,22 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             appContext, WorkerEntryPoint::class.java
         )
 
-        fun startWorker(context: Context, torrentLink: String) {
-            val torrentLinkUuid = UUID.randomUUID().toString()
+        fun startWorker(context: Context, torrentLink: String, requestId: String? = null) {
             coroutineScope.launch {
-                hiltEntryPoint.downloadInfoDao.setDownloadLinkUuidMap(
-                    DownloadLinkUuidMapBean(
-                        link = torrentLink,
-                        uuid = torrentLinkUuid,
+                var torrentLinkUuid =
+                    hiltEntryPoint.downloadInfoDao.getDownloadUuidByLink(torrentLink)
+                if (torrentLinkUuid == null) {
+                    torrentLinkUuid = UUID.randomUUID().toString()
+                    hiltEntryPoint.downloadInfoDao.setDownloadLinkUuidMap(
+                        DownloadLinkUuidMapBean(
+                            link = torrentLink,
+                            uuid = torrentLinkUuid,
+                        )
                     )
-                )
+                }
+
                 val sendLogsWorkRequest = OneTimeWorkRequestBuilder<DownloadTorrentWorker>()
+                    .run { if (requestId != null) setId(UUID.fromString(requestId)) else this }
                     .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
                     .setInputData(workDataOf(TORRENT_LINK_UUID to torrentLinkUuid))
                     .build()
@@ -533,12 +632,52 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     ExistingWorkPolicy.KEEP,
                     sendLogsWorkRequest
                 )
+
+                val flow = WorkManager.getInstance(context)
+                    .getWorkInfoByIdFlow(sendLogsWorkRequest.id)
+                coroutineScope.launch {
+                    flow.filter { it == null || it.state.isFinished }
+                        .onEach {
+                            removeWorkerFromFlow(it.id.toString())
+                        }.collect {
+                            cancel()
+                        }
+                }
             }
         }
 
-        fun pause(context: Context, requestId: String) {
-            WorkManager.getInstance(context)
-                .cancelWorkById(UUID.fromString(requestId))
+        fun pause(
+            context: Context, requestId: String,
+            link: String,
+        ) {
+            val uuid = UUID.fromString(requestId)
+            WorkManager.getInstance(context).apply {
+                if (getWorkInfoById(uuid).get().state.isFinished) {
+                    coroutineScope.launch {
+                        try {
+                            val state = hiltEntryPoint.downloadInfoDao.getDownloadState(link)
+                            val newState: DownloadInfoBean.DownloadState =
+                                if (state == DownloadInfoBean.DownloadState.Seeding ||
+                                    state == DownloadInfoBean.DownloadState.Completed ||
+                                    state == DownloadInfoBean.DownloadState.SeedingPaused
+                                ) {
+                                    DownloadInfoBean.DownloadState.SeedingPaused
+                                } else {
+                                    DownloadInfoBean.DownloadState.Paused
+                                }
+                            hiltEntryPoint.downloadInfoDao.updateDownloadState(
+                                link = link,
+                                downloadState = newState,
+                            )
+                        } catch (e: SQLiteConstraintException) {
+                            // 捕获link外键约束异常
+                            e.printStackTrace()
+                        }
+                    }
+                } else {
+                    cancelWorkById(uuid)
+                }
+            }
         }
 
         fun cancel(
@@ -562,7 +701,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                         cancel()
                     }
             }
-            pause(context, requestId)
+            pause(context, requestId, link)
         }
     }
 }

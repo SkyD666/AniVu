@@ -32,6 +32,9 @@
     <string name="download_paused">Paused</string>
     <string name="download_initializing">Initializing…</string>
     <string name="download_completed">Completed</string>
+    <string name="download_peer_count">Peer(s): %d</string>
+    <string name="download_upload_payload_rate" translatable="false">%s ↑</string>
+    <string name="download_download_payload_rate" translatable="false">%s ↓</string>
     <string name="parent_dir">…</string>
     <string name="player_fragment_name">Player</string>
     <string name="torrent_status_checking_files">Checking files…</string>

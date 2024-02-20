@@ -137,7 +137,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/exo_styled_progress_layout_height"
                 android:layout_marginHorizontal="6dp"
-
                 app:layout_constraintBottom_toTopOf="@id/exo_basic_controls_left" />
 
             <HorizontalScrollView

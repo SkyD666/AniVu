@@ -188,7 +188,7 @@ class PlayerGestureDetector(
                 if (longPressed && event.pointerCount == 1) {
                     handled = mListener.onLongPressUp()
                     longPressed = false
-                } else if (singleMove > 0/* && event.pointerCount == 1*/) {
+                } else if (singleMove == 2/* && event.pointerCount == 1*/) {
                     // 单指滑动了一段距离，第二个手指又落下滑动，然后两个手指抬起
                     // 这时候应该只响应单指滑动，因为它先产生的。
                     // 所以这时event.pointerCount可能不1，所以不能加&& event.pointerCount == 1

@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.room.migration.Migration
 import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.DownloadInfoBean
 import com.skyd.anivu.model.bean.DownloadLinkUuidMapBean
@@ -47,7 +46,7 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var instance: AppDatabase? = null
 
-        private val migrations = arrayOf<Migration>(Migration1To2())
+        private val migrations = arrayOf(Migration1To2())
 
         fun getInstance(context: Context): AppDatabase {
             return if (instance == null) {

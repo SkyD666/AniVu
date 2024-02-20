@@ -25,4 +25,8 @@ object Const {
     val VIDEO_DIR = File(appContext.filesDir.path, "Video").apply {
         if (!exists()) mkdirs()
     }
+
+    val TORRENT_RESUME_DATA_DIR = File(appContext.filesDir.path, "TorrentResumeData").apply {
+        if (!exists()) mkdirs()
+    }
 }

@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.TypedArray
@@ -79,6 +80,17 @@ fun Context.getAppVersionName(): String {
         e.printStackTrace()
     }
     return appVersionName
+}
+
+fun Context.getAppName(): String? {
+    return try {
+        val packageInfo: PackageInfo = packageManager.getPackageInfo(packageName, 0)
+        val labelRes: Int = packageInfo.applicationInfo.labelRes
+        getString(labelRes)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
 }
 
 fun Context.openBrowser(url: String) {

@@ -3,10 +3,11 @@ package com.skyd.anivu.model.bean
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
+import androidx.room.Ignore
 import androidx.room.Index
 import com.skyd.anivu.base.BaseBean
 import com.skyd.anivu.ui.adapter.variety.Diff
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -43,10 +44,21 @@ data class DownloadInfoBean(
     @ColumnInfo(name = DOWNLOAD_REQUEST_ID_COLUMN)
     val downloadRequestId: String,
 ) : BaseBean, Parcelable, Diff {
-    enum class DownloadState {
-        Init, Downloading, Paused, Completed, ErrorPaused
-    }
+    @IgnoredOnParcel
+    @Ignore
+    var peerInfoList: List<PeerInfoBean> = emptyList()
 
+    @IgnoredOnParcel
+    @Ignore
+    var uploadPayloadRate: Int = 0
+
+    @IgnoredOnParcel
+    @Ignore
+    var downloadPayloadRate: Int = 0
+
+    enum class DownloadState {
+        Init, Downloading, Paused, Completed, ErrorPaused, StorageMovedFailed, Seeding, SeedingPaused
+    }
 
     companion object {
         const val LINK_COLUMN = "link"
@@ -61,6 +73,9 @@ data class DownloadInfoBean(
 
         const val PAYLOAD_PROGRESS = "progress"
         const val PAYLOAD_DESCRIPTION = "description"
+        const val PAYLOAD_PEER_INFO = "peerInfo"
+        const val PAYLOAD_UPLOAD_PAYLOAD_RATE = "uploadPayloadRate"
+        const val PAYLOAD_DOWNLOAD_PAYLOAD_RATE = "downloadPayloadRate"
         const val PAYLOAD_DOWNLOAD_STATE = "downloadState"
         const val PAYLOAD_NAME = "name"
         const val PAYLOAD_DOWNLOADING_DIR_NAME = "downloadingDirName"
@@ -81,10 +96,49 @@ data class DownloadInfoBean(
         val list: MutableList<Any> = mutableListOf()
         if (progress != o.progress) list += PAYLOAD_PROGRESS
         if (description != o.description) list += PAYLOAD_DESCRIPTION
+        if (peerInfoList != o.peerInfoList) list += PAYLOAD_PEER_INFO
+        if (uploadPayloadRate != o.uploadPayloadRate) list += PAYLOAD_UPLOAD_PAYLOAD_RATE
+        if (downloadPayloadRate != o.downloadPayloadRate) list += PAYLOAD_DOWNLOAD_PAYLOAD_RATE
         if (downloadState != o.downloadState) list += PAYLOAD_DOWNLOAD_STATE
         if (name != o.name) list += PAYLOAD_NAME
         if (downloadingDirName != o.downloadingDirName) list += PAYLOAD_DOWNLOADING_DIR_NAME
         if (size != o.size) list += PAYLOAD_SIZE
         return list.ifEmpty { null }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DownloadInfoBean
+
+        if (link != other.link) return false
+        if (name != other.name) return false
+        if (downloadingDirName != other.downloadingDirName) return false
+        if (downloadDate != other.downloadDate) return false
+        if (size != other.size) return false
+        if (progress != other.progress) return false
+        if (description != other.description) return false
+        if (downloadState != other.downloadState) return false
+        if (downloadRequestId != other.downloadRequestId) return false
+        if (uploadPayloadRate != other.uploadPayloadRate) return false
+        if (downloadPayloadRate != other.downloadPayloadRate) return false
+        return peerInfoList == other.peerInfoList
+    }
+
+    override fun hashCode(): Int {
+        var result = link.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + downloadingDirName.hashCode()
+        result = 31 * result + downloadDate.hashCode()
+        result = 31 * result + size.hashCode()
+        result = 31 * result + progress.hashCode()
+        result = 31 * result + (description?.hashCode() ?: 0)
+        result = 31 * result + downloadState.hashCode()
+        result = 31 * result + downloadRequestId.hashCode()
+        result = 31 * result + peerInfoList.hashCode()
+        result = 31 * result + uploadPayloadRate.hashCode()
+        result = 31 * result + downloadPayloadRate.hashCode()
+        return result
     }
 }

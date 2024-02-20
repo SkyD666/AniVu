@@ -26,16 +26,32 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_download_1_description"
             style="?attr/textAppearanceBodySmall"
-            android:layout_width="0px"
+            android:layout_width="wrap_content"
             android:layout_height="0px"
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:maxLines="2"
             app:layout_constraintBottom_toTopOf="@id/tv_download_1_progress"
-            app:layout_constraintEnd_toStartOf="@id/btn_download_1_pause"
+            app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="下载中..." />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_download_1_peer_count"
+            style="?attr/textAppearanceBodySmall"
+            android:layout_width="wrap_content"
+            android:layout_height="0px"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="2"
+            app:layout_constraintBottom_toTopOf="@id/tv_download_1_progress"
+            app:layout_constraintEnd_toStartOf="@id/btn_download_1_pause"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/tv_download_1_description"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="3 用户" />
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/tv_download_1_progress"
@@ -57,12 +73,45 @@
             android:layout_marginStart="12dp"
             android:gravity="center_vertical"
             android:maxLines="1"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/tv_download_1_description"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/tv_download_1_progress"
             app:layout_constraintTop_toBottomOf="@id/tv_download_1_description"
             tools:text="123 MB" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_download_1_download_payload_rate"
+            style="?attr/textAppearanceBodySmall"
+            android:layout_width="wrap_content"
+            android:layout_height="0px"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/tv_download_1_description"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/tv_download_1_size"
+            app:layout_constraintTop_toBottomOf="@id/tv_download_1_description"
+            tools:text="3 KB/s" />
+
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tv_download_1_upload_payload_rate"
+            style="?attr/textAppearanceBodySmall"
+            android:layout_width="wrap_content"
+            android:layout_height="0px"
+            android:layout_marginStart="12dp"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="2"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/tv_download_1_description"
+            app:layout_constraintHorizontal_bias="0"
+            app:layout_constraintStart_toEndOf="@id/tv_download_1_download_payload_rate"
+            app:layout_constraintTop_toBottomOf="@id/tv_download_1_description"
+            tools:text="3 KB/s" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_download_1_pause"
