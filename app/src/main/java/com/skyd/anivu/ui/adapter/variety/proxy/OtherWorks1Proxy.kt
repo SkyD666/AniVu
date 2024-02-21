@@ -22,7 +22,7 @@ class OtherWorks1Proxy(
         holder.itemView.setOnClickListener {
             val data = adapter.dataList.getOrNull(holder.bindingAdapterPosition)
             if (data !is OtherWorksBean) return@setOnClickListener
-            it.context.openBrowser(data.url)
+            data.url.openBrowser(it.context)
         }
         return holder
     }

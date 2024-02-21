@@ -22,7 +22,7 @@ class License1Proxy(
         holder.itemView.setOnClickListener {
             val data = adapter.dataList.getOrNull(holder.bindingAdapterPosition)
             if (data !is LicenseBean) return@setOnClickListener
-            it.context.openBrowser(data.link)
+            data.link.openBrowser(it.context)
         }
         return holder
     }

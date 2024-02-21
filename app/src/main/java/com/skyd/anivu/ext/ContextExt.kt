@@ -1,22 +1,16 @@
 package com.skyd.anivu.ext
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.ContextWrapper
-import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.content.res.TypedArray
 import android.graphics.Point
-import android.net.Uri
 import android.os.Build
 import android.util.TypedValue
 import android.view.WindowManager
-import android.widget.Toast
-import com.skyd.anivu.R
-import com.skyd.anivu.ui.component.showToast
 
 val Context.activity: Activity
     get() {
@@ -90,17 +84,5 @@ fun Context.getAppName(): String? {
     } catch (e: Exception) {
         e.printStackTrace()
         null
-    }
-}
-
-fun Context.openBrowser(url: String) {
-    try {
-        val uri: Uri = Uri.parse(url)
-        val intent = Intent(Intent.ACTION_VIEW, uri)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        startActivity(intent)
-    } catch (e: ActivityNotFoundException) {
-        e.printStackTrace()
-        getString(R.string.no_browser_found, url).showToast(Toast.LENGTH_LONG)
     }
 }

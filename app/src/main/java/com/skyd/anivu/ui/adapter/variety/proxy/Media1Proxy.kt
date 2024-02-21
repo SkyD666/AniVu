@@ -11,7 +11,9 @@ import com.skyd.anivu.R
 import com.skyd.anivu.databinding.ItemMedia1Binding
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.gone
+import com.skyd.anivu.ext.openWith
 import com.skyd.anivu.ext.toDateTimeString
+import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.ext.tryAddIcon
 import com.skyd.anivu.ext.visible
 import com.skyd.anivu.model.bean.VideoBean
@@ -65,6 +67,8 @@ class Media1Proxy(
                 onOpenDir(data)
             } else if (data.isMedia(parent.context)) {
                 onPlay(data)
+            } else {
+                data.file.toUri(it.context).openWith(it.context)
             }
         }
         return holder

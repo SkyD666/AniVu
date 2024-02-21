@@ -1,8 +1,15 @@
 package com.skyd.anivu.ext
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import com.skyd.anivu.R
 import com.skyd.anivu.appContext
+import com.skyd.anivu.ui.component.showToast
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -34,6 +41,39 @@ fun Uri.fileName(): String? {
     }.onFailure { it.printStackTrace() }
 
     return name ?: path?.substringAfterLast("/")?.toDecodedUrl()
+}
+
+fun String.openBrowser(context: Context) {
+    Uri.parse(this).openBrowser(context)
+}
+
+fun Uri.openBrowser(context: Context) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, this)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        e.printStackTrace()
+        context.getString(R.string.no_browser_found, path).showToast(Toast.LENGTH_LONG)
+    }
+}
+
+fun Uri.openWith(context: Context) {
+    try {
+        val mimeType = context.contentResolver.getType(this)
+        val intent = Intent.createChooser(
+            Intent().apply {
+                action = Intent.ACTION_VIEW
+                setDataAndType(this@openWith, mimeType)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            },
+            context.getString(R.string.open_with)
+        )
+        ContextCompat.startActivity(context, intent, null)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        context.getString(R.string.failed_msg, e.message).showToast(Toast.LENGTH_LONG)
+    }
 }
 
 fun InputStream.saveTo(target: File): File {

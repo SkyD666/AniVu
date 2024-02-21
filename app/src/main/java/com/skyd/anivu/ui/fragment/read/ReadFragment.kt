@@ -112,7 +112,7 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
                     if (articleState is ArticleState.Success) {
                         val link = articleState.article.article.link
                         if (!link.isNullOrBlank()) {
-                            requireContext().openBrowser(link)
+                            link.openBrowser(requireContext())
                         }
                     }
                     true

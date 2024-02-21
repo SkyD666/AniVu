@@ -33,7 +33,7 @@ interface DownloadInfoDao {
     fun updateDownloadInfoRequestId(
         link: String,
         downloadRequestId: String,
-    )
+    ): Int
 
     @Transaction
     @Query(
@@ -78,7 +78,7 @@ interface DownloadInfoDao {
     fun updateDownloadState(
         link: String,
         downloadState: DownloadInfoBean.DownloadState,
-    )
+    ): Int
 
     @Transaction
     @Query(
@@ -124,7 +124,7 @@ interface DownloadInfoDao {
     fun updateDownloadDescription(
         link: String,
         description: String?,
-    )
+    ): Int
 
     @Transaction
     @Query(
@@ -148,7 +148,7 @@ interface DownloadInfoDao {
     fun updateDownloadSize(
         link: String,
         size: Long,
-    )
+    ): Int
 
     @Transaction
     @Query(
@@ -172,7 +172,7 @@ interface DownloadInfoDao {
     fun updateDownloadProgress(
         link: String,
         progress: Float,
-    )
+    ): Int
 
     @Transaction
     @Query(
@@ -207,7 +207,7 @@ interface DownloadInfoDao {
     fun updateDownloadName(
         link: String,
         name: String,
-    )
+    ): Int
 
     @Transaction
     @Query(

@@ -35,3 +35,5 @@ val Int.sp: Int
         this.toFloat(),
         Resources.getSystem().displayMetrics
     ).toInt()
+
+fun Float.toPercentage(): String = "%.2f%%".format(this * 100)

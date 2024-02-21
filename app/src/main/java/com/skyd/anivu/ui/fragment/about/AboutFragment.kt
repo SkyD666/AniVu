@@ -3,20 +3,17 @@ package com.skyd.anivu.ui.fragment.about
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.annotation.OptIn
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.ViewCompat
-import androidx.core.view.updatePadding
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.google.android.material.badge.BadgeDrawable
-import com.google.android.material.badge.BadgeUtils
-import com.google.android.material.badge.ExperimentalBadgeUtils
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.databinding.FragmentAboutBinding
+import com.skyd.anivu.ext.addBadge
 import com.skyd.anivu.ext.addInsetsByPadding
+import com.skyd.anivu.ext.dp
 import com.skyd.anivu.ext.getAppVersionName
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.popBackStackWithLifecycle
@@ -63,7 +60,6 @@ class AboutFragment : BaseFragment<FragmentAboutBinding>() {
         )
     }
 
-    @OptIn(ExperimentalBadgeUtils::class)
     override fun FragmentAboutBinding.initView() {
         topAppBar.setNavigationOnClickListener { findNavController().popBackStackWithLifecycle() }
         topAppBar.setOnMenuItemClickListener {
@@ -77,19 +73,21 @@ class AboutFragment : BaseFragment<FragmentAboutBinding>() {
             }
         }
 
-        val badgeDrawable = BadgeDrawable.create(requireContext())
-        badgeDrawable.isVisible = true
-        badgeDrawable.text = requireContext().getAppVersionName()
-        BadgeUtils.attachBadgeDrawable(badgeDrawable, tvAboutFragmentAppName)
+        tvAboutFragmentAppName.addBadge {
+            isVisible = true
+            verticalOffset = 7.dp
+            horizontalOffset = 10.dp
+            text = requireContext().getAppVersionName()
+        }
 
         btnAboutFragmentGithub.setOnClickListener {
-            it.context.openBrowser(Const.GITHUB_REPO)
+            Const.GITHUB_REPO.openBrowser(it.context)
         }
         btnAboutFragmentTelegram.setOnClickListener {
-            it.context.openBrowser(Const.TELEGRAM_GROUP)
+            Const.TELEGRAM_GROUP.openBrowser(it.context)
         }
         btnAboutFragmentDiscord.setOnClickListener {
-            it.context.openBrowser(Const.DISCORD_SERVER)
+            Const.DISCORD_SERVER.openBrowser(it.context)
         }
 
         rvAboutFragment.layoutManager = GridLayoutManager(

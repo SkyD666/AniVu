@@ -8,11 +8,10 @@ import com.skyd.anivu.databinding.ItemDownload1Binding
 import com.skyd.anivu.ext.disable
 import com.skyd.anivu.ext.enable
 import com.skyd.anivu.ext.fileSize
-import com.skyd.anivu.ext.gone
+import com.skyd.anivu.ext.toPercentage
 import com.skyd.anivu.model.bean.DownloadInfoBean
 import com.skyd.anivu.ui.adapter.variety.Download1ViewHolder
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
-import com.skyd.anivu.util.floatToPercentage
 
 
 class Download1Proxy(
@@ -45,6 +44,7 @@ class Download1Proxy(
                 else -> Unit
             }
         }
+        holder.binding.btnDownload1Cancel.enable()
         holder.binding.btnDownload1Cancel.setOnClickListener {
             val data = adapter.dataList.getOrNull(holder.bindingAdapterPosition)
             if (data !is DownloadInfoBean) return@setOnClickListener
@@ -123,9 +123,6 @@ class Download1Proxy(
 
                         DownloadInfoBean.PAYLOAD_DOWNLOADING_DIR_NAME -> {
                         }
-
-                        DownloadInfoBean.PAYLOAD_SIZE -> {
-                        }
                     }
                 }
             }
@@ -137,7 +134,7 @@ class Download1Proxy(
         data: DownloadInfoBean,
     ) {
         holder.binding.apply {
-            tvDownload1Progress.text = floatToPercentage(data.progress)
+            tvDownload1Progress.text = data.progress.toPercentage()
             when (data.downloadState) {
                 DownloadInfoBean.DownloadState.Seeding,
                 DownloadInfoBean.DownloadState.SeedingPaused,
@@ -182,9 +179,10 @@ class Download1Proxy(
         holder: Download1ViewHolder,
         data: DownloadInfoBean,
     ) {
-        holder.binding.tvDownload1UploadPayloadRate.text = holder.itemView.context.getString(
+        val context = holder.itemView.context
+        holder.binding.tvDownload1UploadPayloadRate.text = context.getString(
             R.string.download_upload_payload_rate,
-            data.uploadPayloadRate.toLong().fileSize(holder.itemView.context) + "/s"
+            data.uploadPayloadRate.toLong().fileSize(context) + "/s"
         )
     }
 
@@ -192,9 +190,10 @@ class Download1Proxy(
         holder: Download1ViewHolder,
         data: DownloadInfoBean,
     ) {
-        holder.binding.tvDownload1DownloadPayloadRate.text = holder.itemView.context.getString(
+        val context = holder.itemView.context
+        holder.binding.tvDownload1DownloadPayloadRate.text = context.getString(
             R.string.download_download_payload_rate,
-            data.downloadPayloadRate.toLong().fileSize(holder.itemView.context) + "/s"
+            data.downloadPayloadRate.toLong().fileSize(context) + "/s"
         )
     }
 
@@ -224,11 +223,13 @@ class Download1Proxy(
         data: DownloadInfoBean,
     ) {
         holder.binding.apply {
+            val context = holder.itemView.context
             when (data.downloadState) {
                 DownloadInfoBean.DownloadState.Seeding -> {
                     btnDownload1Pause.enable()
                     btnDownload1Pause.setIconResource(R.drawable.ic_pause_24)
-                    btnDownload1Cancel.enable()
+                    btnDownload1Pause.contentDescription =
+                        context.getString(R.string.download_pause)
                     tvDownload1Description.text = data.description
                     lpDownload1.isIndeterminate = false
                 }
@@ -236,7 +237,8 @@ class Download1Proxy(
                 DownloadInfoBean.DownloadState.Downloading -> {
                     btnDownload1Pause.enable()
                     btnDownload1Pause.setIconResource(R.drawable.ic_pause_24)
-                    btnDownload1Cancel.enable()
+                    btnDownload1Pause.contentDescription =
+                        context.getString(R.string.download_pause)
                     tvDownload1Description.text = data.description
                     lpDownload1.isIndeterminate = false
                 }
@@ -245,37 +247,43 @@ class Download1Proxy(
                 DownloadInfoBean.DownloadState.ErrorPaused -> {
                     btnDownload1Pause.enable()
                     btnDownload1Pause.setIconResource(R.drawable.ic_refresh_24)
-                    btnDownload1Cancel.enable()
-                    tvDownload1Description.text =
-                        holder.itemView.context.getString(R.string.download_error_paused)
+                    btnDownload1Pause.contentDescription =
+                        context.getString(R.string.download_retry)
+                    tvDownload1Description.text = context.getString(R.string.download_error_paused)
                     lpDownload1.isIndeterminate = false
                 }
 
-                DownloadInfoBean.DownloadState.SeedingPaused,
+                DownloadInfoBean.DownloadState.SeedingPaused -> {
+                    btnDownload1Pause.enable()
+                    btnDownload1Pause.setIconResource(R.drawable.ic_cloud_upload_24)
+                    btnDownload1Pause.contentDescription =
+                        context.getString(R.string.download_click_to_seeding)
+                    tvDownload1Description.text = context.getString(R.string.download_paused)
+                    lpDownload1.isIndeterminate = false
+                }
+
                 DownloadInfoBean.DownloadState.Paused -> {
                     btnDownload1Pause.enable()
                     btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
-                    btnDownload1Cancel.enable()
-                    tvDownload1Description.text =
-                        holder.itemView.context.getString(R.string.download_paused)
+                    btnDownload1Pause.contentDescription = context.getString(R.string.download)
+                    tvDownload1Description.text = context.getString(R.string.download_paused)
                     lpDownload1.isIndeterminate = false
                 }
 
                 DownloadInfoBean.DownloadState.Init -> {
                     btnDownload1Pause.disable()
                     btnDownload1Pause.setIconResource(R.drawable.ic_play_arrow_24)
-                    btnDownload1Cancel.enable()
-                    tvDownload1Description.text =
-                        holder.itemView.context.getString(R.string.download_initializing)
+                    btnDownload1Pause.contentDescription = context.getString(R.string.download)
+                    tvDownload1Description.text = context.getString(R.string.download_initializing)
                     lpDownload1.isIndeterminate = true
                 }
 
                 DownloadInfoBean.DownloadState.Completed -> {
                     btnDownload1Pause.enable()
                     btnDownload1Pause.setIconResource(R.drawable.ic_cloud_upload_24)
-                    btnDownload1Cancel.enable()
-                    tvDownload1Description.text =
-                        holder.itemView.context.getString(R.string.download_completed)
+                    btnDownload1Pause.contentDescription =
+                        context.getString(R.string.download_click_to_seeding)
+                    tvDownload1Description.text = context.getString(R.string.download_completed)
                     lpDownload1.isIndeterminate = false
                 }
             }

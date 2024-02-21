@@ -28,7 +28,7 @@ class DownloadRepository @Inject constructor(
             list.map { downloadInfoBean ->
                 downloadInfoBean.copy().apply {
                     peerInfoList = peerInfoMap.getOrDefault(downloadRequestId, emptyList()).toList()
-                    val torrentStatus = uploadPayloadRateMap.get(downloadRequestId)
+                    val torrentStatus = uploadPayloadRateMap[downloadRequestId]
                     if (torrentStatus != null) {
                         uploadPayloadRate = torrentStatus.uploadPayloadRate()
                         downloadPayloadRate = torrentStatus.downloadPayloadRate()

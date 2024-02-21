@@ -19,8 +19,8 @@ android {
         applicationId = "com.skyd.anivu"
         minSdk = 24
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.0-beta05"
+        versionCode = 4
+        versionName = "1.0-beta06"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -47,6 +47,14 @@ android {
         create("GitHub") {
             dimension = "version"
         }
+    }
+
+    applicationVariants.all {
+        outputs
+            .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+            .forEach {
+                it.outputFileName = "AniVu_${versionName}_${buildType.name}_${flavorName}.apk"
+            }
     }
 
     buildTypes {

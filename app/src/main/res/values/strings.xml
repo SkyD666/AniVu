@@ -28,8 +28,10 @@
     <string name="downloading">Downloading…</string>
     <string name="download_fragment_name">Download task</string>
     <string name="download_pause">Pause</string>
+    <string name="download_retry">Retry</string>
     <string name="download_error_paused">Error</string>
     <string name="download_paused">Paused</string>
+    <string name="download_click_to_seeding">Seed</string>
     <string name="download_initializing">Initializing…</string>
     <string name="download_completed">Completed</string>
     <string name="download_peer_count">Peer(s): %d</string>
@@ -68,4 +70,6 @@
     <string name="feed_fragment_search_feed">Search feeds</string>
     <string name="read_fragment_open_browser">Open in browser</string>
     <string name="play_activity_label">Play</string>
+    <string name="failed_msg">Failed: %s</string>
+    <string name="open_with">Open with</string>
 </resources>

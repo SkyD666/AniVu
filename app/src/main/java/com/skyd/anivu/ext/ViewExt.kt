@@ -7,9 +7,11 @@ import android.graphics.Rect
 import android.view.DisplayCutout
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.Window
 import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.OptIn
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -21,6 +23,9 @@ import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.core.view.marginTop
 import androidx.core.view.updatePadding
+import com.google.android.material.badge.BadgeDrawable
+import com.google.android.material.badge.BadgeUtils
+import com.google.android.material.badge.ExperimentalBadgeUtils
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
 
@@ -292,4 +297,17 @@ fun View.inSafeInset(displayCutout: DisplayCutout): Boolean {
         if (overlapConsiderPaddingMargin(it)) return false
     }
     return true
+}
+
+@OptIn(ExperimentalBadgeUtils::class)
+fun View.addBadge(init: BadgeDrawable.() -> Unit) {
+    viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+        override fun onGlobalLayout() {
+            BadgeDrawable.create(context).apply {
+                this.init()
+                BadgeUtils.attachBadgeDrawable(this, this@addBadge)
+            }
+            viewTreeObserver.removeOnGlobalLayoutListener(this)
+        }
+    })
 }
