@@ -9,7 +9,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -21,6 +20,7 @@ import com.skyd.anivu.ext.addFabBottomPaddingHook
 import com.skyd.anivu.ext.addInsetsByMargin
 import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
+import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
@@ -36,8 +36,6 @@ import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class FeedFragment : BaseFragment<FragmentFeedBinding>() {
-    override fun enabledOnBackPressedCallback() = false
-
     private val feedViewModel by viewModels<FeedViewModel>()
     private val intents = Channel<FeedIntent>()
 
@@ -147,16 +145,15 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
         topAppBar.setOnMenuItemClickListener {
             when (it.itemId) {
                 R.id.action_to_search_fragment -> {
-                    Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_main)
-                        .navigate(
-                            resId = R.id.action_to_search_fragment,
-                            args = Bundle().apply {
-                                putSerializable(
-                                    SearchFragment.SEARCH_DOMAIN_KEY,
-                                    SearchFragment.SearchDomain.Feed,
-                                )
-                            }
-                        )
+                    findMainNavController().navigate(
+                        resId = R.id.action_to_search_fragment,
+                        args = Bundle().apply {
+                            putSerializable(
+                                SearchFragment.SEARCH_DOMAIN_KEY,
+                                SearchFragment.SearchDomain.Feed,
+                            )
+                        }
+                    )
                     true
                 }
 

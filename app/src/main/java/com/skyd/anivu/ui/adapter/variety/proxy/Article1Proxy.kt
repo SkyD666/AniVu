@@ -4,10 +4,9 @@ package com.skyd.anivu.ui.adapter.variety.proxy
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.Navigation
 import com.skyd.anivu.R
 import com.skyd.anivu.databinding.ItemArticle1Binding
-import com.skyd.anivu.ext.activity
+import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.ext.toDateTimeString
@@ -30,7 +29,6 @@ class Article1Proxy : VarietyAdapter.Proxy<ArticleBean, ItemArticle1Binding, Art
         index: Int,
         action: ((Any?) -> Unit)?
     ) {
-        val activity = holder.itemView.activity
         holder.binding.apply {
             tvArticle1Title.text = data.title?.toHtml()
             data.description?.readable().let { description ->
@@ -68,8 +66,7 @@ class Article1Proxy : VarietyAdapter.Proxy<ArticleBean, ItemArticle1Binding, Art
             val bundle = Bundle().apply {
                 putString(ReadFragment.ARTICLE_ID_KEY, data.articleId)
             }
-            Navigation.findNavController(activity, R.id.nav_host_fragment_main)
-                .navigate(R.id.action_to_read_fragment, bundle)
+            it.findMainNavController().navigate(R.id.action_to_read_fragment, bundle)
         }
     }
 }

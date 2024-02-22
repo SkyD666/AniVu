@@ -21,6 +21,7 @@ import com.skyd.anivu.ext.addFabBottomPaddingHook
 import com.skyd.anivu.ext.addInsetsByMargin
 import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
+import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.ParentDirBean
@@ -42,8 +43,6 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
         const val PATH_KEY = "path"
         const val HAS_PARENT_DIR_KEY = "hasParentDir"
     }
-
-    override fun enabledOnBackPressedCallback() = hasParentDir
 
     private val viewModel by viewModels<MediaViewModel>()
     private val path by lazy { arguments?.getString(PATH_KEY) ?: Const.VIDEO_DIR.path }
@@ -187,7 +186,7 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
         toMutableList().apply { add(0, parentDirBean) }
     } else this
 
-    override fun onResume() {9
+    override fun onResume() {
         super.onResume()
 
         if (!path.isNullOrBlank()) {

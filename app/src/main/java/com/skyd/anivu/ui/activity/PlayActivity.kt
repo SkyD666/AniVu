@@ -83,8 +83,8 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     override fun onDestroy() {
         super.onDestroy()
 
-        binding.playerView.player?.stop()
-        binding.playerView.player?.release()
+        player.stop()
+        player.release()
     }
 
     override fun onResume() {

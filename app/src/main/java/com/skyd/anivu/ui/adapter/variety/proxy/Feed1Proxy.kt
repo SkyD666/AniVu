@@ -7,11 +7,10 @@ import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.updatePadding
-import androidx.navigation.Navigation.findNavController
 import com.skyd.anivu.R
 import com.skyd.anivu.databinding.ItemFeed1Binding
-import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.dp
+import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.ext.toHtml
@@ -38,7 +37,6 @@ class Feed1Proxy(
         index: Int,
         action: ((Any?) -> Unit)?
     ) {
-        val activity = holder.itemView.activity
         holder.binding.apply {
             tvFeed1Title.text = data.title?.toHtml()
             tvFeed1Desc.text = data.description?.readable()
@@ -81,8 +79,7 @@ class Feed1Proxy(
             val bundle = Bundle().apply {
                 putString(ArticleFragment.FEED_URL_KEY, data.url)
             }
-            findNavController(activity, R.id.nav_host_fragment_main)
-                .navigate(R.id.action_to_article_fragment, bundle)
+            it.findMainNavController().navigate(R.id.action_to_article_fragment, bundle)
         }
     }
 }

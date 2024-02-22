@@ -23,11 +23,14 @@ import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.core.view.marginTop
 import androidx.core.view.updatePadding
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
 import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
+import kotlin.math.max
 
 
 fun View.enable() {
@@ -122,29 +125,29 @@ fun View.addInsetsByPadding(
     hook: (View, WindowInsetsCompat) -> WindowInsetsCompat = { _, ins -> ins },
 ) {
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, ins ->
+        val systemBarsInsets = ins.getInsets(WindowInsetsCompat.Type.systemBars())
+        val displayCutoutInsets = ins.getInsets(WindowInsetsCompat.Type.displayCutout())
         if (top) {
             val lastTopPadding = v.getTag(R.id.view_add_insets_padding_top_tag) as? Int ?: 0
-            val newTopPadding = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top +
-                    ins.getInsets(WindowInsetsCompat.Type.captionBar()).top
+            val newTopPadding = max(systemBarsInsets.top, displayCutoutInsets.top)
             v.setTag(R.id.view_add_insets_padding_top_tag, newTopPadding)
             v.updatePadding(top = v.paddingTop - lastTopPadding + newTopPadding)
         }
         if (bottom) {
             val lastBottomPadding = v.getTag(R.id.view_add_insets_padding_bottom_tag) as? Int ?: 0
-            val newBottomPadding = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom +
-                    ins.getInsets(WindowInsetsCompat.Type.captionBar()).bottom
+            val newBottomPadding = max(systemBarsInsets.bottom, displayCutoutInsets.bottom)
             v.setTag(R.id.view_add_insets_padding_bottom_tag, newBottomPadding)
             v.updatePadding(bottom = v.paddingBottom - lastBottomPadding + newBottomPadding)
         }
         if (left) {
             val lastLeftPadding = v.getTag(R.id.view_add_insets_padding_left_tag) as? Int ?: 0
-            val newLeftPadding = ins.getInsets(WindowInsetsCompat.Type.displayCutout()).left
+            val newLeftPadding = max(systemBarsInsets.left, displayCutoutInsets.left)
             v.setTag(R.id.view_add_insets_padding_left_tag, newLeftPadding)
             v.updatePadding(left = v.paddingLeft - lastLeftPadding + newLeftPadding)
         }
         if (right) {
             val lastRightPadding = v.getTag(R.id.view_add_insets_padding_right_tag) as? Int ?: 0
-            val newRightPadding = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).right
+            val newRightPadding = max(systemBarsInsets.right, displayCutoutInsets.right)
             v.setTag(R.id.view_add_insets_padding_right_tag, newRightPadding)
             v.updatePadding(right = v.paddingRight - lastRightPadding + newRightPadding)
         }
@@ -161,10 +164,11 @@ fun View.addInsetsByMargin(
     hook: (View, WindowInsetsCompat) -> WindowInsetsCompat = { _, ins -> ins },
 ) {
     ViewCompat.setOnApplyWindowInsetsListener(this) { v, ins ->
+        val systemBarsInsets = ins.getInsets(WindowInsetsCompat.Type.systemBars())
+        val displayCutoutInsets = ins.getInsets(WindowInsetsCompat.Type.displayCutout())
         if (top) {
             val lastTopMargin = v.getTag(R.id.view_add_insets_margin_top_tag) as? Int ?: 0
-            val newTopMargin = ins.getInsets(WindowInsetsCompat.Type.statusBars()).top +
-                    ins.getInsets(WindowInsetsCompat.Type.captionBar()).top
+            val newTopMargin = max(systemBarsInsets.top, displayCutoutInsets.top)
             v.setTag(R.id.view_add_insets_margin_top_tag, newTopMargin)
             (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { layoutParams ->
                 layoutParams.topMargin = layoutParams.topMargin - lastTopMargin + newTopMargin
@@ -173,8 +177,7 @@ fun View.addInsetsByMargin(
         }
         if (bottom) {
             val lastBottomMargin = v.getTag(R.id.view_add_insets_margin_bottom_tag) as? Int ?: 0
-            val newBottomMargin = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).bottom +
-                    ins.getInsets(WindowInsetsCompat.Type.captionBar()).bottom
+            val newBottomMargin = max(systemBarsInsets.bottom, displayCutoutInsets.bottom)
             v.setTag(R.id.view_add_insets_margin_bottom_tag, newBottomMargin)
             (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { layoutParams ->
                 layoutParams.bottomMargin =
@@ -184,7 +187,7 @@ fun View.addInsetsByMargin(
         }
         if (left) {
             val lastLeftMargin = v.getTag(R.id.view_add_insets_margin_left_tag) as? Int ?: 0
-            val newLeftMargin = ins.getInsets(WindowInsetsCompat.Type.displayCutout()).left
+            val newLeftMargin = max(systemBarsInsets.left, displayCutoutInsets.left)
             v.setTag(R.id.view_add_insets_margin_left_tag, newLeftMargin)
             (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { layoutParams ->
                 layoutParams.leftMargin = layoutParams.leftMargin - lastLeftMargin + newLeftMargin
@@ -193,7 +196,7 @@ fun View.addInsetsByMargin(
         }
         if (right) {
             val lastRightMargin = v.getTag(R.id.view_add_insets_margin_right_tag) as? Int ?: 0
-            val newRightMargin = ins.getInsets(WindowInsetsCompat.Type.navigationBars()).right
+            val newRightMargin = max(systemBarsInsets.right, displayCutoutInsets.right)
             v.setTag(R.id.view_add_insets_margin_right_tag, newRightMargin)
             (v.layoutParams as? ViewGroup.MarginLayoutParams)?.let { layoutParams ->
                 layoutParams.rightMargin =
@@ -310,4 +313,8 @@ fun View.addBadge(init: BadgeDrawable.() -> Unit) {
             viewTreeObserver.removeOnGlobalLayoutListener(this)
         }
     })
+}
+
+fun View.findMainNavController(): NavController {
+    return Navigation.findNavController(activity, R.id.nav_host_fragment_main)
 }

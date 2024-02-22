@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.GridLayoutManager
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentMoreBinding
 import com.skyd.anivu.ext.addInsetsByPadding
+import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.getAttrColor
 import com.skyd.anivu.model.bean.MoreBean
 import com.skyd.anivu.ui.adapter.decoration.AniVuItemDecoration
@@ -20,8 +20,6 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MoreFragment : BaseFragment<FragmentMoreBinding>() {
-    override fun enabledOnBackPressedCallback() = false
-
     private val adapter = VarietyAdapter(mutableListOf())
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,8 +45,7 @@ class MoreFragment : BaseFragment<FragmentMoreBinding>() {
             addProxy(More1Proxy(onClick = {
                 val data = dataList[it]
                 if (data is MoreBean) {
-                    Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_main)
-                        .navigate(data.navigateId)
+                    findMainNavController().navigate(data.navigateId)
                 }
             }))
         }

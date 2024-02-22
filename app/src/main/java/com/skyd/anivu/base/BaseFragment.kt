@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.color.MaterialColors
@@ -19,8 +18,7 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     private var _binding: T? = null
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
+    // This property is only valid between onCreateView and onDestroyView.
     protected val binding get() = _binding!!
 
     protected abstract fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
@@ -35,49 +33,6 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        /*returnTransition = AutoTransition()
-        reenterTransition = AutoTransition()
-        enterTransition = AutoTransition()
-        sharedElementEnterTransition = AutoTransition()
-        val windowWidth = requireContext().screenWidth(includeVirtualKey = true)
-        val maxXShift = windowWidth / 20
-        val predictiveBackCallback = object : OnBackPressedCallback(
-            enabled = enabledOnBackPressedCallback()
-        ) {
-            override fun handleOnBackProgressed(backEvent: BackEventCompat) {
-                binding.root.apply {
-                    when (backEvent.swipeEdge) {
-                        BackEventCompat.EDGE_LEFT -> {
-                            translationX = backEvent.progress * maxXShift
-                        }
-
-                        BackEventCompat.EDGE_RIGHT -> {
-                            translationX = -(backEvent.progress * maxXShift)
-                        }
-                    }
-                    scaleX = 1F - (0.1F * backEvent.progress)
-                    scaleY = 1F - (0.1F * backEvent.progress)
-                }
-            }
-
-            override fun handleOnBackPressed() {
-                findMainNavController().popBackStackWithLifecycle()
-            }
-
-            override fun handleOnBackCancelled() {
-                binding.root.apply {
-                    scaleX = 1F
-                    scaleY = 1F
-                    translationX = 0F
-                }
-            }
-        }
-
-        requireActivity().onBackPressedDispatcher.addCallback(
-            this.viewLifecycleOwner,
-            predictiveBackCallback
-        )*/
-
         binding.initView()
         binding.setWindowInsets()
         // Fix https://github.com/material-components/material-components-android/issues/1984#issuecomment-1089710991
@@ -93,25 +48,23 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         _binding = null
     }
 
-    protected open fun enabledOnBackPressedCallback(): Boolean = true
-
-    protected fun findMainNavController() =
-        Navigation.findNavController(requireActivity(), R.id.nav_host_fragment_main)
-
-    protected fun showSnackbar(
+    // https://github.com/material-components/material-components-android/issues/3446
+    protected open fun showSnackbar(
         text: CharSequence,
         @BaseTransientBottomBar.Duration duration: Int = Snackbar.LENGTH_LONG,
         actionText: String? = resources.getString(R.string.close),
         onActionClick: (View) -> Unit? = {},
-    ) {
-        Snackbar.make(
+    ): Snackbar {
+        val snackbar = Snackbar.make(
             binding.root,
             text,
             duration
         ).run {
             if (actionText == null) this
             else setAction(actionText) { onActionClick(it) }
-        }.show()
+        }
+        snackbar.show()
+        return snackbar
     }
 
     protected fun checkArgument(
