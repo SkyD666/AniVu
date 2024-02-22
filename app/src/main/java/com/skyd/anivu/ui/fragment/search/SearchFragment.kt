@@ -17,6 +17,7 @@ import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.popBackStackWithLifecycle
+import com.skyd.anivu.ext.showSoftKeyboard
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.visible
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
@@ -91,11 +92,14 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     override fun FragmentSearchBinding.initView() {
         tilSearchFragment.setStartIconOnClickListener { findNavController().popBackStackWithLifecycle() }
-        tilSearchFragment.editText?.setOnEditorActionListener { v, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                doSearch(v.text.toString())
-                true
-            } else false
+        tilSearchFragment.editText?.apply {
+            setOnEditorActionListener { v, actionId, _ ->
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    doSearch(v.text.toString())
+                    true
+                } else false
+            }
+            showSoftKeyboard(requireActivity().window)
         }
 
         rvSearchFragment.layoutManager = GridLayoutManager(

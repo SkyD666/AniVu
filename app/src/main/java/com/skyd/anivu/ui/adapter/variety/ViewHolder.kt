@@ -12,6 +12,7 @@ import com.skyd.anivu.databinding.ItemMedia1Binding
 import com.skyd.anivu.databinding.ItemMore1Binding
 import com.skyd.anivu.databinding.ItemOtherWorks1Binding
 import com.skyd.anivu.databinding.ItemParentDir1Binding
+import com.skyd.anivu.databinding.ItemSettingsBaseBinding
 
 abstract class BaseViewHolder<V : ViewBinding>(val binding: V) :
     RecyclerView.ViewHolder(binding.root)
@@ -43,3 +44,6 @@ class OtherWorks1ViewHolder(binding: ItemOtherWorks1Binding) :
 
 class License1ViewHolder(binding: ItemLicense1Binding) :
     BaseViewHolder<ItemLicense1Binding>(binding)
+
+class SettingsBaseViewHolder(binding: ItemSettingsBaseBinding) :
+    BaseViewHolder<ItemSettingsBaseBinding>(binding)

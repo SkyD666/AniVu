@@ -67,4 +67,12 @@
     <string name="play_activity_label">播放</string>
     <string name="failed_msg">操作失败：%s</string>
     <string name="open_with">打开方式</string>
+    <string name="settings_fragment_name">设置</string>
+    <string name="data_fragment_name">数据</string>
+    <string name="data_fragment_description">管理数据、文件、缓存等</string>
+    <string name="data_fragment_clear_cache">清空缓存</string>
+    <string name="data_fragment_clear_cache_description">删除缓存的 Torrent 文件等数据</string>
+    <string name="data_fragment_data_cleared_size">%s 数据被删除</string>
+    <string name="data_fragment_clear_cache_warning">确定要删除这些缓存吗？</string>
+    <string name="clear">清除</string>
 </resources>

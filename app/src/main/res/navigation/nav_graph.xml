@@ -123,4 +123,30 @@
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
         app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/settings_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.SettingsFragment"
+        android:label="@string/settings_fragment_name"
+        tools:layout="@layout/fragment_settings" />
+    <action
+        android:id="@+id/action_to_settings_fragment"
+        app:destination="@id/settings_fragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/data_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.data.DataFragment"
+        android:label="@string/data_fragment_name"
+        tools:layout="@layout/fragment_data" />
+    <action
+        android:id="@+id/action_to_data_fragment"
+        app:destination="@id/data_fragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
 </navigation>

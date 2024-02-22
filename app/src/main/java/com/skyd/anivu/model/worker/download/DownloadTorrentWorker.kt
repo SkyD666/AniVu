@@ -7,6 +7,7 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.IconCompat
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
@@ -289,7 +290,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             .setContentTitle(title)
             .setTicker(title)
             .setContentText(progress.toPercentage())
-            .setSmallIcon(R.drawable.ic_icon_24)
+            .setSmallIcon(R.drawable.ic_icon_2_24)
             .setOngoing(true)
             .setProgress(100, (progress * 100).toInt(), false)
             // Add the cancel action to the notification which can be used to cancel the worker

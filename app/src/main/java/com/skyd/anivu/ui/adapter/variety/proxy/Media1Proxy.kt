@@ -90,7 +90,8 @@ class Media1Proxy(
                 cvMedia1Preview.visible()
                 ivMedia1Preview.setTag(R.id.image_view_tag_2, data.file.path)
                 coroutineScope.launch(Dispatchers.IO) {
-                    retriever.setDataSource(data.file.path)
+                    runCatching { retriever.setDataSource(data.file.path) }
+                        .onFailure { return@launch }
                     val duration = retriever
                         .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                         ?.toLongOrNull() ?: return@launch

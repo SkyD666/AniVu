@@ -26,22 +26,7 @@ class MoreFragment : BaseFragment<FragmentMoreBinding>() {
         super.onCreate(savedInstanceState)
 
         adapter.apply {
-            dataList += mutableListOf(
-                MoreBean(
-                    title = getString(R.string.about_fragment_name),
-                    icon = AppCompatResources.getDrawable(
-                        requireContext(),
-                        R.drawable.ic_info_24
-                    )!!,
-                    iconTint = requireContext().getAttrColor(com.google.android.material.R.attr.colorOnPrimary),
-                    navigateId = R.id.action_to_about_fragment,
-                    background = AppCompatResources.getDrawable(
-                        requireContext(),
-                        R.drawable.shape_clover
-                    )!!,
-                    backgroundTint = requireContext().getAttrColor(com.google.android.material.R.attr.colorPrimary),
-                ),
-            )
+            dataList += getMoreBeanList()
             addProxy(More1Proxy(onClick = {
                 val data = dataList[it]
                 if (data is MoreBean) {
@@ -65,6 +50,35 @@ class MoreFragment : BaseFragment<FragmentMoreBinding>() {
     override fun FragmentMoreBinding.setWindowInsets() {
         ablMoreFragment.addInsetsByPadding(top = true, left = true, right = true)
         rvMoreFragment.addInsetsByPadding(left = true, right = true)
+    }
+
+    private fun getMoreBeanList(): MutableList<MoreBean> {
+        return mutableListOf(
+            MoreBean(
+                title = getString(R.string.settings_fragment_name),
+                icon = AppCompatResources.getDrawable(
+                    requireContext(), R.drawable.ic_settings_24
+                )!!,
+                iconTint = requireContext().getAttrColor(com.google.android.material.R.attr.colorOnPrimary),
+                navigateId = R.id.action_to_settings_fragment,
+                background = AppCompatResources.getDrawable(
+                    requireContext(), R.drawable.shape_curly_corner
+                )!!,
+                backgroundTint = requireContext().getAttrColor(com.google.android.material.R.attr.colorPrimary),
+            ),
+            MoreBean(
+                title = getString(R.string.about_fragment_name),
+                icon = AppCompatResources.getDrawable(
+                    requireContext(), R.drawable.ic_info_24
+                )!!,
+                iconTint = requireContext().getAttrColor(com.google.android.material.R.attr.colorOnSecondary),
+                navigateId = R.id.action_to_about_fragment,
+                background = AppCompatResources.getDrawable(
+                    requireContext(), R.drawable.shape_clover
+                )!!,
+                backgroundTint = requireContext().getAttrColor(com.google.android.material.R.attr.colorSecondary),
+            ),
+        )
     }
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =
