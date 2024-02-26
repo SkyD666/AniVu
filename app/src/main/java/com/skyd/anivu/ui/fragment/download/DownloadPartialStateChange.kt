@@ -1,6 +1,6 @@
 package com.skyd.anivu.ui.fragment.download
 
-import com.skyd.anivu.model.bean.DownloadInfoBean
+import com.skyd.anivu.model.bean.download.DownloadInfoBean
 
 
 internal sealed interface DownloadPartialStateChange {

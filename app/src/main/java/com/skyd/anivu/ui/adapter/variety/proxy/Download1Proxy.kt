@@ -9,7 +9,7 @@ import com.skyd.anivu.ext.disable
 import com.skyd.anivu.ext.enable
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.toPercentage
-import com.skyd.anivu.model.bean.DownloadInfoBean
+import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.ui.adapter.variety.Download1ViewHolder
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 

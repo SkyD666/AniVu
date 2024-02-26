@@ -7,7 +7,6 @@ import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.graphics.drawable.IconCompat
 import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
@@ -28,11 +27,12 @@ import com.skyd.anivu.ext.saveTo
 import com.skyd.anivu.ext.toDecodedUrl
 import com.skyd.anivu.ext.toPercentage
 import com.skyd.anivu.ext.validateFileName
-import com.skyd.anivu.model.bean.DownloadInfoBean
-import com.skyd.anivu.model.bean.DownloadLinkUuidMapBean
-import com.skyd.anivu.model.bean.PeerInfoBean
+import com.skyd.anivu.model.bean.download.DownloadInfoBean
+import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
+import com.skyd.anivu.model.bean.download.PeerInfoBean
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
+import com.skyd.anivu.model.db.dao.TorrentFileDao
 import com.skyd.anivu.model.repository.DownloadRepository
 import com.skyd.anivu.model.service.HttpService
 import com.skyd.anivu.util.uniqueInt
@@ -63,6 +63,7 @@ import org.libtorrent4j.TorrentInfo
 import org.libtorrent4j.TorrentStatus
 import org.libtorrent4j.alerts.Alert
 import org.libtorrent4j.alerts.FileErrorAlert
+import org.libtorrent4j.alerts.FileRenamedAlert
 import org.libtorrent4j.alerts.MetadataReceivedAlert
 import org.libtorrent4j.alerts.PeerConnectAlert
 import org.libtorrent4j.alerts.PeerDisconnectedAlert
@@ -72,6 +73,7 @@ import org.libtorrent4j.alerts.StateChangedAlert
 import org.libtorrent4j.alerts.StorageMovedAlert
 import org.libtorrent4j.alerts.StorageMovedFailedAlert
 import org.libtorrent4j.alerts.TorrentAlert
+import org.libtorrent4j.alerts.TorrentCheckedAlert
 import org.libtorrent4j.alerts.TorrentErrorAlert
 import org.libtorrent4j.alerts.TorrentFinishedAlert
 import org.libtorrent4j.swig.settings_pack
@@ -380,12 +382,23 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 )
             }
 
-            is MetadataReceivedAlert -> {
-                // 元数据更新
+            is FileRenamedAlert -> {
+
+            }
+
+            // a torrent completes checking. ready to start downloading
+            is TorrentCheckedAlert -> {
                 val handle = alert.handle()
+                updateTorrentFilesToDb(link = torrentLink, files = handle.torrentFile().files())
                 name = handle.name
                 updateNotificationAsync()     // 更新Notification
                 updateNameInfoToDb(link = torrentLink, name = name)
+            }
+
+            is MetadataReceivedAlert -> {
+                // 元数据更新
+                // save the torrent file in order to load it back up again
+                // when the session is restarted
             }
 
             is StateChangedAlert -> {
@@ -509,6 +522,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         interface WorkerEntryPoint {
             val retrofit: Retrofit
             val downloadInfoDao: DownloadInfoDao
+            val torrentFileDao: TorrentFileDao
             val sessionParamsDao: SessionParamsDao
             val downloadRepository: DownloadRepository
         }
@@ -562,7 +576,8 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         ) {
             val requestUuid = UUID.fromString(requestId)
             WorkManager.getInstance(context).apply {
-                if (getWorkInfoById(requestUuid).get().state.isFinished) {
+                val workerState = getWorkInfoById(requestUuid).get()?.state
+                if (workerState == null || workerState.isFinished) {
                     coroutineScope.launch {
                         val state = hiltEntryPoint.downloadInfoDao.getDownloadState(link)
                         updateDownloadState(

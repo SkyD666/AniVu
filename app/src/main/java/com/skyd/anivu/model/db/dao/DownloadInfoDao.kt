@@ -6,10 +6,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.skyd.anivu.model.bean.DOWNLOAD_INFO_TABLE_NAME
-import com.skyd.anivu.model.bean.DOWNLOAD_LINK_UUID_MAP_TABLE_NAME
-import com.skyd.anivu.model.bean.DownloadInfoBean
-import com.skyd.anivu.model.bean.DownloadLinkUuidMapBean
+import com.skyd.anivu.model.bean.download.DOWNLOAD_INFO_TABLE_NAME
+import com.skyd.anivu.model.bean.download.DOWNLOAD_LINK_UUID_MAP_TABLE_NAME
+import com.skyd.anivu.model.bean.download.DownloadInfoBean
+import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
 import kotlinx.coroutines.flow.Flow
 
 @Dao

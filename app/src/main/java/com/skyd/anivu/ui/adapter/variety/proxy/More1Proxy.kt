@@ -5,7 +5,6 @@ import android.content.res.ColorStateList
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.skyd.anivu.databinding.ItemMore1Binding
-import com.skyd.anivu.model.bean.DownloadInfoBean
 import com.skyd.anivu.model.bean.MoreBean
 import com.skyd.anivu.ui.adapter.variety.More1ViewHolder
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter

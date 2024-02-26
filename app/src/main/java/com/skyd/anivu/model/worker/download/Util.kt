@@ -8,8 +8,10 @@ import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.toDecodedUrl
 import com.skyd.anivu.ext.validateFileName
-import com.skyd.anivu.model.bean.DownloadInfoBean
-import com.skyd.anivu.model.bean.SessionParamsBean
+import com.skyd.anivu.model.bean.download.DownloadInfoBean
+import com.skyd.anivu.model.bean.download.SessionParamsBean
+import com.skyd.anivu.model.bean.download.TorrentFileBean
+import org.libtorrent4j.FileStorage
 import org.libtorrent4j.TorrentStatus
 import org.libtorrent4j.Vectors
 import org.libtorrent4j.alerts.SaveResumeDataAlert
@@ -101,6 +103,27 @@ internal fun updateDescriptionInfoToDb(link: String, description: String): Boole
             )
         }
         return result != 0
+    }
+}
+
+internal fun updateTorrentFilesToDb(link: String, files: FileStorage): Boolean {
+    DownloadTorrentWorker.hiltEntryPoint.torrentFileDao.apply {
+        val list = mutableListOf<TorrentFileBean>()
+        runCatching {
+            for (i in 0..<files.numFiles()) {
+                list.add(
+                    TorrentFileBean(
+                        link = link,
+                        path = files.filePath(i),
+                        size = files.fileSize(i),
+                    )
+                )
+            }
+        }.onFailure {
+            return false
+        }
+        updateTorrentFiles(list)
+        return true
     }
 }
 

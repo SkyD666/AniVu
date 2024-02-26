@@ -76,7 +76,7 @@
     <string name="data_fragment_name">Data</string>
     <string name="data_fragment_description">Managing data, files, caches</string>
     <string name="data_fragment_clear_cache">Clear cache</string>
-    <string name="data_fragment_clear_cache_description">Delete torrent files, etc</string>
+    <string name="data_fragment_clear_cache_description">Deleting detached download temporary files, cached Torrent files, etc</string>
     <string name="data_fragment_data_cleared_size">%s data cleared</string>
     <string name="data_fragment_clear_cache_warning">Sure to clear the caches?</string>
     <string name="clear">Clear</string>

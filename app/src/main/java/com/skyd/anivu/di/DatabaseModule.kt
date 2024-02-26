@@ -9,6 +9,7 @@ import com.skyd.anivu.model.db.dao.EnclosureDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.SearchDomainDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
+import com.skyd.anivu.model.db.dao.TorrentFileDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -40,6 +41,10 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDownloadInfoDao(database: AppDatabase): DownloadInfoDao = database.downloadInfoDao()
+
+    @Provides
+    @Singleton
+    fun provideTorrentFileDao(database: AppDatabase): TorrentFileDao = database.torrentFileDao()
 
     @Provides
     @Singleton

@@ -6,17 +6,20 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.skyd.anivu.model.bean.ArticleBean
-import com.skyd.anivu.model.bean.DownloadInfoBean
-import com.skyd.anivu.model.bean.DownloadLinkUuidMapBean
 import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.SessionParamsBean
+import com.skyd.anivu.model.bean.download.DownloadInfoBean
+import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
+import com.skyd.anivu.model.bean.download.SessionParamsBean
+import com.skyd.anivu.model.bean.download.TorrentFileBean
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.EnclosureDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
+import com.skyd.anivu.model.db.dao.TorrentFileDao
 import com.skyd.anivu.model.db.migration.Migration1To2
+import com.skyd.anivu.model.db.migration.Migration2To3
 
 const val APP_DATA_BASE_FILE_NAME = "app.db"
 
@@ -28,8 +31,9 @@ const val APP_DATA_BASE_FILE_NAME = "app.db"
         DownloadInfoBean::class,
         DownloadLinkUuidMapBean::class,
         SessionParamsBean::class,
+        TorrentFileBean::class,
     ],
-    version = 2
+    version = 3
 )
 @TypeConverters(
     value = []
@@ -40,13 +44,14 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun articleDao(): ArticleDao
     abstract fun enclosureDao(): EnclosureDao
     abstract fun downloadInfoDao(): DownloadInfoDao
+    abstract fun torrentFileDao(): TorrentFileDao
     abstract fun sessionParamsDao(): SessionParamsDao
 
     companion object {
         @Volatile
         private var instance: AppDatabase? = null
 
-        private val migrations = arrayOf(Migration1To2())
+        private val migrations = arrayOf(Migration1To2(), Migration2To3())
 
         fun getInstance(context: Context): AppDatabase {
             return if (instance == null) {

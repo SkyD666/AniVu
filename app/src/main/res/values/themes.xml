@@ -14,7 +14,9 @@
         <item name="windowSplashScreenBackground">@color/splash_background</item>
     </style>
 
-    <style name="Theme.AniVu" parent="Base.Theme.AniVu" />
+    <style name="Theme.AniVu" parent="Base.Theme.AniVu">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 
     <style name="Theme.AniVu.Player" parent="Base.Theme.AniVu">
         <item name="android:windowNoTitle">true</item>
