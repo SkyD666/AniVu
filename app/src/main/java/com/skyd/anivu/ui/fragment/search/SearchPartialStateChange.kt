@@ -1,5 +1,7 @@
 package com.skyd.anivu.ui.fragment.search
 
+import androidx.paging.PagingData
+
 
 internal sealed interface SearchPartialStateChange {
     fun reduce(oldState: SearchState): SearchState
@@ -21,7 +23,7 @@ internal sealed interface SearchPartialStateChange {
             }
         }
 
-        data class Success(val result: List<Any>) : SearchResult
+        data class Success(val result: PagingData<out Any>) : SearchResult
         data class Failed(val msg: String) : SearchResult
         data object Loading : SearchResult
     }

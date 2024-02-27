@@ -1,5 +1,8 @@
 package com.skyd.anivu.model.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.db.dao.ArticleDao
@@ -14,10 +17,12 @@ class ArticleRepository @Inject constructor(
     private val feedDao: FeedDao,
     private val articleDao: ArticleDao,
     private val rssHelper: RssHelper,
+    private val pagingConfig: PagingConfig,
 ) : BaseRepository() {
-    fun requestArticleList(feedUrl: String): Flow<List<ArticleBean>> {
-        return articleDao.getArticleList(feedUrl)
-            .flowOn(Dispatchers.IO)
+    fun requestArticleList(feedUrl: String): Flow<PagingData<ArticleBean>> {
+        return Pager(pagingConfig) {
+            articleDao.getArticlePagingSource(feedUrl)
+        }.flow.flowOn(Dispatchers.IO)
     }
 
     fun refreshArticleList(feedUrl: String): Flow<Unit> {

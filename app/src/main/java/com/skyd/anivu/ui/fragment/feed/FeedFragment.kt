@@ -24,7 +24,8 @@ import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
-import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
+import com.skyd.anivu.ui.adapter.variety.paging.PagingAniSpanSize
+import com.skyd.anivu.ui.adapter.variety.paging.PagingVarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.Feed1Proxy
 import com.skyd.anivu.ui.component.dialog.InputDialogBuilder
 import com.skyd.anivu.ui.fragment.search.SearchFragment
@@ -40,7 +41,7 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
     private val intents = Channel<FeedIntent>()
 
     private var waitingDialog: AlertDialog? = null
-    private val adapter = VarietyAdapter(
+    private val adapter = PagingVarietyAdapter(
         mutableListOf(
             Feed1Proxy(
                 onRemove = { intents.trySend(FeedIntent.RemoveFeed(it.url)) },
@@ -87,19 +88,19 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
         }
         when (val feedListState = feedState.feedListState) {
             is FeedListState.Failed -> {
-                adapter.dataList = emptyList()
+                adapter.clear()
             }
 
             FeedListState.Init -> {
-                adapter.dataList = emptyList()
+                adapter.clear()
             }
 
             FeedListState.Loading -> {
-                adapter.dataList = emptyList()
+                adapter.clear()
             }
 
             is FeedListState.Success -> {
-                adapter.dataList = feedListState.feedList
+                adapter.submitDataAsync(feedListState.feedPagingData)
             }
         }
     }
@@ -165,7 +166,7 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
             requireContext(),
             AniSpanSize.MAX_SPAN_SIZE
         ).apply {
-            spanSizeLookup = AniSpanSize(adapter)
+            spanSizeLookup = PagingAniSpanSize(adapter)
         }
 
         val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)

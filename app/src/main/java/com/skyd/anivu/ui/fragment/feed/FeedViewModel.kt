@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.fragment.feed
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
@@ -88,8 +89,8 @@ class FeedViewModel @Inject constructor(
     private fun SharedFlow<FeedIntent>.toFeedPartialStateChangeFlow(): Flow<FeedPartialStateChange> {
         return merge(
             filterIsInstance<FeedIntent.Init>().flatMapConcat {
-                feedRepo.requestFeedList().map {
-                    FeedPartialStateChange.FeedList.Success(feedList = it)
+                feedRepo.requestFeedList().cachedIn(viewModelScope).map {
+                    FeedPartialStateChange.FeedList.Success(feedPagingData = it)
                 }.startWith(FeedPartialStateChange.FeedList.Loading)
             },
             filterIsInstance<FeedIntent.AddFeed>().flatMapConcat { intent ->

@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.fragment.article
 
+import androidx.paging.PagingData
 import com.skyd.anivu.model.bean.ArticleBean
 
 
@@ -16,7 +17,7 @@ internal sealed interface ArticlePartialStateChange {
         override fun reduce(oldState: ArticleState): ArticleState {
             return when (this) {
                 is Success -> oldState.copy(
-                    articleListState = ArticleListState.Success(articleList = articleList)
+                    articleListState = ArticleListState.Success(articlePagingData = articlePagingData)
                         .apply { loading = false },
                     loadingDialog = false,
                 )
@@ -33,7 +34,7 @@ internal sealed interface ArticlePartialStateChange {
             }
         }
 
-        data class Success(val articleList: List<ArticleBean>) : ArticleList
+        data class Success(val articlePagingData: PagingData<ArticleBean>) : ArticleList
         data class Failed(val msg: String) : ArticleList
         data object Loading : ArticleList
     }
@@ -55,7 +56,7 @@ internal sealed interface ArticlePartialStateChange {
                             }
 
                             is ArticleListState.Success -> {
-                                ArticleListState.Success(articleListState.articleList)
+                                ArticleListState.Success(articleListState.articlePagingData)
                                     .apply { loading = false }
                             }
                         },

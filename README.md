@@ -74,11 +74,12 @@
 - Kotlin ﻿**Coroutines and Flow**
 - **Material You**
 - **ViewModel**
+- **Room**
+- **Paging 3**
 - **Hilt**
 - Media3 **ExoPlayer**
 - **WorkManager**
 - **DataStore**
-- **Room**
 - Splash Screen
 - Navigation
 - Coil

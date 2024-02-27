@@ -20,7 +20,8 @@ import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
-import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
+import com.skyd.anivu.ui.adapter.variety.paging.PagingAniSpanSize
+import com.skyd.anivu.ui.adapter.variety.paging.PagingVarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.Article1Proxy
 import com.skyd.anivu.ui.fragment.search.SearchFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +41,7 @@ class ArticleFragment : BaseFragment<FragmentArticleBinding>() {
     private val intents = Channel<ArticleIntent>()
 
     private var waitingDialog: AlertDialog? = null
-    private val adapter = VarietyAdapter(
+    private val adapter = PagingVarietyAdapter(
         mutableListOf(Article1Proxy())
     )
 
@@ -64,15 +65,15 @@ class ArticleFragment : BaseFragment<FragmentArticleBinding>() {
             binding.srlArticleFragment.isRefreshing = loading
         }) {
             is ArticleListState.Failed -> {
-                adapter.dataList = emptyList()
+                adapter.clear()
             }
 
             ArticleListState.Init -> {
-                adapter.dataList = emptyList()
+                adapter.clear()
             }
 
             is ArticleListState.Success -> {
-                adapter.dataList = feedListState.articleList
+                adapter.submitDataAsync(feedListState.articlePagingData)
             }
         }
     }
@@ -137,7 +138,7 @@ class ArticleFragment : BaseFragment<FragmentArticleBinding>() {
             requireContext(),
             AniSpanSize.MAX_SPAN_SIZE
         ).apply {
-            spanSizeLookup = AniSpanSize(adapter)
+            spanSizeLookup = PagingAniSpanSize(adapter)
         }
 
         val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)

@@ -1,6 +1,11 @@
 package com.skyd.anivu.model.repository
 
 import android.database.DatabaseUtils
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource
+import androidx.paging.PagingState
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.skyd.anivu.appContext
 import com.skyd.anivu.base.BaseRepository
@@ -25,34 +30,70 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.zip
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SearchRepository @Inject constructor(
     private val feedDao: FeedDao,
     private val articleDao: ArticleDao,
+    private val pagingConfig: PagingConfig,
 ) : BaseRepository() {
-    fun requestSearchAll(query: String): Flow<List<Any>> {
-        return requestSearchFeed(query = query)
-            .zip(requestSearchArticle(feedUrl = null, query = query)) { feed, article ->
-                feed + article
-            }.flowOn(Dispatchers.IO)
+    fun requestSearchAll(query: String): Flow<PagingData<Any>> {
+        return Pager(pagingConfig) {
+            object : PagingSource<Int, Any>() {
+                override fun getRefreshKey(state: PagingState<Int, Any>): Int? = null
+
+                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Any> {
+                    val resultList = mutableListOf<Any>()
+                    val key = params.key ?: 0
+                    withContext(Dispatchers.IO) {
+                        val feedSql = genSql(
+                            tableName = FEED_TABLE_NAME,
+                            k = query,
+                            limit = { key to params.loadSize },
+                        )
+                        resultList.addAll(feedDao.getFeedList(feedSql))
+                        val articleSql by lazy {
+                            genSql(
+                                tableName = ARTICLE_TABLE_NAME,
+                                k = query,
+                                leadingFilter = "1",
+                                limit = {
+                                    key to if (resultList.isEmpty()) {
+                                        params.loadSize
+                                    } else {
+                                        params.loadSize - resultList.size
+                                    }
+                                },
+                            )
+                        }
+                        if (resultList.size < params.loadSize) {
+                            resultList.addAll(articleDao.getArticleList(articleSql))
+                        }
+                    }
+                    return LoadResult.Page(
+                        data = resultList,
+                        prevKey = null,
+                        nextKey = key + resultList.size
+                    )
+                }
+            }
+        }.flow.flowOn(Dispatchers.IO)
     }
 
     fun requestSearchFeed(
         query: String,
-    ): Flow<List<FeedBean>> {
+    ): Flow<PagingData<FeedBean>> {
         return flow { emit(genSql(tableName = FEED_TABLE_NAME, k = query)) }.flatMapConcat { sql ->
-            feedDao.getFeedList(sql).take(1)
+            Pager(pagingConfig) { feedDao.getFeedPagingSource(sql) }.flow
         }.flowOn(Dispatchers.IO)
     }
 
     fun requestSearchArticle(
         feedUrl: String? = null,
         query: String,
-    ): Flow<List<ArticleBean>> {
+    ): Flow<PagingData<ArticleBean>> {
         return flow {
             emit(
                 genSql(
@@ -63,8 +104,7 @@ class SearchRepository @Inject constructor(
                 )
             )
         }.flatMapConcat { sql ->
-            articleDao.getArticleList(sql).take(1)
-                .map { list -> list.sortedByDescending { it.date } }
+            Pager(pagingConfig) { articleDao.getArticlePagingSource(sql) }.flow
         }.flowOn(Dispatchers.IO)
     }
 
@@ -91,6 +131,7 @@ class SearchRepository @Inject constructor(
             },
             leadingFilter: String = "1",
             leadingFilterLogicalConnective: String = "AND",
+            limit: (() -> Pair<Int, Int>)? = null,
         ): SimpleSQLiteQuery {
             if (useRegexSearch) {
                 // Check Regex format
@@ -118,6 +159,10 @@ class SearchRepository @Inject constructor(
                             } \n"
                         )
                     }
+                    if (limit != null) {
+                        val (offset, count) = limit()
+                        append("\nLIMIT $offset, $count")
+                    }
                 }
                 SimpleSQLiteQuery(sql)
             } else {
@@ -134,6 +179,10 @@ class SearchRepository @Inject constructor(
                             )
                         } \n"
                     )
+                    if (limit != null) {
+                        val (offset, count) = limit()
+                        append("\nLIMIT $offset, $count")
+                    }
                 }
 
                 SimpleSQLiteQuery(sql)

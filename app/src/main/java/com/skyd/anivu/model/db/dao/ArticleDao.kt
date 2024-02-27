@@ -1,5 +1,6 @@
 package com.skyd.anivu.model.db.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -90,11 +91,15 @@ interface ArticleDao {
         ORDER BY ${ArticleBean.DATE_COLUMN} DESC
         """
     )
-    fun getArticleList(feedUrl: String): Flow<List<ArticleBean>>
+    fun getArticlePagingSource(feedUrl: String): PagingSource<Int, ArticleBean>
 
     @Transaction
     @RawQuery(observedEntities = [ArticleBean::class])
-    fun getArticleList(sql: SupportSQLiteQuery): Flow<List<ArticleBean>>
+    fun getArticlePagingSource(sql: SupportSQLiteQuery): PagingSource<Int, ArticleBean>
+
+    @Transaction
+    @RawQuery(observedEntities = [ArticleBean::class])
+    fun getArticleList(sql: SupportSQLiteQuery): List<ArticleBean>
 
     @Transaction
     @Query(

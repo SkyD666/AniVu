@@ -1,6 +1,8 @@
 package com.skyd.anivu.ui.fragment.search
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.base.mvi.MviSingleEvent
 import com.skyd.anivu.ext.catchMap
@@ -51,28 +53,32 @@ class SearchViewModel @Inject constructor(
     private fun SharedFlow<SearchIntent>.toSearchPartialStateChangeFlow(): Flow<SearchPartialStateChange> {
         return merge(
             filterIsInstance<SearchIntent.Init>().flatMapConcat {
-                flowOf(emptyList<Any>()).map {
-                    SearchPartialStateChange.SearchResult.Success(result = it)
+                flowOf(Unit).map {
+                    SearchPartialStateChange.SearchResult.Success(result = PagingData.empty())
                 }.startWith(SearchPartialStateChange.SearchResult.Loading)
                     .catchMap { SearchPartialStateChange.SearchResult.Failed(it.message.toString()) }
             },
             filterIsInstance<SearchIntent.SearchAll>().flatMapConcat { intent ->
-                searchRepo.requestSearchAll(intent.query).map {
+                searchRepo.requestSearchAll(intent.query).cachedIn(viewModelScope).map {
                     SearchPartialStateChange.SearchResult.Success(result = it)
                 }.startWith(SearchPartialStateChange.SearchResult.Loading)
                     .catchMap { SearchPartialStateChange.SearchResult.Failed(it.message.toString()) }
+                    .take(2)
             },
             filterIsInstance<SearchIntent.SearchFeed>().flatMapConcat { intent ->
-                searchRepo.requestSearchFeed(intent.query).map {
+                searchRepo.requestSearchFeed(intent.query).cachedIn(viewModelScope).map {
                     SearchPartialStateChange.SearchResult.Success(result = it)
                 }.startWith(SearchPartialStateChange.SearchResult.Loading)
                     .catchMap { SearchPartialStateChange.SearchResult.Failed(it.message.toString()) }
+                    .take(2)
             },
             filterIsInstance<SearchIntent.SearchArticle>().flatMapConcat { intent ->
-                searchRepo.requestSearchArticle(intent.feedUrl, intent.query).map {
-                    SearchPartialStateChange.SearchResult.Success(result = it)
-                }.startWith(SearchPartialStateChange.SearchResult.Loading)
+                searchRepo.requestSearchArticle(intent.feedUrl, intent.query)
+                    .cachedIn(viewModelScope).map {
+                        SearchPartialStateChange.SearchResult.Success(result = it)
+                    }.startWith(SearchPartialStateChange.SearchResult.Loading)
                     .catchMap { SearchPartialStateChange.SearchResult.Failed(it.message.toString()) }
+                    .take(2)
             },
         )
     }

@@ -12,21 +12,24 @@ class AniSpanSize(
 ) : GridLayoutManager.SpanSizeLookup() {
     companion object {
         const val MAX_SPAN_SIZE = 60
-    }
 
-    override fun getSpanSize(position: Int): Int {
-        return if (enableLandScape && appContext.screenIsLand) {
-            when (adapter.dataList[position]) {
-                is FeedBean -> MAX_SPAN_SIZE
-                is MoreBean -> MAX_SPAN_SIZE / 3
-                else -> MAX_SPAN_SIZE
-            }
-        } else {
-            when (adapter.dataList[position]) {
-                is FeedBean -> MAX_SPAN_SIZE
-                is MoreBean -> MAX_SPAN_SIZE / 2
-                else -> MAX_SPAN_SIZE
+        fun getSpanSize(data: Any?, enableLandScape: Boolean): Int {
+            return if (enableLandScape && appContext.screenIsLand) {
+                when (data) {
+                    is FeedBean -> MAX_SPAN_SIZE
+                    is MoreBean -> MAX_SPAN_SIZE / 3
+                    else -> MAX_SPAN_SIZE
+                }
+            } else {
+                when (data) {
+                    is FeedBean -> MAX_SPAN_SIZE
+                    is MoreBean -> MAX_SPAN_SIZE / 2
+                    else -> MAX_SPAN_SIZE
+                }
             }
         }
     }
+
+    override fun getSpanSize(position: Int): Int =
+        getSpanSize(adapter.dataList[position], enableLandScape)
 }

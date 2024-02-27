@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.fragment.search
 
+import androidx.paging.PagingData
 import com.skyd.anivu.base.mvi.MviViewState
 
 data class SearchState(
@@ -13,7 +14,7 @@ data class SearchState(
 }
 
 sealed interface SearchResultState {
-    data class Success(val result: List<Any>) : SearchResultState
+    data class Success(val result: PagingData<out Any>) : SearchResultState
     data object Init : SearchResultState
     data object Loading : SearchResultState
     data class Failed(val msg: String) : SearchResultState

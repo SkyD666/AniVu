@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.fragment.feed
 
+import androidx.paging.PagingData
 import com.skyd.anivu.model.bean.FeedBean
 
 
@@ -71,7 +72,7 @@ internal sealed interface FeedPartialStateChange {
         override fun reduce(oldState: FeedState): FeedState {
             return when (this) {
                 is Success -> oldState.copy(
-                    feedListState = FeedListState.Success(feedList = feedList),
+                    feedListState = FeedListState.Success(feedPagingData = feedPagingData),
                     loadingDialog = false,
                 )
 
@@ -87,7 +88,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data class Success(val feedList: List<FeedBean>) : FeedList
+        data class Success(val feedPagingData: PagingData<FeedBean>) : FeedList
         data class Failed(val msg: String) : FeedList
         data object Loading : FeedList
     }

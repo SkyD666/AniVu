@@ -1,5 +1,6 @@
 package com.skyd.anivu.model.db.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -16,7 +17,6 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FeedDao {
@@ -65,7 +65,7 @@ interface FeedDao {
 
     @Transaction
     @Query("SELECT * FROM $FEED_TABLE_NAME")
-    fun getFeedList(): Flow<List<FeedBean>>
+    fun getFeedPagingSource(): PagingSource<Int, FeedBean>
 
     @Transaction
     @Query("SELECT * FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} = :feedUrl")
@@ -73,5 +73,9 @@ interface FeedDao {
 
     @Transaction
     @RawQuery(observedEntities = [FeedBean::class])
-    fun getFeedList(sql: SupportSQLiteQuery): Flow<List<FeedBean>>
+    fun getFeedPagingSource(sql: SupportSQLiteQuery): PagingSource<Int, FeedBean>
+
+    @Transaction
+    @RawQuery(observedEntities = [FeedBean::class])
+    fun getFeedList(sql: SupportSQLiteQuery): List<FeedBean>
 }

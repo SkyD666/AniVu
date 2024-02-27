@@ -21,7 +21,8 @@ import com.skyd.anivu.ext.showSoftKeyboard
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.visible
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
-import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
+import com.skyd.anivu.ui.adapter.variety.paging.PagingAniSpanSize
+import com.skyd.anivu.ui.adapter.variety.paging.PagingVarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.Article1Proxy
 import com.skyd.anivu.ui.adapter.variety.proxy.Feed1Proxy
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,7 +52,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     }
     private val intents = Channel<SearchIntent>()
 
-    private val adapter = VarietyAdapter(
+    private val adapter = PagingVarietyAdapter(
         mutableListOf(Feed1Proxy(), Article1Proxy())
     )
 
@@ -59,7 +60,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         when (val searchResultState = searchState.searchResultState) {
             is SearchResultState.Failed -> {
                 binding.cpiSearchFragment.gone()
-                adapter.dataList = emptyList()
+                adapter.clear()
             }
 
             SearchResultState.Init -> {
@@ -67,13 +68,13 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             }
 
             SearchResultState.Loading -> {
-                adapter.dataList = emptyList()
+                adapter.clear()
                 binding.cpiSearchFragment.visible()
             }
 
             is SearchResultState.Success -> {
                 binding.cpiSearchFragment.gone()
-                adapter.dataList = searchResultState.result
+                adapter.submitDataAsync(searchResultState.result)
             }
         }
     }
@@ -106,7 +107,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
             requireContext(),
             AniSpanSize.MAX_SPAN_SIZE
         ).apply {
-            spanSizeLookup = AniSpanSize(adapter)
+            spanSizeLookup = PagingAniSpanSize(adapter)
         }
 
         val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)

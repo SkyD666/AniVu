@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.fragment.article
 
 import androidx.lifecycle.viewModelScope
+import androidx.paging.cachedIn
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
@@ -16,7 +17,6 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
@@ -69,9 +69,8 @@ class ArticleViewModel @Inject constructor(
     private fun SharedFlow<ArticleIntent>.toArticlePartialStateChangeFlow(): Flow<ArticlePartialStateChange> {
         return merge(
             filterIsInstance<ArticleIntent.Init>().flatMapConcat { intent ->
-                articleRepo.requestArticleList(intent.url).onStart {
-                }.map {
-                    ArticlePartialStateChange.ArticleList.Success(articleList = it)
+                articleRepo.requestArticleList(intent.url).cachedIn(viewModelScope).map {
+                    ArticlePartialStateChange.ArticleList.Success(articlePagingData = it)
                 }.startWith(ArticlePartialStateChange.ArticleList.Loading).catchMap {
                     ArticlePartialStateChange.ArticleList.Failed(it.message.toString())
                 }
