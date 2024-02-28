@@ -80,4 +80,8 @@
     <string name="data_fragment_data_cleared_size">%s data cleared</string>
     <string name="data_fragment_clear_cache_warning">Sure to clear the caches?</string>
     <string name="clear">Clear</string>
+    <string name="rss_config_fragment_name">RSS</string>
+    <string name="rss_config_fragment_description">Configure RSS</string>
+    <string name="rss_config_fragment_parse_link_tag_as_enclosure">Parse link as enclosure</string>
+    <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">Parses and displays the link tag as an enclosure if it\'s a magnet or torrent link</string>
 </resources>

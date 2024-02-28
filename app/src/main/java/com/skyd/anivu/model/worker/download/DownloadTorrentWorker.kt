@@ -235,27 +235,29 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         saveDir: File,
         flags: torrent_flags_t = torrent_flags_t(),
     ) {
-        if (link.startsWith("magnet:")) {
-            sessionManager.download(link, saveDir, flags)
-        } else if (
-            (link.startsWith("http:") || link.startsWith("https:")) &&
-            link.endsWith(".torrent")
-        ) {
-            val tempTorrentFile = File(
-                Const.TEMP_TORRENT_DIR,
-                link.substringAfterLast('/').toDecodedUrl().validateFileName()
-            )
-            hiltEntryPoint.retrofit.create(HttpService::class.java)
-                .requestGetResponseBody(link).execute().body()!!.byteStream()
-                .use { it.saveTo(tempTorrentFile) }
-            sessionManager.download(
-                TorrentInfo(tempTorrentFile), saveDir,
-                null, null, null,
-                flags
-            )
-        } else {
-            error("Unsupported link: $link")
-        }
+        doIfMagnetOrTorrentLink(
+            link = link,
+            onMagnet = {
+                sessionManager.download(link, saveDir, flags)
+            },
+            onTorrent = {
+                val tempTorrentFile = File(
+                    Const.TEMP_TORRENT_DIR,
+                    link.substringAfterLast('/').toDecodedUrl().validateFileName()
+                )
+                hiltEntryPoint.retrofit.create(HttpService::class.java)
+                    .requestGetResponseBody(link).execute().body()!!.byteStream()
+                    .use { it.saveTo(tempTorrentFile) }
+                sessionManager.download(
+                    TorrentInfo(tempTorrentFile), saveDir,
+                    null, null, null,
+                    flags
+                )
+            },
+            onUnsupported = {
+                error("Unsupported link: $link")
+            },
+        )
     }
 
     override suspend fun getForegroundInfo() = createForegroundInfo()

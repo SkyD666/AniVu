@@ -23,6 +23,24 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 
+fun doIfMagnetOrTorrentLink(
+    link: String,
+    onMagnet: (String) -> Unit,
+    onTorrent: (String) -> Unit,
+    onUnsupported: (String) -> Unit = {},
+) {
+    if (link.startsWith("magnet:")) {
+        onMagnet(link)
+    } else if (
+        (link.startsWith("http:") || link.startsWith("https:")) &&
+        link.endsWith(".torrent")
+    ) {
+        onTorrent(link)
+    } else {
+        onUnsupported(link)
+    }
+}
+
 fun TorrentStatus.State.toDisplayString(context: Context): String {
     return when (this) {
         TorrentStatus.State.CHECKING_FILES -> context.getString(R.string.torrent_status_checking_files)

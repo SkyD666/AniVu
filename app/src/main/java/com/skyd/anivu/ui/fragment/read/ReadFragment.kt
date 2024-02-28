@@ -15,11 +15,16 @@ import com.skyd.anivu.ext.addFabBottomPaddingHook
 import com.skyd.anivu.ext.addInsetsByMargin
 import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
+import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.toHtml
+import com.skyd.anivu.model.bean.LinkEnclosureBean
+import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
+import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
 import com.skyd.anivu.util.html.ImageGetter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
@@ -80,7 +85,17 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
                         )
                 }
 
-                enclosureBottomSheet?.updateData(article.enclosures)
+                val dataList: MutableList<Any> = article.enclosures.toMutableList()
+                if (requireContext().dataStore.getOrDefault(ParseLinkTagAsEnclosurePreference)) {
+                    article.article.link?.let { link ->
+                        doIfMagnetOrTorrentLink(
+                            link = link,
+                            onMagnet = { dataList += LinkEnclosureBean(link = link) },
+                            onTorrent = { dataList += LinkEnclosureBean(link = link) },
+                        )
+                    }
+                }
+                enclosureBottomSheet?.updateData(dataList)
             }
         }
     }
@@ -131,7 +146,17 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
             )
             val articleState = feedViewModel.viewState.value.articleState
             if (articleState is ArticleState.Success) {
-                enclosureBottomSheet?.updateData(articleState.article.enclosures)
+                val dataList: MutableList<Any> = articleState.article.enclosures.toMutableList()
+                if (requireContext().dataStore.getOrDefault(ParseLinkTagAsEnclosurePreference)) {
+                    articleState.article.article.link?.let { link ->
+                        doIfMagnetOrTorrentLink(
+                            link = link,
+                            onMagnet = { dataList += LinkEnclosureBean(link = link) },
+                            onTorrent = { dataList += LinkEnclosureBean(link = link) },
+                        )
+                    }
+                }
+                enclosureBottomSheet?.updateData(dataList)
             }
         }
     }

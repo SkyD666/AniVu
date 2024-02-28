@@ -53,11 +53,15 @@ class SettingsFragment : BaseFragment<FragmentSettingsBinding>() {
 
     private fun getSettingsList(): List<Any> = mutableListOf(
         SettingsBaseBean(
+            title = getString(R.string.rss_config_fragment_name),
+            description = getString(R.string.rss_config_fragment_description),
+            icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_rss_feed_24)!!,
+            action = { findMainNavController().navigate(R.id.action_to_rss_config_fragment) }
+        ),
+        SettingsBaseBean(
             title = getString(R.string.data_fragment_name),
             description = getString(R.string.data_fragment_description),
-            icon = AppCompatResources.getDrawable(
-                requireContext(), R.drawable.ic_database_24
-            )!!,
+            icon = AppCompatResources.getDrawable(requireContext(), R.drawable.ic_database_24)!!,
             action = { findMainNavController().navigate(R.id.action_to_data_fragment) }
         ),
     )

@@ -11,10 +11,12 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseBottomSheetDialogFragment
 import com.skyd.anivu.databinding.BottomSheetEnclosureBinding
 import com.skyd.anivu.model.bean.EnclosureBean
+import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.Enclosure1Proxy
+import com.skyd.anivu.ui.adapter.variety.proxy.LinkEnclosure1Proxy
 
 class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureBinding>() {
     companion object {
@@ -26,38 +28,56 @@ class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureB
     ) { resultMap ->
         if (!resultMap.containsValue(false)) {
             waitingDownloadList.removeIf {
+                val url = when (it) {
+                    is EnclosureBean -> it.url
+                    is LinkEnclosureBean -> it.link
+                    else -> return@removeIf true
+                }
+
                 DownloadTorrentWorker.startWorker(
                     context = requireContext(),
-                    torrentLink = it.url
+                    torrentLink = url
                 )
                 true
             }
         }
     }
 
-    private val waitingDownloadList = mutableListOf<EnclosureBean>()
+    private val waitingDownloadList = mutableListOf<Any>()
 
-    private val adapter = VarietyAdapter(
-        mutableListOf(Enclosure1Proxy(onDownload = {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                waitingDownloadList += it
-                registerPostNotificationPermission.launch(
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                        arrayOf(
-                            android.Manifest.permission.POST_NOTIFICATIONS,
-                            android.Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE,
-                        )
-                    } else arrayOf(android.Manifest.permission.POST_NOTIFICATIONS)
-                )
-            } else {
+    private val onDownload: (Any) -> Unit = {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            waitingDownloadList += it
+            registerPostNotificationPermission.launch(
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    arrayOf(
+                        android.Manifest.permission.POST_NOTIFICATIONS,
+                        android.Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE,
+                    )
+                } else arrayOf(android.Manifest.permission.POST_NOTIFICATIONS)
+            )
+        } else {
+            val url = when (it) {
+                is EnclosureBean -> it.url
+                is LinkEnclosureBean -> it.link
+                else -> null
+            }
+            if (!url.isNullOrBlank()) {
                 DownloadTorrentWorker.startWorker(
-                    context = requireContext(), torrentLink = it.url
+                    context = requireContext(), torrentLink = url
                 )
             }
-        }))
+        }
+    }
+
+    private val adapter = VarietyAdapter(
+        mutableListOf(
+            Enclosure1Proxy(onDownload = onDownload),
+            LinkEnclosure1Proxy(onDownload = onDownload),
+        )
     )
 
-    fun updateData(dataList: List<EnclosureBean>) {
+    fun updateData(dataList: List<Any>) {
         adapter.dataList = dataList
     }
 

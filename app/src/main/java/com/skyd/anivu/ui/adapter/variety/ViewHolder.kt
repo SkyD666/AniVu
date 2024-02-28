@@ -8,11 +8,13 @@ import com.skyd.anivu.databinding.ItemDownload1Binding
 import com.skyd.anivu.databinding.ItemEnclosure1Binding
 import com.skyd.anivu.databinding.ItemFeed1Binding
 import com.skyd.anivu.databinding.ItemLicense1Binding
+import com.skyd.anivu.databinding.ItemLinkEnclosure1Binding
 import com.skyd.anivu.databinding.ItemMedia1Binding
 import com.skyd.anivu.databinding.ItemMore1Binding
 import com.skyd.anivu.databinding.ItemOtherWorks1Binding
 import com.skyd.anivu.databinding.ItemParentDir1Binding
 import com.skyd.anivu.databinding.ItemSettingsBaseBinding
+import com.skyd.anivu.databinding.ItemSettingsSwitchBinding
 
 abstract class BaseViewHolder<V : ViewBinding>(val binding: V) :
     RecyclerView.ViewHolder(binding.root)
@@ -26,6 +28,9 @@ class Article1ViewHolder(binding: ItemArticle1Binding) :
 
 class Enclosure1ViewHolder(binding: ItemEnclosure1Binding) :
     BaseViewHolder<ItemEnclosure1Binding>(binding)
+
+class LinkEnclosure1ViewHolder(binding: ItemLinkEnclosure1Binding) :
+    BaseViewHolder<ItemLinkEnclosure1Binding>(binding)
 
 class Download1ViewHolder(binding: ItemDownload1Binding) :
     BaseViewHolder<ItemDownload1Binding>(binding)
@@ -47,3 +52,6 @@ class License1ViewHolder(binding: ItemLicense1Binding) :
 
 class SettingsBaseViewHolder(binding: ItemSettingsBaseBinding) :
     BaseViewHolder<ItemSettingsBaseBinding>(binding)
+
+class SettingsSwitchViewHolder(binding: ItemSettingsSwitchBinding) :
+    BaseViewHolder<ItemSettingsSwitchBinding>(binding)
