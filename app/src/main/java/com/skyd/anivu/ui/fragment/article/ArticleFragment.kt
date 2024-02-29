@@ -18,6 +18,7 @@ import com.skyd.anivu.databinding.FragmentArticleBinding
 import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.popBackStackWithLifecycle
+import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.paging.PagingAniSpanSize

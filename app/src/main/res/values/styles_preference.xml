@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AniVuPreferenceThemeOverlay" parent="@style/PreferenceThemeOverlay">
+        <item name="android:layout">@layout/fragment_settings</item>
+        <item name="preferenceCategoryStyle">@style/Preference.Category.Material3</item>
+        <item name="preferenceStyle">@style/Preference.Material3</item>
+        <item name="dialogPreferenceStyle">@style/Preference.Material3</item>
+        <item name="switchPreferenceStyle">@style/Preference.MaterialSwitchPreference</item>
+        <item name="switchPreferenceCompatStyle">@style/Preference.MaterialSwitchPreference</item>
+    </style>
+
+    <style name="Preference.Category.Material3" parent="@style/Preference.Category.Material">
+        <item name="android:layout">@layout/m3_preference_category</item>
+        <item name="iconSpaceReserved">false</item>
+        <item name="allowDividerAbove">false</item>
+        <item name="allowDividerBelow">false</item>
+    </style>
+
+    <style name="Preference.Material3" parent="@style/Preference.Material">
+        <item name="layout">@layout/m3_preference_base</item>
+        <item name="iconSpaceReserved">false</item>
+    </style>
+
+    <style name="Preference.MaterialSwitchPreference" parent="@style/Preference.SwitchPreference.Material">
+        <item name="layout">@layout/m3_preference_base</item>
+        <item name="iconSpaceReserved">false</item>
+        <item name="android:widgetLayout">@layout/m3_preference_widget_switch</item>
+    </style>
+</resources>

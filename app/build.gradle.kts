@@ -20,7 +20,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 5
-        versionName = "1.0-beta11"
+        versionName = "1.0-beta12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -137,6 +137,7 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-dash:1.2.1")
     implementation("androidx.media3:media3-ui:1.2.1")
     implementation("androidx.paging:paging-runtime-ktx:3.2.1")
+    implementation("androidx.preference:preference-ktx:1.2.1")
 
     implementation("com.google.android.material:material:1.11.0")
 

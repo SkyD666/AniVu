@@ -79,4 +79,5 @@
     <string name="rss_config_fragment_description">配置 RSS 等</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure">解析 Link 为附件</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">解析 Link 标签，若符合磁力链或 Torrent 格式，则显示为附件</string>
+    <string name="rss_config_fragment_parse_category">解析</string>
 </resources>

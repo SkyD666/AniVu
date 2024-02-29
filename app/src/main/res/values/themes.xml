@@ -3,6 +3,7 @@
     <style name="Base.Theme.AniVu" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="materialAlertDialogTheme">@style/AniVuMaterialAlertDialog</item>
         <item name="bottomSheetDialogTheme">@style/AniVuBottomSheetDialog</item>
+        <item name="preferenceTheme">@style/AniVuPreferenceThemeOverlay</item>
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">
             shortEdges
         </item>

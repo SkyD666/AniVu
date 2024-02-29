@@ -9,8 +9,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 
@@ -46,25 +44,6 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    // https://github.com/material-components/material-components-android/issues/3446
-    protected open fun showSnackbar(
-        text: CharSequence,
-        @BaseTransientBottomBar.Duration duration: Int = Snackbar.LENGTH_LONG,
-        actionText: String? = resources.getString(R.string.close),
-        onActionClick: (View) -> Unit? = {},
-    ): Snackbar {
-        val snackbar = Snackbar.make(
-            binding.root,
-            text,
-            duration
-        ).run {
-            if (actionText == null) this
-            else setAction(actionText) { onActionClick(it) }
-        }
-        snackbar.show()
-        return snackbar
     }
 
     protected fun checkArgument(
