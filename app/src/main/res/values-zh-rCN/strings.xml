@@ -80,4 +80,9 @@
     <string name="rss_config_fragment_parse_link_tag_as_enclosure">解析 Link 为附件</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">解析 Link 标签，若符合磁力链或 Torrent 格式，则显示为附件</string>
     <string name="rss_config_fragment_parse_category">解析</string>
+    <string name="transmission_fragment_name">传输</string>
+    <string name="transmission_fragment_description">数据传输配置、行为等</string>
+    <string name="transmission_fragment_transmission_behavior_category">行为</string>
+    <string name="transmission_fragment_seeding_when_complete">自动做种</string>
+    <string name="transmission_fragment_seeding_when_complete_description">下载完成后自动做种</string>
 </resources>

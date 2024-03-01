@@ -41,5 +41,17 @@ class SettingsFragment : BasePreferenceFragmentCompat() {
             }
             screen.addPreference(this)
         }
+
+        Preference(this).apply {
+            key = "transmission"
+            title = getString(R.string.transmission_fragment_name)
+            summary = getString(R.string.transmission_fragment_description)
+            setIcon(R.drawable.ic_swap_vert_24)
+            setOnPreferenceClickListener {
+                findMainNavController().navigate(R.id.action_to_transmission_fragment)
+                true
+            }
+            screen.addPreference(this)
+        }
     }
 }

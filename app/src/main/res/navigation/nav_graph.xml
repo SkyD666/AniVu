@@ -162,4 +162,17 @@
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
         app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/transmission_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.transmission.TransmissionFragment"
+        android:label="@string/transmission_fragment_name"
+        tools:layout="@layout/fragment_transmission" />
+    <action
+        android:id="@+id/action_to_transmission_fragment"
+        app:destination="@id/transmission_fragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
 </navigation>

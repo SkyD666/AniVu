@@ -20,8 +20,10 @@ import com.skyd.anivu.BuildConfig
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
 import com.skyd.anivu.config.Const
+import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getAppName
 import com.skyd.anivu.ext.getAppVersionName
+import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.saveTo
 import com.skyd.anivu.ext.toDecodedUrl
@@ -33,6 +35,7 @@ import com.skyd.anivu.model.bean.download.PeerInfoBean
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
 import com.skyd.anivu.model.db.dao.TorrentFileDao
+import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 import com.skyd.anivu.model.repository.DownloadRepository
 import com.skyd.anivu.model.service.HttpService
 import com.skyd.anivu.util.uniqueInt
@@ -382,6 +385,14 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     sessionStateData = sessionManager.saveState() ?: byteArrayOf(),
                     downloadState = DownloadInfoBean.DownloadState.Completed,
                 )
+                // Do not seeding when complete
+                if (!applicationContext.dataStore.getOrDefault(SeedingWhenCompletePreference)) {
+                    pause(
+                        context = applicationContext,
+                        requestId = id.toString(),
+                        link = torrentLink
+                    )
+                }
             }
 
             is FileRenamedAlert -> {

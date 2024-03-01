@@ -53,6 +53,11 @@ class Media1Proxy(
                             true
                         }
 
+                        R.id.action_media_item_open_with -> {
+                            data.file.toUri(v.context).openWith(v.context)
+                            true
+                        }
+
                         else -> false
                     }
                 }

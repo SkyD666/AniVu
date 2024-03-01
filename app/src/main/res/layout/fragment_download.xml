@@ -21,7 +21,6 @@
             app:navigationContentDescription="@string/back"
             app:navigationIcon="@drawable/ic_arrow_back_24"
             app:subtitleCentered="true"
-            app:layout_scrollFlags="scroll|enterAlways"
             app:title="@string/download_fragment_name"
             app:titleCentered="true" />
     </com.google.android.material.appbar.AppBarLayout>

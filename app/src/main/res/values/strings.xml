@@ -85,4 +85,9 @@
     <string name="rss_config_fragment_parse_link_tag_as_enclosure">Parse link as enclosure</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">Parses and displays the link tag as an enclosure if it\'s a magnet or torrent link</string>
     <string name="rss_config_fragment_parse_category">Parse</string>
+    <string name="transmission_fragment_name">Transmission</string>
+    <string name="transmission_fragment_description">Data transfer setup, behavior</string>
+    <string name="transmission_fragment_transmission_behavior_category">Behavior</string>
+    <string name="transmission_fragment_seeding_when_complete">Auto seeding</string>
+    <string name="transmission_fragment_seeding_when_complete_description">Auto seeding when download is complete</string>
 </resources>
