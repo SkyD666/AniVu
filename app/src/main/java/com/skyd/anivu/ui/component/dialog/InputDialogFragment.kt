@@ -47,10 +47,25 @@ open class InputDialogBuilder(
         } as InputDialogBuilder
     }
 
-    fun setInitInputText(
-        text: String,
+    fun setPositiveButton(
+        text: CharSequence?,
+        listener: (dialog: DialogInterface, which: Int, text: String) -> Unit,
     ): InputDialogBuilder {
-        textField.editText?.setText(text)
+        return super.setPositiveButton(text) { dialog, which ->
+            listener(dialog, which, textField.editText?.text.toString())
+        } as InputDialogBuilder
+    }
+
+    fun setInitInputText(text: String): InputDialogBuilder {
+        textField.editText?.apply {
+            setText(text)
+            setSelection(text.length)
+        }
+        return this
+    }
+
+    fun setHint(text: String): InputDialogBuilder {
+        textField.hint = text
         return this
     }
 

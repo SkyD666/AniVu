@@ -90,4 +90,19 @@
     <string name="transmission_fragment_transmission_behavior_category">Behavior</string>
     <string name="transmission_fragment_seeding_when_complete">Auto seeding</string>
     <string name="transmission_fragment_seeding_when_complete_description">Auto seeding when download is complete</string>
+    <string name="transmission_fragment_proxy_category">Proxy</string>
+    <string name="proxy_fragment_name">Proxy</string>
+    <string name="proxy_fragment_description">Configure proxy server address, port, account, etc</string>
+    <string name="proxy_mode_auto">Auto</string>
+    <string name="proxy_mode_manual">Manual</string>
+    <string name="proxy_mode_unknown">Unknown</string>
+    <string name="proxy_fragment_use_proxy">Use proxy</string>
+    <string name="proxy_fragment_mode">Proxy mode</string>
+    <string name="proxy_fragment_hostname">Hostname</string>
+    <string name="proxy_fragment_port">Port</string>
+    <string name="proxy_fragment_username">Username</string>
+    <string name="proxy_fragment_password">Password</string>
+    <string name="proxy_fragment_type">Type</string>
+    <string name="not_configure">Not configure</string>
+    <string name="configured">Configured</string>
 </resources>

@@ -49,6 +49,7 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
                 onEdit = {
                     InputDialogBuilder(requireContext())
                         .setInitInputText(it.url)
+                        .setHint(getString(R.string.feed_fragment_add_rss_hint))
                         .setPositiveButton { _, _, text ->
                             if (text.isNotBlank()) {
                                 intents.trySend(
@@ -177,6 +178,7 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
 
         fabFeedFragment.setOnClickListener {
             InputDialogBuilder(requireContext())
+                .setHint(getString(R.string.feed_fragment_add_rss_hint))
                 .setPositiveButton { _, _, text ->
                     if (text.isNotBlank()) {
                         intents.trySend(FeedIntent.AddFeed(text))

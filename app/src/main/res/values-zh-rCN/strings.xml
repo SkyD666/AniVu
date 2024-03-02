@@ -85,4 +85,19 @@
     <string name="transmission_fragment_transmission_behavior_category">行为</string>
     <string name="transmission_fragment_seeding_when_complete">自动做种</string>
     <string name="transmission_fragment_seeding_when_complete_description">下载完成后自动做种</string>
+    <string name="transmission_fragment_proxy_category">代理</string>
+    <string name="proxy_fragment_name">代理</string>
+    <string name="proxy_fragment_description">配置代理服务器地址、端口、账号等</string>
+    <string name="proxy_mode_auto">自动</string>
+    <string name="proxy_mode_manual">手动</string>
+    <string name="proxy_mode_unknown">未知</string>
+    <string name="proxy_fragment_use_proxy">使用代理</string>
+    <string name="proxy_fragment_mode">代理模式</string>
+    <string name="proxy_fragment_hostname">主机</string>
+    <string name="proxy_fragment_port">端口</string>
+    <string name="proxy_fragment_username">用户名</string>
+    <string name="proxy_fragment_password">密码</string>
+    <string name="proxy_fragment_type">类型</string>
+    <string name="not_configure">未设置</string>
+    <string name="configured">已设置</string>
 </resources>

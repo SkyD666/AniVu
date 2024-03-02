@@ -6,8 +6,12 @@
         <item name="preferenceCategoryStyle">@style/Preference.Category.Material3</item>
         <item name="preferenceStyle">@style/Preference.Material3</item>
         <item name="dialogPreferenceStyle">@style/Preference.Material3</item>
+        <item name="dropdownPreferenceStyle">@style/Preference.Material3</item>
+        <item name="editTextPreferenceStyle">@style/Preference.MaterialEditTextPreference</item>
         <item name="switchPreferenceStyle">@style/Preference.MaterialSwitchPreference</item>
         <item name="switchPreferenceCompatStyle">@style/Preference.MaterialSwitchPreference</item>
+        <item name="bannerSwitchPreferenceStyle">@style/Preference.MaterialBannerSwitchPreference
+        </item>
     </style>
 
     <style name="Preference.Category.Material3" parent="@style/Preference.Category.Material">
@@ -17,8 +21,9 @@
         <item name="allowDividerBelow">false</item>
     </style>
 
-    <style name="Preference.Material3" parent="@style/Preference.Material">
-        <item name="layout">@layout/m3_preference_base</item>
+    <style name="Preference.Material3" parent="@style/Preference.DropDown.Material">
+        <item name="layout">@layout/m3_preference_dropdown</item>
+        <item name="allowDividerBelow">false</item>
         <item name="iconSpaceReserved">false</item>
     </style>
 
@@ -26,5 +31,15 @@
         <item name="layout">@layout/m3_preference_base</item>
         <item name="iconSpaceReserved">false</item>
         <item name="android:widgetLayout">@layout/m3_preference_widget_switch</item>
+    </style>
+
+    <style name="Preference.MaterialBannerSwitchPreference" parent="Preference.MaterialSwitchPreference">
+        <item name="layout">@layout/m3_preference_banner_base</item>
+    </style>
+
+    <style name="Preference.MaterialEditTextPreference" parent="Preference.DialogPreference.EditTextPreference.Material">
+        <item name="android:layout">@layout/m3_preference_base</item>
+        <item name="allowDividerBelow">false</item>
+        <item name="iconSpaceReserved">false</item>
     </style>
 </resources>

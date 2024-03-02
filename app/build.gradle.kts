@@ -19,8 +19,8 @@ android {
         applicationId = "com.skyd.anivu"
         minSdk = 24
         targetSdk = 34
-        versionCode = 5
-        versionName = "1.0-beta13"
+        versionCode = 6
+        versionName = "1.0-beta14"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

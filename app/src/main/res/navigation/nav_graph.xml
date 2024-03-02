@@ -140,8 +140,7 @@
     <fragment
         android:id="@+id/data_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.data.DataFragment"
-        android:label="@string/data_fragment_name"
-        tools:layout="@layout/fragment_data" />
+        android:label="@string/data_fragment_name" />
     <action
         android:id="@+id/action_to_data_fragment"
         app:destination="@id/data_fragment"
@@ -153,8 +152,7 @@
     <fragment
         android:id="@+id/rss_config_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.rssconfig.RssConfigFragment"
-        android:label="@string/rss_config_fragment_name"
-        tools:layout="@layout/fragment_rss_config" />
+        android:label="@string/rss_config_fragment_name" />
     <action
         android:id="@+id/action_to_rss_config_fragment"
         app:destination="@id/rss_config_fragment"
@@ -166,11 +164,22 @@
     <fragment
         android:id="@+id/transmission_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.transmission.TransmissionFragment"
-        android:label="@string/transmission_fragment_name"
-        tools:layout="@layout/fragment_transmission" />
+        android:label="@string/transmission_fragment_name" />
     <action
         android:id="@+id/action_to_transmission_fragment"
         app:destination="@id/transmission_fragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/proxy_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.transmission.proxy.ProxyFragment"
+        android:label="@string/proxy_fragment_name" />
+    <action
+        android:id="@+id/action_to_proxy_fragment"
+        app:destination="@id/proxy_fragment"
         app:enterAnim="@animator/nav_default_enter_anim"
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"

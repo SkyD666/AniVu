@@ -2,22 +2,35 @@ package com.skyd.anivu.model.worker.download
 
 import android.content.Context
 import android.database.sqlite.SQLiteConstraintException
+import android.net.ConnectivityManager
+import android.net.ProxyInfo
 import android.util.Log
 import com.skyd.anivu.R
 import com.skyd.anivu.config.Const
+import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.toDecodedUrl
 import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.bean.download.SessionParamsBean
 import com.skyd.anivu.model.bean.download.TorrentFileBean
+import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
+import com.skyd.anivu.model.preference.proxy.ProxyModePreference
+import com.skyd.anivu.model.preference.proxy.ProxyPasswordPreference
+import com.skyd.anivu.model.preference.proxy.ProxyPortPreference
+import com.skyd.anivu.model.preference.proxy.ProxyTypePreference
+import com.skyd.anivu.model.preference.proxy.ProxyUsernamePreference
+import com.skyd.anivu.model.preference.proxy.UseProxyPreference
 import org.libtorrent4j.FileStorage
+import org.libtorrent4j.SettingsPack
 import org.libtorrent4j.TorrentStatus
 import org.libtorrent4j.Vectors
 import org.libtorrent4j.alerts.SaveResumeDataAlert
 import org.libtorrent4j.swig.add_torrent_params
 import org.libtorrent4j.swig.error_code
 import org.libtorrent4j.swig.libtorrent
+import org.libtorrent4j.swig.settings_pack
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -50,6 +63,71 @@ fun TorrentStatus.State.toDisplayString(context: Context): String {
         TorrentStatus.State.SEEDING -> context.getString(R.string.torrent_status_seeding)
         TorrentStatus.State.CHECKING_RESUME_DATA -> context.getString(R.string.torrent_status_checking_resume_data)
         TorrentStatus.State.UNKNOWN -> ""
+    }
+}
+
+internal fun initProxySettings(context: Context, settings: SettingsPack): SettingsPack {
+    val dataStore = context.dataStore
+
+    if (!dataStore.getOrDefault(UseProxyPreference)) {
+        return settings
+    }
+
+    val proxyType: String
+    val proxyHostname: String
+    val proxyPort: Int
+    val proxyUsername: String
+    val proxyPassword: String
+    if (dataStore.getOrDefault(ProxyModePreference) == ProxyModePreference.AUTO_MODE) {
+        val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val proxyInfo: ProxyInfo? = cm.defaultProxy
+        if (proxyInfo != null) {
+            proxyType = ProxyTypePreference.HTTP
+            proxyHostname = proxyInfo.host
+            proxyPort = proxyInfo.port
+            proxyUsername = ""
+            proxyPassword = ""
+        } else {
+            // No proxy
+            return settings
+        }
+    } else {
+        proxyType = dataStore.getOrDefault(ProxyTypePreference)
+        proxyHostname = dataStore.getOrDefault(ProxyHostnamePreference)
+        proxyPort = dataStore.getOrDefault(ProxyPortPreference)
+        proxyUsername = dataStore.getOrDefault(ProxyUsernamePreference)
+        proxyPassword = dataStore.getOrDefault(ProxyPasswordPreference)
+    }
+
+    return settings.setInteger(
+        settings_pack.int_types.proxy_type.swigValue(),
+        toSettingsPackProxyType(proxyType).swigValue()
+    ).setString(
+        settings_pack.string_types.proxy_hostname.swigValue(),
+        proxyHostname
+    ).setInteger(
+        settings_pack.int_types.proxy_port.swigValue(),
+        proxyPort
+    ).run {
+        if (proxyUsername.isBlank() || proxyPassword.isBlank()) this
+        else {
+            setString(
+                settings_pack.string_types.proxy_username.swigValue(),
+                proxyUsername
+            ).setString(
+                settings_pack.string_types.proxy_password.swigValue(),
+                proxyPassword
+            )
+        }
+    }
+}
+
+internal fun toSettingsPackProxyType(proxyType: String): settings_pack.proxy_type_t {
+    return when (proxyType) {
+        ProxyTypePreference.HTTP -> return settings_pack.proxy_type_t.http
+        ProxyTypePreference.SOCKS4 -> return settings_pack.proxy_type_t.socks4
+        ProxyTypePreference.SOCKS5 -> return settings_pack.proxy_type_t.socks5
+        else -> settings_pack.proxy_type_t.http
     }
 }
 

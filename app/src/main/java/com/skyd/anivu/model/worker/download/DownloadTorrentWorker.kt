@@ -185,7 +185,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             val sessionParams = if (lastSessionParams == null) SessionParams()
             else SessionParams(lastSessionParams.data)
 
-            sessionParams.settings = sessionParams.settings.setString(
+            sessionParams.settings = initProxySettings(
+                context = applicationContext,
+                settings = sessionParams.settings,
+            ).setString(
                 settings_pack.string_types.user_agent.swigValue(),
                 "${applicationContext.getAppName() ?: "AniVu"}/${applicationContext.getAppVersionName()}"
             )

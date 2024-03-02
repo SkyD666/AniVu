@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.ViewCompat
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceScreen
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
@@ -13,8 +12,9 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.popBackStackWithLifecycle
+import com.skyd.anivu.ui.component.preference.MaterialPreferenceFragmentCompat
 
-abstract class BasePreferenceFragmentCompat : PreferenceFragmentCompat() {
+abstract class BasePreferenceFragmentCompat : MaterialPreferenceFragmentCompat() {
     abstract val title: String
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
