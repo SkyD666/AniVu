@@ -61,6 +61,20 @@ class DataViewModel @Inject constructor(
                     DataEvent.ClearCacheResultEvent.Failed(change.msg)
                 }
 
+                is DataPartialStateChange.DeleteArticleBeforeResult.Success -> {
+                    DataEvent.DeleteArticleBeforeResultEvent.Success(
+                        appContext.resources.getQuantityString(
+                            R.plurals.data_fragment_deleted_count,
+                            change.count,
+                            change.count,
+                        )
+                    )
+                }
+
+                is DataPartialStateChange.DeleteArticleBeforeResult.Failed -> {
+                    DataEvent.DeleteArticleBeforeResultEvent.Failed(change.msg)
+                }
+
                 else -> return@onEach
             }
             sendEvent(event)
@@ -74,6 +88,12 @@ class DataViewModel @Inject constructor(
                     DataPartialStateChange.ClearCacheResult.Success(deletedSize = it)
                 }.startWith(DataPartialStateChange.LoadingDialog.Show)
                     .catchMap { DataPartialStateChange.ClearCacheResult.Failed(it.message.toString()) }
+            },
+            filterIsInstance<DataIntent.DeleteArticleBefore>().flatMapConcat { intent ->
+                dataRepo.requestDeleteArticleBefore(intent.timestamp).map {
+                    DataPartialStateChange.DeleteArticleBeforeResult.Success(count = it)
+                }.startWith(DataPartialStateChange.LoadingDialog.Show)
+                    .catchMap { DataPartialStateChange.DeleteArticleBeforeResult.Failed(it.message.toString()) }
             },
         )
     }

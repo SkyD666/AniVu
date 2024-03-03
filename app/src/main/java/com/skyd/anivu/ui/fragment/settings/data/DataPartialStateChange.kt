@@ -23,4 +23,18 @@ internal sealed interface DataPartialStateChange {
         data class Success(val deletedSize: Long) : ClearCacheResult
         data class Failed(val msg: String) : ClearCacheResult
     }
+
+    sealed interface DeleteArticleBeforeResult : DataPartialStateChange {
+        override fun reduce(oldState: DataState): DataState {
+            return when (this) {
+                is Success,
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val count: Int) : DeleteArticleBeforeResult
+        data class Failed(val msg: String) : DeleteArticleBeforeResult
+    }
 }

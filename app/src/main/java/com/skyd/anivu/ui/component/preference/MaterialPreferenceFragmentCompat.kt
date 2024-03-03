@@ -5,10 +5,10 @@ import androidx.preference.ListPreference
 import androidx.preference.ListPreferenceDialogFragmentCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.skyd.anivu.R
 import com.skyd.anivu.ui.component.dialog.InputDialogBuilder
 
 abstract class MaterialPreferenceFragmentCompat : PreferenceFragmentCompat() {
+    // https://github.com/material-components/material-components-android/issues/2732
     override fun onDisplayPreferenceDialog(preference: Preference) {
         when (preference) {
             is EditTextPreference -> {

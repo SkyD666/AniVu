@@ -42,20 +42,21 @@
 ## 💡 Features
 
 1. **Subscribe to RSS**, Update RSS, **Read** RSS
-2. **Download enclosures** (enclosure tags) of **torrent or magnet** links in RSS articles
-2. **Seeding** downloaded files
-4. **Play downloaded videos**
-5. Support variable playback **speed**, **long press** to speed up playback
-6. **Double-finger** gesture to **rotate and zoom** video
-7. **Swipe** on the video to **control volume**, **brightness**, and **playback position**
-8. **Searching** existing **RSS subscription content**
-9. **Play other videos on the phone**
-10. Support **dark mode**
-11. ......
+2. **Automatically update RSS** subscriptions
+3. **Download enclosures** (enclosure tags) of **torrent or magnet** links in RSS articles
+4. **Seeding** downloaded files
+5. **Play downloaded videos**
+6. Support variable playback **speed**, **long press** to speed up playback
+7. **Double-finger** gesture to **rotate and zoom** video
+8. **Swipe** on the video to **control volume**, **brightness**, and **playback position**
+9. **Searching** existing **RSS subscription content**
+10. **Play other videos on the phone**
+11. Support **dark mode**
+12. ......
 
 ## 🚧 Todo
 
-1. **Automatically update RSS** subscriptions and **download videos**
+1. Automatically **download new videos**
 2. **Customize player settings**, such as default screen scale, surface type used by the player, and more
 3. **Float** video playback **window**
 4. **Automatically** play the **next video**

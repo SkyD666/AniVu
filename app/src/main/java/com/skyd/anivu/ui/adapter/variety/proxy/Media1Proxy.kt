@@ -12,6 +12,7 @@ import com.skyd.anivu.databinding.ItemMedia1Binding
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.openWith
+import com.skyd.anivu.ext.share
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.ext.tryAddIcon
@@ -48,13 +49,18 @@ class Media1Proxy(
                     val data = adapter.dataList.getOrNull(holder.bindingAdapterPosition)
                     if (data !is VideoBean) return@setOnMenuItemClickListener false
                     when (menuItem.itemId) {
-                        R.id.action_media_item_remove -> {
-                            onRemove(data)
+                        R.id.action_media_item_open_with -> {
+                            data.file.toUri(v.context).openWith(v.context)
                             true
                         }
 
-                        R.id.action_media_item_open_with -> {
-                            data.file.toUri(v.context).openWith(v.context)
+                        R.id.action_media_item_share -> {
+                            data.file.toUri(v.context).share(v.context)
+                            true
+                        }
+
+                        R.id.action_media_item_remove -> {
+                            onRemove(data)
                             true
                         }
 

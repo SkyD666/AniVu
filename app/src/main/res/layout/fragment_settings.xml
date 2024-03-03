@@ -10,7 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:liftOnScroll="true"
-        app:liftOnScrollTargetViewId="@+id/rv_settings_fragment">
+        app:liftOnScrollTargetViewId="@id/recycler_view">
+        <!-- The RecyclerView's id is recycler_view -->
+        <!-- R.layout.preference_recyclerview -->
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/ctl_settings_fragment"

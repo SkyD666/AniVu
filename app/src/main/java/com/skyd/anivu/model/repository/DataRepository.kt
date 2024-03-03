@@ -3,6 +3,7 @@ package com.skyd.anivu.model.repository
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.deleteRecursivelyExclude
+import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.TorrentFileDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -12,6 +13,7 @@ import javax.inject.Inject
 
 class DataRepository @Inject constructor(
     private val torrentFileDao: TorrentFileDao,
+    private val articleDao: ArticleDao,
 ) : BaseRepository() {
     fun requestClearCache(): Flow<Long> {
         return flow {
@@ -31,6 +33,13 @@ class DataRepository @Inject constructor(
                 }
             }
             emit(size)
+        }.flowOn(Dispatchers.IO)
+    }
+
+    fun requestDeleteArticleBefore(timestamp: Long): Flow<Int> {
+        return flow {
+            val count = articleDao.deleteArticleBefore(timestamp)
+            emit(count)
         }.flowOn(Dispatchers.IO)
     }
 }

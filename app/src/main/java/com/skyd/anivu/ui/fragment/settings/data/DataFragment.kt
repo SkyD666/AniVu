@@ -7,7 +7,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
+import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceScreen
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BasePreferenceFragmentCompat
@@ -60,13 +62,10 @@ class DataFragment : BasePreferenceFragmentCompat() {
 
     private fun showEvent(dataEvent: DataEvent) {
         when (dataEvent) {
-            is DataEvent.ClearCacheResultEvent.Success -> {
-                showSnackbar(text = dataEvent.msg)
-            }
-
-            is DataEvent.ClearCacheResultEvent.Failed -> {
-                showSnackbar(text = dataEvent.msg)
-            }
+            is DataEvent.ClearCacheResultEvent.Success -> showSnackbar(text = dataEvent.msg)
+            is DataEvent.ClearCacheResultEvent.Failed -> showSnackbar(text = dataEvent.msg)
+            is DataEvent.DeleteArticleBeforeResultEvent.Failed -> showSnackbar(text = dataEvent.msg)
+            is DataEvent.DeleteArticleBeforeResultEvent.Success -> showSnackbar(text = dataEvent.msg)
         }
     }
 
@@ -87,6 +86,11 @@ class DataFragment : BasePreferenceFragmentCompat() {
         rootKey: String?,
         screen: PreferenceScreen
     ) {
+        val clearUpCategory = PreferenceCategory(this).apply {
+            key = "clearUpCategory"
+            title = getString(R.string.data_fragment_clear_up_category)
+            screen.addPreference(this)
+        }
         Preference(this).apply {
             key = "clearCache"
             title = getString(R.string.data_fragment_clear_cache)
@@ -96,8 +100,30 @@ class DataFragment : BasePreferenceFragmentCompat() {
                 deleteWarningDialog.show()
                 true
             }
-            screen.addPreference(this)
+            clearUpCategory.addPreference(this)
+        }
+        Preference(this).apply {
+            key = "deleteArticleBefore"
+            title = getString(R.string.data_fragment_delete_article_before)
+            summary = getString(R.string.data_fragment_delete_article_before_description)
+            setIcon(R.drawable.ic_today_24)
+            setOnPreferenceClickListener {
+                val datePicker = MaterialDatePicker.Builder.datePicker()
+                    .setTitleText(getString(R.string.select_date))
+                    .setPositiveButtonText(getString(R.string.delete))
+                    .setSelection(MaterialDatePicker.thisMonthInUtcMilliseconds())
+                    .build()
 
+                datePicker.addOnPositiveButtonClickListener {
+                    intents.trySend(DataIntent.DeleteArticleBefore(it))
+                }
+                datePicker.show(
+                    requireActivity().supportFragmentManager,
+                    "deleteArticleBeforePicker",
+                )
+                true
+            }
+            clearUpCategory.addPreference(this)
         }
     }
 }

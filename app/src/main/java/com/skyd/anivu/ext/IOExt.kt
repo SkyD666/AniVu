@@ -58,16 +58,29 @@ fun Uri.openBrowser(context: Context) {
     }
 }
 
-fun Uri.openWith(context: Context) {
+fun Uri.openWith(context: Context) = openChooser(
+    context = context,
+    action = Intent.ACTION_VIEW,
+    chooserTitle = context.getString(R.string.open_with),
+)
+
+fun Uri.share(context: Context) = openChooser(
+    context = context,
+    action = Intent.ACTION_SEND,
+    chooserTitle = context.getString(R.string.share),
+)
+
+private fun Uri.openChooser(context: Context, action: String, chooserTitle: CharSequence) {
     try {
         val mimeType = context.contentResolver.getType(this)
         val intent = Intent.createChooser(
             Intent().apply {
-                action = Intent.ACTION_VIEW
-                setDataAndType(this@openWith, mimeType)
+                this.action = action
+                putExtra(Intent.EXTRA_STREAM, this@openChooser)
+                setDataAndType(this@openChooser, mimeType)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             },
-            context.getString(R.string.open_with)
+            chooserTitle
         )
         ContextCompat.startActivity(context, intent, null)
     } catch (e: Exception) {

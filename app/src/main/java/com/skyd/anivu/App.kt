@@ -3,6 +3,7 @@ package com.skyd.anivu
 import android.app.Application
 import android.content.Context
 import com.google.android.material.color.DynamicColors
+import com.skyd.anivu.model.worker.rsssync.listenerRssSyncFrequency
 import dagger.hilt.android.HiltAndroidApp
 
 
@@ -13,6 +14,8 @@ class App : Application() {
         super.onCreate()
         appContext = this
         DynamicColors.applyToActivitiesIfAvailable(this)
+
+        listenerRssSyncFrequency(this)
     }
 }
 

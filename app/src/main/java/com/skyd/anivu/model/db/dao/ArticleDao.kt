@@ -86,6 +86,16 @@ interface ArticleDao {
     @Transaction
     @Query(
         """
+        DELETE FROM $ARTICLE_TABLE_NAME
+        WHERE ${ArticleBean.UPDATE_AT_COLUMN} IS NULL
+        OR ${ArticleBean.UPDATE_AT_COLUMN} <= :timestamp
+        """
+    )
+    suspend fun deleteArticleBefore(timestamp: Long): Int
+
+    @Transaction
+    @Query(
+        """
         SELECT * FROM $ARTICLE_TABLE_NAME 
         WHERE ${ArticleBean.FEED_URL_COLUMN} = :feedUrl
         ORDER BY ${ArticleBean.DATE_COLUMN} DESC

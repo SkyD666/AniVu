@@ -17,6 +17,7 @@
     <string name="close">关闭</string>
     <string name="exit">关闭</string>
     <string name="remove">删除</string>
+    <string name="delete">删除</string>
     <string name="edit">编辑</string>
     <string name="article_fragment_name">文章</string>
     <string name="article_fragment_feed_url_illegal">RSS 订阅链接格式错误</string>
@@ -100,4 +101,24 @@
     <string name="proxy_fragment_type">类型</string>
     <string name="not_configure">未设置</string>
     <string name="configured">已设置</string>
+    <string name="data_fragment_delete_article_before">删除之前的文章</string>
+    <string name="data_fragment_delete_article_before_description">删除更新日期在指定日期之前的所有文章数据</string>
+    <string name="select_date">选择日期</string>
+    <string name="data_fragment_clear_up_category">清理</string>
+    <plurals name="data_fragment_deleted_count">
+        <item quantity="other">删除了 %d 项</item>
+    </plurals>
+    <string name="rss_config_fragment_sync_category">同步</string>
+    <string name="rss_sync_frequency_manual">手动</string>
+    <string name="rss_config_fragment_sync_frequency">同步频率</string>
+    <string name="share">分享</string>
+    <plurals name="rss_sync_frequency_minute">
+        <item quantity="other">每 %d 分钟</item>
+    </plurals>
+    <plurals name="rss_sync_frequency_hour">
+        <item quantity="other">每 %d 小时</item>
+    </plurals>
+    <plurals name="rss_sync_frequency_day">
+        <item quantity="other">每 %d 天</item>
+    </plurals>
 </resources>
