@@ -83,13 +83,13 @@
             tools:text="2024年2月6日" />
 
         <ImageView
-            android:id="@+id/iv_media_1_is_video"
+            android:id="@+id/iv_media_1_type_icon"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_marginStart="12dp"
             android:contentDescription="@string/video"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_movie_24" />
+            tools:src="@drawable/ic_movie_24" />
     </LinearLayout>
 
     <Button

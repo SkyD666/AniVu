@@ -175,7 +175,7 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
 
     override fun FragmentMediaBinding.setWindowInsets() {
         ablMediaFragment.addInsetsByPadding(top = true, left = true, right = true)
-        fabMediaFragment.addInsetsByMargin(left = true, right = true)
+        fabMediaFragment.addInsetsByMargin(left = true, right = true, bottom = hasParentDir)
         rvMediaFragment.addInsetsByPadding(
             left = true,
             right = true,

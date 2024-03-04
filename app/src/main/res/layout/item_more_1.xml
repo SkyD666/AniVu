@@ -20,6 +20,7 @@
             android:layout_width="66dp"
             android:layout_height="66dp"
             android:background="@drawable/ic_shape_1"
+            android:importantForAccessibility="no"
             android:padding="15dp"
             app:tint="?attr/colorOnTertiary"
             tools:src="@drawable/ic_info_24" />

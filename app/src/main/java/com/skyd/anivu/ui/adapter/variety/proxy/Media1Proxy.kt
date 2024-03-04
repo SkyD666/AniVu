@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
 import androidx.appcompat.widget.PopupMenu
-import androidx.core.view.isVisible
 import com.skyd.anivu.R
 import com.skyd.anivu.databinding.ItemMedia1Binding
 import com.skyd.anivu.ext.fileSize
@@ -67,7 +66,16 @@ class Media1Proxy(
                         else -> false
                     }
                 }
-                popup.menu.tryAddIcon(v.context)
+                popup.menu.apply {
+                    tryAddIcon(v.context)
+                    val data = adapter.dataList.getOrNull(holder.bindingAdapterPosition)
+                    if (data is VideoBean) {
+                        if (data.isDir) {
+                            removeItem(R.id.action_media_item_open_with)
+                            removeItem(R.id.action_media_item_share)
+                        }
+                    }
+                }
                 popup.show()
             }
         }
@@ -96,8 +104,9 @@ class Media1Proxy(
             tvMedia1Title.text = data.name
             tvMedia1Date.text = data.date.toDateTimeString()
             tvMedia1Size.text = data.size.fileSize(context)
-            ivMedia1IsVideo.isVisible = data.isMedia(context)
             if (data.isMedia(context)) {
+                ivMedia1TypeIcon.visible()
+                ivMedia1TypeIcon.setImageResource(R.drawable.ic_movie_24)
                 cvMedia1Preview.visible()
                 ivMedia1Preview.setTag(R.id.image_view_tag_2, data.file.path)
                 coroutineScope.launch(Dispatchers.IO) {
@@ -116,7 +125,12 @@ class Media1Proxy(
                         }
                     }
                 }
+            } else if (data.isDir) {
+                ivMedia1TypeIcon.visible()
+                ivMedia1TypeIcon.setImageResource(R.drawable.ic_folder_24)
+                cvMedia1Preview.gone()
             } else {
+                ivMedia1TypeIcon.gone()
                 cvMedia1Preview.gone()
             }
         }

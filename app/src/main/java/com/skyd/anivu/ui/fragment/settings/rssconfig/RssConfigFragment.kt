@@ -13,7 +13,10 @@ import com.skyd.anivu.base.BasePreferenceFragmentCompat
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
+import com.skyd.anivu.model.preference.rss.RssSyncBatteryNotLowConstraintPreference
+import com.skyd.anivu.model.preference.rss.RssSyncChargingConstraintPreference
 import com.skyd.anivu.model.preference.rss.RssSyncFrequencyPreference
+import com.skyd.anivu.model.preference.rss.RssSyncWifiConstraintPreference
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -39,10 +42,57 @@ class RssConfigFragment : BasePreferenceFragmentCompat() {
             entries = RssSyncFrequencyPreference.frequencies.map {
                 RssSyncFrequencyPreference.toDisplayName(context, it)
             }.toTypedArray()
-            entryValues = RssSyncFrequencyPreference.frequencies.map { it.toString() }.toTypedArray()
+            entryValues =
+                RssSyncFrequencyPreference.frequencies.map { it.toString() }.toTypedArray()
             setOnPreferenceChangeListener { _, newValue ->
                 RssSyncFrequencyPreference.put(
                     requireContext(), lifecycleScope, (newValue as String).toLong(),
+                )
+                true
+            }
+            rssSyncCategory.addPreference(this)
+        }
+        SwitchPreferenceCompat(this).apply {
+            key = "rssSyncWifiConstraint"
+            title = getString(R.string.rss_config_fragment_sync_wifi_constraint)
+            setIcon(R.drawable.ic_wifi_24)
+            isChecked = requireContext().dataStore.getOrDefault(RssSyncWifiConstraintPreference)
+            setOnPreferenceChangeListener { _, newValue ->
+                RssSyncWifiConstraintPreference.put(
+                    context = requireContext(),
+                    scope = lifecycleScope,
+                    value = newValue as Boolean,
+                )
+                true
+            }
+            rssSyncCategory.addPreference(this)
+        }
+        SwitchPreferenceCompat(this).apply {
+            key = "rssSyncChargingConstraint"
+            title = getString(R.string.rss_config_fragment_sync_charging_constraint)
+            setIcon(R.drawable.ic_battery_charging_full_24)
+            isChecked = requireContext().dataStore.getOrDefault(RssSyncChargingConstraintPreference)
+            setOnPreferenceChangeListener { _, newValue ->
+                RssSyncChargingConstraintPreference.put(
+                    context = requireContext(),
+                    scope = lifecycleScope,
+                    value = newValue as Boolean,
+                )
+                true
+            }
+            rssSyncCategory.addPreference(this)
+        }
+        SwitchPreferenceCompat(this).apply {
+            key = "rssSyncBatteryNotLowConstraint"
+            title = getString(R.string.rss_config_fragment_sync_battery_not_low_constraint)
+            setIcon(R.drawable.ic_battery_very_low_24)
+            isChecked =
+                requireContext().dataStore.getOrDefault(RssSyncBatteryNotLowConstraintPreference)
+            setOnPreferenceChangeListener { _, newValue ->
+                RssSyncBatteryNotLowConstraintPreference.put(
+                    context = requireContext(),
+                    scope = lifecycleScope,
+                    value = newValue as Boolean,
                 )
                 true
             }

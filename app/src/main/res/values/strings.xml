@@ -118,6 +118,9 @@
     <string name="rss_sync_frequency_manual">Manual</string>
     <string name="rss_config_fragment_sync_frequency">Sync frequency</string>
     <string name="share">Share</string>
+    <string name="rss_config_fragment_sync_wifi_constraint">Only on Wi-Fi</string>
+    <string name="rss_config_fragment_sync_charging_constraint">Only when charging</string>
+    <string name="rss_config_fragment_sync_battery_not_low_constraint">Only not in low battery mode</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

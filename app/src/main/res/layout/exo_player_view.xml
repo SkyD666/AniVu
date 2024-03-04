@@ -35,11 +35,12 @@
             android:layout_height="match_parent"
             android:background="@android:color/black" />
 
-        <!-- 不应该相应触摸 -->
+        <!-- 不应该响应触摸 -->
         <ImageView
             android:id="@id/exo_artwork"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:importantForAccessibility="no"
             android:scaleType="fitXY" />
 
         <!-- 不应该相应触摸 -->

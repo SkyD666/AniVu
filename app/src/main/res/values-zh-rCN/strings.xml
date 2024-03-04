@@ -112,6 +112,9 @@
     <string name="rss_sync_frequency_manual">手动</string>
     <string name="rss_config_fragment_sync_frequency">同步频率</string>
     <string name="share">分享</string>
+    <string name="rss_config_fragment_sync_wifi_constraint">仅在 Wi-Fi 连接时</string>
+    <string name="rss_config_fragment_sync_charging_constraint">仅在充电时</string>
+    <string name="rss_config_fragment_sync_battery_not_low_constraint">仅在电量充足时</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>
