@@ -5,6 +5,7 @@ import java.io.File
 
 object Const {
     const val GITHUB_REPO = "https://github.com/SkyD666/AniVu"
+    const val GITHUB_NEW_ISSUE_URL = "https://github.com/SkyD666/AniVu/issues/new"
     const val TELEGRAM_GROUP = "https://t.me/SkyD666Chat"
     const val DISCORD_SERVER = "https://discord.gg/pEWEjeJTa3"
 
