@@ -108,7 +108,7 @@
     <plurals name="data_fragment_deleted_count">
         <item quantity="other">删除了 %d 项</item>
     </plurals>
-    <string name="rss_config_fragment_sync_category">同步</string>
+    <string name="rss_config_fragment_sync_category">自动同步</string>
     <string name="rss_sync_frequency_manual">手动</string>
     <string name="rss_config_fragment_sync_frequency">同步频率</string>
     <string name="share">分享</string>

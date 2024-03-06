@@ -62,7 +62,7 @@
 <img src="../image/zh-rCN/ic_rss_fragment.jpg" alt="ic_rss_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_media_fragment.jpg" alt="ic_media_fragment" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_article_fragment.jpg" alt="ic_article_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_read_fragment.jpg" alt="ic_read_fragment" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
-<img src="../image/zh-rCN/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
+<img src="../image/zh-rCN/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_player_activity.png" alt="ic_player_activity" style="zoom:80%;" />
 
 ## 🛠主要技术栈

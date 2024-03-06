@@ -114,7 +114,7 @@
         <item quantity="one">%d item deleted</item>
         <item quantity="other">%d items deleted</item>
     </plurals>
-    <string name="rss_config_fragment_sync_category">Sync</string>
+    <string name="rss_config_fragment_sync_category">Auto sync</string>
     <string name="rss_sync_frequency_manual">Manual</string>
     <string name="rss_config_fragment_sync_frequency">Sync frequency</string>
     <string name="share">Share</string>

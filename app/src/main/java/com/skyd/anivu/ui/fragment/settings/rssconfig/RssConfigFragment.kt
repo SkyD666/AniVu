@@ -85,7 +85,7 @@ class RssConfigFragment : BasePreferenceFragmentCompat() {
         SwitchPreferenceCompat(this).apply {
             key = "rssSyncBatteryNotLowConstraint"
             title = getString(R.string.rss_config_fragment_sync_battery_not_low_constraint)
-            setIcon(R.drawable.ic_battery_very_low_24)
+            setIcon(R.drawable.ic_battery_full_alt_24)
             isChecked =
                 requireContext().dataStore.getOrDefault(RssSyncBatteryNotLowConstraintPreference)
             setOnPreferenceChangeListener { _, newValue ->
