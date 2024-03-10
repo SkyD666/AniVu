@@ -14,6 +14,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BasePreferenceFragmentCompat
 import com.skyd.anivu.ext.collectIn
+import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.showSnackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
@@ -77,8 +78,8 @@ class DataFragment : BasePreferenceFragmentCompat() {
             .onEach(viewModel::processIntent)
             .launchIn(lifecycleScope)
 
-        viewModel.viewState.collectIn(this) { updateState(it) }
-        viewModel.singleEvent.collectIn(this) { showEvent(it) }
+        viewModel.viewState.collectIn(lifecycleOwner = this, action = ::updateState)
+        viewModel.singleEvent.collectIn(lifecycleOwner = this, action = ::showEvent)
     }
 
     override fun Context.onAddPreferences(
@@ -121,6 +122,17 @@ class DataFragment : BasePreferenceFragmentCompat() {
                     requireActivity().supportFragmentManager,
                     "deleteArticleBeforePicker",
                 )
+                true
+            }
+            clearUpCategory.addPreference(this)
+        }
+        Preference(this).apply {
+            key = "autoDeleteArticle"
+            title = getString(R.string.auto_delete_article_fragment_name)
+            summary = getString(R.string.auto_delete_article_fragment_description)
+            setIcon(R.drawable.ic_auto_delete_24)
+            setOnPreferenceClickListener {
+                findMainNavController().navigate(R.id.action_to_auto_delete_article_fragment)
                 true
             }
             clearUpCategory.addPreference(this)

@@ -57,7 +57,7 @@ object RssSyncFrequencyPreference : BasePreference<Long> {
         context: Context,
         value: Long = context.dataStore.getOrDefault(this),
     ): String = when (value) {
-        MANUAL -> context.getString(R.string.rss_sync_frequency_manual)
+        MANUAL -> context.getString(R.string.frequency_manual)
         EVERY_15_MINUTE, EVERY_30_MINUTE -> context.resources.getQuantityString(
             R.plurals.rss_sync_frequency_minute,
             value.milliseconds.inWholeMinutes.toInt(),
@@ -73,11 +73,11 @@ object RssSyncFrequencyPreference : BasePreference<Long> {
         }
 
         EVERY_1_DAY -> context.resources.getQuantityString(
-            R.plurals.rss_sync_frequency_day,
+            R.plurals.frequency_day,
             value.milliseconds.inWholeDays.toInt(),
             value.milliseconds.inWholeDays.toInt(),
         )
 
-        else -> context.getString(R.string.rss_sync_frequency_manual)
+        else -> context.getString(R.string.frequency_manual)
     }
 }

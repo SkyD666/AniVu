@@ -550,19 +550,14 @@ import java.util.List;
         }
 
         switch (uxState) {
-            case UX_STATE_NONE_VISIBLE:
-                showAllBarsAnimator.start();
-                break;
-            case UX_STATE_ONLY_PROGRESS_VISIBLE:
-                showMainBarAnimator.start();
-                break;
-            case UX_STATE_ANIMATING_HIDE:
-                needToShowBars = true;
-                break;
-            case UX_STATE_ANIMATING_SHOW:
+            case UX_STATE_NONE_VISIBLE -> showAllBarsAnimator.start();
+            case UX_STATE_ONLY_PROGRESS_VISIBLE -> showMainBarAnimator.start();
+            case UX_STATE_ANIMATING_HIDE -> needToShowBars = true;
+            case UX_STATE_ANIMATING_SHOW -> {
                 return;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
         resetHideCallbacks();
     }
@@ -659,8 +654,7 @@ import java.util.List;
                 timeBarParams.bottomMargin = (isMinimalMode ? 0 : timeBarMarginBottom);
                 timeBar.setLayoutParams(timeBarParams);
             }
-            if (timeBar instanceof DefaultTimeBar) {
-                DefaultTimeBar defaultTimeBar = (DefaultTimeBar) timeBar;
+            if (timeBar instanceof DefaultTimeBar defaultTimeBar) {
                 if (isMinimalMode) {
                     defaultTimeBar.hideScrubber(/* disableScrubberPadding= */ true);
                 } else if (uxState == UX_STATE_ONLY_PROGRESS_VISIBLE) {
@@ -759,8 +753,7 @@ import java.util.List;
         }
         int width = v.getWidth();
         LayoutParams layoutParams = v.getLayoutParams();
-        if (layoutParams instanceof MarginLayoutParams) {
-            MarginLayoutParams marginLayoutParams = (MarginLayoutParams) layoutParams;
+        if (layoutParams instanceof MarginLayoutParams marginLayoutParams) {
             width += marginLayoutParams.leftMargin + marginLayoutParams.rightMargin;
         }
         return width;
@@ -772,8 +765,7 @@ import java.util.List;
         }
         int height = v.getHeight();
         LayoutParams layoutParams = v.getLayoutParams();
-        if (layoutParams instanceof MarginLayoutParams) {
-            MarginLayoutParams marginLayoutParams = (MarginLayoutParams) layoutParams;
+        if (layoutParams instanceof MarginLayoutParams marginLayoutParams) {
             height += marginLayoutParams.topMargin + marginLayoutParams.bottomMargin;
         }
         return height;

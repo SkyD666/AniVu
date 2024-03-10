@@ -118,7 +118,7 @@ interface ArticleDao {
         WHERE ${ArticleBean.ARTICLE_ID_COLUMN} LIKE :articleId
         """
     )
-    fun getArticleWithEnclosures(articleId: String): Flow<ArticleWithEnclosureBean>
+    fun getArticleWithEnclosures(articleId: String): Flow<ArticleWithEnclosureBean?>
 
     @RewriteQueriesToDropUnusedColumns
     @Query(

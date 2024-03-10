@@ -55,17 +55,19 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
         if (action()) {
             onSuccess()
         } else {
-            if (onError == null) {
-                MaterialAlertDialogBuilder(requireContext())
-                    .setIcon(R.drawable.ic_warning_24)
-                    .setTitle(R.string.warning)
-                    .setMessage(messageRes)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.exit) { _, _ ->
-                        findNavController().popBackStackWithLifecycle()
-                    }
-                    .show()
-            } else onError()
+            if (onError == null) showExitDialog(message = getString(messageRes)) else onError()
         }
+    }
+
+    protected fun showExitDialog(title: String = getString(R.string.warning), message: String) {
+        MaterialAlertDialogBuilder(requireContext())
+            .setIcon(R.drawable.ic_warning_24)
+            .setTitle(title)
+            .setMessage(message)
+            .setCancelable(false)
+            .setPositiveButton(R.string.exit) { _, _ ->
+                findNavController().popBackStackWithLifecycle()
+            }
+            .show()
     }
 }

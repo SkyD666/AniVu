@@ -98,8 +98,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
-//import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
-//import org.checkerframework.checker.nullness.qual.RequiresNonNull;
 
 /**
  * A high level view for {@link Player} media playbacks. It displays video, subtitles and album art
@@ -668,10 +666,8 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
                     new ViewGroup.LayoutParams(
                             ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             switch (surfaceType) {
-                case SURFACE_TYPE_TEXTURE_VIEW:
-                    surfaceView = new TextureView(context);
-                    break;
-                case SURFACE_TYPE_SPHERICAL_GL_SURFACE_VIEW:
+                case SURFACE_TYPE_TEXTURE_VIEW -> surfaceView = new TextureView(context);
+                case SURFACE_TYPE_SPHERICAL_GL_SURFACE_VIEW -> {
                     try {
                         Class<?> clazz =
                                 Class.forName("androidx.media3.exoplayer.video.spherical.SphericalGLSurfaceView");
@@ -681,8 +677,8 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
                                 "spherical_gl_surface_view requires an ExoPlayer dependency", e);
                     }
                     surfaceViewIgnoresVideoAspectRatio = true;
-                    break;
-                case SURFACE_TYPE_VIDEO_DECODER_GL_SURFACE_VIEW:
+                }
+                case SURFACE_TYPE_VIDEO_DECODER_GL_SURFACE_VIEW -> {
                     try {
                         Class<?> clazz =
                                 Class.forName("androidx.media3.exoplayer.video.VideoDecoderGLSurfaceView");
@@ -691,14 +687,14 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
                         throw new IllegalStateException(
                                 "video_decoder_gl_surface_view requires an ExoPlayer dependency", e);
                     }
-                    break;
-                default:
+                }
+                default -> {
                     SurfaceView view = new SurfaceView(context);
                     if (Util.SDK_INT >= 34) {
                         Api34.setSurfaceLifecycleToFollowsAttachment(view);
                     }
                     surfaceView = view;
-                    break;
+                }
             }
             surfaceView.setLayoutParams(params);
             // We don't want surfaceView to be clickable separately to the PlayerView itself, but we
@@ -775,9 +771,7 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
             controller.addVisibilityListener(/* listener= */ componentListener);
 
             controller.onZoomStateChanged(false);
-            controller.setOnResetZoomButtonClickListener((v) -> {
-                playerGestureDetector.restoreZoom(contentFrame);
-            });
+            controller.setOnResetZoomButtonClickListener(v -> playerGestureDetector.restoreZoom(contentFrame));
         }
         if (useController) {
             setClickable(true);

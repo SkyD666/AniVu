@@ -2,9 +2,9 @@ package com.skyd.anivu.ui.activity
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.core.content.IntentCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -42,23 +42,19 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        val data = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent?.extras?.getParcelable(VIDEO_URI_KEY, Uri::class.java)
-        } else {
-            intent?.extras?.getParcelable(VIDEO_URI_KEY)
-        } ?: intent?.data
-        if (data != null) {
-            videoUri = data
-            play()
+        if (intent != null) {
+            val data = IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
+                ?: intent.data
+            if (data != null) {
+                videoUri = data
+                play()
+            }
         }
     }
 
     override fun ActivityPlayBinding.initView() {
-        videoUri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            intent.extras?.getParcelable(VIDEO_URI_KEY, Uri::class.java)
-        } else {
-            intent.extras?.getParcelable(VIDEO_URI_KEY)
-        } ?: intent.data
+        val videoUri = IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
+            ?: intent.data
 
         if (videoUri != null) {
             playerView.setOnBackButtonClickListener { finish() }

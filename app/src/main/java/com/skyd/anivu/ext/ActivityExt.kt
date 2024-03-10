@@ -5,7 +5,6 @@ import android.provider.Settings
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.skyd.anivu.R
-import com.skyd.anivu.ui.activity.MainActivity
 
 /**
  * 获取系统屏幕亮度

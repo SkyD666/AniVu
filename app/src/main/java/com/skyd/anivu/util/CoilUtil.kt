@@ -56,10 +56,7 @@ object CoilUtil {
         load(url) {
             placeholder(placeholder)
             error(error)
-            addHeader("Host", URL(url).host)
-            addHeader("Accept", "*/*")
-            addHeader("Accept-Encoding", "gzip, deflate")
-            addHeader("Connection", "keep-alive")
+            runCatching { addHeader("Host", URL(url).host) }.onFailure { it.printStackTrace() }
         }
     }
 

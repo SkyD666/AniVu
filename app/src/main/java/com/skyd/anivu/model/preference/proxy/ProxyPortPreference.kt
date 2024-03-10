@@ -3,7 +3,6 @@ package com.skyd.anivu.model.preference.proxy
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
 import com.skyd.anivu.base.BasePreference
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.put

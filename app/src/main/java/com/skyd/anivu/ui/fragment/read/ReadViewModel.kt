@@ -1,6 +1,8 @@
 package com.skyd.anivu.ui.fragment.read
 
 import androidx.lifecycle.viewModelScope
+import com.skyd.anivu.R
+import com.skyd.anivu.appContext
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.base.mvi.MviSingleEvent
 import com.skyd.anivu.ext.startWith
@@ -50,7 +52,13 @@ class ReadViewModel @Inject constructor(
         return merge(
             filterIsInstance<ReadIntent.Init>().flatMapConcat { intent ->
                 readRepo.requestArticleWithEnclosure(intent.articleId).map {
-                    ReadPartialStateChange.ArticleResult.Success(article = it)
+                    if (it == null) {
+                        ReadPartialStateChange.ArticleResult.Failed(
+                            appContext.getString(R.string.read_fragment_article_id_illegal)
+                        )
+                    } else {
+                        ReadPartialStateChange.ArticleResult.Success(article = it)
+                    }
                 }.startWith(ReadPartialStateChange.ArticleResult.Loading)
             },
         )

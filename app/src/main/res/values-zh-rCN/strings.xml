@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">AniVu</string>
-    <string name="action_settings">设置</string>
     <string name="main_fragment_name">主页</string>
     <string name="feed_fragment_name">订阅</string>
     <string name="media_fragment_name">媒体</string>
@@ -37,7 +36,6 @@
     <string name="download_completed">已完成</string>
     <string name="download_peer_count">用户：%d</string>
     <string name="parent_dir">…</string>
-    <string name="player_fragment_name">播放器</string>
     <string name="torrent_status_checking_files">检查文件中…</string>
     <string name="torrent_status_downloading_metadata">下载元数据中…</string>
     <string name="torrent_status_downloading">下载中…</string>
@@ -109,7 +107,7 @@
         <item quantity="other">删除了 %d 项</item>
     </plurals>
     <string name="rss_config_fragment_sync_category">自动同步</string>
-    <string name="rss_sync_frequency_manual">手动</string>
+    <string name="frequency_manual">手动</string>
     <string name="rss_config_fragment_sync_frequency">同步频率</string>
     <string name="share">分享</string>
     <string name="rss_config_fragment_sync_wifi_constraint">仅在 Wi-Fi 连接时</string>
@@ -118,13 +116,22 @@
     <string name="crashed">崩溃了</string>
     <string name="submit_an_issue_on_github">报告</string>
     <string name="copied">已复制</string>
+    <string name="read_fragment_article_id_illegal">文章 ID 无效，可能是已被删除。</string>
+    <string name="auto_delete_article_fragment_name">自动删除</string>
+    <string name="auto_delete_article_fragment_description">自动删除一段时间之前的文章</string>
+    <string name="auto_delete_article_fragment_use">启用</string>
+    <string name="auto_delete_article_fragment_delete_frequency">执行频率</string>
+    <string name="auto_delete_article_fragment_delete_before">删除范围</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>
     <plurals name="rss_sync_frequency_hour">
         <item quantity="other">每 %d 小时</item>
     </plurals>
-    <plurals name="rss_sync_frequency_day">
+    <plurals name="frequency_day">
         <item quantity="other">每 %d 天</item>
+    </plurals>
+    <plurals name="before_day">
+        <item quantity="other">%d 天之前</item>
     </plurals>
 </resources>

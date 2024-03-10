@@ -184,4 +184,16 @@
         app:exitAnim="@animator/nav_default_exit_anim"
         app:popEnterAnim="@animator/nav_default_pop_enter_anim"
         app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+
+    <fragment
+        android:id="@+id/auto_delete_article_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.data.autodelete.AutoDeleteArticleFragment"
+        android:label="@string/auto_delete_article_fragment_name" />
+    <action
+        android:id="@+id/action_to_auto_delete_article_fragment"
+        app:destination="@id/auto_delete_article_fragment"
+        app:enterAnim="@animator/nav_default_enter_anim"
+        app:exitAnim="@animator/nav_default_exit_anim"
+        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
+        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
 </navigation>

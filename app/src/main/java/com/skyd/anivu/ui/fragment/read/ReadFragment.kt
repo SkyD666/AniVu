@@ -48,6 +48,7 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
     private fun updateState(readState: ReadState) {
         when (val articleState = readState.articleState) {
             is ArticleState.Failed -> {
+                showExitDialog(message = articleState.msg)
                 enclosureBottomSheet?.updateData(emptyList())
                 binding.topAppBar.menu?.findItem(R.id.action_read_fragment_open_in_browser)
                     ?.isEnabled = false
@@ -104,7 +105,7 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
         super.onViewCreated(view, savedInstanceState)
 
         checkArgument(
-            messageRes = R.string.article_fragment_feed_url_illegal,
+            messageRes = R.string.read_fragment_article_id_illegal,
             action = { !articleId.isNullOrBlank() },
             onSuccess = {
                 intents

@@ -11,7 +11,7 @@ import javax.inject.Inject
 class ReadRepository @Inject constructor(
     private val articleDao: ArticleDao,
 ) : BaseRepository() {
-    fun requestArticleWithEnclosure(articleId: String): Flow<ArticleWithEnclosureBean> {
+    fun requestArticleWithEnclosure(articleId: String): Flow<ArticleWithEnclosureBean?> {
         return articleDao.getArticleWithEnclosures(articleId = articleId)
             .flowOn(Dispatchers.IO)
     }
