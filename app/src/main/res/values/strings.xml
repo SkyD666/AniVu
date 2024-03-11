@@ -133,8 +133,8 @@
         <item quantity="other">Every %d minutes</item>
     </plurals>
     <plurals name="rss_sync_frequency_hour">
-        <item quantity="one">Every %d hours</item>
-        <item quantity="other">Every %d hour</item>
+        <item quantity="one">Every %d hour</item>
+        <item quantity="other">Every %d hours</item>
     </plurals>
     <plurals name="frequency_day">
         <item quantity="one">Every %d day</item>

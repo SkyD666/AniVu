@@ -53,7 +53,7 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     }
 
     override fun ActivityPlayBinding.initView() {
-        val videoUri = IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
+        videoUri = IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
             ?: intent.data
 
         if (videoUri != null) {

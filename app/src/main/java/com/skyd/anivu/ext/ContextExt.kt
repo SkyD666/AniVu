@@ -10,11 +10,11 @@ import android.content.res.TypedArray
 import android.graphics.Point
 import android.os.Build
 import android.util.TypedValue
-import android.view.WindowManager
+import androidx.core.content.ContextCompat
 
 val Context.activity: Activity
     get() {
-        return tryActivity ?: error("can't find activity: $this")
+        return tryActivity ?: error("Can't find activity: $this")
     }
 
 @get:JvmName("tryActivity")
@@ -34,8 +34,7 @@ val Context.screenIsLand: Boolean
     get() = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
 fun Context.screenHeight(includeVirtualKey: Boolean): Int {
-    val display =
-        (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+    val display = ContextCompat.getDisplayOrDefault(this)
     val outPoint = Point()
     // 可能有虚拟按键的情况
     if (includeVirtualKey) display.getRealSize(outPoint)
@@ -44,8 +43,7 @@ fun Context.screenHeight(includeVirtualKey: Boolean): Int {
 }
 
 fun Context.screenWidth(includeVirtualKey: Boolean): Int {
-    val display =
-        (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+    val display = ContextCompat.getDisplayOrDefault(this)
     val outPoint = Point()
     // 可能有虚拟按键的情况
     if (includeVirtualKey) display.getRealSize(outPoint)
