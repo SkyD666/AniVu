@@ -173,7 +173,8 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         runCatching {
             howToDownload(saveDir = saveDir)
         }.onFailure {
-            pauseWorker(handle = null)
+            it.printStackTrace()
+            pauseWorker(handle = null, state = DownloadInfoBean.DownloadState.ErrorPaused)
             continuation.resumeWithException(it)
         }
     }
@@ -251,6 +252,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     Const.TEMP_TORRENT_DIR,
                     link.substringAfterLast('/').toDecodedUrl().validateFileName()
                 )
+                // May throw exceptions
                 hiltEntryPoint.retrofit.create(HttpService::class.java)
                     .requestGetResponseBody(link).execute().body()!!.byteStream()
                     .use { it.saveTo(tempTorrentFile) }

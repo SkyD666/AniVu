@@ -20,7 +20,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 10
-        versionName = "1.1-alpha02"
+        versionName = "1.1-alpha03"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -133,9 +133,9 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.media3:media3-exoplayer:1.2.1")
-    implementation("androidx.media3:media3-exoplayer-dash:1.2.1")
-    implementation("androidx.media3:media3-ui:1.2.1")
+    implementation("androidx.media3:media3-exoplayer:1.3.0")
+    implementation("androidx.media3:media3-exoplayer-dash:1.3.0")
+    implementation("androidx.media3:media3-ui:1.3.0")
     implementation("androidx.paging:paging-runtime-ktx:3.2.1")
     implementation("androidx.preference:preference-ktx:1.2.1")
 
