@@ -19,6 +19,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/shape_gray_transparent_angle_270"
             android:layoutDirection="ltr"
+            android:paddingHorizontal="12dp"
             android:paddingBottom="@dimen/exo_styled_top_bar_padding_bottom"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -56,6 +57,7 @@
             android:layout_gravity="bottom"
             android:background="@drawable/shape_gray_transparent_angle_90"
             android:layoutDirection="ltr"
+            android:paddingHorizontal="12dp"
             app:layout_constraintBottom_toBottomOf="parent">
 
             <LinearLayout
@@ -121,7 +123,7 @@
 
                 <ImageButton
                     android:id="@id/exo_subtitle"
-                    style="@style/ExoStyledControls.Button.Bottom.CC" />
+                    style="@style/AniVuStyledControls.Button.Bottom.CC" />
 
                 <ImageButton
                     android:id="@id/exo_fullscreen"
@@ -136,7 +138,6 @@
                 android:id="@id/exo_progress_placeholder"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/exo_styled_progress_layout_height"
-                android:layout_marginHorizontal="6dp"
                 app:layout_constraintBottom_toTopOf="@id/exo_basic_controls_left" />
 
             <HorizontalScrollView

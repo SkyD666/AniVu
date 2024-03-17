@@ -61,6 +61,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.DisplayCutout;
 import android.view.KeyEvent;
@@ -104,6 +105,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.common.collect.ImmutableList;
 import com.skyd.anivu.ext.IOExtKt;
+import com.skyd.anivu.ext.PopupWindowExtKt;
 import com.skyd.anivu.ext.ViewExtKt;
 
 import java.util.ArrayList;
@@ -1462,7 +1464,8 @@ public class PlayerControlView extends FrameLayout {
                     continue;
                 }
                 String trackName = trackNameProvider.getTrackName(trackFormat);
-                trackInfos.add(new TrackInformation(tracks, trackGroupIndex, trackIndex, trackName));
+                trackInfos.add(new TrackInformation(
+                        tracks, trackGroupIndex, trackIndex, trackName, trackFormat.label));
             }
         }
         return trackInfos.build();
@@ -1650,7 +1653,7 @@ public class PlayerControlView extends FrameLayout {
         int xoff = getWidth() - settingsWindow.getWidth() - settingsWindowMargin;
         int yoff = -settingsWindow.getHeight() - settingsWindowMargin;
 
-        settingsWindow.showAsDropDown(anchorView, xoff, yoff);
+        PopupWindowExtKt.showAsDropDownImmersively(settingsWindow, anchorView, xoff, yoff);
     }
 
     private void setPlaybackSpeed(float speed) {
@@ -2261,11 +2264,17 @@ public class PlayerControlView extends FrameLayout {
         public final Tracks.Group trackGroup;
         public final int trackIndex;
         public final String trackName;
+        public final String trackLabel;
 
-        public TrackInformation(Tracks tracks, int trackGroupIndex, int trackIndex, String trackName) {
+        public TrackInformation(Tracks tracks,
+                                int trackGroupIndex,
+                                int trackIndex,
+                                String trackName,
+                                String trackLabel) {
             this.trackGroup = tracks.getGroups().get(trackGroupIndex);
             this.trackIndex = trackIndex;
             this.trackName = trackName;
+            this.trackLabel = trackLabel;
         }
 
         public boolean isSelected() {
@@ -2449,7 +2458,11 @@ public class PlayerControlView extends FrameLayout {
                 TrackSelectionParameters params = player.getTrackSelectionParameters();
                 boolean explicitlySelected =
                         params.overrides.get(mediaTrackGroup) != null && track.isSelected();
-                holder.textView.setText(track.trackName);
+                if (TextUtils.isEmpty(track.trackLabel)) {
+                    holder.textView.setText(track.trackName);
+                } else {
+                    holder.textView.setText(track.trackName + " - " + track.trackLabel);
+                }
                 holder.checkView.setVisibility(explicitlySelected ? VISIBLE : INVISIBLE);
                 holder.itemView.setOnClickListener(
                         v -> {

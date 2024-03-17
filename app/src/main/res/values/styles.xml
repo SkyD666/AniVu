@@ -36,6 +36,15 @@
     <style name="AniVuStyledControls.Button.Center.Next" parent="ExoStyledControls.Button.Center.Next">
         <item name="android:padding">10dp</item>
         <item name="android:tint">#FFFFFF</item>
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_marginStart">0dp</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:layout_marginEnd">0dp</item>
+    </style>
+
+    <style name="AniVuStyledControls.Button.Bottom.CC" parent="ExoStyledControls.Button.Bottom.CC">
+        <item name="android:padding">10dp</item>
+        <item name="android:tint">#FFFFFF</item>
         <item name="android:layout_width">43dp</item>
         <item name="android:layout_marginStart">0dp</item>
         <item name="android:scaleType">centerInside</item>

@@ -22,7 +22,7 @@ import kotlin.system.exitProcess
 
 
 /**
- * 调试用的异常activity，不要继承BaseActivity
+ * CrashActivity, do not extends BaseActivity
  */
 class CrashActivity : AppCompatActivity() {
     companion object {
@@ -67,7 +67,7 @@ class CrashActivity : AppCompatActivity() {
             .setMessage(message)
             .setCancelable(false)
             .setPositiveButton(getString(R.string.submit_an_issue_on_github)) { _, _ ->
-                copyToClipboard(crashInfo)
+                copyToClipboard(message)
                 Uri.parse(GITHUB_NEW_ISSUE_URL).openBrowser(this)
                 exitApp()
             }
@@ -75,7 +75,7 @@ class CrashActivity : AppCompatActivity() {
                 exitApp()
             }
             .setNeutralButton(getString(android.R.string.copy)) { _, _ ->
-                copyToClipboard(crashInfo)
+                copyToClipboard(message)
                 getString(R.string.copied).showToast()
                 exitApp()
             }

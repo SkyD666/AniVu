@@ -7,6 +7,7 @@
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">
             shortEdges
         </item>
+        <item name="show_subtitle_button">true</item>
     </style>
 
     <style name="Theme.AniVu.NoActionBar.Splash" parent="Theme.SplashScreen">
