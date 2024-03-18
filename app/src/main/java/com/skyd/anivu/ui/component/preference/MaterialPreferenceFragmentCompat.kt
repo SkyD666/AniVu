@@ -1,10 +1,13 @@
 package com.skyd.anivu.ui.component.preference
 
+import android.os.Bundle
+import android.view.View
 import androidx.preference.EditTextPreference
 import androidx.preference.ListPreference
 import androidx.preference.ListPreferenceDialogFragmentCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import com.google.android.material.color.MaterialColors
 import com.skyd.anivu.ui.component.dialog.InputDialogBuilder
 
 abstract class MaterialPreferenceFragmentCompat : PreferenceFragmentCompat() {
@@ -38,5 +41,12 @@ abstract class MaterialPreferenceFragmentCompat : PreferenceFragmentCompat() {
                 )
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        // Fix https://github.com/material-components/material-components-android/issues/1984#issuecomment-1089710991
+        view.setBackgroundColor(MaterialColors.getColor(view, android.R.attr.colorBackground))
     }
 }
