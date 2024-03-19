@@ -45,6 +45,8 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
         const val HAS_PARENT_DIR_KEY = "hasParentDir"
     }
 
+    override val transitionProvider: () -> Unit = nullTransitionProvider
+
     private val viewModel by viewModels<MediaViewModel>()
     private val path by lazy { arguments?.getString(PATH_KEY) ?: Const.VIDEO_DIR.path }
     private val hasParentDir by lazy { arguments?.getBoolean(HAS_PARENT_DIR_KEY) ?: false }

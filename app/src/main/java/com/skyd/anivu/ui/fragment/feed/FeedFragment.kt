@@ -38,6 +38,8 @@ import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class FeedFragment : BaseFragment<FragmentFeedBinding>() {
+    override val transitionProvider: () -> Unit = nullTransitionProvider
+
     private val feedViewModel by viewModels<FeedViewModel>()
     private val intents = Channel<FeedIntent>()
 

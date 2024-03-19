@@ -579,7 +579,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     getWorkInfoByIdFlow(workRequest.id)
                         .filter { it == null || it.state.isFinished }
                         .onEach {
-                            removeWorkerFromFlow(it.id.toString())
+                            removeWorkerFromFlow(workRequest.id.toString())
                         }.collect {
                             cancel()
                         }

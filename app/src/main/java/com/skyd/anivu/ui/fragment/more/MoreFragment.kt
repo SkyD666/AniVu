@@ -20,6 +20,8 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MoreFragment : BaseFragment<FragmentMoreBinding>() {
+    override val transitionProvider: () -> Unit = nullTransitionProvider
+
     private val adapter = VarietyAdapter(mutableListOf())
 
     override fun onCreate(savedInstanceState: Bundle?) {
