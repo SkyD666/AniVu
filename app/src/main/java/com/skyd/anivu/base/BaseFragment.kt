@@ -22,8 +22,6 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     protected abstract fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
 
-    open val requestTransitionAnimation = true
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -76,12 +74,22 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        if (requestTransitionAnimation) {
-            enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
-            returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
-            exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
-            reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
-        }
+        transitionProvider()
     }
+
+    private val defaultTransitionProvider: () -> Unit = {
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
+        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
+    }
+
+    protected val nullTransitionProvider: () -> Unit = {
+        enterTransition = null
+        returnTransition = null
+        exitTransition = null
+        reenterTransition = null
+    }
+
+    protected open val transitionProvider: () -> Unit = defaultTransitionProvider
 }

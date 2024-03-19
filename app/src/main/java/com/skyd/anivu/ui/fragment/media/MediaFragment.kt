@@ -40,13 +40,12 @@ import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class MediaFragment : BaseFragment<FragmentMediaBinding>() {
-
-    override val requestTransitionAnimation = false
-
     companion object {
         const val PATH_KEY = "path"
         const val HAS_PARENT_DIR_KEY = "hasParentDir"
     }
+
+    override val transitionProvider: () -> Unit = nullTransitionProvider
 
     private val viewModel by viewModels<MediaViewModel>()
     private val path by lazy { arguments?.getString(PATH_KEY) ?: Const.VIDEO_DIR.path }

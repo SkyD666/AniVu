@@ -20,8 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MoreFragment : BaseFragment<FragmentMoreBinding>() {
-
-    override val requestTransitionAnimation = false
+    override val transitionProvider: () -> Unit = nullTransitionProvider
 
     private val adapter = VarietyAdapter(mutableListOf())
 
