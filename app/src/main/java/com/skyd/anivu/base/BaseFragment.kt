@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.transition.MaterialSharedAxis
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 
@@ -20,6 +21,8 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
     protected val binding get() = _binding!!
 
     protected abstract fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
+
+    open val requestTransitionAnimation = true
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,5 +72,16 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
                 findNavController().popBackStackWithLifecycle()
             }
             .show()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (requestTransitionAnimation) {
+            enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
+            returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
+            exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
+            reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
+        }
     }
 }

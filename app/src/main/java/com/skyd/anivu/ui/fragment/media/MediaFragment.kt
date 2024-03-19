@@ -40,6 +40,9 @@ import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class MediaFragment : BaseFragment<FragmentMediaBinding>() {
+
+    override val requestTransitionAnimation = false
+
     companion object {
         const val PATH_KEY = "path"
         const val HAS_PARENT_DIR_KEY = "hasParentDir"
