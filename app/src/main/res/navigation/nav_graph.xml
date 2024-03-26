@@ -24,11 +24,7 @@
     </fragment>
     <action
         android:id="@+id/action_to_article_fragment"
-        app:destination="@id/article_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/article_fragment" />
 
     <fragment
         android:id="@+id/read_fragment"
@@ -43,11 +39,7 @@
     </fragment>
     <action
         android:id="@+id/action_to_read_fragment"
-        app:destination="@id/read_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/read_fragment" />
 
     <fragment
         android:id="@+id/download_fragment"
@@ -56,11 +48,7 @@
         tools:layout="@layout/fragment_download" />
     <action
         android:id="@+id/action_to_download_fragment"
-        app:destination="@id/download_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/download_fragment" />
 
     <fragment
         android:id="@+id/video_fragment"
@@ -79,11 +67,7 @@
     </fragment>
     <action
         android:id="@+id/action_to_video_fragment"
-        app:destination="@id/video_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/video_fragment" />
 
     <fragment
         android:id="@+id/about_fragment"
@@ -92,11 +76,7 @@
         tools:layout="@layout/fragment_about" />
     <action
         android:id="@+id/action_to_about_fragment"
-        app:destination="@id/about_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/about_fragment" />
 
     <fragment
         android:id="@+id/license_fragment"
@@ -105,11 +85,7 @@
         tools:layout="@layout/fragment_license" />
     <action
         android:id="@+id/action_to_license_fragment"
-        app:destination="@id/license_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/license_fragment" />
 
     <fragment
         android:id="@+id/search_fragment"
@@ -118,11 +94,7 @@
         tools:layout="@layout/fragment_search" />
     <action
         android:id="@+id/action_to_search_fragment"
-        app:destination="@id/search_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/search_fragment" />
 
     <fragment
         android:id="@+id/settings_fragment"
@@ -131,11 +103,7 @@
         tools:layout="@layout/fragment_settings" />
     <action
         android:id="@+id/action_to_settings_fragment"
-        app:destination="@id/settings_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/settings_fragment" />
 
     <fragment
         android:id="@+id/data_fragment"
@@ -143,11 +111,7 @@
         android:label="@string/data_fragment_name" />
     <action
         android:id="@+id/action_to_data_fragment"
-        app:destination="@id/data_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/data_fragment" />
 
     <fragment
         android:id="@+id/rss_config_fragment"
@@ -155,11 +119,7 @@
         android:label="@string/rss_config_fragment_name" />
     <action
         android:id="@+id/action_to_rss_config_fragment"
-        app:destination="@id/rss_config_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/rss_config_fragment" />
 
     <fragment
         android:id="@+id/transmission_fragment"
@@ -167,11 +127,7 @@
         android:label="@string/transmission_fragment_name" />
     <action
         android:id="@+id/action_to_transmission_fragment"
-        app:destination="@id/transmission_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/transmission_fragment" />
 
     <fragment
         android:id="@+id/proxy_fragment"
@@ -179,11 +135,7 @@
         android:label="@string/proxy_fragment_name" />
     <action
         android:id="@+id/action_to_proxy_fragment"
-        app:destination="@id/proxy_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/proxy_fragment" />
 
     <fragment
         android:id="@+id/auto_delete_article_fragment"
@@ -191,9 +143,5 @@
         android:label="@string/auto_delete_article_fragment_name" />
     <action
         android:id="@+id/action_to_auto_delete_article_fragment"
-        app:destination="@id/auto_delete_article_fragment"
-        app:enterAnim="@animator/nav_default_enter_anim"
-        app:exitAnim="@animator/nav_default_exit_anim"
-        app:popEnterAnim="@animator/nav_default_pop_enter_anim"
-        app:popExitAnim="@animator/nav_default_pop_exit_anim" />
+        app:destination="@id/auto_delete_article_fragment" />
 </navigation>

@@ -74,22 +74,24 @@ abstract class BaseFragment<T : ViewBinding> : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        transitionProvider()
+        transitionProvider?.let { provider ->
+            enterTransition = provider.enterTransition
+            returnTransition = provider.returnTransition
+            exitTransition = provider.exitTransition
+            reenterTransition = provider.reenterTransition
+        }
     }
 
-    private val defaultTransitionProvider: () -> Unit = {
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
-    }
+    data class TransitionProvider(
+        var enterTransition: Any? = MaterialSharedAxis(MaterialSharedAxis.Z, true),
+        var returnTransition: Any? = MaterialSharedAxis(MaterialSharedAxis.Z, false),
+        var exitTransition: Any? = MaterialSharedAxis(MaterialSharedAxis.Z, true),
+        var reenterTransition: Any? = MaterialSharedAxis(MaterialSharedAxis.Z, false),
+    )
 
-    protected val nullTransitionProvider: () -> Unit = {
-        enterTransition = null
-        returnTransition = null
-        exitTransition = null
-        reenterTransition = null
-    }
+    private val defaultTransitionProvider = TransitionProvider()
 
-    protected open val transitionProvider: () -> Unit = defaultTransitionProvider
+    protected val nullTransitionProvider: TransitionProvider? = null
+
+    protected open val transitionProvider: TransitionProvider? = defaultTransitionProvider
 }

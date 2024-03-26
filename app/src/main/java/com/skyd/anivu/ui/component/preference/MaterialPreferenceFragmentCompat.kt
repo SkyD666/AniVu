@@ -8,7 +8,7 @@ import androidx.preference.ListPreferenceDialogFragmentCompat
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.google.android.material.color.MaterialColors
-import com.google.android.material.transition.MaterialSharedAxis
+import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.ui.component.dialog.InputDialogBuilder
 
 abstract class MaterialPreferenceFragmentCompat : PreferenceFragmentCompat() {
@@ -54,22 +54,18 @@ abstract class MaterialPreferenceFragmentCompat : PreferenceFragmentCompat() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        transitionProvider()
+        transitionProvider?.let { provider ->
+            enterTransition = provider.enterTransition
+            returnTransition = provider.returnTransition
+            exitTransition = provider.exitTransition
+            reenterTransition = provider.reenterTransition
+        }
     }
 
-    private val defaultTransitionProvider: () -> Unit = {
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
-        exitTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ true)
-        reenterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, /* forward= */ false)
-    }
+    private val defaultTransitionProvider = BaseFragment.TransitionProvider()
 
-    protected val nullTransitionProvider: () -> Unit = {
-        enterTransition = null
-        returnTransition = null
-        exitTransition = null
-        reenterTransition = null
-    }
+    protected val nullTransitionProvider: BaseFragment.TransitionProvider? = null
 
-    protected open val transitionProvider: () -> Unit = defaultTransitionProvider
+    protected open val transitionProvider: BaseFragment.TransitionProvider? =
+        defaultTransitionProvider
 }
