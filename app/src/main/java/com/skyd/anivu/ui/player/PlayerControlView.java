@@ -2306,6 +2306,7 @@ public class PlayerControlView extends FrameLayout {
         public void onBindViewHolderAtZeroPosition(SubSettingViewHolder holder) {
             // CC options include "Off" at the first position, which disables text rendering.
             holder.textView.setText(R.string.exo_track_selection_none);
+            holder.description.setVisibility(View.GONE);
             boolean isTrackSelectionOff = true;
             for (int i = 0; i < tracks.size(); i++) {
                 if (tracks.get(i).isSelected()) {
@@ -2352,6 +2353,7 @@ public class PlayerControlView extends FrameLayout {
         public void onBindViewHolderAtZeroPosition(SubSettingViewHolder holder) {
             // Audio track selection option includes "Auto" at the top.
             holder.textView.setText(R.string.exo_track_selection_auto);
+            holder.description.setVisibility(View.GONE);
             // hasSelectionOverride is true means there is an explicit track selection, not "Auto".
             TrackSelectionParameters parameters = checkNotNull(player).getTrackSelectionParameters();
             boolean hasSelectionOverride = hasSelectionOverride(parameters);
@@ -2458,10 +2460,12 @@ public class PlayerControlView extends FrameLayout {
                 TrackSelectionParameters params = player.getTrackSelectionParameters();
                 boolean explicitlySelected =
                         params.overrides.get(mediaTrackGroup) != null && track.isSelected();
+                holder.textView.setText(track.trackName);
                 if (TextUtils.isEmpty(track.trackLabel)) {
-                    holder.textView.setText(track.trackName);
+                    holder.description.setVisibility(View.GONE);
                 } else {
-                    holder.textView.setText(track.trackName + " - " + track.trackLabel);
+                    holder.description.setVisibility(View.VISIBLE);
+                    holder.description.setText(track.trackLabel);
                 }
                 holder.checkView.setVisibility(explicitlySelected ? VISIBLE : INVISIBLE);
                 holder.itemView.setOnClickListener(
@@ -2498,6 +2502,7 @@ public class PlayerControlView extends FrameLayout {
     private static class SubSettingViewHolder extends RecyclerView.ViewHolder {
 
         public final TextView textView;
+        public final TextView description;
         public final View checkView;
 
         public SubSettingViewHolder(View itemView) {
@@ -2507,6 +2512,7 @@ public class PlayerControlView extends FrameLayout {
                 itemView.setFocusable(true);
             }
             textView = itemView.findViewById(R.id.exo_text);
+            description = itemView.findViewById(com.skyd.anivu.R.id.exo_description);
             checkView = itemView.findViewById(R.id.exo_check);
         }
     }

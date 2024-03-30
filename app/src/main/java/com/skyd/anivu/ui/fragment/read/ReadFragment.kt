@@ -25,6 +25,7 @@ import com.skyd.anivu.ext.toHtml
 import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
+import com.skyd.anivu.util.ShareUtil
 import com.skyd.anivu.util.html.ImageGetter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
@@ -50,25 +51,26 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
             is ArticleState.Failed -> {
                 showExitDialog(message = articleState.msg)
                 enclosureBottomSheet?.updateData(emptyList())
-                binding.topAppBar.menu?.findItem(R.id.action_read_fragment_open_in_browser)
-                    ?.isEnabled = false
+                binding.topAppBar.menu?.apply {
+                    findItem(R.id.action_read_fragment_open_in_browser)?.isEnabled = false
+                    findItem(R.id.action_read_fragment_share)?.isEnabled = false
+                }
             }
 
-            ArticleState.Init -> {
-                enclosureBottomSheet?.updateData(emptyList())
-                binding.topAppBar.menu?.findItem(R.id.action_read_fragment_open_in_browser)
-                    ?.isEnabled = false
-            }
-
+            ArticleState.Init,
             ArticleState.Loading -> {
                 enclosureBottomSheet?.updateData(emptyList())
-                binding.topAppBar.menu?.findItem(R.id.action_read_fragment_open_in_browser)
-                    ?.isEnabled = false
+                binding.topAppBar.menu?.apply {
+                    findItem(R.id.action_read_fragment_open_in_browser)?.isEnabled = false
+                    findItem(R.id.action_read_fragment_share)?.isEnabled = false
+                }
             }
 
             is ArticleState.Success -> {
-                binding.topAppBar.menu?.findItem(R.id.action_read_fragment_open_in_browser)
-                    ?.isEnabled = true
+                binding.topAppBar.menu?.apply {
+                    findItem(R.id.action_read_fragment_open_in_browser)?.isEnabled = true
+                    findItem(R.id.action_read_fragment_share)?.isEnabled = true
+                }
                 val article = articleState.article
                 binding.tvReadFragmentContent.post {
                     binding.tvReadFragmentContent.text = article.article.content
@@ -129,6 +131,21 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
                         val link = articleState.article.article.link
                         if (!link.isNullOrBlank()) {
                             link.openBrowser(requireContext())
+                        }
+                    }
+                    true
+                }
+
+                R.id.action_read_fragment_share -> {
+                    val articleState = feedViewModel.viewState.value.articleState
+                    if (articleState is ArticleState.Success) {
+                        val link = articleState.article.article.link
+                        val title = articleState.article.article.title
+                        if (!link.isNullOrBlank()) {
+                            ShareUtil.shareText(
+                                context = requireContext(),
+                                text = if (title.isNullOrBlank()) link else "[$title] $link",
+                            )
                         }
                     }
                     true

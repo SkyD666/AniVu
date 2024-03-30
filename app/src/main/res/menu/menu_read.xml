@@ -6,4 +6,9 @@
         android:icon="@drawable/ic_public_24"
         android:title="@string/read_fragment_open_browser"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_read_fragment_share"
+        android:icon="@drawable/ic_share_24"
+        android:title="@string/share"
+        app:showAsAction="ifRoom" />
 </menu>

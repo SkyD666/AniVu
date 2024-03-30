@@ -24,7 +24,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.random.Random
 
 
 class Media1Proxy(
@@ -116,7 +115,7 @@ class Media1Proxy(
                         .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
                         ?.toLongOrNull() ?: return@launch
                     val bitmap = retriever.getFrameAtTime(
-                        Random.nextLong(duration) * 1000,
+                        (1000 * duration) shr 1,
                         MediaMetadataRetriever.OPTION_CLOSEST_SYNC,
                     ) ?: return@launch
                     withContext(Dispatchers.Main) {
