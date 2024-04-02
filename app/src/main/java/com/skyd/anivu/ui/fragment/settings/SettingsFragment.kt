@@ -31,6 +31,18 @@ class SettingsFragment : BasePreferenceFragmentCompat() {
         }
 
         Preference(this).apply {
+            key = "playerConfig"
+            title = getString(R.string.player_config_fragment_name)
+            summary = getString(R.string.player_config_fragment_description)
+            setIcon(R.drawable.ic_smart_display_24)
+            setOnPreferenceClickListener {
+                findMainNavController().navigate(R.id.action_to_player_config_fragment)
+                true
+            }
+            screen.addPreference(this)
+        }
+
+        Preference(this).apply {
             key = "data"
             title = getString(R.string.data_fragment_name)
             summary = getString(R.string.data_fragment_description)

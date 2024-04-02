@@ -89,8 +89,10 @@ import androidx.media3.ui.SubtitleView;
 import com.google.common.collect.ImmutableList;
 import com.skyd.anivu.ext.ActivityExtKt;
 import com.skyd.anivu.ext.ContextExtKt;
+import com.skyd.anivu.ext.DataStoreExtKt;
 import com.skyd.anivu.ext.NumberExtKt;
 import com.skyd.anivu.ext.VibratorExtKt;
+import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
@@ -543,14 +545,57 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
     private final GestureDetector gestureDetector = new GestureDetector(
             getContext(), new GestureDetector.SimpleOnGestureListener() {
 
-        @Override
-        public boolean onDoubleTap(@NonNull MotionEvent e) {
+        private boolean onDoubleTapPausePlay(@NonNull MotionEvent e) {
             if (controller != null) {
                 controller.playOrPause();
                 return true;
-            } else {
-                return false;
             }
+            return false;
+        }
+
+        private boolean onDoubleTapBackwardForward(@NonNull MotionEvent e) {
+            if (player != null) {
+                var x = e.getX();
+                if (x < getWidth() / 2f) {
+                    player.seekTo(player.getCurrentPosition() - 10000); // -10s.
+                } else {
+                    player.seekTo(player.getCurrentPosition() + 10000); // +10s.
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private boolean onDoubleTapBackwardPausePlayForward(@NonNull MotionEvent e) {
+            if (player == null) {
+                return onDoubleTapPausePlay(e);
+            }
+            if (controller == null) {
+                return onDoubleTapBackwardForward(e);
+            }
+            var x = e.getX();
+            if (x <= getWidth() * 0.25f) {
+                player.seekTo(player.getCurrentPosition() - 10000); // -10s.
+            } else if (x >= getWidth() * 0.75f) {
+                player.seekTo(player.getCurrentPosition() + 10000); // +10s.
+            } else {
+                controller.playOrPause();
+            }
+            return true;
+        }
+
+        @Override
+        public boolean onDoubleTap(@NonNull MotionEvent e) {
+            var doubleTapPreference = DataStoreExtKt.getOrDefault(
+                    DataStoreExtKt.getDataStore(getContext()),
+                    PlayerDoubleTapPreference.INSTANCE);
+
+            return switch (doubleTapPreference) {
+                case PlayerDoubleTapPreference.BACKWARD_FORWARD -> onDoubleTapBackwardForward(e);
+                case PlayerDoubleTapPreference.BACKWARD_PAUSE_PLAY_FORWARD ->
+                        onDoubleTapBackwardPausePlayForward(e);
+                default -> onDoubleTapPausePlay(e);     // PAUSE_PLAY or other
+            };
         }
 
         @Override

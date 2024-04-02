@@ -89,7 +89,7 @@
     <string name="proxy_fragment_description">配置代理服务器地址、端口、账号等</string>
     <string name="proxy_mode_auto">自动</string>
     <string name="proxy_mode_manual">手动</string>
-    <string name="proxy_mode_unknown">未知</string>
+    <string name="unknown">未知</string>
     <string name="proxy_fragment_use_proxy">使用代理</string>
     <string name="proxy_fragment_mode">代理模式</string>
     <string name="proxy_fragment_hostname">主机</string>
@@ -122,6 +122,14 @@
     <string name="auto_delete_article_fragment_use">启用</string>
     <string name="auto_delete_article_fragment_delete_frequency">执行频率</string>
     <string name="auto_delete_article_fragment_delete_before">删除范围</string>
+    <string name="player_pause">暂停/播放</string>
+    <string name="player_backward_forward">后退/快进</string>
+    <string name="player_backward_pause_forward">后退/快进 &amp; 暂停/播放</string>
+    <string name="player_config_fragment_name">播放器</string>
+    <string name="player_config_fragment_behavior_category">行为</string>
+    <string name="player_config_fragment_double_tap">双击</string>
+    <string name="player_config_fragment_description">配置播放器行为等</string>
+    <string name="player_config_fragment_double_tap_description">配置双击行为</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

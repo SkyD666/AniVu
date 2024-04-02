@@ -144,4 +144,12 @@
     <action
         android:id="@+id/action_to_auto_delete_article_fragment"
         app:destination="@id/auto_delete_article_fragment" />
+
+    <fragment
+        android:id="@+id/player_config_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.playerconfig.PlayerConfigFragment"
+        android:label="@string/player_config_fragment_name" />
+    <action
+        android:id="@+id/action_to_player_config_fragment"
+        app:destination="@id/player_config_fragment" />
 </navigation>

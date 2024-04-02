@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.preference.proxy
+package com.skyd.anivu.model.preference.player
 
 import android.content.Context
 import androidx.datastore.preferences.core.Preferences
@@ -12,15 +12,18 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object ProxyModePreference : BasePreference<String> {
-    private const val PROXY_MODE = "proxyMode"
+object PlayerDoubleTapPreference : BasePreference<String> {
+    private const val PLAYER_DOUBLE_TAP = "playerDoubleTap"
 
-    const val AUTO_MODE = "Auto"
-    const val MANUAL_MODE = "Manual"
+    const val PAUSE_PLAY = "PausePlay"
+    const val BACKWARD_FORWARD = "BackwardForward"
+    const val BACKWARD_PAUSE_PLAY_FORWARD = "BackwardPausePlayForward"
 
-    override val default = AUTO_MODE
+    val values = arrayOf(PAUSE_PLAY, BACKWARD_FORWARD, BACKWARD_PAUSE_PLAY_FORWARD)
 
-    val key = stringPreferencesKey(PROXY_MODE)
+    override val default = PAUSE_PLAY
+
+    val key = stringPreferencesKey(PLAYER_DOUBLE_TAP)
 
     fun put(context: Context, scope: CoroutineScope, value: String) {
         scope.launch(Dispatchers.IO) {
@@ -34,8 +37,9 @@ object ProxyModePreference : BasePreference<String> {
         context: Context,
         value: String = context.dataStore.getOrDefault(this),
     ): String = when (value) {
-        AUTO_MODE -> context.getString(R.string.proxy_mode_auto)
-        MANUAL_MODE -> context.getString(R.string.proxy_mode_manual)
+        PAUSE_PLAY -> context.getString(R.string.player_pause)
+        BACKWARD_FORWARD -> context.getString(R.string.player_backward_forward)
+        BACKWARD_PAUSE_PLAY_FORWARD -> context.getString(R.string.player_backward_pause_forward)
         else -> context.getString(R.string.unknown)
     }
 }

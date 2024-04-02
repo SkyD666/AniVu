@@ -94,7 +94,7 @@
     <string name="proxy_fragment_description">Configure proxy server address, port, account, etc</string>
     <string name="proxy_mode_auto">Auto</string>
     <string name="proxy_mode_manual">Manual</string>
-    <string name="proxy_mode_unknown">Unknown</string>
+    <string name="unknown">Unknown</string>
     <string name="proxy_fragment_use_proxy">Use proxy</string>
     <string name="proxy_fragment_mode">Proxy mode</string>
     <string name="proxy_fragment_hostname">Hostname</string>
@@ -128,6 +128,14 @@
     <string name="auto_delete_article_fragment_use">Enable</string>
     <string name="auto_delete_article_fragment_delete_frequency">Execution frequency</string>
     <string name="auto_delete_article_fragment_delete_before">Delete range</string>
+    <string name="player_pause">Pause/Play</string>
+    <string name="player_backward_forward">Back/Forward</string>
+    <string name="player_backward_pause_forward">Back/Forward &amp; Pause/Play</string>
+    <string name="player_config_fragment_name">Player config</string>
+    <string name="player_config_fragment_behavior_category">Behavior</string>
+    <string name="player_config_fragment_double_tap">Double tap</string>
+    <string name="player_config_fragment_description">Configure player behavior</string>
+    <string name="player_config_fragment_double_tap_description">Configure double tap behavior</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>
