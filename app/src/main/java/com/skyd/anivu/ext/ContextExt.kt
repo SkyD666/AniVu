@@ -6,10 +6,8 @@ import android.content.ContextWrapper
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.content.res.TypedArray
 import android.graphics.Point
 import android.os.Build
-import android.util.TypedValue
 import androidx.core.content.ContextCompat
 
 val Context.activity: Activity
@@ -49,14 +47,6 @@ fun Context.screenWidth(includeVirtualKey: Boolean): Int {
     if (includeVirtualKey) display.getRealSize(outPoint)
     else display.getSize(outPoint)
     return outPoint.x
-}
-
-fun Context.getAttrColor(attr: Int): Int {
-    val typedValue = TypedValue()
-    val typedArray: TypedArray = obtainStyledAttributes(typedValue.data, intArrayOf(attr))
-    val color = typedArray.getColor(0, 0)
-    typedArray.recycle()
-    return color
 }
 
 fun Context.getAppVersionName(): String {

@@ -53,7 +53,7 @@
                 android:layout_height="120dp"
                 android:importantForAccessibility="no"
                 android:src="@drawable/ic_icon_foreground_24"
-                app:tint="?attr/colorOnPrimaryContainer" />
+                app:tint="?attr/colorPrimary" />
 
             <TextView
                 android:id="@+id/tv_about_fragment_app_name"

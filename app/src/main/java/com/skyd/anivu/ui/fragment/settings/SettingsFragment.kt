@@ -19,6 +19,18 @@ class SettingsFragment : BasePreferenceFragmentCompat() {
         screen: PreferenceScreen
     ) {
         Preference(this).apply {
+            key = "appearance"
+            title = getString(R.string.appearance_fragment_name)
+            summary = getString(R.string.appearance_fragment_description)
+            setIcon(R.drawable.ic_palette_24)
+            setOnPreferenceClickListener {
+                findMainNavController().navigate(R.id.action_to_appearance_fragment)
+                true
+            }
+            screen.addPreference(this)
+        }
+
+        Preference(this).apply {
             key = "rssConfig"
             title = getString(R.string.rss_config_fragment_name)
             summary = getString(R.string.rss_config_fragment_description)

@@ -37,3 +37,5 @@ val Int.sp: Int
     ).toInt()
 
 fun Float.toPercentage(): String = "%.2f%%".format(this * 100)
+
+fun Float.toDegrees(): Float = (this * 180 / Math.PI).toFloat()

@@ -370,6 +370,10 @@ public class PlayerControlView extends FrameLayout {
     @Nullable
     private final LinearProgressIndicator volumeProgressView;
     @Nullable
+    private final ForwardRippleView backwardRipple;
+    @Nullable
+    private final ForwardRippleView forwardRipple;
+    @Nullable
     private final View playbackSpeedButton;
     @Nullable
     private final View audioTrackButton;
@@ -587,6 +591,9 @@ public class PlayerControlView extends FrameLayout {
             volumeControlsView.setVisibility(View.GONE);
         }
         volumeProgressView = findViewById(com.skyd.anivu.R.id.exo_volume_progress);
+
+        backwardRipple = findViewById(com.skyd.anivu.R.id.exo_backward_ripple);
+        forwardRipple = findViewById(com.skyd.anivu.R.id.exo_forward_ripple);
 
         audioTrackButton = findViewById(R.id.exo_audio_track);
         if (audioTrackButton != null) {
@@ -1161,6 +1168,18 @@ public class PlayerControlView extends FrameLayout {
             } else {
                 postDelayed(setBrightnessControlsGoneRunnable, 300);
             }
+        }
+    }
+
+    public void showBackwardRipple() {
+        if (backwardRipple != null) {
+            backwardRipple.visible();
+        }
+    }
+
+    public void showForwardRipple() {
+        if (forwardRipple != null) {
+            forwardRipple.visible();
         }
     }
 

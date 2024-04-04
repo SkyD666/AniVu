@@ -6,6 +6,26 @@
     android:layout_height="match_parent"
     tools:ignore="PrivateResource">
 
+    <!-- below of the exo_auto_hidden_control_view -->
+    <com.skyd.anivu.ui.player.ForwardRippleView
+        android:id="@+id/exo_backward_ripple"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        app:center="startCenter"
+        app:drawable="@drawable/ic_fast_rewind_24"
+        app:layout_constraintStart_toStartOf="parent"
+        app:text="-10s" />
+
+    <!-- below of the exo_auto_hidden_control_view -->
+    <com.skyd.anivu.ui.player.ForwardRippleView
+        android:id="@+id/exo_forward_ripple"
+        android:layout_width="250dp"
+        android:layout_height="match_parent"
+        app:center="endCenter"
+        app:drawable="@drawable/ic_fast_forward_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:text="+10s" />
+
     <!-- exo_auto_hidden_control_view在显示一段时间后会自动隐藏 -->
     <!-- 不要放置例如长按倍速、拖动进度提示等控件 -->
     <androidx.constraintlayout.widget.ConstraintLayout

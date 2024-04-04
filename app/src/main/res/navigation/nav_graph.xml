@@ -152,4 +152,12 @@
     <action
         android:id="@+id/action_to_player_config_fragment"
         app:destination="@id/player_config_fragment" />
+
+    <fragment
+        android:id="@+id/appearance_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.appearance.AppearanceFragment"
+        android:label="@string/appearance_fragment_name" />
+    <action
+        android:id="@+id/action_to_appearance_fragment"
+        app:destination="@id/appearance_fragment" />
 </navigation>

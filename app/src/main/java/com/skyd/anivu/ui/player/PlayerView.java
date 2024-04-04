@@ -557,8 +557,14 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
             if (player != null) {
                 var x = e.getX();
                 if (x < getWidth() / 2f) {
+                    if (controller != null) {
+                        controller.showBackwardRipple();
+                    }
                     player.seekTo(player.getCurrentPosition() - 10000); // -10s.
                 } else {
+                    if (controller != null) {
+                        controller.showForwardRipple();
+                    }
                     player.seekTo(player.getCurrentPosition() + 10000); // +10s.
                 }
                 return true;
@@ -575,8 +581,10 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
             }
             var x = e.getX();
             if (x <= getWidth() * 0.25f) {
+                controller.showBackwardRipple();
                 player.seekTo(player.getCurrentPosition() - 10000); // -10s.
             } else if (x >= getWidth() * 0.75f) {
+                controller.showForwardRipple();
                 player.seekTo(player.getCurrentPosition() + 10000); // +10s.
             } else {
                 controller.playOrPause();

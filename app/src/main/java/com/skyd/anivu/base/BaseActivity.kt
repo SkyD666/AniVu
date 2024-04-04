@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
+import com.skyd.anivu.model.preference.appearance.ThemePreference
 
 abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     protected lateinit var binding: T
@@ -14,9 +15,10 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        binding = getViewBinding()
-
+        initTheme()
         beforeSetContentView()
+
+        binding = getViewBinding()
         setContentView(binding.root)
 
         binding.initView()
@@ -25,4 +27,8 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     protected open fun T.initView() {}
 
     protected open fun beforeSetContentView() {}
+
+    private fun initTheme() {
+        setTheme(ThemePreference.toResId(this))
+    }
 }
