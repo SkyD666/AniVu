@@ -14,4 +14,10 @@
             <enum name="endCenter" value="1" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="ColorPaletteView">
+        <attr name="icon" format="reference" />
+        <attr name="android:padding" format="dimension" />
+        <attr name="cardCornerRadius" format="dimension" />
+    </declare-styleable>
 </resources>

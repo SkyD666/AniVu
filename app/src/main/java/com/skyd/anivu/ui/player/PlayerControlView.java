@@ -362,6 +362,8 @@ public class PlayerControlView extends FrameLayout {
     @Nullable
     private final View resetZoomView;
     @Nullable
+    private final View forward85sView;
+    @Nullable
     private final ViewGroup brightnessControlsView;
     @Nullable
     private final LinearProgressIndicator brightnessProgressView;
@@ -564,6 +566,15 @@ public class PlayerControlView extends FrameLayout {
             resetZoomView.setOnClickListener(onResetZoomButtonClickListener);
         }
         isZoom = false;
+
+        forward85sView = findViewById(com.skyd.anivu.R.id.exo_forward_85s);
+        if (forward85sView != null) {
+            forward85sView.setOnClickListener((v) -> {
+                if (player != null) {
+                    player.seekTo(player.getCurrentPosition() + 85000);
+                }
+            });
+        }
 
         longPressPlaybackSpeedView = findViewById(com.skyd.anivu.R.id.exo_long_press_playback_speed);
         if (longPressPlaybackSpeedView != null) {
@@ -1106,6 +1117,12 @@ public class PlayerControlView extends FrameLayout {
             resetZoomView.setVisibility(View.VISIBLE);
         } else {
             resetZoomView.setVisibility(View.GONE);
+        }
+    }
+
+    public void setForward85sButton(boolean visible) {
+        if (forward85sView != null) {
+            forward85sView.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }
 

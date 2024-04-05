@@ -146,6 +146,10 @@
     <string name="theme_blue">Blue</string>
     <string name="theme_yellow">Yellow</string>
     <string name="theme_purple">Purple</string>
+    <string name="player_forward_85s" translatable="false">+85s</string>
+    <string name="player_config_fragment_appearance_category">Appearance</string>
+    <string name="player_config_fragment_show_85s_button">+85s button</string>
+    <string name="player_config_fragment_show_85s_button_description">Show +85s button above the progress bar</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

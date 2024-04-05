@@ -140,6 +140,9 @@
     <string name="theme_blue">蓝色幻想</string>
     <string name="theme_yellow">雪黄色</string>
     <string name="theme_purple">基佬紫</string>
+    <string name="player_config_fragment_appearance_category">外观</string>
+    <string name="player_config_fragment_show_85s_button">+85s 按钮</string>
+    <string name="player_config_fragment_show_85s_button_description">在播放进度条上方显示 +85s 按钮</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

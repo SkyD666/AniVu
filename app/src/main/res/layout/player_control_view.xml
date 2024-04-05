@@ -189,6 +189,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
+        <TextView
+            android:id="@+id/exo_forward_85s"
+            style="@style/AniVuStyledControls.Button.FloatButton.Forward85s"
+            app:layout_constraintBottom_toTopOf="@id/exo_bottom_bar"
+            app:layout_constraintEnd_toEndOf="parent" />
+
         <LinearLayout
             android:id="@id/exo_minimal_controls"
             android:layout_width="wrap_content"

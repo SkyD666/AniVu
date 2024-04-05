@@ -7,9 +7,13 @@ import androidx.preference.DropDownPreference
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceScreen
+import androidx.preference.SwitchPreferenceCompat
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BasePreferenceFragmentCompat
+import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
+import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -44,6 +48,29 @@ class PlayerConfigFragment : BasePreferenceFragmentCompat() {
                 true
             }
             playerBehaviorCategory.addPreference(this)
+        }
+
+        val playerAppearanceCategory = PreferenceCategory(this).apply {
+            key = "playerAppearanceCategory"
+            title = getString(R.string.player_config_fragment_appearance_category)
+            screen.addPreference(this)
+        }
+
+        SwitchPreferenceCompat(this).apply {
+            key = "playerShow85sButton"
+            title = getString(R.string.player_config_fragment_show_85s_button)
+            summary = getString(R.string.player_config_fragment_show_85s_button_description)
+            setIcon(R.drawable.ic_fast_forward_24)
+            isChecked = requireContext().dataStore.getOrDefault(PlayerShow85sButtonPreference)
+            setOnPreferenceChangeListener { _, newValue ->
+                PlayerShow85sButtonPreference.put(
+                    context = requireContext(),
+                    scope = lifecycleScope,
+                    value = newValue as Boolean,
+                )
+                true
+            }
+            playerAppearanceCategory.addPreference(this)
         }
     }
 }

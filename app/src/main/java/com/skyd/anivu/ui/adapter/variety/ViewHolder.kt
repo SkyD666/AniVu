@@ -4,6 +4,7 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.skyd.anivu.databinding.ItemArticle1Binding
+import com.skyd.anivu.databinding.ItemColorPalette1Binding
 import com.skyd.anivu.databinding.ItemDownload1Binding
 import com.skyd.anivu.databinding.ItemEnclosure1Binding
 import com.skyd.anivu.databinding.ItemFeed1Binding
@@ -41,6 +42,9 @@ class ParentDir1ViewHolder(binding: ItemParentDir1Binding) :
 
 class More1ViewHolder(binding: ItemMore1Binding) :
     BaseViewHolder<ItemMore1Binding>(binding)
+
+class ColorPalette1ViewHolder(binding: ItemColorPalette1Binding) :
+    BaseViewHolder<ItemColorPalette1Binding>(binding)
 
 class OtherWorks1ViewHolder(binding: ItemOtherWorks1Binding) :
     BaseViewHolder<ItemOtherWorks1Binding>(binding)

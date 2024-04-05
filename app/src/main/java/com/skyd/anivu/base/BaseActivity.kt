@@ -1,5 +1,6 @@
 package com.skyd.anivu.base
 
+import android.content.res.Resources
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -27,7 +28,9 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
     protected open fun T.initView() {}
 
     protected open fun beforeSetContentView() {}
-
+    override fun getTheme(): Resources.Theme {
+        return super.getTheme()
+    }
     private fun initTheme() {
         setTheme(ThemePreference.toResId(this))
     }

@@ -99,6 +99,11 @@
         <item name="android:text">@string/player_reset_zoom</item>
     </style>
 
+    <style name="AniVuStyledControls.Button.FloatButton.Forward85s" parent="AniVuStyledControls.Button.FloatButton">
+        <item name="android:text">@string/player_forward_85s</item>
+        <item name="android:layout_marginEnd">30dp</item>
+    </style>
+
     <style name="AniVuStyledControls.Button.FloatButton.BrightnessVolume" parent="AniVuStyledControls.Button.FloatButton">
         <item name="android:gravity">center_vertical</item>
     </style>

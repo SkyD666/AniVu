@@ -12,6 +12,9 @@ import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
 import com.skyd.anivu.base.BaseActivity
 import com.skyd.anivu.databinding.ActivityPlayBinding
+import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.getOrDefault
+import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 
 class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     companion object {
@@ -53,6 +56,8 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     }
 
     override fun ActivityPlayBinding.initView() {
+        playerView.setForward85sButton(dataStore.getOrDefault(PlayerShow85sButtonPreference))
+
         videoUri = IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
             ?: intent.data
 

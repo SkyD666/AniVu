@@ -1425,6 +1425,11 @@ public class PlayerView extends FrameLayout implements AdViewProvider {
         controller.setRepeatToggleModes(repeatToggleModes);
     }
 
+    public void setForward85sButton(boolean visible) {
+        Assertions.checkStateNotNull(controller);
+        controller.setForward85sButton(visible);
+    }
+
     /**
      * Sets whether the shuffle button is shown.
      *
