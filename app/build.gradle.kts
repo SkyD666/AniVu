@@ -70,7 +70,7 @@ android {
             .forEach { output ->
                 val abi = output.getFilter(FilterConfiguration.FilterType.ABI.name) ?: "universal"
                 output.outputFileName =
-                    "AniVu_${versionName}_${buildType.name}_${abi}_${flavorName}.apk"
+                    "AniVu_${versionName}_${abi}_${buildType.name}_${flavorName}.apk"
             }
     }
 

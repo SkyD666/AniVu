@@ -65,7 +65,9 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: Pre-Release Apk (x86)
-        path: app/build/outputs/apk/GitHub/release/*x86*.apk
+        path: |
+          app/build/outputs/apk/GitHub/release/*x86*.apk
+          !app/build/outputs/apk/GitHub/release/*x86_64*.apk
     # Upload apk (universal)
     - name: Upload Pre-Release Apk (universal)
       uses: actions/upload-artifact@v3
@@ -78,7 +80,7 @@ jobs:
       with:
         name: Pre-Release Mapping
         path: app/build/outputs/mapping/GitHubRelease/mapping.txt
-    # 获取 apk 路径
+    # Get apk path
     - name: Get Pre-Release Apk File Path
       run: |
         echo "PRE_RELEASE_APK_ARM64_V8=$(find app/build/outputs/apk/GitHub/release -name '*arm64-v8a*.apk' -type f | head -1)" >> $GITHUB_ENV
@@ -86,7 +88,7 @@ jobs:
         echo "PRE_RELEASE_APK_X86_64=$(find app/build/outputs/apk/GitHub/release -name '*x86_64*.apk' -type f | head -1)" >> $GITHUB_ENV
         echo "PRE_RELEASE_APK_X86=$(find app/build/outputs/apk/GitHub/release -name '*x86*.apk' -type f | head -1)" >> $GITHUB_ENV
         echo "PRE_RELEASE_APK_UNIVERSAL=$(find app/build/outputs/apk/GitHub/release -name '*universal*.apk' -type f | head -1)" >> $GITHUB_ENV
-    # 发送至 Telegram 频道
+    # Send to Telegram
     - name: Post to Telegram Channel
       if: github.ref == 'refs/heads/master' && contains(github.event.head_commit.message, '[skip_post]') == false
       env:
