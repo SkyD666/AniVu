@@ -1,3 +1,4 @@
+import com.android.build.api.variant.FilterConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -20,7 +21,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 10
-        versionName = "1.1-beta02"
+        versionName = "1.1-beta03"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -49,11 +50,27 @@ android {
         }
     }
 
+    splits {
+        abi {
+            // Enables building multiple APKs per ABI.
+            isEnable = true
+            // By default all ABIs are included, so use reset() and include().
+            // Resets the list of ABIs for Gradle to create APKs for to none.
+            reset()
+            // A list of ABIs for Gradle to create APKs for.
+            include("arm64-v8a", "armeabi-v7a", "x86", "x86_64")
+            // We want to also generate a universal APK that includes all ABIs.
+            isUniversalApk = true
+        }
+    }
+
     applicationVariants.all {
         outputs
             .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
-            .forEach {
-                it.outputFileName = "AniVu_${versionName}_${buildType.name}_${flavorName}.apk"
+            .forEach { output ->
+                val abi = output.getFilter(FilterConfiguration.FilterType.ABI.name) ?: "universal"
+                output.outputFileName =
+                    "AniVu_${versionName}_${buildType.name}_${abi}_${flavorName}.apk"
             }
     }
 
@@ -66,9 +83,6 @@ android {
                 "proguard-rules.pro"
             )
             applicationIdSuffix = ".debug"
-            ndk {
-                abiFilters += mutableSetOf("armeabi-v7a", "x86", "x86_64", "arm64-v8a")
-            }
         }
         release {
             signingConfig = signingConfigs.getByName("release")    // signing
@@ -78,10 +92,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            ndk {
-                //noinspection ChromeOsAbiSupport
-                abiFilters += "arm64-v8a"
-            }
         }
     }
     compileOptions {
@@ -155,8 +165,13 @@ dependencies {
     implementation("io.coil-kt:coil:2.6.0")
     implementation("com.rometools:rome:2.1.0")
     implementation("net.dankito.readability4j:readability4j:1.0.8")
-    implementation("org.libtorrent4j:libtorrent4j-android-arm64:2.1.0-31")
 
+    implementation("org.libtorrent4j:libtorrent4j-android-arm64:2.1.0-31")
+    implementation("org.libtorrent4j:libtorrent4j-android-arm:2.1.0-31")
+    implementation("org.libtorrent4j:libtorrent4j-android-x86:2.1.0-31")
+    implementation("org.libtorrent4j:libtorrent4j-android-x86_64:2.1.0-31")
+
+//    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")

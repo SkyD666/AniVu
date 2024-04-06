@@ -1,9 +1,9 @@
 package com.skyd.anivu.model.preference.appearance
 
 import android.content.Context
-import android.os.Build
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.google.android.material.color.DynamicColors
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BasePreference
 import com.skyd.anivu.ext.dataStore
@@ -24,13 +24,15 @@ object ThemePreference : BasePreference<String> {
     const val YELLOW = "Yellow"
     const val PURPLE = "Purple"
 
+    val basicValues = arrayOf(PINK, GREEN, BLUE, YELLOW, PURPLE)
+
     val values: Array<String>
         get() {
-            val v = arrayOf(PINK, GREEN, BLUE, YELLOW, PURPLE)
-            return if (supportDynamicTheme()) arrayOf(DYNAMIC, *v) else v
+            return if (DynamicColors.isDynamicColorAvailable()) arrayOf(DYNAMIC, *basicValues)
+            else basicValues
         }
 
-    override val default = if (supportDynamicTheme()) DYNAMIC else PINK
+    override val default = if (DynamicColors.isDynamicColorAvailable()) DYNAMIC else PINK
 
     val key = stringPreferencesKey(THEME)
 
@@ -49,8 +51,6 @@ object ThemePreference : BasePreference<String> {
     }
 
     override fun fromPreferences(preferences: Preferences): String = preferences[key] ?: default
-
-    private fun supportDynamicTheme(): Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
     fun toDisplayName(
         context: Context,

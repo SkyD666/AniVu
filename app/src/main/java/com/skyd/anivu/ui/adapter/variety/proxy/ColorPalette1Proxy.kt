@@ -20,7 +20,7 @@ class ColorPalette1Proxy(
             ItemColorPalette1Binding
                 .inflate(LayoutInflater.from(parent.context), parent, false),
         )
-        holder.itemView.setOnClickListener {
+        holder.binding.root.setOnClickListener {
             onClick(holder.bindingAdapterPosition)
         }
         return holder

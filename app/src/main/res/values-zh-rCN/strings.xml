@@ -143,6 +143,11 @@
     <string name="player_config_fragment_appearance_category">外观</string>
     <string name="player_config_fragment_show_85s_button">+85s 按钮</string>
     <string name="player_config_fragment_show_85s_button_description">在播放进度条上方显示 +85s 按钮</string>
+    <string name="dark_mode_light">浅色</string>
+    <string name="dark_mode_dark">深色</string>
+    <string name="dark_mode_follow_system">跟随系统</string>
+    <string name="appearance_fragment_use_dynamic_theme">动态主题</string>
+    <string name="appearance_fragment_use_dynamic_theme_description">将壁纸颜色应用于主题</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

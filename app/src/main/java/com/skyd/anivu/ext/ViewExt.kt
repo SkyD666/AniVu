@@ -2,7 +2,6 @@ package com.skyd.anivu.ext
 
 import android.annotation.TargetApi
 import android.app.Activity
-import android.content.Context
 import android.graphics.Rect
 import android.view.DisplayCutout
 import android.view.View
@@ -30,7 +29,6 @@ import com.google.android.material.badge.BadgeDrawable
 import com.google.android.material.badge.BadgeUtils
 import com.google.android.material.badge.ExperimentalBadgeUtils
 import com.skyd.anivu.R
-import com.skyd.anivu.appContext
 
 
 fun View.enable() {
@@ -73,21 +71,6 @@ val View.activity: Activity
 
 val View.tryActivity: Activity?
     get() = context.tryActivity
-
-fun View.showKeyboard() {
-    isFocusable = true
-    isFocusableInTouchMode = true
-    requestFocus()
-    val inputManager =
-        appContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputManager.showSoftInput(this, 0)
-}
-
-fun View.hideKeyboard() {
-    val inputManager =
-        appContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputManager.hideSoftInputFromWindow(this.windowToken, 0)
-}
 
 /**
  * 判断View和给定的Rect是否重叠（边和点不计入）
@@ -235,6 +218,12 @@ fun View.showSoftKeyboard() {
 fun View.showSoftKeyboard(window: Window) {
     if (requestFocus()) {
         WindowCompat.getInsetsController(window, this).show(WindowInsetsCompat.Type.ime())
+    }
+}
+
+fun View.hideSoftKeyboard(window: Window) {
+    if (requestFocus()) {
+        WindowCompat.getInsetsController(window, this).hide(WindowInsetsCompat.Type.ime())
     }
 }
 

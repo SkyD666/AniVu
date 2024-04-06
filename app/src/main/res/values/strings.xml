@@ -150,6 +150,11 @@
     <string name="player_config_fragment_appearance_category">Appearance</string>
     <string name="player_config_fragment_show_85s_button">+85s button</string>
     <string name="player_config_fragment_show_85s_button_description">Show +85s button above the progress bar</string>
+    <string name="dark_mode_light">Light</string>
+    <string name="dark_mode_dark">Dark</string>
+    <string name="dark_mode_follow_system">System</string>
+    <string name="appearance_fragment_use_dynamic_theme">Dynamic theme</string>
+    <string name="appearance_fragment_use_dynamic_theme_description">Apply wallpaper colors to the app</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

@@ -16,6 +16,7 @@ import com.skyd.anivu.databinding.FragmentSearchBinding
 import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.gone
+import com.skyd.anivu.ext.hideSoftKeyboard
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.showSoftKeyboard
 import com.skyd.anivu.ext.startWith
@@ -37,8 +38,14 @@ import java.io.Serializable
 class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     @kotlinx.serialization.Serializable
     sealed interface SearchDomain : Serializable {
-        data object All : SearchDomain
-        data object Feed : SearchDomain
+        data object All : SearchDomain {
+            private fun readResolve(): Any = All
+        }
+
+        data object Feed : SearchDomain {
+            private fun readResolve(): Any = Feed
+        }
+
         data class Article(val feedUrl: String?) : SearchDomain
     }
 
@@ -129,6 +136,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
                 )
             }
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        binding.tilSearchFragment.editText?.hideSoftKeyboard(window = requireActivity().window)
     }
 
     override fun FragmentSearchBinding.setWindowInsets() {

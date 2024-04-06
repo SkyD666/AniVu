@@ -57,7 +57,8 @@ class CrashActivity : AppCompatActivity() {
             append("VersionName: ").append(getAppVersionName()).append("\n")
             append("Brand: ").append(Build.BRAND).append("\n")
             append("Model: ").append(Build.MODEL).append("\n")
-            append("SDK Version: ").append(Build.VERSION.SDK_INT).append("\n\n")
+            append("SDK Version: ").append(Build.VERSION.SDK_INT).append("\n")
+            append("ABI: ").append(Build.SUPPORTED_ABIS.firstOrNull().orEmpty()).append("\n\n")
             append("Crash Info: \n")
             append(crashInfo)
         }
