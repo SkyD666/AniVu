@@ -18,6 +18,7 @@ import com.skyd.anivu.ext.getAppVersionName
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.model.bean.OtherWorksBean
+import com.skyd.anivu.ui.adapter.decoration.AniVuItemDecoration
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.OtherWorks1Proxy
@@ -96,6 +97,7 @@ class AboutFragment : BaseFragment<FragmentAboutBinding>() {
         ).apply {
             spanSizeLookup = AniSpanSize(adapter)
         }
+        rvAboutFragment.addItemDecoration(AniVuItemDecoration(hItemSpace = 20.dp))
         rvAboutFragment.adapter = adapter
     }
 

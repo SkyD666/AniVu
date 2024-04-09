@@ -23,6 +23,7 @@ import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.popBackStackWithLifecycle
+import com.skyd.anivu.ext.screenIsLand
 import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.ParentDirBean
@@ -176,10 +177,11 @@ class MediaFragment : BaseFragment<FragmentMediaBinding>() {
     }
 
     override fun FragmentMediaBinding.setWindowInsets() {
-        ablMediaFragment.addInsetsByPadding(top = true, left = true, right = true)
-        fabMediaFragment.addInsetsByMargin(left = true, right = true, bottom = hasParentDir)
+        val leftPadding = hasParentDir || !requireContext().screenIsLand
+        ablMediaFragment.addInsetsByPadding(top = true, left = leftPadding, right = true)
+        fabMediaFragment.addInsetsByMargin(left = leftPadding, right = true, bottom = hasParentDir)
         rvMediaFragment.addInsetsByPadding(
-            left = true,
+            left = leftPadding,
             right = true,
             hook = ::addFabBottomPaddingHook,
         )

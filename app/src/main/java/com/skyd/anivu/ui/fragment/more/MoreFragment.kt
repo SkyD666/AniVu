@@ -10,6 +10,7 @@ import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentMoreBinding
 import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.findMainNavController
+import com.skyd.anivu.ext.screenIsLand
 import com.skyd.anivu.model.bean.MoreBean
 import com.skyd.anivu.ui.adapter.decoration.AniVuItemDecoration
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
@@ -43,8 +44,9 @@ class MoreFragment : BaseFragment<FragmentMoreBinding>() {
     }
 
     override fun FragmentMoreBinding.setWindowInsets() {
-        ablMoreFragment.addInsetsByPadding(top = true, left = true, right = true)
-        rvMoreFragment.addInsetsByPadding(left = true, right = true)
+        val isLand = requireContext().screenIsLand
+        ablMoreFragment.addInsetsByPadding(top = true, left = !isLand, right = true)
+        rvMoreFragment.addInsetsByPadding(left = !isLand, right = true)
     }
 
     private fun getMoreBeanList(): MutableList<MoreBean> {

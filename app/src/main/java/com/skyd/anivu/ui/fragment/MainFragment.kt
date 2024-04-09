@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.navigation.NavigationBarView
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentMainBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,6 +22,6 @@ class MainFragment : BaseFragment<FragmentMainBinding>() {
         val navHostFragment = binding.navHostFragment.getFragment<NavHostFragment>()
         val navController = navHostFragment.navController
 
-        binding.bottomNavigation.setupWithNavController(navController)
+        (binding.bottomNavigation as NavigationBarView).setupWithNavController(navController)
     }
 }

@@ -22,6 +22,7 @@ import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.gone
+import com.skyd.anivu.ext.screenIsLand
 import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
@@ -199,10 +200,11 @@ class FeedFragment : BaseFragment<FragmentFeedBinding>() {
     }
 
     override fun FragmentFeedBinding.setWindowInsets() {
-        ablFeedFragment.addInsetsByPadding(top = true, left = true, right = true)
-        fabFeedFragment.addInsetsByMargin(left = true, right = true)
+        val isLand = requireContext().screenIsLand
+        ablFeedFragment.addInsetsByPadding(top = true, left = !isLand, right = true)
+        fabFeedFragment.addInsetsByMargin(left = !isLand, right = true)
         rvFeedFragment.addInsetsByPadding(
-            left = true,
+            left = !isLand,
             right = true,
             hook = ::addFabBottomPaddingHook,
         )

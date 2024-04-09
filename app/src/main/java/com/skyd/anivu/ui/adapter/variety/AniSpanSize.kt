@@ -5,6 +5,7 @@ import com.skyd.anivu.appContext
 import com.skyd.anivu.ext.screenIsLand
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.MoreBean
+import com.skyd.anivu.model.bean.OtherWorksBean
 
 class AniSpanSize(
     private val adapter: VarietyAdapter,
@@ -18,6 +19,7 @@ class AniSpanSize(
                 when (data) {
                     is FeedBean -> MAX_SPAN_SIZE
                     is MoreBean -> MAX_SPAN_SIZE / 3
+                    is OtherWorksBean -> MAX_SPAN_SIZE / 2
                     else -> MAX_SPAN_SIZE
                 }
             } else {
