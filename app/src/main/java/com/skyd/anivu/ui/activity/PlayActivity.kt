@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.activity
 
 import android.content.Intent
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
@@ -15,6 +16,7 @@ import com.skyd.anivu.databinding.ActivityPlayBinding
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
+
 
 class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     companion object {
@@ -57,7 +59,11 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
 
     override fun ActivityPlayBinding.initView() {
         playerView.setForward85sButton(dataStore.getOrDefault(PlayerShow85sButtonPreference))
-
+//        playerView.setOnScreenshotListener {
+//            val retriever = MediaMetadataRetriever()
+//            retriever.setDataSource(player.curren)
+//            val bitmap = retriever.getFrameAtTime(simpleExoPlayer.getCurrentPosition())
+//        }
         videoUri = IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
             ?: intent.data
 

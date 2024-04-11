@@ -254,8 +254,4 @@ class PlayerGestureDetector(
         fun onLongPressUp(): Boolean = false
         fun onLongPress() {}
     }
-
-    companion object {
-        private const val INVALID_POINTER_ID = -1
-    }
 }

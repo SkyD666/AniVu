@@ -21,7 +21,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 10
-        versionName = "1.1-beta04"
+        versionName = "1.1-beta05"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -32,8 +32,6 @@ android {
 
     signingConfigs {
         create("release") {
-            // You need to specify either an absolute path or include the
-            // keystore file in the same directory as the build.gradle file.
             @Suppress("UNCHECKED_CAST")
             val sign = ((extra["secret"] as Map<*, *>)["sign"] as Map<String, String>)
             storeFile = file("../key.jks")

@@ -108,6 +108,18 @@
         <item name="android:gravity">center_vertical</item>
     </style>
 
+    <style name="AniVuStyledControls.ScreenShot" parent="ExoStyledControls.Button">
+        <item name="android:padding">10dp</item>
+        <item name="android:tint">#FFFFFF</item>
+        <item name="android:layout_height">50dp</item>
+        <item name="android:layout_width">50dp</item>
+        <item name="android:background">@drawable/shape_fill_circle_corner_6</item>
+        <item name="android:layout_marginStart">0dp</item>
+        <item name="android:src">@drawable/ic_photo_camera_24</item>
+        <item name="android:scaleType">centerInside</item>
+        <item name="android:layout_marginEnd">30dp</item>
+    </style>
+
     <style name="ExoStyledControls.TitleText">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>

@@ -364,6 +364,8 @@ public class PlayerControlView extends FrameLayout {
     @Nullable
     private final View forward85sView;
     @Nullable
+    private final View screenshotView;
+    @Nullable
     private final ViewGroup brightnessControlsView;
     @Nullable
     private final LinearProgressIndicator brightnessProgressView;
@@ -574,6 +576,11 @@ public class PlayerControlView extends FrameLayout {
                     player.seekTo(player.getCurrentPosition() + 85000);
                 }
             });
+        }
+
+        screenshotView = findViewById(com.skyd.anivu.R.id.exo_screenshot);
+        if (screenshotView != null) {
+            if (!screenshotView.hasOnClickListeners()) screenshotView.setVisibility(View.GONE);
         }
 
         longPressPlaybackSpeedView = findViewById(com.skyd.anivu.R.id.exo_long_press_playback_speed);
@@ -1123,6 +1130,13 @@ public class PlayerControlView extends FrameLayout {
     public void setForward85sButton(boolean visible) {
         if (forward85sView != null) {
             forward85sView.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    public void setOnScreenshotListener(@Nullable View.OnClickListener listener) {
+        if (screenshotView != null) {
+            screenshotView.setVisibility(listener == null ? View.GONE : View.VISIBLE);
+            screenshotView.setOnClickListener(listener);
         }
     }
 
@@ -1901,7 +1915,7 @@ public class PlayerControlView extends FrameLayout {
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         super.onLayout(changed, left, top, right, bottom);
-        controlViewLayoutManager.onLayout(changed, left, top, right, bottom);
+        controlViewLayoutManager.onLayout(left, top, right, bottom);
     }
 
     private void onLayoutChange(

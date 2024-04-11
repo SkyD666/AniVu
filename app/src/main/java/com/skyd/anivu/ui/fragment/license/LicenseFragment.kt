@@ -9,8 +9,10 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentLicenseBinding
 import com.skyd.anivu.ext.addInsetsByPadding
+import com.skyd.anivu.ext.dp
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.model.bean.LicenseBean
+import com.skyd.anivu.ui.adapter.decoration.AniVuItemDecoration
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.License1Proxy
@@ -38,6 +40,7 @@ class LicenseFragment : BaseFragment<FragmentLicenseBinding>() {
         ).apply {
             spanSizeLookup = AniSpanSize(adapter)
         }
+        rvLicenseFragment.addItemDecoration(AniVuItemDecoration())
         rvLicenseFragment.adapter = adapter
     }
 

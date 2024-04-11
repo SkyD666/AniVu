@@ -141,7 +141,7 @@ class AniVuItemDecoration(
     }
 
     companion object {
-        val H_ITEM_SPACE: Int = 12.dp
+        val H_ITEM_SPACE: Int = 16.dp
         val HORIZONTAL_PADDING: Int = 16.dp
         val VERTICAL_PADDING: Int = 16.dp
 

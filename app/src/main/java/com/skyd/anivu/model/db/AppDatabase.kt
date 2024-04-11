@@ -64,6 +64,7 @@ abstract class AppDatabase : RoomDatabase() {
                         )
                             .addMigrations(*migrations)
                             .build()
+                            .apply { instance = this }
                     } else {
                         instance as AppDatabase
                     }

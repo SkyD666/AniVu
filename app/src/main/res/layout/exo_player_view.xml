@@ -19,7 +19,7 @@
     android:background="@android:color/black"
     tools:ignore="PrivateResource">
 
-    <!-- 不应该相应触摸 -->
+    <!-- Should not respond to touch -->
     <androidx.media3.ui.AspectRatioFrameLayout
         android:id="@id/exo_content_frame"
         android:layout_width="match_parent"
@@ -28,14 +28,14 @@
 
         <!-- Video surface will be inserted as the first child of the content frame. -->
 
-        <!-- 不应该相应触摸 -->
+        <!-- Should not respond to touch -->
         <View
             android:id="@id/exo_shutter"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@android:color/black" />
 
-        <!-- 不应该响应触摸 -->
+        <!-- Should not respond to touch -->
         <ImageView
             android:id="@id/exo_artwork"
             android:layout_width="match_parent"
@@ -43,7 +43,7 @@
             android:importantForAccessibility="no"
             android:scaleType="fitXY" />
 
-        <!-- 不应该相应触摸 -->
+        <!-- Should not respond to touch -->
         <androidx.media3.ui.SubtitleView
             android:id="@id/exo_subtitles"
             android:layout_width="match_parent"
