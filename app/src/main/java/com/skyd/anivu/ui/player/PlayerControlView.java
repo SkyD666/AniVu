@@ -1801,7 +1801,11 @@ public class PlayerControlView extends FrameLayout {
             if (activity != null) {
                 View decorView = activity.getWindow().getDecorView();
                 decorView.post(() -> {
-                    DisplayCutout displayCutout = decorView.getRootWindowInsets().getDisplayCutout();
+                    var windowInsets = decorView.getRootWindowInsets();
+                    if (windowInsets == null) {
+                        return;
+                    }
+                    DisplayCutout displayCutout = windowInsets.getDisplayCutout();
                     if (displayCutout == null) {
                         return;
                     }
@@ -2287,20 +2291,15 @@ public class PlayerControlView extends FrameLayout {
             if (position < playbackSpeedTexts.length) {
                 holder.textView.setText(playbackSpeedTexts[position]);
             }
-            if (position == selectedIndex) {
-                holder.itemView.setSelected(true);
-                holder.checkView.setVisibility(VISIBLE);
-            } else {
-                holder.itemView.setSelected(false);
-                holder.checkView.setVisibility(INVISIBLE);
-            }
-            holder.itemView.setOnClickListener(
-                    v -> {
-                        if (position != selectedIndex) {
-                            setPlaybackSpeed(playbackSpeeds[position]);
-                        }
-                        settingsWindow.dismiss();
-                    });
+            holder.description.setVisibility(GONE);
+            holder.itemView.setSelected(position == selectedIndex);
+            holder.checkView.setVisibility(position == selectedIndex ? VISIBLE : INVISIBLE);
+            holder.itemView.setOnClickListener(v -> {
+                if (position != selectedIndex) {
+                    setPlaybackSpeed(playbackSpeeds[position]);
+                }
+                settingsWindow.dismiss();
+            });
         }
 
         @Override
