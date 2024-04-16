@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.fragment.article
 
 import androidx.paging.PagingData
-import com.skyd.anivu.model.bean.ArticleBean
+import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 
 
 internal sealed interface ArticlePartialStateChange {
@@ -34,7 +34,9 @@ internal sealed interface ArticlePartialStateChange {
             }
         }
 
-        data class Success(val articlePagingData: PagingData<ArticleBean>) : ArticleList
+        data class Success(val articlePagingData: PagingData<ArticleWithEnclosureBean>) :
+            ArticleList
+
         data class Failed(val msg: String) : ArticleList
         data object Loading : ArticleList
     }

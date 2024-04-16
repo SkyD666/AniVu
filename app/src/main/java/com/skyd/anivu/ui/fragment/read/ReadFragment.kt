@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.fragment.read
 
+import android.content.Context
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
@@ -22,6 +23,7 @@ import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.toHtml
+import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
@@ -38,6 +40,23 @@ import kotlinx.coroutines.flow.onEach
 class ReadFragment : BaseFragment<FragmentReadBinding>() {
     companion object {
         const val ARTICLE_ID_KEY = "articleId"
+
+        fun getEnclosuresList(
+            context: Context,
+            articleWithEnclosureBean: ArticleWithEnclosureBean,
+        ): List<Any> {
+            val dataList: MutableList<Any> = articleWithEnclosureBean.enclosures.toMutableList()
+            if (context.dataStore.getOrDefault(ParseLinkTagAsEnclosurePreference)) {
+                articleWithEnclosureBean.article.link?.let { link ->
+                    doIfMagnetOrTorrentLink(
+                        link = link,
+                        onMagnet = { dataList += LinkEnclosureBean(link = link) },
+                        onTorrent = { dataList += LinkEnclosureBean(link = link) },
+                    )
+                }
+            }
+            return dataList
+        }
     }
 
     private val feedViewModel by viewModels<ReadViewModel>()
@@ -88,17 +107,7 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
                         )
                 }
 
-                val dataList: MutableList<Any> = article.enclosures.toMutableList()
-                if (requireContext().dataStore.getOrDefault(ParseLinkTagAsEnclosurePreference)) {
-                    article.article.link?.let { link ->
-                        doIfMagnetOrTorrentLink(
-                            link = link,
-                            onMagnet = { dataList += LinkEnclosureBean(link = link) },
-                            onTorrent = { dataList += LinkEnclosureBean(link = link) },
-                        )
-                    }
-                }
-                enclosureBottomSheet?.updateData(dataList)
+                enclosureBottomSheet?.updateData(getEnclosuresList(requireContext(), article))
             }
         }
     }
@@ -164,17 +173,9 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
             )
             val articleState = feedViewModel.viewState.value.articleState
             if (articleState is ArticleState.Success) {
-                val dataList: MutableList<Any> = articleState.article.enclosures.toMutableList()
-                if (requireContext().dataStore.getOrDefault(ParseLinkTagAsEnclosurePreference)) {
-                    articleState.article.article.link?.let { link ->
-                        doIfMagnetOrTorrentLink(
-                            link = link,
-                            onMagnet = { dataList += LinkEnclosureBean(link = link) },
-                            onTorrent = { dataList += LinkEnclosureBean(link = link) },
-                        )
-                    }
-                }
-                enclosureBottomSheet?.updateData(dataList)
+                enclosureBottomSheet?.updateData(
+                    getEnclosuresList(requireContext(), articleState.article)
+                )
             }
         }
     }

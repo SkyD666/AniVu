@@ -5,6 +5,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.model.bean.ArticleBean
+import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +20,7 @@ class ArticleRepository @Inject constructor(
     private val rssHelper: RssHelper,
     private val pagingConfig: PagingConfig,
 ) : BaseRepository() {
-    fun requestArticleList(feedUrl: String): Flow<PagingData<ArticleBean>> {
+    fun requestArticleList(feedUrl: String): Flow<PagingData<ArticleWithEnclosureBean>> {
         return Pager(pagingConfig) {
             articleDao.getArticlePagingSource(feedUrl)
         }.flow.flowOn(Dispatchers.IO)

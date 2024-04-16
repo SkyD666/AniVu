@@ -101,15 +101,15 @@ interface ArticleDao {
         ORDER BY ${ArticleBean.DATE_COLUMN} DESC
         """
     )
-    fun getArticlePagingSource(feedUrl: String): PagingSource<Int, ArticleBean>
+    fun getArticlePagingSource(feedUrl: String): PagingSource<Int, ArticleWithEnclosureBean>
 
     @Transaction
     @RawQuery(observedEntities = [ArticleBean::class])
-    fun getArticlePagingSource(sql: SupportSQLiteQuery): PagingSource<Int, ArticleBean>
+    fun getArticlePagingSource(sql: SupportSQLiteQuery): PagingSource<Int, ArticleWithEnclosureBean>
 
     @Transaction
     @RawQuery(observedEntities = [ArticleBean::class])
-    fun getArticleList(sql: SupportSQLiteQuery): List<ArticleBean>
+    fun getArticleList(sql: SupportSQLiteQuery): List<ArticleWithEnclosureBean>
 
     @Transaction
     @Query(

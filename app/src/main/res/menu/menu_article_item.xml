@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_article_item_enclosures"
+        android:icon="@drawable/ic_home_storage_24"
+        android:title="@string/bottom_sheet_enclosure_title" />
+</menu>
