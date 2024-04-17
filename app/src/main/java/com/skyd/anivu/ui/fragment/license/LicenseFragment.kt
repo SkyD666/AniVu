@@ -2,56 +2,114 @@ package com.skyd.anivu.ui.fragment.license
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.ViewCompat
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import com.skyd.anivu.base.BaseFragment
-import com.skyd.anivu.databinding.FragmentLicenseBinding
-import com.skyd.anivu.ext.addInsetsByPadding
-import com.skyd.anivu.ext.dp
-import com.skyd.anivu.ext.popBackStackWithLifecycle
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.skyd.anivu.R
+import com.skyd.anivu.base.BaseComposeFragment
+import com.skyd.anivu.ext.openBrowser
+import com.skyd.anivu.ext.plus
 import com.skyd.anivu.model.bean.LicenseBean
-import com.skyd.anivu.ui.adapter.decoration.AniVuItemDecoration
-import com.skyd.anivu.ui.adapter.variety.AniSpanSize
-import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
-import com.skyd.anivu.ui.adapter.variety.proxy.License1Proxy
+import com.skyd.anivu.ui.component.AniVuTopBar
+import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class LicenseFragment : BaseFragment<FragmentLicenseBinding>() {
-    private val adapter = VarietyAdapter(mutableListOf()).apply {
-        addProxy(License1Proxy(adapter = this))
-    }
+class LicenseFragment : BaseComposeFragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = setContentBase { LicenseScreen() }
+}
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        adapter.dataList = licenseList
-    }
-
-    override fun FragmentLicenseBinding.initView() {
-        topAppBar.setNavigationOnClickListener { findNavController().popBackStackWithLifecycle() }
-
-        rvLicenseFragment.layoutManager = GridLayoutManager(
-            requireContext(),
-            AniSpanSize.MAX_SPAN_SIZE
-        ).apply {
-            spanSizeLookup = AniSpanSize(adapter)
+@Composable
+fun LicenseScreen() {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    Scaffold(
+        topBar = {
+            AniVuTopBar(
+                style = AniVuTopBarStyle.Large,
+                title = { Text(text = stringResource(R.string.license_screen_name)) },
+                scrollBehavior = scrollBehavior,
+            )
         }
-        rvLicenseFragment.addItemDecoration(AniVuItemDecoration())
-        rvLicenseFragment.adapter = adapter
+    ) {
+        val dataList = remember { getLicenseList() }
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentPadding = PaddingValues(vertical = 7.dp) + it,
+        ) {
+            items(items = dataList) { item ->
+                LicenseItem(item)
+            }
+        }
     }
+}
 
-    override fun FragmentLicenseBinding.setWindowInsets() {
-        ablLicenseFragment.addInsetsByPadding(top = true, left = true, right = true)
-        // Fix: https://github.com/material-components/material-components-android/issues/1310
-        ViewCompat.setOnApplyWindowInsetsListener(ctlLicenseFragment, null)
-        rvLicenseFragment.addInsetsByPadding(bottom = true, left = true, right = true)
+@Composable
+private fun LicenseItem(data: LicenseBean) {
+    val context = LocalContext.current
+    Card(
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp),
+        shape = RoundedCornerShape(20)
+    ) {
+        Column(
+            modifier = Modifier
+                .clickable { data.link.openBrowser(context) }
+                .padding(15.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    modifier = Modifier.weight(1f),
+                    text = data.name,
+                    style = MaterialTheme.typography.titleLarge
+                )
+                Text(
+                    modifier = Modifier.padding(start = 5.dp),
+                    text = data.license,
+                    style = MaterialTheme.typography.labelMedium
+                )
+            }
+            Text(
+                modifier = Modifier.padding(top = 6.dp),
+                text = data.link,
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
+}
 
-    private val licenseList = mutableListOf(
+private fun getLicenseList(): List<LicenseBean> {
+    return listOf(
         LicenseBean(
             name = "Android Open Source Project",
             license = "Apache-2.0",
@@ -118,7 +176,4 @@ class LicenseFragment : BaseFragment<FragmentLicenseBinding>() {
             link = "https://github.com/aldenml/libtorrent4j",
         ),
     ).sortedBy { it.name }
-
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =
-        FragmentLicenseBinding.inflate(inflater, container, false)
 }

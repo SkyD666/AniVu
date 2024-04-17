@@ -57,7 +57,7 @@
     <string name="about_fragment_other_works_raca_description">一个在本地记录、查找抽象段落/评论区小作文的工具。🤗 您还在为记不住小作文内容，面临前面、中间、后面都忘了的尴尬处境吗？使用这款工具将帮助您记录您所遇到的小作文，再也不因为忘记而烦恼！😋</string>
     <string name="about_fragment_other_works_night_screen_description">当您在夜间🌙使用手机时，Night Screen 可以帮助您减少屏幕亮度，减少对眼睛的伤害。</string>
     <string name="no_browser_found">找不到浏览器！网址：%s</string>
-    <string name="license_fragment_name">开源许可证</string>
+    <string name="license_screen_name">开源许可证</string>
     <string name="search_fragment_name">搜索</string>
     <string name="clear_input_text">清除</string>
     <string name="article_fragment_search_article">搜索文章</string>

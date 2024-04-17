@@ -3,6 +3,9 @@ package com.skyd.anivu.model.preference.appearance
 import android.content.Context
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.skyd.anivu.R
@@ -65,5 +68,13 @@ object DarkModePreference : BasePreference<Int> {
             AppCompatDelegate.setDefaultNightMode(value)
         }
         return value
+    }
+
+    @Composable
+    @ReadOnlyComposable
+    fun inDark(value: Int) = when (value) {
+        AppCompatDelegate.MODE_NIGHT_YES -> true
+        AppCompatDelegate.MODE_NIGHT_NO -> false
+        else -> isSystemInDarkTheme()
     }
 }

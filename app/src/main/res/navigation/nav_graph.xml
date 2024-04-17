@@ -81,8 +81,7 @@
     <fragment
         android:id="@+id/license_fragment"
         android:name="com.skyd.anivu.ui.fragment.license.LicenseFragment"
-        android:label="@string/license_fragment_name"
-        tools:layout="@layout/fragment_license" />
+        android:label="@string/license_screen_name" />
     <action
         android:id="@+id/action_to_license_fragment"
         app:destination="@id/license_fragment" />

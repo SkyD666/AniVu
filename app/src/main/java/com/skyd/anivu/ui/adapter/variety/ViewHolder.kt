@@ -8,7 +8,6 @@ import com.skyd.anivu.databinding.ItemColorPalette1Binding
 import com.skyd.anivu.databinding.ItemDownload1Binding
 import com.skyd.anivu.databinding.ItemEnclosure1Binding
 import com.skyd.anivu.databinding.ItemFeed1Binding
-import com.skyd.anivu.databinding.ItemLicense1Binding
 import com.skyd.anivu.databinding.ItemLinkEnclosure1Binding
 import com.skyd.anivu.databinding.ItemMedia1Binding
 import com.skyd.anivu.databinding.ItemMore1Binding
@@ -48,6 +47,3 @@ class ColorPalette1ViewHolder(binding: ItemColorPalette1Binding) :
 
 class OtherWorks1ViewHolder(binding: ItemOtherWorks1Binding) :
     BaseViewHolder<ItemOtherWorks1Binding>(binding)
-
-class License1ViewHolder(binding: ItemLicense1Binding) :
-    BaseViewHolder<ItemLicense1Binding>(binding)

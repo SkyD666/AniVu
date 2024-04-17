@@ -5,6 +5,6 @@
     <item
         android:id="@+id/action_about_fragment_license"
         android:icon="@drawable/ic_balance_24"
-        android:title="@string/license_fragment_name"
+        android:title="@string/license_screen_name"
         app:showAsAction="ifRoom" />
 </menu>
