@@ -145,6 +145,12 @@ private fun getLicenseList(): List<LicenseBean> {
             license = "Apache-2.0",
             link = "https://github.com/Kotlin/kotlinx.serialization",
         ),
+
+        LicenseBean(
+            name = "MaterialKolor",
+            license = "MIT",
+            link = "https://github.com/jordond/MaterialKolor"
+        ),
         LicenseBean(
             name = "Retrofit",
             license = "Apache-2.0",

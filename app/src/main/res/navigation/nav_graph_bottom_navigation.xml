@@ -18,8 +18,7 @@
     <fragment
         android:id="@+id/item_bottom_navigation_more"
         android:name="com.skyd.anivu.ui.fragment.more.MoreFragment"
-        android:label="@string/more_fragment_name"
-        tools:layout="@layout/fragment_more" />
+        android:label="@string/more_screen_name" />
 
     <action
         android:id="@+id/action_feed_fragment"

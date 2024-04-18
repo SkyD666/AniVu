@@ -103,5 +103,8 @@ public static final ** CREATOR;
 -keep class com.skyd.anivu.ui.adapter.variety.VarietyAdapter$Proxy { *; }
 -keep class com.skyd.anivu.ui.adapter.variety.AsyncListDiffer { *; }
 
+-keep class * extends com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter$Proxy
+-keep class com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter$Proxy { *; }
+
 # Retrofit
 -keep, allowobfuscation, allowshrinking interface retrofit2.Call

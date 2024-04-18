@@ -20,8 +20,8 @@ android {
         applicationId = "com.skyd.anivu"
         minSdk = 24
         targetSdk = 34
-        versionCode = 11
-        versionName = "1.1-beta08"
+        versionCode = 12
+        versionName = "1.1-beta09"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -144,9 +144,11 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation("androidx.compose.ui:ui:1.6.5")
     implementation("androidx.compose.material3:material3:1.2.1")
     implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
+    implementation("androidx.compose.material:material-icons-extended:1.6.5")
     implementation("com.materialkolor:material-kolor:1.4.4")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
@@ -167,6 +169,7 @@ dependencies {
 
     implementation("com.google.dagger:hilt-android:2.51")
     ksp("com.google.dagger:hilt-android-compiler:2.51")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:okhttp-coroutines-jvm:5.0.0-alpha.12")
@@ -176,6 +179,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     implementation("io.coil-kt:coil:2.6.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.rometools:rome:2.1.0")
     implementation("net.dankito.readability4j:readability4j:1.0.8")
 

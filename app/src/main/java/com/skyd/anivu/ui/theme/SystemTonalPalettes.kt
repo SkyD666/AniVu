@@ -23,7 +23,7 @@ private fun getColorFromTheme(context: Context, @ColorRes id: Int): Color {
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
-private fun primarySystem(context: Context, tone: Int = 50): Color = when (tone) {
+fun primarySystem(context: Context, tone: Int = 50): Color = when (tone) {
     0 -> getColorFromTheme(context, android.R.color.system_accent1_1000)
     10 -> getColorFromTheme(context, android.R.color.system_accent1_900)
     20 -> getColorFromTheme(context, android.R.color.system_accent1_800)

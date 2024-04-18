@@ -11,6 +11,7 @@ import com.skyd.anivu.ext.toSettings
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.ui.local.LocalDarkMode
+import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import com.skyd.anivu.ui.local.LocalTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -19,6 +20,8 @@ data class Settings(
     // Theme
     val theme: String = ThemePreference.default,
     val darkMode: Int = DarkModePreference.default,
+    // Update
+    val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
 )
 
 @Composable
@@ -33,6 +36,8 @@ fun SettingsProvider(
         // Theme
         LocalTheme provides settings.theme,
         LocalDarkMode provides settings.darkMode,
+        // Update
+        LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
     ) {
         content()
     }

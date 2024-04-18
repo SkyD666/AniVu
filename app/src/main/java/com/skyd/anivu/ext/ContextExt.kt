@@ -9,6 +9,7 @@ import android.content.res.Configuration
 import android.graphics.Point
 import android.os.Build
 import androidx.core.content.ContextCompat
+import androidx.core.content.pm.PackageInfoCompat
 
 val Context.activity: Activity
     get() {
@@ -62,6 +63,19 @@ fun Context.getAppVersionName(): String {
         e.printStackTrace()
     }
     return appVersionName
+}
+
+fun Context.getAppVersionCode(): Long {
+    var appVersionCode: Long = 0
+    try {
+        val packageInfo = applicationContext
+            .packageManager
+            .getPackageInfo(packageName, 0)
+        appVersionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
+    } catch (e: PackageManager.NameNotFoundException) {
+        e.printStackTrace()
+    }
+    return appVersionCode
 }
 
 fun Context.getAppName(): String? {

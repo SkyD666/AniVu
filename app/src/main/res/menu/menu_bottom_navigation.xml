@@ -14,5 +14,5 @@
         android:id="@+id/item_bottom_navigation_more"
         android:enabled="true"
         android:icon="@drawable/selector_bottom_navigation_more"
-        android:title="@string/more_fragment_name" />
+        android:title="@string/more_screen_name" />
 </menu>

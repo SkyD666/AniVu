@@ -1,15 +1,15 @@
 package com.skyd.anivu.model.bean
 
-import android.graphics.drawable.Drawable
-import androidx.annotation.ColorInt
-import androidx.annotation.IdRes
+import androidx.annotation.DrawableRes
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import com.skyd.anivu.base.BaseBean
 
 data class MoreBean(
-    val icon: Drawable,
-    @ColorInt val iconTint: Int,
     val title: String,
-    @IdRes val navigateId: Int,
-    val background: Drawable,
-    @ColorInt val backgroundTint: Int,
+    @DrawableRes val icon: Int,
+    val iconTint: Color,
+    val shape: Shape,
+    val shapeColor: Color,
+    val action: () -> Unit,
 ) : BaseBean

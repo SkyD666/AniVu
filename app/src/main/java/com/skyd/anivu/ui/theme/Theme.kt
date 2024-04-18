@@ -83,20 +83,21 @@ private fun setSystemBarsColor(view: View, darkMode: Boolean) {
 
 @Composable
 fun extractAllColors(darkTheme: Boolean): Map<String, ColorScheme> {
-    return extractColors(darkTheme) + extractColorsFromWallpaper(darkTheme)
+    return extractColors(darkTheme) + extractDynamicColor(darkTheme)
 }
 
 @Composable
 fun extractColors(darkTheme: Boolean): Map<String, ColorScheme> {
     return ThemePreference.values.associateWith {
         rememberDynamicColorScheme(
-            ThemePreference.toSeedColor(LocalContext.current, it), isDark = darkTheme
+            seedColor = ThemePreference.toSeedColor(LocalContext.current, it),
+            isDark = darkTheme,
         )
     }.toMutableMap()
 }
 
 @Composable
-fun extractColorsFromWallpaper(darkTheme: Boolean): Map<String, ColorScheme> {
+fun extractDynamicColor(darkTheme: Boolean): Map<String, ColorScheme> {
     val context = LocalContext.current
     val preset = mutableMapOf<String, ColorScheme>()
 
@@ -104,26 +105,12 @@ fun extractColorsFromWallpaper(darkTheme: Boolean): Map<String, ColorScheme> {
         val colors = WallpaperManager.getInstance(context)
             .getWallpaperColors(WallpaperManager.FLAG_SYSTEM)
         val primary = colors?.primaryColor?.toArgb()
-        val secondary = colors?.secondaryColor?.toArgb()
-        val tertiary = colors?.tertiaryColor?.toArgb()
         if (primary != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                preset["WallpaperPrimary"] = rememberSystemDynamicColorScheme(isDark = darkTheme)
+            preset[ThemePreference.DYNAMIC] = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                rememberSystemDynamicColorScheme(isDark = darkTheme)
             } else {
-                preset["WallpaperPrimary"] = rememberDynamicColorScheme(
-                    seedColor = Color(primary), isDark = darkTheme,
-                )
+                rememberDynamicColorScheme(seedColor = Color(primary), isDark = darkTheme)
             }
-        }
-        if (secondary != null) {
-            preset["WallpaperSecondary"] = rememberDynamicColorScheme(
-                seedColor = Color(secondary), isDark = darkTheme,
-            )
-        }
-        if (tertiary != null) {
-            preset["WallpaperTertiary"] = rememberDynamicColorScheme(
-                seedColor = Color(tertiary), isDark = darkTheme,
-            )
         }
     }
     return preset

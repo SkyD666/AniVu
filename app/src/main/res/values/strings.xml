@@ -3,7 +3,7 @@
     <string name="main_fragment_name">Main Fragment</string>
     <string name="feed_fragment_name">Feed</string>
     <string name="media_fragment_name">Media</string>
-    <string name="more_fragment_name">More</string>
+    <string name="more_screen_name">More</string>
     <string name="add">Add</string>
     <string name="feed_fragment_add_rss_hint">RSS URL</string>
     <string name="paste">Paste</string>
@@ -48,19 +48,19 @@
     <string name="video">Video</string>
     <string name="player_reset_zoom">Reset</string>
     <string name="player_long_press_playback_speed">Fast forwarding…</string>
-    <string name="about_fragment_name">About</string>
+    <string name="about_screen_name">About</string>
     <string name="app_short_description">An all-in-one tool for RSS anime subscription and updates, bit torrent downloads, and video playback.</string>
-    <string name="app_tech_stack_description">AniVu utilizes the MVI architecture and fully adopts the Material You design style. All pages are developed using Android View.</string>
-    <string name="about_fragment_visit_github">GitHub repository</string>
-    <string name="about_fragment_join_telegram">Telegram group</string>
-    <string name="about_fragment_join_discord">Discord server</string>
-    <string name="about_fragment_other_works">Other works</string>
-    <string name="about_fragment_other_works_rays_name" translatable="false">Rays (Record All Your Stickers)</string>
-    <string name="about_fragment_other_works_rays_description">A tool to record, search and manage stickers on your phone. Are you still struggling with too many stickers on your phone and having trouble finding the ones you want? This tool will help you manage your stickers! \uD83D\uDE0B</string>
-    <string name="about_fragment_other_works_raca_name" translatable="false">Raca (Record All Classic Articles)</string>
-    <string name="about_fragment_other_works_raca_description">A tool to record and search abstract passages and mini-essays in the comments section locally. 🤗 Are you still having trouble remembering the content of your mini-essay and facing the embarrassing situation of forgetting the front, middle and back? Using this tool will help you record the mini-essays you come across and never worry about forgetting them again! 😋</string>
-    <string name="about_fragment_other_works_night_screen_name" translatable="false">Night Screen</string>
-    <string name="about_fragment_other_works_night_screen_description">When you use your phone at night 🌙, Night Screen can help you reduce the brightness of the screen and reduce the damage to your eyes.</string>
+    <string name="app_tech_stack_description">AniVu utilizes the MVI architecture and fully adopts the Material You design style. All pages are developed using Android View and Compose.</string>
+    <string name="about_screen_visit_github">GitHub repository</string>
+    <string name="about_screen_join_telegram">Telegram group</string>
+    <string name="about_screen_join_discord">Discord server</string>
+    <string name="about_screen_other_works">Other works</string>
+    <string name="about_screen_other_works_rays_name" translatable="false">Rays (Record All Your Stickers)</string>
+    <string name="about_screen_other_works_rays_description">A tool to record, search and manage stickers on your phone. Are you still struggling with too many stickers on your phone and having trouble finding the ones you want? This tool will help you manage your stickers! \uD83D\uDE0B</string>
+    <string name="about_screen_other_works_raca_name" translatable="false">Raca (Record All Classic Articles)</string>
+    <string name="about_screen_other_works_raca_description">A tool to record and search abstract passages and mini-essays in the comments section locally. 🤗 Are you still having trouble remembering the content of your mini-essay and facing the embarrassing situation of forgetting the front, middle and back? Using this tool will help you record the mini-essays you come across and never worry about forgetting them again! 😋</string>
+    <string name="about_screen_other_works_night_screen_name" translatable="false">Night Screen</string>
+    <string name="about_screen_other_works_night_screen_description">When you use your phone at night 🌙, Night Screen can help you reduce the brightness of the screen and reduce the damage to your eyes.</string>
     <string name="no_browser_found">Can\'t find the browser! Link: %s</string>
     <string name="license_screen_name">License</string>
     <string name="search_fragment_name">Search</string>
@@ -155,6 +155,18 @@
     <string name="dark_mode_follow_system">System</string>
     <string name="appearance_fragment_use_dynamic_theme">Dynamic theme</string>
     <string name="appearance_fragment_use_dynamic_theme_description">Apply wallpaper colors to the app</string>
+    <string name="help_translate">Translate</string>
+    <string name="sponsor">Sponsor</string>
+    <string name="sponsor_description">If you like the app, you can buy me a cup of coffee, thanks!</string>
+    <string name="sponsor_afadian">Afadian</string>
+    <string name="sponsor_buy_me_a_coffee" translatable="false">Buy me a coffee</string>
+    <string name="update_check">Check updates</string>
+    <string name="update_no_update">Already the latest version!</string>
+    <string name="update_newer">New version</string>
+    <string name="update_newer_text">New version: %1$s\nPublished on: %2$s\nDownloads: %3$s\n</string>
+    <string name="download_update">Download</string>
+    <string name="update_ignore">Ignore this update</string>
+    <string name="update_check_failed">Check for update failed: %s</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

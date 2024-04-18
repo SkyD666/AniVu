@@ -72,8 +72,7 @@
     <fragment
         android:id="@+id/about_fragment"
         android:name="com.skyd.anivu.ui.fragment.about.AboutFragment"
-        android:label="@string/about_fragment_name"
-        tools:layout="@layout/fragment_about" />
+        android:label="@string/about_screen_name" />
     <action
         android:id="@+id/action_to_about_fragment"
         app:destination="@id/about_fragment" />
