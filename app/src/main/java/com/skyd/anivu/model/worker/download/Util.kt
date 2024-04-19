@@ -109,8 +109,11 @@ internal fun initProxySettings(context: Context, settings: SettingsPack): Settin
         settings_pack.int_types.proxy_port.swigValue(),
         proxyPort
     ).run {
-        if (proxyUsername.isBlank() || proxyPassword.isBlank()) this
-        else {
+        if (proxyUsername.isBlank() || proxyPassword.isBlank()) {
+            clear(settings_pack.string_types.proxy_username.swigValue())
+            clear(settings_pack.string_types.proxy_password.swigValue())
+            this
+        } else {
             setString(
                 settings_pack.string_types.proxy_username.swigValue(),
                 proxyUsername

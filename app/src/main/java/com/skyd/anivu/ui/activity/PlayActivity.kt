@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.activity
 
+import android.annotation.SuppressLint
 import android.content.Intent
-import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
@@ -11,13 +11,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import com.skyd.anivu.base.BaseActivity
 import com.skyd.anivu.databinding.ActivityPlayBinding
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
+import com.skyd.anivu.ui.player.TorrentDataSource
 
 
+@SuppressLint("UnsafeOptInUsageError")
 class PlayActivity : BaseActivity<ActivityPlayBinding>() {
     companion object {
         const val VIDEO_URI_KEY = "videoUri"
@@ -79,8 +82,14 @@ class PlayActivity : BaseActivity<ActivityPlayBinding>() {
         if (videoUri == null) {
             return false
         }
-        // Set the media item to be played.
-        player.setMediaItem(MediaItem.fromUri(videoUri!!))
+        if (videoUri.toString().startsWith("magnet:")) {
+            player.setMediaSource(DefaultMediaSourceFactory { TorrentDataSource() }
+                .createMediaSource(MediaItem.fromUri(videoUri!!)))
+        } else {
+            // Set the media item to be played.
+            player.setMediaItem(MediaItem.fromUri(videoUri!!))
+        }
+//        player.setMediaItem(MediaItem.fromUri(Uri.parse("magnet:?xt=urn:btih:344a65fde5ab561370ad5f144319a9f4951ac125&dn=%5BLPSub%5D%20Kaii%20to%20Otome%20to%20Kamikakushi%20%5B01%5D%5BAVC%20AAC%5D%5B1080p%5D%5BJPTC%5D.mp4&tr=udp%3A%2F%2F104.143.10.186%3A8000%2Fannounce&tr=http%3A%2F%2F104.143.10.186%3A8000%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker3.itzmx.com%3A6961%2Fannounce&tr=udp%3A%2F%2Ftracker4.itzmx.com%3A2710%2Fannounce&tr=http%3A%2F%2Ftracker.publicbt.com%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.prq.to%2Fannounce&tr=http%3A%2F%2Fopen.acgtracker.com%3A1096%2Fannounce&tr=https%3A%2F%2Ft-115.rhcloud.com%2Fonly_for_ylbud&tr=udp%3A%2F%2Ftracker1.itzmx.com%3A8080%2Fannounce&tr=udp%3A%2F%2Ftracker2.itzmx.com%3A6961%2Fannounce&tr=http%3A%2F%2Ftracker1.itzmx.com%3A8080%2Fannounce&tr=http%3A%2F%2Ftracker2.itzmx.com%3A6961%2Fannounce&tr=http%3A%2F%2Ftracker3.itzmx.com%3A6961%2Fannounce&tr=http%3A%2F%2Ftracker4.itzmx.com%3A2710%2Fannounce")))
         // Prepare the player.
         player.prepare()
         player.play()
