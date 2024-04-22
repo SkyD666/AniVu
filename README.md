@@ -30,12 +30,13 @@
         <b>AniVu</b>, an <b>all-in-one tool</b> for <b>RSS anime subscription and updates</b>, <b>bit torrent downloads</b>, and <b>video playback</b>.
     </p>
     <p>
-        AniVu utilizes the <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> architecture and fully adopts the <b><a href="https://m3.material.io/">Material You</a></b> design style. All pages are developed using <b>Android View</b>.
+        AniVu utilizes the <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> architecture and fully adopts the <b><a href="https://m3.material.io/">Material You</a></b> design style. All pages are developed using <b>Android View</b> and <b>Jetpack Compose</b>.
     </p>
     <p>
         <b><a href="doc/readme/README-zh-rCN.md">中文</a></b>
     </p>
 </div>
+
 
 
 
@@ -72,6 +73,7 @@
 ## 🛠 Primary technology stack
 
 - **MVI** Architecture
+- Jetpack **Compose**
 - Kotlin ﻿**Coroutines and Flow**
 - **Material You**
 - **ViewModel**

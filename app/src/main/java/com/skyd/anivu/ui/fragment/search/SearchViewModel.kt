@@ -54,29 +54,33 @@ class SearchViewModel @Inject constructor(
         return merge(
             filterIsInstance<SearchIntent.Init>().flatMapConcat {
                 flowOf(Unit).map {
-                    SearchPartialStateChange.SearchResult.Success(result = PagingData.empty())
+                    SearchPartialStateChange.SearchResult.Success(result = flowOf(PagingData.empty()))
                 }.startWith(SearchPartialStateChange.SearchResult.Loading)
                     .catchMap { SearchPartialStateChange.SearchResult.Failed(it.message.toString()) }
             },
             filterIsInstance<SearchIntent.SearchAll>().flatMapConcat { intent ->
-                searchRepo.requestSearchAll(intent.query).cachedIn(viewModelScope).map {
+                flowOf(searchRepo.requestSearchAll(intent.query).cachedIn(viewModelScope)).map {
                     SearchPartialStateChange.SearchResult.Success(result = it)
                 }.startWith(SearchPartialStateChange.SearchResult.Loading)
                     .catchMap { SearchPartialStateChange.SearchResult.Failed(it.message.toString()) }
                     .take(2)
             },
             filterIsInstance<SearchIntent.SearchFeed>().flatMapConcat { intent ->
-                searchRepo.requestSearchFeed(intent.query).cachedIn(viewModelScope).map {
-                    SearchPartialStateChange.SearchResult.Success(result = it)
+                flowOf(searchRepo.requestSearchFeed(intent.query).cachedIn(viewModelScope)).map {
+                    @Suppress("UNCHECKED_CAST")
+                    SearchPartialStateChange.SearchResult.Success(result = it as Flow<PagingData<Any>>)
                 }.startWith(SearchPartialStateChange.SearchResult.Loading)
                     .catchMap { SearchPartialStateChange.SearchResult.Failed(it.message.toString()) }
                     .take(2)
             },
             filterIsInstance<SearchIntent.SearchArticle>().flatMapConcat { intent ->
-                searchRepo.requestSearchArticle(intent.feedUrl, intent.query)
-                    .cachedIn(viewModelScope).map {
-                        SearchPartialStateChange.SearchResult.Success(result = it)
-                    }.startWith(SearchPartialStateChange.SearchResult.Loading)
+                flowOf(
+                    searchRepo.requestSearchArticle(intent.feedUrl, intent.query)
+                        .cachedIn(viewModelScope)
+                ).map {
+                    @Suppress("UNCHECKED_CAST")
+                    SearchPartialStateChange.SearchResult.Success(result = it as Flow<PagingData<Any>>)
+                }.startWith(SearchPartialStateChange.SearchResult.Loading)
                     .catchMap { SearchPartialStateChange.SearchResult.Failed(it.message.toString()) }
                     .take(2)
             },

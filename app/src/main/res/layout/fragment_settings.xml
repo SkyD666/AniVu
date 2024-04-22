@@ -29,7 +29,7 @@
                 app:layout_collapseMode="pin"
                 app:navigationContentDescription="@string/back"
                 app:navigationIcon="@drawable/ic_arrow_back_24"
-                tools:title="@string/settings_fragment_name" />
+                tools:title="@string/settings_screen_name" />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 

@@ -14,7 +14,6 @@ class AniSpanSize(
         fun getSpanSize(data: Any?, enableLandScape: Boolean): Int {
             return if (enableLandScape && appContext.screenIsLand) {
                 when (data) {
-//                    is OtherWorksBean -> MAX_SPAN_SIZE / 2
                     else -> MAX_SPAN_SIZE
                 }
             } else {

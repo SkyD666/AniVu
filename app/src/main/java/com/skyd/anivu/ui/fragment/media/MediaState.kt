@@ -9,14 +9,17 @@ data class MediaState(
 ) : MviViewState {
     companion object {
         fun initial() = MediaState(
-            mediaListState = MediaListState.Init,
+            mediaListState = MediaListState.Init(),
             loadingDialog = false,
         )
     }
 }
 
-sealed class MediaListState(var loading: Boolean = false) {
-    class Success(val list: List<VideoBean>) : MediaListState()
-    data object Init : MediaListState()
-    data class Failed(val msg: String) : MediaListState()
+sealed class MediaListState(open val loading: Boolean) {
+    data class Success(val list: List<VideoBean>, override val loading: Boolean = false) :
+        MediaListState(loading)
+
+    data class Init(override val loading: Boolean = false) : MediaListState(loading)
+    data class Failed(val msg: String, override val loading: Boolean = false) :
+        MediaListState(loading)
 }

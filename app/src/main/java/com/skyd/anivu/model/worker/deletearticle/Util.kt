@@ -40,7 +40,7 @@ fun listenerDeleteArticleFrequency(context: Context) {
             )
         }.distinctUntilChanged().combine(
             WorkManager.getInstance(context)
-                .getWorkInfosForUniqueWorkFlow(DeleteArticleWorker.uniqueWorkName)
+                .getWorkInfosForUniqueWorkFlow(DeleteArticleWorker.UNIQUE_WORK_NAME)
                 .distinctUntilChanged(),
         ) { deleteArticleConfiguration, workInfos ->
             val workInfo = workInfos.firstOrNull()
@@ -103,7 +103,7 @@ fun startRssSyncWorker(
     deleteArticleFrequency: Long,
 ) {
     WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-        DeleteArticleWorker.uniqueWorkName,
+        DeleteArticleWorker.UNIQUE_WORK_NAME,
         ExistingPeriodicWorkPolicy.KEEP,
         getDeleteArticleWorkRequest(
             deleteArticleFrequency = deleteArticleFrequency,
@@ -112,7 +112,7 @@ fun startRssSyncWorker(
 }
 
 fun stopDeleteArticleWorker(context: Context) {
-    WorkManager.getInstance(context).cancelUniqueWork(DeleteArticleWorker.uniqueWorkName)
+    WorkManager.getInstance(context).cancelUniqueWork(DeleteArticleWorker.UNIQUE_WORK_NAME)
 }
 
 fun getDeleteArticleWorkRequest(

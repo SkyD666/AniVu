@@ -2,7 +2,6 @@ package com.skyd.anivu.ui.player
 
 import android.util.Log
 import org.libtorrent4j.AlertListener
-import org.libtorrent4j.TorrentHandle
 import org.libtorrent4j.alerts.Alert
 import org.libtorrent4j.alerts.AlertType
 import org.libtorrent4j.alerts.PieceFinishedAlert
@@ -10,7 +9,7 @@ import java.io.FilterInputStream
 import java.io.IOException
 import java.io.InputStream
 
-internal class TorrentInputStream(private val torrent: Torrent, inputStream: InputStream) :
+internal class TorrentInputStream(val torrent: Torrent, inputStream: InputStream) :
     FilterInputStream(inputStream), AlertListener {
     private var stopped = false
     private var location: Long = 0
@@ -46,6 +45,7 @@ internal class TorrentInputStream(private val torrent: Torrent, inputStream: Inp
     override fun read(buffer: ByteArray, offset: Int, length: Int): Int {
         val pieceLength: Int = torrent.torrentHandle.torrentFile().pieceLength()
         var i = 0
+        Log.e("TAG", "wantread: $location")
         while (i < length) {
             if (!waitForPiece(location + i)) {
                 return -1
@@ -53,7 +53,7 @@ internal class TorrentInputStream(private val torrent: Torrent, inputStream: Inp
             i += pieceLength
         }
         location += length.toLong()
-        Log.e("TAG", "read: $location", )
+        Log.e("TAG", "read: $location")
         return super.read(buffer, offset, length)
     }
 

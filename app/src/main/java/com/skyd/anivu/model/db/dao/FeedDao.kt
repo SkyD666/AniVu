@@ -77,7 +77,7 @@ interface FeedDao {
 
     @Transaction
     @RawQuery(observedEntities = [FeedBean::class])
-    fun getFeedList(sql: SupportSQLiteQuery): List<FeedBean>
+    fun getFeedListPagingSource(sql: SupportSQLiteQuery): List<FeedBean>
 
     @Transaction
     @Query("SELECT ${FeedBean.URL_COLUMN} FROM $FEED_TABLE_NAME")

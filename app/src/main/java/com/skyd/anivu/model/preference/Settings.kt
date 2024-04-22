@@ -10,7 +10,13 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.toSettings
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
+import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
+import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
+import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
+import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
+import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDarkMode
+import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import com.skyd.anivu.ui.local.LocalTheme
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +28,10 @@ data class Settings(
     val darkMode: Int = DarkModePreference.default,
     // Update
     val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
+    // Behavior
+    val deduplicateTitleInDesc: Boolean = DeduplicateTitleInDescPreference.default,
+    val articleTapAction: String = ArticleTapActionPreference.default,
+    val articleSwipeLeftAction: String = ArticleSwipeLeftActionPreference.default,
 )
 
 @Composable
@@ -38,6 +48,10 @@ fun SettingsProvider(
         LocalDarkMode provides settings.darkMode,
         // Update
         LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
+        // Behavior
+        LocalDeduplicateTitleInDesc provides settings.deduplicateTitleInDesc,
+        LocalArticleTapAction provides settings.articleTapAction,
+        LocalArticleSwipeLeftAction provides settings.articleSwipeLeftAction,
     ) {
         content()
     }

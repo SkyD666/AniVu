@@ -3,6 +3,7 @@ package com.skyd.anivu.ui.fragment.article
 import androidx.paging.PagingData
 import com.skyd.anivu.base.mvi.MviViewState
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import kotlinx.coroutines.flow.Flow
 
 data class ArticleState(
     val articleListState: ArticleListState,
@@ -10,14 +11,19 @@ data class ArticleState(
 ) : MviViewState {
     companion object {
         fun initial() = ArticleState(
-            articleListState = ArticleListState.Init,
+            articleListState = ArticleListState.Init(),
             loadingDialog = false,
         )
     }
 }
 
-sealed class ArticleListState(var loading: Boolean = false) {
-    class Success(val articlePagingData: PagingData<ArticleWithEnclosureBean>) : ArticleListState()
-    data object Init : ArticleListState()
-    data class Failed(val msg: String) : ArticleListState()
+sealed class ArticleListState(open val loading: Boolean = false) {
+    data class Success(
+        val articlePagingDataFlow: Flow<PagingData<ArticleWithEnclosureBean>>,
+        override val loading: Boolean = false
+    ) : ArticleListState()
+
+    data class Init(override val loading: Boolean = false) : ArticleListState()
+    data class Failed(val msg: String, override val loading: Boolean = false) :
+        ArticleListState()
 }

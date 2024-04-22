@@ -46,6 +46,6 @@ class RssSyncWorker(context: Context, parameters: WorkerParameters) :
     }
 
     companion object {
-        const val uniqueWorkName = "rssSyncWorker"
+        const val UNIQUE_WORK_NAME = "rssSyncWorker"
     }
 }

@@ -50,7 +50,7 @@ fun listenerRssSyncFrequency(context: Context) {
             )
         }.distinctUntilChanged().combine(
             WorkManager.getInstance(context)
-                .getWorkInfosForUniqueWorkFlow(RssSyncWorker.uniqueWorkName)
+                .getWorkInfosForUniqueWorkFlow(RssSyncWorker.UNIQUE_WORK_NAME)
                 .distinctUntilChanged(),
         ) { rssSyncConfiguration, workInfos ->
             val workInfo = workInfos.firstOrNull()
@@ -136,7 +136,7 @@ fun startRssSyncWorker(
     requireBatteryNotLow: Boolean,
 ) {
     WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-        RssSyncWorker.uniqueWorkName,
+        RssSyncWorker.UNIQUE_WORK_NAME,
         ExistingPeriodicWorkPolicy.KEEP,
         getRssSyncWorkRequest(
             rssSyncFrequency = rssSyncFrequency,
@@ -148,7 +148,7 @@ fun startRssSyncWorker(
 }
 
 fun stopRssSyncWorker(context: Context) {
-    WorkManager.getInstance(context).cancelUniqueWork(RssSyncWorker.uniqueWorkName)
+    WorkManager.getInstance(context).cancelUniqueWork(RssSyncWorker.UNIQUE_WORK_NAME)
 }
 
 fun getRssSyncWorkRequest(

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -89,7 +90,7 @@ class FeedViewModel @Inject constructor(
     private fun SharedFlow<FeedIntent>.toFeedPartialStateChangeFlow(): Flow<FeedPartialStateChange> {
         return merge(
             filterIsInstance<FeedIntent.Init>().flatMapConcat {
-                feedRepo.requestFeedList().cachedIn(viewModelScope).map {
+                flowOf(feedRepo.requestFeedList().cachedIn(viewModelScope)).map {
                     FeedPartialStateChange.FeedList.Success(feedPagingData = it)
                 }.startWith(FeedPartialStateChange.FeedList.Loading)
             },

@@ -6,6 +6,9 @@ import androidx.navigation.NavHostController
 import com.skyd.anivu.model.preference.IgnoreUpdateVersionPreference
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
+import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
+import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
+import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
 
 val LocalNavController = compositionLocalOf<NavHostController> {
     error("LocalNavController not initialized!")
@@ -21,3 +24,8 @@ val LocalDarkMode = compositionLocalOf { DarkModePreference.default }
 
 // Update
 val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreference.default }
+
+// Behavior
+val LocalDeduplicateTitleInDesc = compositionLocalOf { DeduplicateTitleInDescPreference.default }
+val LocalArticleTapAction = compositionLocalOf { ArticleTapActionPreference.default }
+val LocalArticleSwipeLeftAction = compositionLocalOf { ArticleSwipeLeftActionPreference.default }

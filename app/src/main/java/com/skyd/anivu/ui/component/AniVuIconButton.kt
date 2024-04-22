@@ -131,7 +131,7 @@ fun AniVuIconButton(
 }
 
 @Composable
-fun RaysIconToggleButton(
+fun AniVuIconToggleButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,

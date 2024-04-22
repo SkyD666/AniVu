@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item
-        android:id="@+id/action_to_search_fragment"
-        android:icon="@drawable/ic_search_24"
-        android:title="@string/feed_fragment_search_feed"
-        app:showAsAction="ifRoom" />
-</menu>

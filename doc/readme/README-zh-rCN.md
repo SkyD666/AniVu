@@ -27,12 +27,13 @@
         <b>AniVu</b>，一个集<b> RSS 番剧订阅与更新、比特洪流下载、视频播放</b>为一体的工具。
     </p>
     <p>
-        使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架构，完全采用 <b><a href="https://m3.material.io/">Material You</a></b> 设计风格。所有页面均使用 <b>Android View</b> 开发。
+        使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架构，完全采用 <b><a href="https://m3.material.io/">Material You</a></b> 设计风格。使用 <b>Android View</b> 和 <b>Jetpack Compose</b> 混合开发。
     </p>
     <p>
         <b><a href="../../README.md">English</a></b>
     </p>
 </div>
+
 
 
 ## 💡主要功能
@@ -68,6 +69,7 @@
 ## 🛠主要技术栈
 
 - **MVI** Architecture
+- Jetpack **Compose**
 - Kotlin ﻿**Coroutines and Flow**
 - **Material You**
 - **ViewModel**

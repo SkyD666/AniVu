@@ -5,24 +5,42 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -33,9 +51,6 @@ import com.skyd.anivu.ext.plus
 import com.skyd.anivu.model.bean.MoreBean
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
-import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.MoreProxy
 import com.skyd.anivu.ui.component.shape.CloverShape
 import com.skyd.anivu.ui.component.shape.CurlyCornerShape
 import com.skyd.anivu.ui.local.LocalNavController
@@ -52,6 +67,8 @@ class MoreFragment : BaseComposeFragment() {
         savedInstanceState: Bundle?
     ): View = setContentBase { MoreScreen() }
 }
+
+const val MORE_SCREEN_ROUTE = "moreScreen"
 
 @Composable
 fun MoreScreen() {
@@ -82,21 +99,73 @@ fun MoreScreen() {
         )
     ) {
         val colorScheme: ColorScheme = MaterialTheme.colorScheme
-        val adapter = remember {
-            LazyGridAdapter(
-                mutableListOf(
-                    MoreProxy(onClickListener = { data -> data.action.invoke() })
+        val dataList = remember(context, colorScheme, density, navController) {
+            getMoreBeanList(context, colorScheme, density, navController)
+        }
+        LazyVerticalGrid(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = it + PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+            columns = GridCells.Adaptive(130.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            items(dataList) { item ->
+                More1Item(
+                    data = item,
+                    onClickListener = { data -> data.action.invoke() }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun More1Item(
+    data: MoreBean,
+    onClickListener: ((data: MoreBean) -> Unit)? = null
+) {
+    OutlinedCard(
+        modifier = Modifier.padding(vertical = 6.dp),
+        shape = RoundedCornerShape(16)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .combinedClickable(
+                    onClick = {
+                        onClickListener?.invoke(data)
+                    }
+                )
+                .padding(25.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .padding(5.dp)
+                    .background(
+                        color = data.shapeColor,
+                        shape = data.shape
+                    )
+                    .padding(16.dp)
+            ) {
+                Icon(
+                    modifier = Modifier.size(35.dp),
+                    painter = painterResource(id = data.icon),
+                    contentDescription = null,
+                    tint = data.iconTint
+                )
+            }
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 5.dp)
+                    .padding(top = 15.dp)
+                    .basicMarquee(iterations = Int.MAX_VALUE),
+                text = data.title,
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1,
+                textAlign = TextAlign.Center
             )
         }
-        AniVuLazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            dataList = remember(context, colorScheme, density, navController) {
-                getMoreBeanList(context, colorScheme, density, navController)
-            },
-            adapter = adapter,
-            contentPadding = it + PaddingValues(vertical = 10.dp),
-        )
     }
 }
 
@@ -108,7 +177,7 @@ private fun getMoreBeanList(
 ): MutableList<MoreBean> {
     return mutableListOf(
         MoreBean(
-            title = context.getString(R.string.settings_fragment_name),
+            title = context.getString(R.string.settings_screen_name),
             icon = R.drawable.ic_settings_24,
             iconTint = colorScheme.onPrimary,
             shape = CloverShape,

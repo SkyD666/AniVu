@@ -36,6 +36,6 @@ class DeleteArticleWorker(context: Context, parameters: WorkerParameters) :
     }
 
     companion object {
-        const val uniqueWorkName = "deleteArticleWorker"
+        const val UNIQUE_WORK_NAME = "deleteArticleWorker"
     }
 }

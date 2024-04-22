@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">AniVu</string>
     <string name="main_fragment_name">Main Fragment</string>
-    <string name="feed_fragment_name">Feed</string>
-    <string name="media_fragment_name">Media</string>
+    <string name="feed_screen_name">Feed</string>
+    <string name="media_screen_name">Media</string>
     <string name="more_screen_name">More</string>
     <string name="add">Add</string>
-    <string name="feed_fragment_add_rss_hint">RSS URL</string>
+    <string name="feed_screen_add_rss_hint">RSS URL</string>
     <string name="paste">Paste</string>
     <string name="warning">Warning</string>
     <string name="cancel">Cancel</string>
@@ -18,9 +18,9 @@
     <string name="remove">Remove</string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
-    <string name="article_fragment_name">Article</string>
+    <string name="article_screen_name">Article</string>
     <string name="article_fragment_feed_url_illegal">Feed URL is illegal</string>
-    <string name="search_fragment_hint">Search</string>
+    <string name="search_screen_hint">Search</string>
     <string name="back">Back</string>
     <string name="read_fragment_name">Read</string>
     <string name="bottom_sheet_enclosure_title">Enclosures</string>
@@ -37,14 +37,12 @@
     <string name="download_peer_count">Peer(s): %d</string>
     <string name="download_upload_payload_rate" translatable="false">%s ↑</string>
     <string name="download_download_payload_rate" translatable="false">%s ↓</string>
-    <string name="parent_dir">…</string>
     <string name="torrent_status_checking_files">Checking files…</string>
     <string name="torrent_status_downloading_metadata">Downloading metadata…</string>
     <string name="torrent_status_downloading">Downloading…</string>
     <string name="torrent_status_finished">Finished</string>
     <string name="torrent_status_seeding">Seeding…</string>
     <string name="torrent_status_checking_resume_data">Checking resume data…</string>
-    <string name="options">Options</string>
     <string name="video">Video</string>
     <string name="player_reset_zoom">Reset</string>
     <string name="player_long_press_playback_speed">Fast forwarding…</string>
@@ -63,15 +61,17 @@
     <string name="about_screen_other_works_night_screen_description">When you use your phone at night 🌙, Night Screen can help you reduce the brightness of the screen and reduce the damage to your eyes.</string>
     <string name="no_browser_found">Can\'t find the browser! Link: %s</string>
     <string name="license_screen_name">License</string>
-    <string name="search_fragment_name">Search</string>
+    <string name="search_screen_name">Search</string>
     <string name="clear_input_text">Clear</string>
-    <string name="article_fragment_search_article">Search articles</string>
-    <string name="feed_fragment_search_feed">Search feeds</string>
+    <string name="password_visibility_off">Hide</string>
+    <string name="password_visibility_on">Show</string>
+    <string name="article_screen_search_article">Search articles</string>
+    <string name="feed_screen_search_feed">Search feeds</string>
     <string name="read_fragment_open_browser">Open in browser</string>
     <string name="play_activity_label">Play</string>
     <string name="failed_msg">Failed: %s</string>
     <string name="open_with">Open with</string>
-    <string name="settings_fragment_name">Settings</string>
+    <string name="settings_screen_name">Settings</string>
     <string name="data_fragment_name">Data</string>
     <string name="data_fragment_description">Managing data, files, caches</string>
     <string name="data_fragment_clear_cache">Clear cache</string>
@@ -138,7 +138,6 @@
     <string name="player_config_fragment_double_tap_description">Configure double tap behavior</string>
     <string name="appearance_fragment_name">Appearance &amp; Style</string>
     <string name="appearance_fragment_theme_category">Theme</string>
-    <string name="appearance_fragment_theme">Theme</string>
     <string name="appearance_fragment_description">Configure theme, appearance</string>
     <string name="theme_dynamic">Dynamic</string>
     <string name="theme_pink">Pink</string>
@@ -167,6 +166,17 @@
     <string name="download_update">Download</string>
     <string name="update_ignore">Ignore this update</string>
     <string name="update_check_failed">Check for update failed: %s</string>
+    <string name="article_screen_read">Read</string>
+    <string name="behavior_screen_name">Behavior</string>
+    <string name="behavior_screen_description">Configure behavior in response to user operations</string>
+    <string name="behavior_screen_article_screen_category">Article list</string>
+    <string name="behavior_screen_article_screen_deduplicate_title_in_desc">Deduplicate title</string>
+    <string name="behavior_screen_article_screen_deduplicate_title_in_desc_description">Remove substrings in the description text that are the same as the title</string>
+    <string name="article_action_read">Read</string>
+    <string name="article_action_show_enclosures">Show enclosures</string>
+    <string name="behavior_screen_article_tap_action">Tap item</string>
+    <string name="behavior_screen_article_swipe_left_action">Swipe left</string>
+    <string name="search_screen_list_to_top">To top</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

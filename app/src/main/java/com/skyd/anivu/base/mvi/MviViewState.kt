@@ -3,7 +3,7 @@ package com.skyd.anivu.base.mvi
 import android.os.Bundle
 
 /**
- * Immutable object which contains all the required information to render a [MviView].
+ * Immutable object which contains all the required information to render a View.
  */
 interface MviViewState
 

@@ -2,6 +2,7 @@ package com.skyd.anivu.ui.fragment.feed
 
 import androidx.paging.PagingData
 import com.skyd.anivu.model.bean.FeedBean
+import kotlinx.coroutines.flow.Flow
 
 
 internal sealed interface FeedPartialStateChange {
@@ -88,7 +89,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data class Success(val feedPagingData: PagingData<FeedBean>) : FeedList
+        data class Success(val feedPagingData: Flow<PagingData<FeedBean>>) : FeedList
         data class Failed(val msg: String) : FeedList
         data object Loading : FeedList
     }

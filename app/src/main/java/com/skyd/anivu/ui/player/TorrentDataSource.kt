@@ -38,6 +38,7 @@ class TorrentDataSource(
     private val fileIndex: Int = 0,
 ) : BaseDataSource(true) {
     private lateinit var dataSpec: DataSpec
+    private var closed = false
     private lateinit var sessionManager: SessionManager
     private var torrentHandle: TorrentHandle? = null
     private var file: File? = null
@@ -152,14 +153,20 @@ class TorrentDataSource(
     }
 
     override fun close() {
-        inputStream?.let { sessionManager.removeListener(it) }
+        if (closed) return
+        closed = true
+        inputStream?.let {
+            Log.e("TAG", "close: ")
+            sessionManager.removeListener(it)
+            sessionManager.removeListener(it.torrent)
+        }
+        if (torrentHandle?.isValid == true) {
+            torrentHandle?.pause()
+        }
         sessionManager.pause()
         sessionManager.stopDht()
         sessionManager.stop()
         inputStream?.close()
-        if (torrentHandle?.isValid == true) {
-            torrentHandle?.pause()
-        }
     }
 
     override fun getUri(): Uri = dataSpec.uri

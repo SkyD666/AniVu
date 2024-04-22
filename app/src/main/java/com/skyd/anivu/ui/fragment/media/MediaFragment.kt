@@ -5,200 +5,244 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.app.AlertDialog
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.divider.MaterialDividerItemDecoration
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
-import com.skyd.anivu.base.BaseFragment
+import com.skyd.anivu.base.BaseComposeFragment
+import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.config.Const
-import com.skyd.anivu.databinding.FragmentMediaBinding
-import com.skyd.anivu.ext.addFabBottomPaddingHook
-import com.skyd.anivu.ext.addInsetsByMargin
-import com.skyd.anivu.ext.addInsetsByPadding
-import com.skyd.anivu.ext.collectIn
-import com.skyd.anivu.ext.findMainNavController
+import com.skyd.anivu.ext.activity
+import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.popBackStackWithLifecycle
-import com.skyd.anivu.ext.screenIsLand
 import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.toUri
-import com.skyd.anivu.model.bean.ParentDirBean
+import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.activity.PlayActivity
 import com.skyd.anivu.ui.activity.PlayActivity.Companion.VIDEO_URI_KEY
-import com.skyd.anivu.ui.adapter.variety.AniSpanSize
-import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
-import com.skyd.anivu.ui.adapter.variety.proxy.Media1Proxy
-import com.skyd.anivu.ui.adapter.variety.proxy.ParentDir1Proxy
+import com.skyd.anivu.ui.component.AniVuFloatingActionButton
+import com.skyd.anivu.ui.component.AniVuTopBar
+import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.BackIcon
+import com.skyd.anivu.ui.component.OnLifecycleEvent
+import com.skyd.anivu.ui.component.dialog.AniVuDialog
+import com.skyd.anivu.ui.component.dialog.WaitingDialog
+import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
-class MediaFragment : BaseFragment<FragmentMediaBinding>() {
+class MediaFragment : BaseComposeFragment() {
     companion object {
         const val PATH_KEY = "path"
         const val HAS_PARENT_DIR_KEY = "hasParentDir"
     }
 
-    override val transitionProvider = nullTransitionProvider
-
     private val viewModel by viewModels<MediaViewModel>()
     private val path by lazy { arguments?.getString(PATH_KEY) ?: Const.VIDEO_DIR.path }
     private val hasParentDir by lazy { arguments?.getBoolean(HAS_PARENT_DIR_KEY) ?: false }
-    private val intents = Channel<MediaIntent>()
 
-    private var waitingDialog: AlertDialog? = null
-    private val adapter = VarietyAdapter(mutableListOf()).apply {
-        addProxy(
-            Media1Proxy(
-                adapter = this,
-                onPlay = {
-                    startActivity(
-                        Intent(requireContext(), PlayActivity::class.java).apply {
-                            putExtra(VIDEO_URI_KEY, it.file.toUri(requireContext()))
-                        }
-                    )
+    override val transitionProvider
+        get() = if (hasParentDir) defaultTransitionProvider else nullTransitionProvider
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = setContentBase { MediaScreen(path, hasParentDir, viewModel) }
+}
+
+const val MEDIA_SCREEN_ROUTE = "mediaScreen"
+
+@Composable
+fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel = hiltViewModel()) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val snackbarHostState = remember { SnackbarHostState() }
+    val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val windowSizeClass = LocalWindowSizeClass.current
+
+    var fabHeight by remember { mutableStateOf(0.dp) }
+    var fabWidth by remember { mutableStateOf(0.dp) }
+
+    val uiState by viewModel.viewState.collectAsStateWithLifecycle()
+    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        topBar = {
+            AniVuTopBar(
+                style = AniVuTopBarStyle.CenterAligned,
+                title = { Text(text = stringResource(R.string.media_screen_name)) },
+                navigationIcon = if (hasParentDir) {
+                    { BackIcon() }
+                } else {
+                    { }
                 },
-                onOpenDir = {
-                    findMainNavController().navigate(
-                        R.id.action_to_video_fragment,
-                        Bundle().apply {
-                            putString(PATH_KEY, "${path}/${it.name}")
-                            putBoolean(HAS_PARENT_DIR_KEY, true)
-                        }
-                    )
-                },
-                onRemove = {
-                    intents.trySend(MediaIntent.Delete(it.file))
-                },
-                coroutineScope = lifecycleScope,
+                scrollBehavior = scrollBehavior,
+                windowInsets = WindowInsets.safeDrawing.run {
+                    val leftPadding = hasParentDir || windowSizeClass.isCompact
+                    var sides = WindowInsetsSides.Top + WindowInsetsSides.Right
+                    if (leftPadding) sides += WindowInsetsSides.Left
+                    only(sides)
+                }
             )
-        )
-        addProxy(ParentDir1Proxy(
-            onClick = { findNavController().popBackStackWithLifecycle() }
-        ))
-    }
-    private val parentDirBean = ParentDirBean()
-
-    private fun updateState(mediaState: MediaState) {
-        if (mediaState.loadingDialog) {
-            if (waitingDialog == null || !waitingDialog!!.isShowing) {
-                waitingDialog = MaterialAlertDialogBuilder(requireContext())
-                    .setIcon(R.drawable.ic_info_24)
-                    .setTitle(R.string.info)
-                    .setCancelable(false)
-                    .setMessage(R.string.waiting)
-                    .show()
-            } else if (waitingDialog!!.isShowing) {
-                waitingDialog?.show()
+        },
+        floatingActionButton = {
+            AniVuFloatingActionButton(
+                onClick = { navController.navigate(R.id.action_to_download_fragment) },
+                onSizeWithSinglePaddingChanged = { width, height ->
+                    fabWidth = width
+                    fabHeight = height
+                },
+                contentDescription = stringResource(R.string.download_fragment_name),
+            ) {
+                Icon(imageVector = Icons.Default.Download, contentDescription = null)
             }
+        },
+        contentWindowInsets = WindowInsets.safeDrawing.run {
+            val leftPadding = hasParentDir || windowSizeClass.isCompact
+            var sides = WindowInsetsSides.Top + WindowInsetsSides.Right
+            if (leftPadding) sides += WindowInsetsSides.Left
+            if (hasParentDir) sides += WindowInsetsSides.Bottom
+            only(sides)
+        },
+    ) { innerPadding ->
+        if (path.isBlank()) {
+            AniVuDialog(
+                visible = true,
+                text = { Text(text = stringResource(id = R.string.article_fragment_feed_url_illegal)) },
+                confirmButton = {
+                    TextButton(onClick = { navController.popBackStackWithLifecycle() }) {
+                        Text(text = stringResource(id = R.string.exit))
+                    }
+                }
+            )
         } else {
-            waitingDialog?.dismiss()
-            waitingDialog = null
+            val dispatch = viewModel.getDispatcher(startWith = MediaIntent.Init(path))
+
+            OnLifecycleEvent { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) dispatch(MediaIntent.Refresh(path))
+            }
+
+            val state = rememberPullRefreshState(
+                refreshing = uiState.mediaListState.loading,
+                onRefresh = { dispatch(MediaIntent.Refresh(path)) },
+            )
+            Box(modifier = Modifier.pullRefresh(state)) {
+                when (val mediaListState = uiState.mediaListState) {
+                    is MediaListState.Failed -> Unit
+                    is MediaListState.Init -> Unit
+                    is MediaListState.Success -> {
+                        MediaList(
+                            data = mediaListState.list,
+                            contentPadding = innerPadding,
+                            onPlay = {
+                                (context.activity).startActivity(
+                                    Intent(context, PlayActivity::class.java).apply {
+                                        putExtra(VIDEO_URI_KEY, it.file.toUri(context))
+                                    }
+                                )
+                            },
+                            onOpenDir = {
+                                navController.navigate(
+                                    R.id.action_to_video_fragment,
+                                    Bundle().apply {
+                                        putString(MediaFragment.PATH_KEY, "${path}/${it.name}")
+                                        putBoolean(MediaFragment.HAS_PARENT_DIR_KEY, true)
+                                    }
+                                )
+                            },
+                            onRemove = {
+                                dispatch(MediaIntent.Delete(it.file))
+                            }
+                        )
+                    }
+                }
+                PullRefreshIndicator(
+                    refreshing = uiState.mediaListState.loading,
+                    state = state,
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .align(Alignment.TopCenter),
+                )
+            }
         }
-        when (val videoListState = mediaState.mediaListState.apply {
-            binding.srlMediaFragment.isRefreshing = loading
-        }) {
-            is MediaListState.Failed -> {
-                adapter.dataList = emptyList<Any>().addHeader()
-            }
 
-            MediaListState.Init -> {
-                adapter.dataList = emptyList<Any>().addHeader()
-            }
+        WaitingDialog(visible = uiState.loadingDialog)
 
-            is MediaListState.Success -> {
-                adapter.dataList = videoListState.list.addHeader()
+        when (val event = uiEvent) {
+            is MediaEvent.DeleteUriResultEvent.Failed -> snackbarHostState.showSnackbar(
+                scope = scope, message = event.msg,
+            )
+
+            null -> Unit
+        }
+    }
+}
+
+@Composable
+private fun MediaList(
+    modifier: Modifier = Modifier,
+    data: List<Any>,
+    contentPadding: PaddingValues,
+    onPlay: (VideoBean) -> Unit,
+    onOpenDir: (VideoBean) -> Unit,
+    onRemove: (VideoBean) -> Unit,
+) {
+    LazyVerticalGrid(
+        modifier = modifier.fillMaxSize(),
+        contentPadding = contentPadding,
+        columns = GridCells.Adaptive(300.dp),
+    ) {
+        items(data) { item ->
+            if (item is VideoBean) {
+                Media1Item(
+                    data = item,
+                    onPlay = onPlay,
+                    onOpenDir = onOpenDir,
+                    onRemove = onRemove,
+                )
             }
         }
     }
-
-    private fun showEvent(mediaEvent: MediaEvent) {
-        when (mediaEvent) {
-            is MediaEvent.DeleteUriResultEvent.Failed -> {
-                showSnackbar(text = mediaEvent.msg)
-            }
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        checkArgument(
-            messageRes = R.string.article_fragment_feed_url_illegal,
-            action = { !path.isNullOrBlank() },
-            onSuccess = {
-                intents
-                    .consumeAsFlow()
-                    .onEach(viewModel::processIntent)
-                    .launchIn(lifecycleScope)
-
-                viewModel.viewState.collectIn(this) { updateState(it) }
-                viewModel.singleEvent.collectIn(this) { showEvent(it) }
-            }
-        )
-    }
-
-    override fun FragmentMediaBinding.initView() {
-        if (hasParentDir) {
-            topAppBar.setNavigationIcon(R.drawable.ic_arrow_back_24)
-            topAppBar.setNavigationOnClickListener {
-                findNavController().popBackStackWithLifecycle()
-            }
-        } else {
-            topAppBar.navigationIcon = null
-        }
-
-        fabMediaFragment.setOnClickListener {
-            findMainNavController().navigate(R.id.action_to_download_fragment)
-        }
-
-        srlMediaFragment.setOnRefreshListener {
-            intents.trySend(MediaIntent.Refresh(path))
-        }
-
-        rvMediaFragment.layoutManager = GridLayoutManager(
-            requireContext(),
-            AniSpanSize.MAX_SPAN_SIZE
-        ).apply {
-            spanSizeLookup = AniSpanSize(adapter)
-        }
-
-        val divider = MaterialDividerItemDecoration(requireContext(), LinearLayoutManager.VERTICAL)
-        divider.isLastItemDecorated = false
-        rvMediaFragment.addItemDecoration(divider)
-        rvMediaFragment.adapter = adapter
-    }
-
-    override fun FragmentMediaBinding.setWindowInsets() {
-        val leftPadding = hasParentDir || !requireContext().screenIsLand
-        ablMediaFragment.addInsetsByPadding(top = true, left = leftPadding, right = true)
-        fabMediaFragment.addInsetsByMargin(left = leftPadding, right = true, bottom = hasParentDir)
-        rvMediaFragment.addInsetsByPadding(
-            left = leftPadding,
-            right = true,
-            hook = ::addFabBottomPaddingHook,
-        )
-    }
-
-    private fun List<Any>.addHeader() = if (hasParentDir) {
-        toMutableList().apply { add(0, parentDirBean) }
-    } else this
-
-    override fun onResume() {
-        super.onResume()
-
-        if (!path.isNullOrBlank()) {
-            intents.trySend(MediaIntent.Refresh(path))
-        }
-    }
-
-    override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =
-        FragmentMediaBinding.inflate(inflater, container, false)
 }

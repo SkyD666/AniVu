@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.fragment.search
 
 import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
 
 
 internal sealed interface SearchPartialStateChange {
@@ -23,7 +24,7 @@ internal sealed interface SearchPartialStateChange {
             }
         }
 
-        data class Success(val result: PagingData<out Any>) : SearchResult
+        data class Success(val result: Flow<PagingData<Any>>) : SearchResult
         data class Failed(val msg: String) : SearchResult
         data object Loading : SearchResult
     }

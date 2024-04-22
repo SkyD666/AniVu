@@ -1,12 +1,12 @@
 package com.skyd.anivu.ui.player
 
+import android.util.Log
 import org.libtorrent4j.AlertListener
 import org.libtorrent4j.Priority
 import org.libtorrent4j.TorrentFlags
 import org.libtorrent4j.TorrentHandle
 import org.libtorrent4j.alerts.Alert
 import org.libtorrent4j.alerts.AlertType
-import org.libtorrent4j.alerts.BlockFinishedAlert
 import org.libtorrent4j.alerts.PieceFinishedAlert
 import java.io.File
 import java.io.FileInputStream
@@ -15,7 +15,6 @@ import java.lang.ref.WeakReference
 
 class Torrent(
     val torrentHandle: TorrentHandle,
-    private val prepareSize: Long = 15 * 1024L * 1024L,
 ) : AlertListener {
     enum class State {
         RETRIEVING_META,
@@ -23,12 +22,6 @@ class Torrent(
         STREAMING
     }
 
-    /**
-     * Get amount of pieces to prepare
-     *
-     * @return Amount of pieces to prepare
-     */
-    private var piecesToPrepare: Int = 0
     private var lastPieceIndex: Int = -1
     private var firstPieceIndex: Int = -1
     private var selectedFileIndex = -1
@@ -39,9 +32,6 @@ class Torrent(
      * @return Interested piece index
      */
     private var interestedPieceIndex = 0
-    private var prepareProgress = 0.0
-    private var progressStep = 0.0
-    private var preparePieces: MutableList<Int> = mutableListOf()
     private var hasPieces: BooleanArray? = null
     private val torrentStreamReferences: MutableList<WeakReference<TorrentInputStream>> =
         mutableListOf()
@@ -74,7 +64,7 @@ class Torrent(
         val priorities = torrentHandle.piecePriorities()
         for (i in priorities.indices) {
             if (i in firstPieceIndex..lastPieceIndex) {
-                torrentHandle.piecePriority(i, Priority.DEFAULT)
+                torrentHandle.piecePriority(i, Priority.IGNORE)
             } else {
                 torrentHandle.piecePriority(i, Priority.IGNORE)
             }
@@ -83,8 +73,8 @@ class Torrent(
 
     val videoFile: File
         get() = File(
-            torrentHandle.savePath() + "/" + torrentHandle.torrentFile().files()
-                .filePath(selectedFileIndex)
+            torrentHandle.savePath(),
+            torrentHandle.torrentFile().files().filePath(selectedFileIndex)
         )
 
     val videoStream: InputStream
@@ -95,8 +85,7 @@ class Torrent(
          * @return [InputStream]
          */
         get() {
-            val file = videoFile
-            val inputStream = TorrentInputStream(this, FileInputStream(file))
+            val inputStream = TorrentInputStream(this, FileInputStream(videoFile))
             torrentStreamReferences.add(WeakReference(inputStream))
             return inputStream
         }
@@ -106,7 +95,7 @@ class Torrent(
          *
          * @return [File] The file location
          */
-        get() = File(torrentHandle.savePath() + "/" + torrentHandle.getName())
+        get() = File(torrentHandle.savePath(), torrentHandle.getName())
 
     fun resume() {
         torrentHandle.resume()
@@ -179,26 +168,9 @@ class Torrent(
         if (lastPieceIndexLocal == -1) {
             lastPieceIndexLocal = piecePriorities.size - 1
         }
-        val pieceCount = lastPieceIndexLocal - firstPieceIndexLocal + 1
-        val pieceLength = torrentHandle.torrentFile().pieceLength()
-        var activePieceCount: Int
-        if (pieceLength > 0) {
-            activePieceCount = (prepareSize / pieceLength).toInt()
-            if (activePieceCount < MIN_PREPARE_COUNT) {
-                activePieceCount = MIN_PREPARE_COUNT
-            } else if (activePieceCount > MAX_PREPARE_COUNT) {
-                activePieceCount = MAX_PREPARE_COUNT
-            }
-        } else {
-            activePieceCount = DEFAULT_PREPARE_COUNT
-        }
-        if (pieceCount < activePieceCount) {
-            activePieceCount = pieceCount / 2
-        }
         firstPieceIndex = firstPieceIndexLocal
         interestedPieceIndex = firstPieceIndex
         lastPieceIndex = lastPieceIndexLocal
-        piecesToPrepare = activePieceCount
     }
 
     val fileNames: Array<String?>
@@ -217,35 +189,18 @@ class Torrent(
         }
 
     /**
-     * Prepare torrent for playback. Prioritize the first `piecesToPrepare` pieces and the last `piecesToPrepare` pieces
-     * from `firstPieceIndex` and `lastPieceIndex`. Ignore all other pieces.
+     * Prepare torrent for playback.
      */
     fun startDownload() {
         if (state == State.STREAMING || state == State.STARTING) return
         state = State.STARTING
-        val indices: MutableList<Int> = ArrayList()
         val priorities = torrentHandle.piecePriorities()
         for (i in priorities.indices) {
             if (priorities[i] != Priority.IGNORE) {
                 torrentHandle.piecePriority(i, Priority.DEFAULT)
             }
         }
-        for (i in 0 until piecesToPrepare) {
-            indices.add(lastPieceIndex - i)
-            torrentHandle.piecePriority(lastPieceIndex - i, Priority.TOP_PRIORITY)
-            torrentHandle.setPieceDeadline(lastPieceIndex - i, 1000)
-        }
-        for (i in 0 until piecesToPrepare) {
-            indices.add(firstPieceIndex + i)
-            torrentHandle.piecePriority(firstPieceIndex + i, Priority.TOP_PRIORITY)
-            torrentHandle.setPieceDeadline(firstPieceIndex + i, 1000)
-        }
-        preparePieces = indices
         hasPieces = BooleanArray(lastPieceIndex - firstPieceIndex + 1) { false }
-        val torrentInfo = torrentHandle.torrentFile()
-        val status = torrentHandle.status()
-        val blockCount = (indices.size * torrentInfo.pieceLength() / status.blockSize()).toDouble()
-        progressStep = 100 / blockCount
         torrentStreamReferences.clear()
         torrentHandle.resume()
     }
@@ -272,22 +227,23 @@ class Torrent(
      * @param bytes The bytes you're interested in
      */
     fun setInterestedBytes(bytes: Long) {
-        if (hasPieces == null && bytes >= 0) {
-            return
-        }
+        val hasPieces = this.hasPieces ?: return
         val pieceIndex = (bytes / torrentHandle.torrentFile().pieceLength()).toInt()
         interestedPieceIndex = pieceIndex
-        if (!hasPieces!![pieceIndex] && torrentHandle.piecePriority(pieceIndex + firstPieceIndex) != Priority.TOP_PRIORITY) {
-            interestedPieceIndex = pieceIndex
-            var pieces = 5
-            for (i in pieceIndex until hasPieces!!.size) {
-                // Set full priority to first found piece that is not confirmed finished
-                if (!hasPieces!![i]) {
-                    torrentHandle.piecePriority(i + firstPieceIndex, Priority.TOP_PRIORITY)
-                    torrentHandle.setPieceDeadline(i + firstPieceIndex, 1000)
-                    pieces--
-                    if (pieces == 0) {
-                        break
+        if (!hasPieces[pieceIndex] &&
+            torrentHandle.piecePriority(pieceIndex + firstPieceIndex) != Priority.TOP_PRIORITY
+        ) {
+            val pieces = 5
+            for (i in hasPieces.indices) {
+                if (!hasPieces[i]) {
+                    if (i < pieceIndex) {
+                        torrentHandle.piecePriority(i + firstPieceIndex, Priority.IGNORE)
+                    } else if (i > pieceIndex + pieces) {
+                        torrentHandle.piecePriority(i + firstPieceIndex, Priority.IGNORE)
+                    } else {
+                        // Set full priority to first found piece that is not confirmed finished
+                        torrentHandle.piecePriority(i + firstPieceIndex, Priority.TOP_PRIORITY)
+                        torrentHandle.setPieceDeadline(i + firstPieceIndex, 1000)
                     }
                 }
             }
@@ -324,19 +280,19 @@ class Torrent(
         resetPriorities()
         if (hasPieces == null) {
             torrentHandle.flags = torrentHandle.flags.and_(TorrentFlags.SEQUENTIAL_DOWNLOAD)
-        } else {
-            for (i in firstPieceIndex + piecesToPrepare until firstPieceIndex + piecesToPrepare + SEQUENTIAL_CONCURRENT_PIECES_COUNT) {
-                torrentHandle.piecePriority(i, Priority.TOP_PRIORITY)
-                torrentHandle.setPieceDeadline(i, 1000)
-            }
         }
     }
 
     private fun pieceFinished(alert: PieceFinishedAlert) {
+        if (state != State.STREAMING) {
+            startSequentialMode()
+            state = State.STREAMING
+        }
         if (state == State.STREAMING && hasPieces != null) {
             val pieceIndex = alert.pieceIndex() - firstPieceIndex
-            hasPieces!![pieceIndex] = true
-            if (pieceIndex >= interestedPieceIndex) {
+            Log.e("TAG", "pieceFinished: $pieceIndex")
+            hasPieces?.set(pieceIndex, true)
+            if (pieceIndex >= interestedPieceIndex && hasInterestedBytes()) {
                 for (i in pieceIndex until hasPieces!!.size) {
                     // Set full priority to first found piece that is not confirmed finished
                     if (!hasPieces!![i]) {
@@ -346,36 +302,16 @@ class Torrent(
                     }
                 }
             }
-        } else {
-            preparePieces.removeIf { index: Int -> index == alert.pieceIndex() }
-            hasPieces?.set(alert.pieceIndex() - firstPieceIndex, true)
-            if (preparePieces.isEmpty()) {
-                startSequentialMode()
-                prepareProgress = 100.0
-                state = State.STREAMING
-            }
-        }
-    }
-
-    private fun blockFinished(alert: BlockFinishedAlert) {
-        for (index in preparePieces) {
-            if (index == alert.pieceIndex()) {
-                prepareProgress += progressStep
-                break
-            }
         }
     }
 
     override fun types() = intArrayOf(
         AlertType.PIECE_FINISHED.swig(),
-        AlertType.BLOCK_FINISHED.swig(),
     )
 
     override fun alert(alert: Alert<*>) {
         when (alert) {
             is PieceFinishedAlert -> pieceFinished(alert)
-            is BlockFinishedAlert -> blockFinished(alert)
-            else -> {}
         }
         val i = torrentStreamReferences.iterator()
         while (i.hasNext()) {
@@ -390,9 +326,6 @@ class Torrent(
     }
 
     companion object {
-        private const val MAX_PREPARE_COUNT = 20
-        private const val MIN_PREPARE_COUNT = 2
-        private const val DEFAULT_PREPARE_COUNT = 5
         private const val SEQUENTIAL_CONCURRENT_PIECES_COUNT = 5
     }
 }

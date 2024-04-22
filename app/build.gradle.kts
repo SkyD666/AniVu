@@ -21,7 +21,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 13
-        versionName = "1.1-beta11"
+        versionName = "1.1-beta12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -144,8 +144,10 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
     implementation("androidx.compose.ui:ui:1.6.5")
+    implementation("androidx.compose.material:material:1.6.5")
     implementation("androidx.compose.material3:material3:1.2.1")
     implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
     implementation("androidx.compose.material:material-icons-extended:1.6.5")
@@ -158,10 +160,11 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.media3:media3-exoplayer:1.3.0")
-    implementation("androidx.media3:media3-exoplayer-dash:1.3.0")
-    implementation("androidx.media3:media3-ui:1.3.0")
+    implementation("androidx.media3:media3-exoplayer:1.3.1")
+    implementation("androidx.media3:media3-exoplayer-dash:1.3.1")
+    implementation("androidx.media3:media3-ui:1.3.1")
     implementation("androidx.paging:paging-runtime-ktx:3.2.1")
+    implementation("androidx.paging:paging-compose:3.3.0-beta01")
     implementation("androidx.preference:preference-ktx:1.2.1")
     implementation("com.google.code.gson:gson:2.10.1")
 
@@ -180,6 +183,7 @@ dependencies {
 
     implementation("io.coil-kt:coil:2.6.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation("io.coil-kt:coil-gif:2.5.0")
     implementation("com.rometools:rome:2.1.0")
     implementation("net.dankito.readability4j:readability4j:1.0.8")
 

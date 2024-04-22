@@ -1,7 +1,6 @@
 package com.skyd.anivu.ui.component.lazyverticalgrid.adapter
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import java.lang.reflect.ParameterizedType
 
 class LazyGridAdapter(
@@ -9,9 +8,9 @@ class LazyGridAdapter(
 ) {
     @Suppress("UNCHECKED_CAST")
     @Composable
-    fun Draw(modifier: Modifier, index: Int, data: Any) {
+    fun Draw(index: Int, data: Any) {
         val type: Int = getProxyIndex(data)
-        if (type != -1) (proxyList[type] as Proxy<Any>).Draw(modifier, index, data)
+        if (type != -1) (proxyList[type] as Proxy<Any>).Draw(index, data)
     }
 
     // 获取策略在列表中的索引，可能返回-1
@@ -36,6 +35,6 @@ class LazyGridAdapter(
     // 抽象策略类
     abstract class Proxy<T> {
         @Composable
-        abstract fun Draw(modifier: Modifier, index: Int, data: T)
+        abstract fun Draw(index: Int, data: T)
     }
 }

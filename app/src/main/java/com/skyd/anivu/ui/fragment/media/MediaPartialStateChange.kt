@@ -27,7 +27,13 @@ internal sealed interface MediaPartialStateChange {
                 )
 
                 Loading -> oldState.copy(
-                    mediaListState = oldState.mediaListState.apply { loading = true },
+                    mediaListState = oldState.mediaListState.let {
+                        when (it) {
+                            is MediaListState.Failed -> it.copy(loading = false)
+                            is MediaListState.Init -> it.copy(loading = false)
+                            is MediaListState.Success -> it.copy(loading = false)
+                        }
+                    },
                     loadingDialog = false,
                 )
             }

@@ -13,18 +13,6 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="AniVuSearchTextInputLayout">
-        <item name="boxStrokeWidth">0px</item>
-        <item name="boxStrokeWidthFocused">0px</item>
-        <item name="endIconContentDescription">@string/clear_input_text</item>
-        <item name="endIconDrawable">@drawable/ic_close_24</item>
-        <item name="enforceMaterialTheme">true</item>
-        <item name="endIconMode">clear_text</item>
-        <item name="hintEnabled">false</item>
-        <item name="startIconContentDescription">@string/back</item>
-        <item name="startIconDrawable">@drawable/ic_arrow_back_24</item>
-    </style>
-
     <!--  ExoPlayer  -->
     <style name="AniVuStyledControls.Button.Center.PlayPause" parent="ExoStyledControls.Button.Center.PlayPause">
         <item name="android:padding">10dp</item>

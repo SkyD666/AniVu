@@ -44,7 +44,7 @@ abstract class BaseComposeFragment : Fragment() {
         }
     }
 
-    private val defaultTransitionProvider = BaseFragment.TransitionProvider()
+    protected val defaultTransitionProvider = BaseFragment.TransitionProvider()
 
     protected val nullTransitionProvider: BaseFragment.TransitionProvider? = null
 

@@ -8,14 +8,12 @@
     <fragment
         android:id="@+id/main_fragment"
         android:name="com.skyd.anivu.ui.fragment.MainFragment"
-        android:label="@string/main_fragment_name"
-        tools:layout="@layout/fragment_main" />
+        android:label="@string/main_fragment_name" />
 
     <fragment
         android:id="@+id/article_fragment"
         android:name="com.skyd.anivu.ui.fragment.article.ArticleFragment"
-        android:label="@string/article_fragment_name"
-        tools:layout="@layout/fragment_article">
+        android:label="@string/article_screen_name">
 
         <argument
             android:name="feedUrl"
@@ -53,8 +51,7 @@
     <fragment
         android:id="@+id/video_fragment"
         android:name="com.skyd.anivu.ui.fragment.media.MediaFragment"
-        android:label="@string/media_fragment_name"
-        tools:layout="@layout/fragment_media">
+        android:label="@string/media_screen_name">
 
         <argument
             android:name="path"
@@ -88,8 +85,7 @@
     <fragment
         android:id="@+id/search_fragment"
         android:name="com.skyd.anivu.ui.fragment.search.SearchFragment"
-        android:label="@string/search_fragment_name"
-        tools:layout="@layout/fragment_search" />
+        android:label="@string/search_screen_name" />
     <action
         android:id="@+id/action_to_search_fragment"
         app:destination="@id/search_fragment" />
@@ -97,7 +93,7 @@
     <fragment
         android:id="@+id/settings_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.SettingsFragment"
-        android:label="@string/settings_fragment_name"
+        android:label="@string/settings_screen_name"
         tools:layout="@layout/fragment_settings" />
     <action
         android:id="@+id/action_to_settings_fragment"
@@ -158,4 +154,12 @@
     <action
         android:id="@+id/action_to_appearance_fragment"
         app:destination="@id/appearance_fragment" />
+
+    <fragment
+        android:id="@+id/behavior_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.behavior.BehaviorFragment"
+        android:label="@string/behavior_screen_name" />
+    <action
+        android:id="@+id/action_to_behavior_fragment"
+        app:destination="@id/behavior_fragment" />
 </navigation>

@@ -4,7 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.skyd.anivu.base.BaseRepository
-import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao

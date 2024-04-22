@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -69,8 +70,8 @@ class ArticleViewModel @Inject constructor(
     private fun SharedFlow<ArticleIntent>.toArticlePartialStateChangeFlow(): Flow<ArticlePartialStateChange> {
         return merge(
             filterIsInstance<ArticleIntent.Init>().flatMapConcat { intent ->
-                articleRepo.requestArticleList(intent.url).cachedIn(viewModelScope).map {
-                    ArticlePartialStateChange.ArticleList.Success(articlePagingData = it)
+                flowOf(articleRepo.requestArticleList(intent.url).cachedIn(viewModelScope)).map {
+                    ArticlePartialStateChange.ArticleList.Success(articlePagingDataFlow = it)
                 }.startWith(ArticlePartialStateChange.ArticleList.Loading).catchMap {
                     ArticlePartialStateChange.ArticleList.Failed(it.message.toString())
                 }

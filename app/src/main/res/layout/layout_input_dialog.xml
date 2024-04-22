@@ -9,7 +9,7 @@
     app:endIconContentDescription="@string/paste"
     app:endIconDrawable="@drawable/ic_content_paste_24"
     app:endIconMode="custom"
-    tools:hint="@string/feed_fragment_add_rss_hint">
+    tools:hint="@string/feed_screen_add_rss_hint">
 
     <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/et_input_dialog"

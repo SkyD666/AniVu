@@ -81,6 +81,7 @@ class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureB
                         putExtra(PlayActivity.VIDEO_URI_KEY, it.url.toUri())
                     }
                 )
+                dismiss()
             }),
             LinkEnclosure1Proxy(onDownload = onDownload),
         )
