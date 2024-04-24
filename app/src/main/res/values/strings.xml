@@ -177,6 +177,12 @@
     <string name="behavior_screen_article_tap_action">Tap item</string>
     <string name="behavior_screen_article_swipe_left_action">Swipe left</string>
     <string name="search_screen_list_to_top">To top</string>
+    <string name="default_feed_group">Default</string>
+    <string name="feed_group">Group</string>
+    <string name="feed_screen_add_group">Add a group</string>
+    <string name="feed_screen_group_feeds_move_to">Move to</string>
+    <string name="feed_screen_delete_group_warning">Delete the \"%s\" group and all the feeds and articles it contains</string>
+    <string name="feed_screen_delete_group_warning_title">Delete group</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

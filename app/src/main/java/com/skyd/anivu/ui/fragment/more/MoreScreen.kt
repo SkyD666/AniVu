@@ -1,10 +1,6 @@
 package com.skyd.anivu.ui.fragment.more
 
 import android.content.Context
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
@@ -45,7 +41,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.skyd.anivu.R
-import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.model.bean.MoreBean
@@ -55,18 +50,7 @@ import com.skyd.anivu.ui.component.shape.CloverShape
 import com.skyd.anivu.ui.component.shape.CurlyCornerShape
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
-class MoreFragment : BaseComposeFragment() {
-    override val transitionProvider = nullTransitionProvider
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View = setContentBase { MoreScreen() }
-}
 
 const val MORE_SCREEN_ROUTE = "moreScreen"
 

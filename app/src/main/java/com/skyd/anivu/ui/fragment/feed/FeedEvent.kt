@@ -21,4 +21,19 @@ sealed interface FeedEvent : MviSingleEvent {
         data object Success : RemoveFeedResultEvent
         data class Failed(val msg: String) : RemoveFeedResultEvent
     }
+
+    sealed interface CreateGroupResultEvent : FeedEvent {
+        data object Success : CreateGroupResultEvent
+        data class Failed(val msg: String) : CreateGroupResultEvent
+    }
+
+    sealed interface DeleteGroupResultEvent : FeedEvent {
+        data object Success : DeleteGroupResultEvent
+        data class Failed(val msg: String) : DeleteGroupResultEvent
+    }
+
+    sealed interface MoveFeedsToGroupResultEvent : FeedEvent {
+        data object Success : MoveFeedsToGroupResultEvent
+        data class Failed(val msg: String) : MoveFeedsToGroupResultEvent
+    }
 }

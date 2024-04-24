@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.skyd.anivu.R
 import com.skyd.anivu.config.Const.GITHUB_NEW_ISSUE_URL
+import com.skyd.anivu.ext.getAppVersionCode
 import com.skyd.anivu.ext.getAppVersionName
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.sp
@@ -55,6 +56,7 @@ class CrashActivity : AppCompatActivity() {
 
         val message = buildString {
             append("VersionName: ").append(getAppVersionName()).append("\n")
+            append("VersionCode: ").append(getAppVersionCode()).append("\n")
             append("Brand: ").append(Build.BRAND).append("\n")
             append("Model: ").append(Build.MODEL).append("\n")
             append("SDK Version: ").append(Build.VERSION.SDK_INT).append("\n")

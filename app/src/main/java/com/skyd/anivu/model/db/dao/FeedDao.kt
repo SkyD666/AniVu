@@ -13,6 +13,8 @@ import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedWithArticleBean
+import com.skyd.anivu.model.bean.GROUP_TABLE_NAME
+import com.skyd.anivu.model.bean.GroupBean
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -64,6 +66,34 @@ interface FeedDao {
     suspend fun removeFeed(url: String): Int
 
     @Transaction
+    @Query("DELETE FROM $FEED_TABLE_NAME WHERE ${FeedBean.GROUP_ID_COLUMN} = :groupId")
+    suspend fun removeFeedByGroupId(groupId: String): Int
+
+    @Transaction
+    @Query(
+        """
+        UPDATE $FEED_TABLE_NAME
+        SET ${FeedBean.GROUP_ID_COLUMN} = :groupId
+        WHERE ${FeedBean.URL_COLUMN} = :feedUrl
+        """
+    )
+    suspend fun updateFeedGroupId(feedUrl: String, groupId: String?): Int
+
+    @Transaction
+    @Query(
+        """
+        UPDATE $FEED_TABLE_NAME
+        SET ${FeedBean.GROUP_ID_COLUMN} = :toGroupId
+        WHERE :fromGroupId IS NULL AND ${FeedBean.GROUP_ID_COLUMN} IS NULL OR
+        ${FeedBean.GROUP_ID_COLUMN} = :fromGroupId OR
+        :fromGroupId IS NULL AND ${FeedBean.GROUP_ID_COLUMN} NOT IN (
+            SELECT DISTINCT ${GroupBean.GROUP_ID_COLUMN} FROM `$GROUP_TABLE_NAME`
+        )
+        """
+    )
+    suspend fun moveFeedToGroup(fromGroupId: String?, toGroupId: String?): Int
+
+    @Transaction
     @Query("SELECT * FROM $FEED_TABLE_NAME")
     fun getFeedPagingSource(): PagingSource<Int, FeedBean>
 
@@ -72,12 +102,22 @@ interface FeedDao {
     suspend fun getFeed(feedUrl: String): FeedBean
 
     @Transaction
+    @Query(
+        """
+            SELECT * FROM $FEED_TABLE_NAME
+            WHERE ${FeedBean.GROUP_ID_COLUMN} IS NULL OR 
+            ${FeedBean.GROUP_ID_COLUMN} NOT IN (:groupIds)
+        """
+    )
+    suspend fun getFeedsNotIn(groupIds: List<String>): List<FeedBean>
+
+    @Transaction
     @RawQuery(observedEntities = [FeedBean::class])
     fun getFeedPagingSource(sql: SupportSQLiteQuery): PagingSource<Int, FeedBean>
 
     @Transaction
     @RawQuery(observedEntities = [FeedBean::class])
-    fun getFeedListPagingSource(sql: SupportSQLiteQuery): List<FeedBean>
+    fun getFeedList(sql: SupportSQLiteQuery): List<FeedBean>
 
     @Transaction
     @Query("SELECT ${FeedBean.URL_COLUMN} FROM $FEED_TABLE_NAME")

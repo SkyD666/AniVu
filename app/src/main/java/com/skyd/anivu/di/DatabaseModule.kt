@@ -7,6 +7,7 @@ import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.EnclosureDao
 import com.skyd.anivu.model.db.dao.FeedDao
+import com.skyd.anivu.model.db.dao.GroupDao
 import com.skyd.anivu.model.db.dao.SearchDomainDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
 import com.skyd.anivu.model.db.dao.TorrentFileDao
@@ -25,6 +26,10 @@ object DatabaseModule {
     @Singleton
     fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase =
         AppDatabase.getInstance(context)
+
+    @Provides
+    @Singleton
+    fun provideGroupDao(database: AppDatabase): GroupDao = database.groupDao()
 
     @Provides
     @Singleton

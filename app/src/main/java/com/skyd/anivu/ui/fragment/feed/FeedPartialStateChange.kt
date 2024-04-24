@@ -1,9 +1,5 @@
 package com.skyd.anivu.ui.fragment.feed
 
-import androidx.paging.PagingData
-import com.skyd.anivu.model.bean.FeedBean
-import kotlinx.coroutines.flow.Flow
-
 
 internal sealed interface FeedPartialStateChange {
     fun reduce(oldState: FeedState): FeedState
@@ -69,27 +65,78 @@ internal sealed interface FeedPartialStateChange {
         data class Failed(val msg: String) : RemoveFeed
     }
 
-    sealed interface FeedList : FeedPartialStateChange {
+    sealed interface CreateGroup : FeedPartialStateChange {
         override fun reduce(oldState: FeedState): FeedState {
             return when (this) {
                 is Success -> oldState.copy(
-                    feedListState = FeedListState.Success(feedPagingData = feedPagingData),
                     loadingDialog = false,
                 )
 
                 is Failed -> oldState.copy(
-                    feedListState = FeedListState.Failed(msg = msg),
-                    loadingDialog = false,
-                )
-
-                Loading -> oldState.copy(
-                    feedListState = FeedListState.Loading,
                     loadingDialog = false,
                 )
             }
         }
 
-        data class Success(val feedPagingData: Flow<PagingData<FeedBean>>) : FeedList
+        data object Success : CreateGroup
+        data class Failed(val msg: String) : CreateGroup
+    }
+
+    sealed interface DeleteGroup : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : DeleteGroup
+        data class Failed(val msg: String) : DeleteGroup
+    }
+
+    sealed interface MoveFeedsToGroup : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : MoveFeedsToGroup
+        data class Failed(val msg: String) : MoveFeedsToGroup
+    }
+
+    sealed interface FeedList : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    groupListState = GroupListState.Success(dataList = dataList),
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    groupListState = GroupListState.Failed(msg = msg),
+                    loadingDialog = false,
+                )
+
+                Loading -> oldState.copy(
+                    groupListState = GroupListState.Loading,
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val dataList: List<Any>) : FeedList
         data class Failed(val msg: String) : FeedList
         data object Loading : FeedList
     }

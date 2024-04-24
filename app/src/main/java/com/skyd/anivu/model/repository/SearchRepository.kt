@@ -53,7 +53,7 @@ class SearchRepository @Inject constructor(
                             k = query,
                             limit = { key to params.loadSize },
                         )
-                        resultList.addAll(feedDao.getFeedListPagingSource(feedSql))
+                        resultList.addAll(feedDao.getFeedList(feedSql))
                         val articleSql by lazy {
                             genSql(
                                 tableName = ARTICLE_TABLE_NAME,

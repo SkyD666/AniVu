@@ -1,7 +1,6 @@
 package com.skyd.anivu.ui.fragment.feed
 
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -81,6 +79,30 @@ class FeedViewModel @Inject constructor(
                     FeedEvent.InitFeetListResultEvent.Failed(change.msg)
                 }
 
+                is FeedPartialStateChange.CreateGroup.Success -> {
+                    FeedEvent.CreateGroupResultEvent.Success
+                }
+
+                is FeedPartialStateChange.CreateGroup.Failed -> {
+                    FeedEvent.CreateGroupResultEvent.Failed(change.msg)
+                }
+
+                is FeedPartialStateChange.DeleteGroup.Success -> {
+                    FeedEvent.DeleteGroupResultEvent.Success
+                }
+
+                is FeedPartialStateChange.DeleteGroup.Failed -> {
+                    FeedEvent.DeleteGroupResultEvent.Failed(change.msg)
+                }
+
+                is FeedPartialStateChange.MoveFeedsToGroup.Success -> {
+                    FeedEvent.MoveFeedsToGroupResultEvent.Success
+                }
+
+                is FeedPartialStateChange.MoveFeedsToGroup.Failed -> {
+                    FeedEvent.MoveFeedsToGroupResultEvent.Failed(change.msg)
+                }
+
                 else -> return@onEach
             }
             sendEvent(event)
@@ -90,18 +112,18 @@ class FeedViewModel @Inject constructor(
     private fun SharedFlow<FeedIntent>.toFeedPartialStateChangeFlow(): Flow<FeedPartialStateChange> {
         return merge(
             filterIsInstance<FeedIntent.Init>().flatMapConcat {
-                flowOf(feedRepo.requestFeedList().cachedIn(viewModelScope)).map {
-                    FeedPartialStateChange.FeedList.Success(feedPagingData = it)
+                feedRepo.requestGroupAnyList().map {
+                    FeedPartialStateChange.FeedList.Success(dataList = it)
                 }.startWith(FeedPartialStateChange.FeedList.Loading)
             },
             filterIsInstance<FeedIntent.AddFeed>().flatMapConcat { intent ->
-                feedRepo.setFeed(intent.url).map {
+                feedRepo.setFeed(url = intent.url, groupId = intent.group.groupId).map {
                     FeedPartialStateChange.AddFeed.Success
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.AddFeed.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.EditFeed>().flatMapConcat { intent ->
-                feedRepo.editFeed(intent.oldUrl, intent.newUrl).map {
+                feedRepo.editFeed(intent.oldUrl, intent.newUrl, intent.groupId).map {
                     FeedPartialStateChange.EditFeed.Success
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
@@ -111,6 +133,24 @@ class FeedViewModel @Inject constructor(
                     if (it > 0) FeedPartialStateChange.RemoveFeed.Success
                     else FeedPartialStateChange.RemoveFeed.Failed("Remove failed!")
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+            },
+            filterIsInstance<FeedIntent.CreateGroup>().flatMapConcat { intent ->
+                feedRepo.createGroup(intent.group).map {
+                    FeedPartialStateChange.CreateGroup.Success
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.CreateGroup.Failed(it.message.toString()) }
+            },
+            filterIsInstance<FeedIntent.DeleteGroup>().flatMapConcat { intent ->
+                feedRepo.deleteGroup(intent.groupId).map {
+                    FeedPartialStateChange.DeleteGroup.Success
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.DeleteGroup.Failed(it.message.toString()) }
+            },
+            filterIsInstance<FeedIntent.MoveFeedsToGroup>().flatMapConcat { intent ->
+                feedRepo.moveGroupFeedsTo(intent.fromGroupId, intent.toGroupId).map {
+                    FeedPartialStateChange.MoveFeedsToGroup.Success
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.MoveFeedsToGroup.Failed(it.message.toString()) }
             },
         )
     }
