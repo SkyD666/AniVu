@@ -14,6 +14,7 @@ import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
 import dagger.hilt.EntryPoint
@@ -101,15 +102,15 @@ interface ArticleDao {
         ORDER BY ${ArticleBean.DATE_COLUMN} DESC
         """
     )
-    fun getArticlePagingSource(feedUrl: String): PagingSource<Int, ArticleWithEnclosureBean>
+    fun getArticlePagingSource(feedUrl: String): PagingSource<Int, ArticleWithFeed>
 
     @Transaction
     @RawQuery(observedEntities = [ArticleBean::class])
-    fun getArticlePagingSource(sql: SupportSQLiteQuery): PagingSource<Int, ArticleWithEnclosureBean>
+    fun getArticlePagingSource(sql: SupportSQLiteQuery): PagingSource<Int, ArticleWithFeed>
 
     @Transaction
     @RawQuery(observedEntities = [ArticleBean::class])
-    fun getArticleList(sql: SupportSQLiteQuery): List<ArticleWithEnclosureBean>
+    fun getArticleList(sql: SupportSQLiteQuery): List<ArticleWithFeed>
 
     @Transaction
     @Query(

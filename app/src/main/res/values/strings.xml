@@ -183,6 +183,7 @@
     <string name="feed_screen_group_feeds_move_to">Move to</string>
     <string name="feed_screen_delete_group_warning">Delete the \"%s\" group and all the feeds and articles it contains</string>
     <string name="feed_screen_delete_group_warning_title">Delete group</string>
+    <string name="feed_screen_rss_nickname">Name (Optional)</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

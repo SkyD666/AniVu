@@ -2,6 +2,7 @@ package com.skyd.anivu.ui.fragment.media
 
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -46,6 +47,8 @@ import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.component.AniVuImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @Composable
 fun Media1Item(
@@ -83,30 +86,29 @@ fun Media1Item(
         ) {
             if (isMedia) {
                 LaunchedEffect(data) {
-                    getMediaThumbnail(retriever = retriever, path = data.file.path)
-                        ?.let { bitmap = it }
+                    bitmap = withContext(Dispatchers.IO) {
+                        getMediaThumbnail(retriever = retriever, path = data.file.path)
+                    }
                 }
-                if (bitmap != null) {
-                    OutlinedCard {
+                AnimatedVisibility(visible = bitmap != null) {
+                    OutlinedCard(
+                        modifier = Modifier
+                            .padding(end = 10.dp)
+                            .heightIn(min = 50.dp)
+                            .fillMaxHeight()
+                            .width(70.dp),
+                    ) {
                         AniVuImage(
                             model = bitmap,
-                            modifier = Modifier
-                                .heightIn(min = 50.dp)
-                                .fillMaxHeight()
-                                .width(70.dp),
                             contentScale = ContentScale.Crop,
                         )
                     }
-                    Spacer(modifier = Modifier.width(10.dp))
                 }
             }
             Text(text = data.name, maxLines = 3, style = MaterialTheme.typography.titleSmall)
         }
         Spacer(modifier = Modifier.height(6.dp))
-        Row(
-            modifier = Modifier.height(IntrinsicSize.Max),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = data.size.fileSize(context),
                 style = MaterialTheme.typography.labelMedium,

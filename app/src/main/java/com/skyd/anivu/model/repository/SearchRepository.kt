@@ -15,6 +15,7 @@ import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.db.dao.ArticleDao
@@ -93,7 +94,7 @@ class SearchRepository @Inject constructor(
     fun requestSearchArticle(
         feedUrl: String? = null,
         query: String,
-    ): Flow<PagingData<ArticleWithEnclosureBean>> {
+    ): Flow<PagingData<ArticleWithFeed>> {
         return flow {
             emit(
                 genSql(

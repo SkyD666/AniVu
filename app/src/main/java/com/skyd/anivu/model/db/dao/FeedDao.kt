@@ -73,11 +73,11 @@ interface FeedDao {
     @Query(
         """
         UPDATE $FEED_TABLE_NAME
-        SET ${FeedBean.GROUP_ID_COLUMN} = :groupId
+        SET ${FeedBean.NICKNAME_COLUMN} = :nickname, ${FeedBean.GROUP_ID_COLUMN} = :groupId
         WHERE ${FeedBean.URL_COLUMN} = :feedUrl
         """
     )
-    suspend fun updateFeedGroupId(feedUrl: String, groupId: String?): Int
+    suspend fun updateFeedGroupId(feedUrl: String, nickname: String?, groupId: String?): Int
 
     @Transaction
     @Query(

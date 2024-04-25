@@ -40,7 +40,7 @@ import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.showSnackbar
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
@@ -164,7 +164,7 @@ fun ArticleScreen(feedUrl: String?, viewModel: ArticleViewModel = hiltViewModel(
 @Composable
 private fun ArticleList(
     modifier: Modifier = Modifier,
-    articles: LazyPagingItems<ArticleWithEnclosureBean>,
+    articles: LazyPagingItems<ArticleWithFeed>,
     contentPadding: PaddingValues,
 ) {
     val adapter = remember {
@@ -176,6 +176,6 @@ private fun ArticleList(
         dataList = articles,
         adapter = adapter,
         contentPadding = contentPadding,
-        key = { _, item -> (item as ArticleWithEnclosureBean).article.articleId },
+        key = { _, item -> (item as ArticleWithFeed).articleWithEnclosure.article.articleId },
     )
 }

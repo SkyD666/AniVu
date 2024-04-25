@@ -26,6 +26,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,6 +51,7 @@ import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.ui.component.AniVuImage
@@ -61,28 +63,34 @@ import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalNavController
 
-class Article1Proxy : LazyGridAdapter.Proxy<ArticleWithEnclosureBean>() {
+class Article1Proxy : LazyGridAdapter.Proxy<ArticleWithFeed>() {
     @Composable
-    override fun Draw(index: Int, data: ArticleWithEnclosureBean) {
+    override fun Draw(index: Int, data: ArticleWithFeed) {
         Article1Item(data = data)
     }
 }
 
 @Composable
 fun Article1Item(
-    data: ArticleWithEnclosureBean,
+    data: ArticleWithFeed,
 ) {
     val navController = LocalNavController.current
     val context = LocalContext.current
     val articleTapAction = LocalArticleTapAction.current
     val articleSwipeLeftAction = LocalArticleSwipeLeftAction.current
-    val article = data.article
+    val articleWithEnclosure = data.articleWithEnclosure
+    val article = articleWithEnclosure.article
     var expandMenu by rememberSaveable { mutableStateOf(false) }
 
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
             if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                swipeLeftAction(articleSwipeLeftAction, context, navController, data)
+                swipeLeftAction(
+                    articleSwipeLeftAction,
+                    context,
+                    navController,
+                    articleWithEnclosure,
+                )
             }
             false
         },
@@ -111,10 +119,17 @@ fun Article1Item(
             modifier = Modifier
                 .background(MaterialTheme.colorScheme.background)
                 .fillMaxWidth()
-                .height(IntrinsicSize.Max)
+                .run { if (article.image.isNullOrBlank()) this else height(IntrinsicSize.Max) }
                 .combinedClickable(
                     onLongClick = { expandMenu = true },
-                    onClick = { tapAction(articleTapAction, context, navController, data) },
+                    onClick = {
+                        tapAction(
+                            articleTapAction,
+                            context,
+                            navController,
+                            articleWithEnclosure,
+                        )
+                    },
                 )
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
@@ -140,22 +155,44 @@ fun Article1Item(
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )
-                val author = article.author
-                if (!author.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(3.dp))
-                    Text(
-                        text = author,
-                        style = MaterialTheme.typography.labelSmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                Row(
+                    modifier = Modifier
+                        .height(IntrinsicSize.Max)
+                        .padding(top = 3.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    val feedName =
+                        data.feed.nickname.orEmpty().ifBlank { data.feed.title.orEmpty() }
+                    if (feedName.isNotBlank()) {
+                        Text(
+                            text = feedName,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    val author = article.author
+                    if (!author.isNullOrBlank()) {
+                        if (feedName.isNotBlank()) {
+                            VerticalDivider(
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 4.dp)
+                            )
+                        }
+                        Text(
+                            text = author,
+                            style = MaterialTheme.typography.labelSmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
                 val date = article.date?.toDateTimeString()
                 if (!date.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(3.dp))
                     Text(
+                        modifier = Modifier.padding(top = 3.dp),
                         text = date,
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -168,6 +205,7 @@ fun Article1Item(
                     Text(
                         text = description,
                         style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
                     )
@@ -186,7 +224,10 @@ fun Article1Item(
                             )
                         },
                         onClick = {
-                            navigateToReadScreen(navController = navController, data = data)
+                            navigateToReadScreen(
+                                navController = navController,
+                                data = articleWithEnclosure,
+                            )
                             expandMenu = false
                         },
                     )
@@ -199,7 +240,10 @@ fun Article1Item(
                             )
                         },
                         onClick = {
-                            showEnclosureBottomSheet(context = context, data = data)
+                            showEnclosureBottomSheet(
+                                context = context,
+                                data = articleWithEnclosure
+                            )
                             expandMenu = false
                         },
                     )

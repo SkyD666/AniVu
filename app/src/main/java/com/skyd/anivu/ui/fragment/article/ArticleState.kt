@@ -2,7 +2,7 @@ package com.skyd.anivu.ui.fragment.article
 
 import androidx.paging.PagingData
 import com.skyd.anivu.base.mvi.MviViewState
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.ArticleWithFeed
 import kotlinx.coroutines.flow.Flow
 
 data class ArticleState(
@@ -19,7 +19,7 @@ data class ArticleState(
 
 sealed class ArticleListState(open val loading: Boolean = false) {
     data class Success(
-        val articlePagingDataFlow: Flow<PagingData<ArticleWithEnclosureBean>>,
+        val articlePagingDataFlow: Flow<PagingData<ArticleWithFeed>>,
         override val loading: Boolean = false
     ) : ArticleListState()
 

@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.fragment.article
 
 import androidx.paging.PagingData
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.ArticleWithFeed
 import kotlinx.coroutines.flow.Flow
 
 
@@ -43,7 +43,7 @@ internal sealed interface ArticlePartialStateChange {
             }
         }
 
-        data class Success(val articlePagingDataFlow: Flow<PagingData<ArticleWithEnclosureBean>>) :
+        data class Success(val articlePagingDataFlow: Flow<PagingData<ArticleWithFeed>>) :
             ArticleList
 
         data class Failed(val msg: String) : ArticleList

@@ -75,7 +75,9 @@ fun Feed1Item(
                 )
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            val title = rememberSaveable(data.title) { data.title?.readable().orEmpty() }
+            val title = rememberSaveable(data.title, data.nickname) {
+                data.nickname.orEmpty().ifBlank { data.title?.readable().orEmpty() }
+            }
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleLarge,
@@ -89,6 +91,7 @@ fun Feed1Item(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     maxLines = 4,
                     overflow = TextOverflow.Ellipsis,
                 )

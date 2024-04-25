@@ -28,10 +28,12 @@ import com.skyd.anivu.R
 
 @Composable
 fun AniVuTextField(
+    modifier: Modifier = Modifier,
     value: String,
     label: String = "",
     readOnly: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
+    autoRequestFocus: Boolean = true,
     onValueChange: (String) -> Unit,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     isPassword: Boolean = false,
@@ -44,12 +46,12 @@ fun AniVuTextField(
     val focusRequester = remember { FocusRequester() }
     var showPassword by rememberSaveable { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
+    LaunchedEffect(autoRequestFocus) {
+        if (autoRequestFocus) focusRequester.requestFocus()
     }
 
     TextField(
-        modifier = Modifier.focusRequester(focusRequester),
+        modifier = modifier.run { if (autoRequestFocus) focusRequester(focusRequester) else this },
         maxLines = maxLines,
         enabled = !readOnly,
         value = value,

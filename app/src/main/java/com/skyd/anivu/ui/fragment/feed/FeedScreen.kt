@@ -47,13 +47,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -93,14 +96,16 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
     val windowSizeClass = LocalWindowSizeClass.current
     val scope = rememberCoroutineScope()
     var openAddDialog by rememberSaveable { mutableStateOf(false) }
-    var addDialogText by rememberSaveable { mutableStateOf("") }
+    var addDialogUrl by rememberSaveable { mutableStateOf("") }
+    var addDialogNickname by rememberSaveable { mutableStateOf("") }
     var addDialogGroup by rememberSaveable { mutableStateOf(GroupBean.defaultGroup) }
     var openEditDialog by rememberSaveable { mutableStateOf<FeedBean?>(null) }
     var editDialogUrl by rememberSaveable { mutableStateOf<String?>(null) }
+    var editDialogNickname by rememberSaveable { mutableStateOf("") }
     var editDialogGroupId by rememberSaveable { mutableStateOf<String?>(null) }
 
     var openCreateGroupDialog by rememberSaveable { mutableStateOf(false) }
-    var createGroupDialogText by rememberSaveable { mutableStateOf("") }
+    var createGroupDialogGroup by rememberSaveable { mutableStateOf("") }
 
     var fabHeight by remember { mutableStateOf(0.dp) }
     var fabWidth by remember { mutableStateOf(0.dp) }
@@ -170,6 +175,7 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                     onEditFeed = { feed ->
                         openEditDialog = feed
                         editDialogUrl = feed.url
+                        editDialogNickname = feed.nickname.orEmpty()
                         editDialogGroupId = feed.groupId
                     },
                     onDeleteGroup = { dispatch(FeedIntent.DeleteGroup(it.groupId)) },
@@ -180,7 +186,7 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                     },
                     openCreateGroupDialog = {
                         openCreateGroupDialog = true
-                        createGroupDialogText = ""
+                        createGroupDialogGroup = ""
                     }
                 )
             }
@@ -191,25 +197,31 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                 ?.dataList?.filterIsInstance<GroupBean>().orEmpty()
             EditFeedDialog(
                 title = stringResource(id = R.string.add),
-                url = addDialogText,
-                onUrlChange = { text -> addDialogText = text },
+                url = addDialogUrl,
+                onUrlChange = { text -> addDialogUrl = text },
+                nickname = addDialogNickname,
+                onNicknameChange = { addDialogNickname = it },
                 group = addDialogGroup,
                 groups = groups,
                 onGroupChange = { addDialogGroup = it },
                 openCreateGroupDialog = {
                     openCreateGroupDialog = true
-                    createGroupDialogText = ""
+                    createGroupDialogGroup = ""
                 },
-                onConfirm = { newUrl, group ->
+                onConfirm = { newUrl, nickname, group ->
                     if (newUrl.isNotBlank()) {
-                        dispatch(FeedIntent.AddFeed(url = newUrl, group = group))
+                        dispatch(
+                            FeedIntent.AddFeed(url = newUrl, nickname = nickname, group = group)
+                        )
                     }
-                    addDialogText = ""
+                    addDialogUrl = ""
+                    addDialogNickname = ""
                     addDialogGroup = GroupBean.defaultGroup
                     openAddDialog = false
                 },
                 onDismissRequest = {
-                    addDialogText = ""
+                    addDialogUrl = ""
+                    addDialogNickname = ""
                     addDialogGroup = GroupBean.defaultGroup
                     openAddDialog = false
                 }
@@ -222,26 +234,31 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
             EditFeedDialog(
                 url = editDialogUrl!!,
                 onUrlChange = { editDialogUrl = it },
+                nickname = editDialogNickname,
+                onNicknameChange = { editDialogNickname = it },
                 group = groups.find { it.groupId == editDialogGroupId } ?: GroupBean.defaultGroup,
                 groups = groups,
                 onGroupChange = { editDialogGroupId = it.groupId },
                 openCreateGroupDialog = {
                     openCreateGroupDialog = true
-                    createGroupDialogText = ""
+                    createGroupDialogGroup = ""
                 },
-                onConfirm = { newUrl, group ->
+                onConfirm = { newUrl, nickname, group ->
                     dispatch(
                         FeedIntent.EditFeed(
                             oldUrl = openEditDialog!!.url,
                             newUrl = newUrl,
+                            nickname = nickname,
                             groupId = group.groupId,
                         )
                     )
                     openEditDialog = null
+                    editDialogNickname = ""
                     editDialogUrl = null
                 },
                 onDismissRequest = {
                     openEditDialog = null
+                    editDialogNickname = ""
                     editDialogUrl = null
                 },
             )
@@ -251,8 +268,8 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
 
         CreateGroupDialog(
             visible = openCreateGroupDialog,
-            value = createGroupDialogText,
-            onValueChange = { text -> createGroupDialogText = text },
+            value = createGroupDialogGroup,
+            onValueChange = { text -> createGroupDialogGroup = text },
             onCreateGroup = {
                 dispatch(FeedIntent.CreateGroup(it))
                 openCreateGroupDialog = false
@@ -300,17 +317,16 @@ private fun EditFeedDialog(
     title: String = stringResource(id = R.string.edit),
     url: String,
     onUrlChange: (String) -> Unit,
+    nickname: String,
+    onNicknameChange: (String) -> Unit,
     group: GroupBean,
     groups: List<GroupBean>,
     onGroupChange: (GroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
-    onConfirm: (url: String, group: GroupBean) -> Unit,
+    onConfirm: (url: String, nickname: String, group: GroupBean) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    val focusManager = LocalFocusManager.current
     var expandMenu by rememberSaveable { mutableStateOf(false) }
-    val keyboard = LocalSoftwareKeyboardController.current
-    val focusRequester = remember { FocusRequester() }
 
     AniVuDialog(
         visible = true,
@@ -319,14 +335,33 @@ private fun EditFeedDialog(
         onDismissRequest = onDismissRequest,
         text = {
             Column {
+                val focusManager = LocalFocusManager.current
+                val focusRequester = remember { FocusRequester() }
+                val keyboard = LocalSoftwareKeyboardController.current
                 ClipboardTextField(
                     modifier = Modifier.focusRequester(focusRequester),
                     value = url,
                     onValueChange = onUrlChange,
+                    autoRequestFocus = false,
                     placeholder = stringResource(id = R.string.feed_screen_add_rss_hint),
                     focusManager = focusManager,
+                    imeAction = ImeAction.Next,
+                    keyboardAction = { _, _ ->
+                        focusManager.moveFocus(FocusDirection.Next)
+                    }
                 )
-                Spacer(modifier = Modifier.height(3.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+                ClipboardTextField(
+                    value = nickname,
+                    onValueChange = onNicknameChange,
+                    autoRequestFocus = false,
+                    placeholder = stringResource(id = R.string.feed_screen_rss_nickname),
+                    focusManager = focusManager,
+                    keyboardAction = { _, _ ->
+                        focusManager.clearFocus()
+                    }
+                )
+                Spacer(modifier = Modifier.height(10.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     ExposedDropdownMenuBox(
                         modifier = Modifier.weight(1f),
@@ -372,14 +407,19 @@ private fun EditFeedDialog(
                         imageVector = Icons.Default.Add,
                     )
                 }
+
+                LaunchedEffect(focusRequester) {
+                    focusRequester.requestFocus()
+                    awaitFrame()
+                    keyboard?.show()
+                }
             }
         },
         confirmButton = {
             TextButton(
                 enabled = url.isNotBlank(),
                 onClick = {
-                    focusManager.clearFocus()
-                    onConfirm(url, group)
+                    onConfirm(url, nickname, group)
                 }
             ) {
                 Text(
@@ -395,12 +435,6 @@ private fun EditFeedDialog(
             }
         },
     )
-
-    LaunchedEffect(focusRequester) {
-        focusRequester.requestFocus()
-        awaitFrame()
-        keyboard?.show()
-    }
 }
 
 @Composable

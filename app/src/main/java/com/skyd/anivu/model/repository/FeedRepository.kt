@@ -56,16 +56,18 @@ class FeedRepository @Inject constructor(
 
     suspend fun setFeed(
         url: String,
-        groupId: String? = null,
-        nickname: String? = null,
+        groupId: String?,
+        nickname: String?,
     ): Flow<Unit> {
         return flow {
-            val realGroupId = if (groupId == GroupBean.DEFAULT_GROUP_ID) null else groupId
+            val realNickname = if (nickname.isNullOrBlank()) null else nickname
+            val realGroupId =
+                if (nickname.isNullOrBlank() || groupId == GroupBean.DEFAULT_GROUP_ID) null else groupId
             val feedWithArticleBean = rssHelper.searchFeed(url = url).run {
                 copy(
                     feed = feed.copy(
                         groupId = realGroupId,
-                        nickname = nickname,
+                        nickname = realNickname,
                     )
                 )
             }
@@ -73,13 +75,22 @@ class FeedRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun editFeed(oldUrl: String, newUrl: String, groupId: String?): Flow<Unit> {
+    suspend fun editFeed(
+        oldUrl: String,
+        newUrl: String,
+        nickname: String?,
+        groupId: String?,
+    ): Flow<Unit> {
         return flow {
+            val realNickname = if (nickname.isNullOrBlank()) null else nickname
+            val realGroupId =
+                if (groupId.isNullOrBlank() || groupId == GroupBean.DEFAULT_GROUP_ID) null else groupId
             if (oldUrl != newUrl) {
                 val feedWithArticleBean = rssHelper.searchFeed(url = newUrl).run {
                     copy(
                         feed = feed.copy(
-                            groupId = groupId,
+                            groupId = realGroupId,
+                            nickname = realNickname,
                         )
                     )
                 }
@@ -87,7 +98,7 @@ class FeedRepository @Inject constructor(
                 feedDao.setFeedWithArticle(feedWithArticleBean)
                 emit(Unit)
             } else {
-                feedDao.updateFeedGroupId(oldUrl, groupId)
+                feedDao.updateFeedGroupId(oldUrl, realNickname, realGroupId)
                 emit(Unit)
             }
         }.flowOn(Dispatchers.IO)

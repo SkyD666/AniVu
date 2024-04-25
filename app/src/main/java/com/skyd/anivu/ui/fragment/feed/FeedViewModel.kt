@@ -117,15 +117,25 @@ class FeedViewModel @Inject constructor(
                 }.startWith(FeedPartialStateChange.FeedList.Loading)
             },
             filterIsInstance<FeedIntent.AddFeed>().flatMapConcat { intent ->
-                feedRepo.setFeed(url = intent.url, groupId = intent.group.groupId).map {
+                feedRepo.setFeed(
+                    url = intent.url,
+                    nickname = intent.nickname,
+                    groupId = intent.group.groupId,
+                ).map {
                     FeedPartialStateChange.AddFeed.Success
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.AddFeed.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.EditFeed>().flatMapConcat { intent ->
-                feedRepo.editFeed(intent.oldUrl, intent.newUrl, intent.groupId).map {
-                    FeedPartialStateChange.EditFeed.Success
-                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                feedRepo.editFeed(
+                    oldUrl = intent.oldUrl,
+                    newUrl = intent.newUrl,
+                    nickname = intent.nickname,
+                    groupId = intent.groupId,
+                )
+                    .map {
+                        FeedPartialStateChange.EditFeed.Success
+                    }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.RemoveFeed>().flatMapConcat { intent ->
