@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceScreen
 import androidx.preference.SwitchPreferenceCompat
@@ -11,6 +12,7 @@ import com.google.android.material.color.DynamicColors
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BasePreferenceFragmentCompat
 import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.inDarkMode
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
@@ -89,6 +91,22 @@ class AppearanceFragment : BasePreferenceFragmentCompat() {
                 }
                 themeCategory.addPreference(this)
             }
+        }
+
+        val styleCategory = PreferenceCategory(this).apply {
+            key = "styleCategory"
+            title = getString(R.string.appearance_fragment_style_category)
+            screen.addPreference(this)
+        }
+
+        Preference(this).apply {
+            key = "feedScreenStyle"
+            title = getString(R.string.feed_style_screen_name)
+            setOnPreferenceClickListener {
+                findMainNavController().navigate(R.id.action_to_feed_style_fragment)
+                true
+            }
+            styleCategory.addPreference(this)
         }
     }
 

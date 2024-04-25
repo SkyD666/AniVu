@@ -22,15 +22,26 @@ data class GroupBean(
     @ColumnInfo(name = NAME_COLUMN)
     val name: String,
 ) : BaseBean, Parcelable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is GroupBean) return false
+        return groupId == other.groupId
+    }
+
+    override fun hashCode(): Int {
+        return groupId.hashCode()
+    }
+
     companion object {
         const val DEFAULT_GROUP_ID = "default"
 
         const val NAME_COLUMN = "name"
         const val GROUP_ID_COLUMN = "groupId"
 
-        val defaultGroup = GroupBean(
-            groupId = DEFAULT_GROUP_ID,
-            name = appContext.getString(R.string.default_feed_group)
-        )
+        val defaultGroup
+            get() = GroupBean(
+                groupId = DEFAULT_GROUP_ID,
+                name = appContext.getString(R.string.default_feed_group)
+            )
     }
 }

@@ -49,7 +49,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -81,6 +80,7 @@ import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Feed1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Group1Proxy
 import com.skyd.anivu.ui.fragment.search.SearchFragment
+import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import kotlinx.coroutines.android.awaitFrame
@@ -170,7 +170,7 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
             is GroupListState.Success -> {
                 FeedList(
                     result = groupListState.dataList,
-                    contentPadding = innerPadding + PaddingValues(bottom = fabHeight),
+                    contentPadding = innerPadding + PaddingValues(bottom = fabHeight + 16.dp),
                     onRemoveFeed = { feed -> dispatch(FeedIntent.RemoveFeed(feed.url)) },
                     onEditFeed = { feed ->
                         openEditDialog = feed
@@ -405,6 +405,7 @@ private fun EditFeedDialog(
                     AniVuIconButton(
                         onClick = openCreateGroupDialog,
                         imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(id = R.string.feed_screen_add_group),
                     )
                 }
 
@@ -474,12 +475,13 @@ private fun FeedList(
     onMoveToGroup: (from: GroupBean, to: GroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
+    val feedGroupExpand = LocalFeedGroupExpand.current
     val groups = rememberSaveable(result) { result.filterIsInstance<GroupBean>() }
     val feedVisible = rememberSaveable(saver = snapshotStateMapSaver()) {
         mutableStateMapOf(
-            GroupBean.DEFAULT_GROUP_ID to false,
+            GroupBean.DEFAULT_GROUP_ID to feedGroupExpand,
             *(groups
-                .map { it.groupId to false }
+                .map { it.groupId to feedGroupExpand }
                 .toTypedArray())
         )
     }

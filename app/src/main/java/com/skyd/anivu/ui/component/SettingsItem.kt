@@ -54,7 +54,7 @@ fun BannerItem(content: @Composable () -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
         CompositionLocalProvider(
             LocalContentColor provides (LocalContentColor.current alwaysLight true),
-            LocalVerticalPadding provides 12.dp
+            LocalVerticalPadding provides 21.dp
         ) {
             Box(
                 modifier = Modifier
@@ -354,7 +354,7 @@ fun BaseSettingsItem(
                         combinedClickable(onLongClick = onLongClick) { onClick() }
                     } else this
                 }
-                .padding(LocalVerticalPadding.current),
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (icon != null) {
@@ -379,7 +379,7 @@ fun BaseSettingsItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(horizontal = 10.dp)
+                    .padding(horizontal = 10.dp, vertical = LocalVerticalPadding.current)
             ) {
                 Text(
                     text = text,
@@ -389,7 +389,7 @@ fun BaseSettingsItem(
                 )
                 dropdownMenu?.invoke()
                 if (description != null) {
-                    Box(modifier = Modifier.padding(top = 5.dp)) {
+                    Box(modifier = Modifier.padding(top = 4.dp)) {
                         description.invoke()
                     }
                 }

@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import com.skyd.anivu.model.preference.IgnoreUpdateVersionPreference
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
@@ -18,9 +19,10 @@ val LocalWindowSizeClass = compositionLocalOf<WindowSizeClass> {
     error("LocalWindowSizeClass not initialized!")
 }
 
-// Theme
+// Appearance
 val LocalTheme = compositionLocalOf { ThemePreference.default }
 val LocalDarkMode = compositionLocalOf { DarkModePreference.default }
+val LocalFeedGroupExpand = compositionLocalOf { FeedGroupExpandPreference.default }
 
 // Update
 val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreference.default }

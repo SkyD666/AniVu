@@ -175,6 +175,11 @@
     <string name="feed_screen_group_feeds_move_to">移动到组</string>
     <string name="feed_screen_delete_group_warning">删除“%s”分组及其所有订阅和文章</string>
     <string name="feed_screen_delete_group_warning_title">删除分组</string>
+    <string name="feed_screen_rss_nickname">名称（可选）</string>
+    <string name="feed_style_screen_name">订阅页面</string>
+    <string name="feed_style_screen_feed_group_expand">总是展开</string>
+    <string name="feed_style_screen_group_list_category">分组列表</string>
+    <string name="appearance_fragment_style_category">样式</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

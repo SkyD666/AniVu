@@ -162,4 +162,12 @@
     <action
         android:id="@+id/action_to_behavior_fragment"
         app:destination="@id/behavior_fragment" />
+
+    <fragment
+        android:id="@+id/feed_style_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.appearance.feed.FeedAppearanceFragment"
+        android:label="@string/feed_style_screen_name" />
+    <action
+        android:id="@+id/action_to_feed_style_fragment"
+        app:destination="@id/feed_style_fragment" />
 </navigation>
