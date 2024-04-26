@@ -38,8 +38,6 @@
 </div>
 
 
-
-
 ## 💡 Features
 
 1. **Subscribe to RSS**, Update RSS, **Read** RSS

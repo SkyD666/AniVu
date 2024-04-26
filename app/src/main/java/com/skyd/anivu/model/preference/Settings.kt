@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.toSettings
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
+import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
@@ -20,6 +21,7 @@ import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
+import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
@@ -29,6 +31,7 @@ data class Settings(
     val theme: String = ThemePreference.default,
     val darkMode: Int = DarkModePreference.default,
     val feedGroupExpand: Boolean = FeedGroupExpandPreference.default,
+    val textFieldStyle: String = TextFieldStylePreference.default,
     // Update
     val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
     // Behavior
@@ -50,6 +53,7 @@ fun SettingsProvider(
         LocalTheme provides settings.theme,
         LocalDarkMode provides settings.darkMode,
         LocalFeedGroupExpand provides settings.feedGroupExpand,
+        LocalTextFieldStyle provides settings.textFieldStyle,
         // Update
         LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
         // Behavior

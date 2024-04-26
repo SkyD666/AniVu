@@ -30,10 +30,9 @@
         使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架構，完全採用 <b><a href="https://m3.material.io/">Material You</a></b> 設計風格。使用 <b>Android View</b> 和 <b>Jetpack Compose</b> 混合開發。
     </p>
     <p>
-        <b><a href="../../README.md">English</a></b> | <b><a href="doc/readme/README-zh-rCN.md">中文</a></b> | <b>正體中文</b>
+        <b><a href="../../README.md">English</a></b> | <b><a href="README-zh-rCN.md">中文</a></b> | <b>正體中文</b>
     </p>
 </div>
-
 
 
 ## 💡主要功能
@@ -60,11 +59,11 @@
 
 ## 🤩應用截圖
 
-<img src="../image/zh-rCN/ic_rss_fragment.jpg" alt="ic_rss_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_media_fragment.jpg" alt="ic_media_fragment" style="zoom:80%;" />
-<img src="../image/zh-rCN/ic_article_fragment.jpg" alt="ic_article_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_read_fragment.jpg" alt="ic_read_fragment" style="zoom:80%;" />
-<img src="../image/zh-rCN/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
-<img src="../image/zh-rCN/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
-<img src="../image/zh-rCN/ic_player_activity.png" alt="ic_player_activity" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_rss_fragment.jpg" alt="ic_rss_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_media_fragment.jpg" alt="ic_media_fragment" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_article_fragment.jpg" alt="ic_article_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_read_fragment.jpg" alt="ic_read_fragment" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_player_activity.png" alt="ic_player_activity" style="zoom:80%;" />
 
 ## 🛠主要技術棧
 

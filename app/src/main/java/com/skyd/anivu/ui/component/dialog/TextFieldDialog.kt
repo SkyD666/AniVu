@@ -11,7 +11,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import com.skyd.anivu.R
+import com.skyd.anivu.ui.component.AniVuTextFieldStyle
 import com.skyd.anivu.ui.component.ClipboardTextField
+import com.skyd.anivu.ui.component.DefaultTrailingIcon
+import com.skyd.anivu.ui.local.LocalTextFieldStyle
 
 @Composable
 fun TextFieldDialog(
@@ -19,10 +22,12 @@ fun TextFieldDialog(
     visible: Boolean = false,
     readOnly: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
+    style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     icon: @Composable (() -> Unit)? = null,
     title: String = "",
     value: String = "",
     placeholder: String = "",
+    trailingIcon: @Composable (() -> Unit)? = DefaultTrailingIcon,
     isPassword: Boolean = false,
     errorText: String = "",
     dismissText: String = stringResource(R.string.cancel),
@@ -46,8 +51,10 @@ fun TextFieldDialog(
                 readOnly = readOnly,
                 value = value,
                 maxLines = maxLines,
+                style = style,
                 onValueChange = onValueChange,
                 placeholder = placeholder,
+                trailingIcon = trailingIcon,
                 isPassword = isPassword,
                 errorText = errorText,
                 imeAction = imeAction,

@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.lifecycle.lifecycleScope
+import androidx.preference.DropDownPreference
+import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceScreen
@@ -16,6 +18,7 @@ import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.inDarkMode
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
+import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.ui.component.preference.ColorPalettesPreference
 import com.skyd.anivu.ui.component.preference.ToggleGroupPreference
@@ -97,6 +100,22 @@ class AppearanceFragment : BasePreferenceFragmentCompat() {
             key = "styleCategory"
             title = getString(R.string.appearance_fragment_style_category)
             screen.addPreference(this)
+        }
+
+        DropDownPreference(this).apply {
+            key = "textFieldStyle"
+            title = getString(R.string.appearance_fragment_text_field_style)
+            value = TextFieldStylePreference.toDisplayName(context)
+            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+            entries = TextFieldStylePreference.values.map {
+                TextFieldStylePreference.toDisplayName(context, it)
+            }.toTypedArray()
+            entryValues = TextFieldStylePreference.values.toTypedArray()
+            setOnPreferenceChangeListener { _, newValue ->
+                TextFieldStylePreference.put(requireContext(), lifecycleScope, newValue as String)
+                true
+            }
+            styleCategory.addPreference(this)
         }
 
         Preference(this).apply {

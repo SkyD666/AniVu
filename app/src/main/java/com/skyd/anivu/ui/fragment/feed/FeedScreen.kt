@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material.icons.Icons
@@ -33,7 +34,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -69,6 +69,8 @@ import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.AniVuTextField
+import com.skyd.anivu.ui.component.AniVuTextFieldStyle
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.ClipboardTextField
@@ -82,6 +84,7 @@ import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Group1Proxy
 import com.skyd.anivu.ui.fragment.search.SearchFragment
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import kotlinx.coroutines.android.awaitFrame
 import java.util.UUID
@@ -343,7 +346,7 @@ private fun EditFeedDialog(
                     value = url,
                     onValueChange = onUrlChange,
                     autoRequestFocus = false,
-                    placeholder = stringResource(id = R.string.feed_screen_add_rss_hint),
+                    label = stringResource(id = R.string.feed_screen_add_rss_hint),
                     focusManager = focusManager,
                     imeAction = ImeAction.Next,
                     keyboardAction = { _, _ ->
@@ -355,7 +358,7 @@ private fun EditFeedDialog(
                     value = nickname,
                     onValueChange = onNicknameChange,
                     autoRequestFocus = false,
-                    placeholder = stringResource(id = R.string.feed_screen_rss_nickname),
+                    label = stringResource(id = R.string.feed_screen_rss_nickname),
                     focusManager = focusManager,
                     keyboardAction = { _, _ ->
                         focusManager.clearFocus()
@@ -368,7 +371,7 @@ private fun EditFeedDialog(
                         expanded = expandMenu,
                         onExpandedChange = { expandMenu = it },
                     ) {
-                        TextField(
+                        AniVuTextField(
                             // The `menuAnchor` modifier must be passed to the text field to handle
                             // expanding/collapsing the menu on click. A read-only text field has
                             // the anchor type `PrimaryNotEditable`.
@@ -376,8 +379,8 @@ private fun EditFeedDialog(
                             value = group.name,
                             onValueChange = {},
                             readOnly = true,
-                            singleLine = true,
-                            label = { Text(stringResource(R.string.feed_group)) },
+                            maxLines = 1,
+                            label = stringResource(R.string.feed_group),
                             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandMenu) },
                             colors = ExposedDropdownMenuDefaults.textFieldColors(),
                         )
@@ -403,6 +406,12 @@ private fun EditFeedDialog(
                         }
                     }
                     AniVuIconButton(
+                        // https://m3.material.io/components/text-fields/specs#605e24f1-1c1f-4c00-b385-4bf50733a5ef
+                        modifier = Modifier.run {
+                            if (LocalTextFieldStyle.current == AniVuTextFieldStyle.Outlined.value)
+                                padding(top = 8.dp)
+                            else this
+                        },
                         onClick = openCreateGroupDialog,
                         imageVector = Icons.Default.Add,
                         contentDescription = stringResource(id = R.string.feed_screen_add_group),

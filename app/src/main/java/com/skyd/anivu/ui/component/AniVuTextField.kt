@@ -8,8 +8,12 @@ import androidx.compose.material.icons.rounded.ContentPaste
 import androidx.compose.material.icons.rounded.Visibility
 import androidx.compose.material.icons.rounded.VisibilityOff
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,53 +29,70 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import com.skyd.anivu.R
+import com.skyd.anivu.ui.local.LocalTextFieldStyle
+
+enum class AniVuTextFieldStyle(val value: String) {
+    Normal("Normal"),
+    Outlined("Outlined");
+
+    companion object {
+        fun toEnum(value: String): AniVuTextFieldStyle {
+            return if (value == Normal.value) Normal else Outlined
+        }
+    }
+}
+
+val DefaultTrailingIcon: @Composable () -> Unit = {}
 
 @Composable
 fun AniVuTextField(
     modifier: Modifier = Modifier,
     value: String,
     label: String = "",
+    enabled: Boolean = true,
     readOnly: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
+    style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     autoRequestFocus: Boolean = true,
     onValueChange: (String) -> Unit,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     isPassword: Boolean = false,
     placeholder: String = "",
+    trailingIcon: @Composable (() -> Unit)? = DefaultTrailingIcon,
     errorMessage: String = "",
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
+    colors: TextFieldColors =
+        if (style == AniVuTextFieldStyle.Normal) TextFieldDefaults.colors()
+        else OutlinedTextFieldDefaults.colors(),
 ) {
+    var showPassword by rememberSaveable { mutableStateOf(false) }
     val clipboardManager = LocalClipboardManager.current
     val focusRequester = remember { FocusRequester() }
-    var showPassword by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(autoRequestFocus) {
         if (autoRequestFocus) focusRequester.requestFocus()
     }
 
-    TextField(
-        modifier = modifier.run { if (autoRequestFocus) focusRequester(focusRequester) else this },
-        maxLines = maxLines,
-        enabled = !readOnly,
-        value = value,
-        label = if (label.isBlank()) null else {
+    val newModifier =
+        modifier.run { if (autoRequestFocus) focusRequester(focusRequester) else this }
+    val newLabel: @Composable (() -> Unit)? =
+        if (label.isBlank()) null
+        else {
             { Text(label) }
-        },
-        onValueChange = {
-            if (!readOnly) onValueChange(it)
-        },
-        visualTransformation = if (isPassword && !showPassword) PasswordVisualTransformation() else visualTransformation,
-        placeholder = {
-            Text(
-                text = placeholder,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f),
-                style = MaterialTheme.typography.bodyMedium
-            )
-        },
-        isError = errorMessage.isNotEmpty(),
-        singleLine = maxLines == 1,
-        trailingIcon = {
+        }
+    val newOnValueChange: (String) -> Unit = { if (!readOnly) onValueChange(it) }
+    val newVisualTransformation =
+        if (isPassword && !showPassword) PasswordVisualTransformation() else visualTransformation
+    val newPlaceholder: @Composable () -> Unit = {
+        Text(
+            text = placeholder,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.7f),
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+    val newTrailingIcon: (@Composable () -> Unit)? = if (trailingIcon == DefaultTrailingIcon) {
+        {
             if (value.isNotEmpty()) {
                 AniVuIconButton(
                     imageVector = if (isPassword) {
@@ -98,8 +119,46 @@ fun AniVuTextField(
                     onClick = { onValueChange(clipboardManager.getText()?.text.orEmpty()) }
                 )
             }
-        },
-        keyboardOptions = keyboardOptions,
-        keyboardActions = keyboardActions,
-    )
+        }
+    } else {
+        trailingIcon
+    }
+
+    when (style) {
+        AniVuTextFieldStyle.Normal -> TextField(
+            modifier = newModifier,
+            maxLines = maxLines,
+            readOnly = readOnly,
+            enabled = enabled,
+            value = value,
+            label = newLabel,
+            onValueChange = newOnValueChange,
+            visualTransformation = newVisualTransformation,
+            placeholder = newPlaceholder,
+            isError = errorMessage.isNotEmpty(),
+            singleLine = maxLines == 1,
+            trailingIcon = newTrailingIcon,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            colors = colors,
+        )
+
+        AniVuTextFieldStyle.Outlined -> OutlinedTextField(
+            modifier = newModifier,
+            maxLines = maxLines,
+            readOnly = readOnly,
+            enabled = enabled,
+            value = value,
+            label = newLabel,
+            onValueChange = newOnValueChange,
+            visualTransformation = newVisualTransformation,
+            placeholder = newPlaceholder,
+            isError = errorMessage.isNotEmpty(),
+            singleLine = maxLines == 1,
+            trailingIcon = newTrailingIcon,
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
+            colors = colors,
+        )
+    }
 }

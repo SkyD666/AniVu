@@ -1,31 +1,63 @@
 package com.skyd.anivu.ui.activity
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Process
-import android.widget.TextView
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.config.Const.GITHUB_NEW_ISSUE_URL
 import com.skyd.anivu.ext.getAppVersionCode
 import com.skyd.anivu.ext.getAppVersionName
 import com.skyd.anivu.ext.openBrowser
-import com.skyd.anivu.ext.sp
-import com.skyd.anivu.ui.component.showToast
-import kotlin.system.exitProcess
+import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.model.preference.SettingsProvider
+import com.skyd.anivu.ui.local.LocalDarkMode
+import com.skyd.anivu.ui.local.LocalWindowSizeClass
+import com.skyd.anivu.ui.theme.AniVuTheme
 
 
 /**
  * CrashActivity, do not extends BaseActivity
  */
-class CrashActivity : AppCompatActivity() {
+class CrashActivity : ComponentActivity() {
     companion object {
         const val CRASH_INFO = "crashInfo"
 
@@ -37,23 +69,11 @@ class CrashActivity : AppCompatActivity() {
         }
     }
 
-    private fun copyToClipboard(crashInfo: String?) {
-        val cm = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        cm.setPrimaryClip(ClipData.newPlainText("Exception trace stack", crashInfo))
-    }
-
-    private fun exitApp() {
-        finish()
-        Process.killProcess(Process.myPid())
-        exitProcess(1)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val crashInfo = intent.getStringExtra(CRASH_INFO)
-
         val message = buildString {
             append("VersionName: ").append(getAppVersionName()).append("\n")
             append("VersionCode: ").append(getAppVersionCode()).append("\n")
@@ -64,31 +84,94 @@ class CrashActivity : AppCompatActivity() {
             append("Crash Info: \n")
             append(crashInfo)
         }
-        MaterialAlertDialogBuilder(this)
-            .setIcon(R.drawable.ic_error_24)
-            .setTitle(getString(R.string.crashed))
-            .setMessage(message)
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.submit_an_issue_on_github)) { _, _ ->
-                copyToClipboard(message)
-                Uri.parse(GITHUB_NEW_ISSUE_URL).openBrowser(this)
-                exitApp()
-            }
-            .setNegativeButton(getString(R.string.close)) { _, _ ->
-                exitApp()
-            }
-            .setNeutralButton(getString(android.R.string.copy)) { _, _ ->
-                copyToClipboard(message)
-                getString(R.string.copied).showToast()
-                exitApp()
-            }
-            .show()
-            .apply {
-                window?.decorView?.findViewById<TextView>(android.R.id.message)?.apply {
-                    setTextIsSelectable(true)
-                    textSize = 3.5f.sp
+
+        setContent {
+            CompositionLocalProvider(
+                LocalWindowSizeClass provides calculateWindowSizeClass(this)
+            ) {
+                SettingsProvider {
+                    AniVuTheme(darkTheme = LocalDarkMode.current) {
+                        CrashScreen(
+                            message = message,
+                            onReport = {
+                                Uri.parse(GITHUB_NEW_ISSUE_URL).openBrowser(this)
+                            }
+                        )
+                    }
                 }
             }
-        setFinishOnTouchOutside(false)
+        }
     }
+}
+
+@Composable
+private fun CrashScreen(
+    message: String,
+    onReport: () -> Unit,
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val clipboardManager = LocalClipboardManager.current
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+    ) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(it)
+                .padding(20.dp)
+        ) {
+            Spacer(modifier = Modifier.height(40.dp))
+            Icon(
+                modifier = Modifier.size(40.dp),
+                imageVector = Icons.Default.BugReport,
+                contentDescription = null,
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+            Text(
+                text = stringResource(id = R.string.crashed),
+                style = MaterialTheme.typography.headlineLarge,
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                TextButton(onClick = {
+                    copyToClipboard(message, clipboardManager)
+                    snackbarHostState.showSnackbar(
+                        scope = scope,
+                        message = context.getString(R.string.copied),
+                    )
+                }) {
+                    Text(text = stringResource(id = R.string.crash_screen_copy_crash_log))
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                Button(onClick = {
+                    copyToClipboard(message, clipboardManager)
+                    onReport()
+                }) {
+                    Text(text = stringResource(id = R.string.submit_an_issue_on_github))
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+            Text(
+                text = stringResource(R.string.crash_screen_crash_log),
+                style = MaterialTheme.typography.titleLarge,
+            )
+
+            Spacer(modifier = Modifier.height(10.dp))
+            SelectionContainer {
+                Text(text = message, style = MaterialTheme.typography.bodyMedium)
+            }
+        }
+    }
+}
+
+private fun copyToClipboard(text: String, clipboardManager: ClipboardManager) {
+    clipboardManager.setText(AnnotatedString(text))
 }

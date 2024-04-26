@@ -119,8 +119,8 @@
     <string name="rss_config_fragment_sync_wifi_constraint">Only on Wi-Fi</string>
     <string name="rss_config_fragment_sync_charging_constraint">Only when charging</string>
     <string name="rss_config_fragment_sync_battery_not_low_constraint">Only not in low battery mode</string>
-    <string name="crashed">Crashed!</string>
-    <string name="submit_an_issue_on_github">Report</string>
+    <string name="crashed"><![CDATA[Crashed (＃＞＜)]]></string>
+    <string name="submit_an_issue_on_github">Report on GitHub</string>
     <string name="copied">Copied</string>
     <string name="read_fragment_article_id_illegal">Article ID is invalid, probably it has been deleted.</string>
     <string name="auto_delete_article_fragment_name">Auto delete</string>
@@ -188,6 +188,11 @@
     <string name="feed_style_screen_feed_group_expand">Always expand</string>
     <string name="feed_style_screen_group_list_category">Group list</string>
     <string name="appearance_fragment_style_category">Style</string>
+    <string name="normal_text_field_style">Normal</string>
+    <string name="outlined_text_field_style">Outlined</string>
+    <string name="appearance_fragment_text_field_style">Text field style</string>
+    <string name="crash_screen_crash_log">Log</string>
+    <string name="crash_screen_copy_crash_log">Copy log</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

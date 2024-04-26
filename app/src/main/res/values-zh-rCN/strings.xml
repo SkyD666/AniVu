@@ -113,8 +113,8 @@
     <string name="rss_config_fragment_sync_wifi_constraint">仅在 Wi-Fi 连接时</string>
     <string name="rss_config_fragment_sync_charging_constraint">仅在充电时</string>
     <string name="rss_config_fragment_sync_battery_not_low_constraint">仅在电量充足时</string>
-    <string name="crashed">崩溃了</string>
-    <string name="submit_an_issue_on_github">报告</string>
+    <string name="crashed"><![CDATA[崩溃了 (＃＞＜)]]></string>
+    <string name="submit_an_issue_on_github">在 GitHub 上报告</string>
     <string name="copied">已复制</string>
     <string name="read_fragment_article_id_illegal">文章 ID 无效，可能是已被删除。</string>
     <string name="auto_delete_article_fragment_name">自动删除</string>
@@ -180,6 +180,11 @@
     <string name="feed_style_screen_feed_group_expand">总是展开</string>
     <string name="feed_style_screen_group_list_category">分组列表</string>
     <string name="appearance_fragment_style_category">样式</string>
+    <string name="normal_text_field_style">正常</string>
+    <string name="outlined_text_field_style">轮廓</string>
+    <string name="appearance_fragment_text_field_style">文本框样式</string>
+    <string name="crash_screen_crash_log">日志</string>
+    <string name="crash_screen_copy_crash_log">复制日志</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

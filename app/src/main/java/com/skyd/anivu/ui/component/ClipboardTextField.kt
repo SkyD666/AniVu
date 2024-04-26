@@ -15,6 +15,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.skyd.anivu.ui.local.LocalTextFieldStyle
+
 
 @Composable
 fun ClipboardTextField(
@@ -23,9 +25,11 @@ fun ClipboardTextField(
     value: String = "",
     label: String = "",
     maxLines: Int = Int.MAX_VALUE,
+    style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     autoRequestFocus: Boolean = true,
     onValueChange: (String) -> Unit = {},
     placeholder: String = "",
+    trailingIcon: @Composable (() -> Unit)? = DefaultTrailingIcon,
     isPassword: Boolean = false,
     errorText: String = "",
     imeAction: ImeAction = ImeAction.Done,
@@ -40,9 +44,11 @@ fun ClipboardTextField(
             value = value,
             label = label,
             maxLines = maxLines,
+            style = style,
             autoRequestFocus = autoRequestFocus,
             onValueChange = onValueChange,
             placeholder = placeholder,
+            trailingIcon = trailingIcon,
             isPassword = isPassword,
             errorMessage = errorText,
             keyboardActions = KeyboardActions(

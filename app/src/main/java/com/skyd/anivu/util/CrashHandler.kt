@@ -16,7 +16,7 @@ class CrashHandler private constructor(
         Thread.getDefaultUncaughtExceptionHandler()
 
     /**
-     * 当UncaughtException发生时会转入该函数来处理
+     * When UncaughtException occurs, this function will handle it.
      */
     override fun uncaughtException(thread: Thread, ex: Throwable) {
         try {
