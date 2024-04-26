@@ -24,7 +24,7 @@
         </a>
     </p>
     <p>
-        <b>AniVu</b>，一個集<b> RSS 番劇訂閱與更新、位元洪流下載、影片播放</b>為一體的工具。
+        <b>AniVu</b>，一個集<b> RSS 番劇訂閱與更新、BitTorrent下載、影片播放</b>為一體的工具。
     </p>
     <p>
         使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架構，完全採用 <b><a href="https://m3.material.io/">Material You</a></b> 設計風格。使用 <b>Android View</b> 和 <b>Jetpack Compose</b> 混合開發。
