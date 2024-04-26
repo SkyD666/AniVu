@@ -30,7 +30,7 @@
         使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架构，完全采用 <b><a href="https://m3.material.io/">Material You</a></b> 设计风格。使用 <b>Android View</b> 和 <b>Jetpack Compose</b> 混合开发。
     </p>
     <p>
-        <b><a href="../../README.md">English</a></b>
+        <b><a href="../../README.md">English</a></b> | <b>中文</b> | <b><a href="doc/readme/README-zh-rTW.md">正體中文</a></b>
     </p>
 </div>
 
