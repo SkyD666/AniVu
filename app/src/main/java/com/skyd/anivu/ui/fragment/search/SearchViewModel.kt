@@ -75,7 +75,7 @@ class SearchViewModel @Inject constructor(
             },
             filterIsInstance<SearchIntent.SearchArticle>().flatMapConcat { intent ->
                 flowOf(
-                    searchRepo.requestSearchArticle(intent.feedUrl, intent.query)
+                    searchRepo.requestSearchArticle(intent.feedUrls, intent.query)
                         .cachedIn(viewModelScope)
                 ).map {
                     @Suppress("UNCHECKED_CAST")

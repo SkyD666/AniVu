@@ -10,16 +10,22 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
+import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseFragment
 import com.skyd.anivu.databinding.FragmentDownloadBinding
+import com.skyd.anivu.ext.addFabBottomPaddingHook
+import com.skyd.anivu.ext.addInsetsByMargin
 import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.popBackStackWithLifecycle
+import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
+import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
 import com.skyd.anivu.ui.adapter.variety.proxy.Download1Proxy
+import com.skyd.anivu.ui.component.dialog.InputDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.consumeAsFlow
@@ -94,6 +100,24 @@ class DownloadFragment : BaseFragment<FragmentDownloadBinding>() {
 
     override fun FragmentDownloadBinding.initView() {
         topAppBar.setNavigationOnClickListener { findNavController().popBackStackWithLifecycle() }
+
+        fabDownloadFragment.setOnClickListener {
+            InputDialogBuilder(requireContext())
+                .setHint(getString(R.string.download_fragment_add_download_hint))
+                .setPositiveButton(getString(R.string.download)) { _, _, text ->
+                    doIfMagnetOrTorrentLink(
+                        link = text,
+                        onMagnet = { intents.trySend(DownloadIntent.AddDownload(text)) },
+                        onTorrent = { intents.trySend(DownloadIntent.AddDownload(text)) },
+                        onUnsupported = { showSnackbar(getString(R.string.download_fragment_unsupported_link)) },
+                    )
+                }
+                .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+                .setTitle(R.string.download)
+                .setIcon(R.drawable.ic_download_2_24)
+                .show()
+        }
+
         rvDownloadFragment.layoutManager = GridLayoutManager(
             requireContext(),
             AniSpanSize.MAX_SPAN_SIZE
@@ -109,7 +133,10 @@ class DownloadFragment : BaseFragment<FragmentDownloadBinding>() {
 
     override fun FragmentDownloadBinding.setWindowInsets() {
         ablDownloadFragment.addInsetsByPadding(top = true, left = true, right = true)
-        rvDownloadFragment.addInsetsByPadding(bottom = true, left = true, right = true)
+        fabDownloadFragment.addInsetsByMargin(bottom = true, right = true)
+        rvDownloadFragment.addInsetsByPadding(
+            bottom = true, left = true, right = true, hook = ::addFabBottomPaddingHook,
+        )
     }
 
     override fun getViewBinding(inflater: LayoutInflater, container: ViewGroup?) =

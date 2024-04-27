@@ -27,7 +27,7 @@ class FeedRepository @Inject constructor(
             groupList to feedDao.getFeedsNotIn(groupIds)
         }.map { (groupList, defaultFeeds) ->
             val dataList = mutableListOf<Any>()
-            dataList.add(GroupBean.defaultGroup)
+            dataList.add(GroupBean.DefaultGroup)
             dataList.addAll(defaultFeeds)
             groupList.forEach { group ->
                 dataList.add(group.group)

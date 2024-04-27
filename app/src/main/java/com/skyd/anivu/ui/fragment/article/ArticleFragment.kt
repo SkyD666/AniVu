@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -56,21 +56,21 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ArticleFragment : BaseComposeFragment() {
     companion object {
-        const val FEED_URL_KEY = "feedUrl"
+        const val FEED_URLS_KEY = "feedUrls"
     }
 
     private val feedViewModel by viewModels<ArticleViewModel>()
-    private val feedUrl by lazy { arguments?.getString(FEED_URL_KEY) }
+    private val feedUrls by lazy { arguments?.getStringArrayList(FEED_URLS_KEY).orEmpty() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = setContentBase { ArticleScreen(feedUrl = feedUrl, viewModel = feedViewModel) }
+    ): View = setContentBase { ArticleScreen(feedUrls = feedUrls, viewModel = feedViewModel) }
 }
 
 @Composable
-fun ArticleScreen(feedUrl: String?, viewModel: ArticleViewModel = hiltViewModel()) {
+fun ArticleScreen(feedUrls: List<String>, viewModel: ArticleViewModel = hiltViewModel()) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val navController = LocalNavController.current
@@ -94,12 +94,12 @@ fun ArticleScreen(feedUrl: String?, viewModel: ArticleViewModel = hiltViewModel(
                                 args = Bundle().apply {
                                     putSerializable(
                                         SearchFragment.SEARCH_DOMAIN_KEY,
-                                        SearchFragment.SearchDomain.Article(feedUrl),
+                                        SearchFragment.SearchDomain.Article(feedUrls),
                                     )
                                 }
                             )
                         },
-                        imageVector = Icons.Default.Search,
+                        imageVector = Icons.Outlined.Search,
                         contentDescription = stringResource(id = R.string.article_screen_search_article),
                     )
                 },
@@ -107,7 +107,7 @@ fun ArticleScreen(feedUrl: String?, viewModel: ArticleViewModel = hiltViewModel(
             )
         }
     ) {
-        if (feedUrl.isNullOrBlank()) {
+        if (feedUrls.isEmpty()) {
             AniVuDialog(
                 visible = true,
                 text = { Text(text = stringResource(id = R.string.article_fragment_feed_url_illegal)) },
@@ -118,10 +118,10 @@ fun ArticleScreen(feedUrl: String?, viewModel: ArticleViewModel = hiltViewModel(
                 }
             )
         } else {
-            val dispatch = viewModel.getDispatcher(startWith = ArticleIntent.Init(feedUrl))
+            val dispatch = viewModel.getDispatcher(startWith = ArticleIntent.Init(feedUrls))
             val state = rememberPullRefreshState(
                 refreshing = uiState.articleListState.loading,
-                onRefresh = { dispatch(ArticleIntent.Refresh(feedUrl)) },
+                onRefresh = { dispatch(ArticleIntent.Refresh(feedUrls)) },
             )
             Box(modifier = Modifier.pullRefresh(state)) {
                 when (val articleListState = uiState.articleListState) {

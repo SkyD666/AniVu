@@ -22,6 +22,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BugReport
+import androidx.compose.material.icons.outlined.BugReport
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -126,7 +127,7 @@ private fun CrashScreen(
             Spacer(modifier = Modifier.height(40.dp))
             Icon(
                 modifier = Modifier.size(40.dp),
-                imageVector = Icons.Default.BugReport,
+                imageVector = Icons.Outlined.BugReport,
                 contentDescription = null,
             )
 

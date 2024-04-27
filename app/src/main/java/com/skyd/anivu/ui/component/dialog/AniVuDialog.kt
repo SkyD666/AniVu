@@ -4,7 +4,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -19,7 +19,7 @@ fun AniVuDialog(
     onDismissRequest: () -> Unit = {},
     icon: @Composable (() -> Unit)? = {
         Icon(
-            imageVector = Icons.Default.Info,
+            imageVector = Icons.Outlined.Info,
             contentDescription = null,
         )
     },

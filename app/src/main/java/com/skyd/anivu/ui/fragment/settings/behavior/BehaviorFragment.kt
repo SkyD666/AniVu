@@ -7,9 +7,9 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.SwipeLeft
+import androidx.compose.material.icons.automirrored.outlined.Article
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.SwipeLeft
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -96,7 +96,7 @@ fun BehaviorScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.AutoMirrored.Default.Article),
+                    icon = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.Article),
                     text = stringResource(id = R.string.behavior_screen_article_tap_action),
                     descriptionText = ArticleTapActionPreference.toDisplayName(
                         context = context,
@@ -113,7 +113,7 @@ fun BehaviorScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.SwipeLeft),
+                    icon = rememberVectorPainter(image = Icons.Outlined.SwipeLeft),
                     text = stringResource(id = R.string.behavior_screen_article_swipe_left_action),
                     descriptionText = ArticleSwipeLeftActionPreference.toDisplayName(
                         context = context,
@@ -147,7 +147,7 @@ private fun ArticleTapActionMenu(expanded: Boolean, onDismissRequest: () -> Unit
                 text = { Text(text = ArticleTapActionPreference.toDisplayName(context, action)) },
                 leadingIcon = {
                     if (articleTapAction == action) {
-                        Icon(imageVector = Icons.Default.Done, contentDescription = null)
+                        Icon(imageVector = Icons.Outlined.Done, contentDescription = null)
                     }
                 },
                 onClick = {
@@ -180,7 +180,7 @@ private fun ArticleSwipeLeftActionMenu(expanded: Boolean, onDismissRequest: () -
                 },
                 leadingIcon = {
                     if (articleSwipeLeftAction == action) {
-                        Icon(imageVector = Icons.Default.Done, contentDescription = null)
+                        Icon(imageVector = Icons.Outlined.Done, contentDescription = null)
                     }
                 },
                 onClick = {

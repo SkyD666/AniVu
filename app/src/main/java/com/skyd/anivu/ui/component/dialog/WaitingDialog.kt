@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.outlined.HourglassEmpty
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -89,7 +89,7 @@ fun WaitingDialog(
     AniVuDialog(
         visible = visible,
         onDismissRequest = { },
-        icon = { Icon(imageVector = Icons.Default.HourglassEmpty, contentDescription = null) },
+        icon = { Icon(imageVector = Icons.Outlined.HourglassEmpty, contentDescription = null) },
         title = { Text(text = title) },
         text = text,
         confirmButton = {}

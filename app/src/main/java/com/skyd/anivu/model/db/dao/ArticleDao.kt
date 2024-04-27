@@ -98,11 +98,11 @@ interface ArticleDao {
     @Query(
         """
         SELECT * FROM $ARTICLE_TABLE_NAME 
-        WHERE ${ArticleBean.FEED_URL_COLUMN} = :feedUrl
+        WHERE ${ArticleBean.FEED_URL_COLUMN} IN (:feedUrls)
         ORDER BY ${ArticleBean.DATE_COLUMN} DESC
         """
     )
-    fun getArticlePagingSource(feedUrl: String): PagingSource<Int, ArticleWithFeed>
+    fun getArticlePagingSource(feedUrls: List<String>): PagingSource<Int, ArticleWithFeed>
 
     @Transaction
     @RawQuery(observedEntities = [ArticleBean::class])

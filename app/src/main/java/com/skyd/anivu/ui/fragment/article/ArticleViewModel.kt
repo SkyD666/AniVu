@@ -70,14 +70,14 @@ class ArticleViewModel @Inject constructor(
     private fun SharedFlow<ArticleIntent>.toArticlePartialStateChangeFlow(): Flow<ArticlePartialStateChange> {
         return merge(
             filterIsInstance<ArticleIntent.Init>().flatMapConcat { intent ->
-                flowOf(articleRepo.requestArticleList(intent.url).cachedIn(viewModelScope)).map {
+                flowOf(articleRepo.requestArticleList(intent.urls).cachedIn(viewModelScope)).map {
                     ArticlePartialStateChange.ArticleList.Success(articlePagingDataFlow = it)
                 }.startWith(ArticlePartialStateChange.ArticleList.Loading).catchMap {
                     ArticlePartialStateChange.ArticleList.Failed(it.message.toString())
                 }
             },
             filterIsInstance<ArticleIntent.Refresh>().flatMapConcat { intent ->
-                articleRepo.refreshArticleList(intent.url).map {
+                articleRepo.refreshArticleList(intent.urls).map {
                     ArticlePartialStateChange.RefreshArticleList.Success
                 }.startWith(ArticlePartialStateChange.RefreshArticleList.Loading).catchMap {
                     it.printStackTrace()

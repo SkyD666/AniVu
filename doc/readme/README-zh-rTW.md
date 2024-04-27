@@ -68,7 +68,7 @@
 
 ## 🌏翻譯
 
-如果您对此项目感兴趣，请**帮助我们进行翻译**，谢谢。
+如果你有興趣，**請幫我們翻譯**，謝謝。
 
 <a title="Crowdin" target="_blank" href="https://crowdin.com/project/anivu"><img src="https://badges.crowdin.net/anivu/localized.svg"></a>
 

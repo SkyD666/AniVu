@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Expand
+import androidx.compose.material.icons.outlined.Expand
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -64,7 +64,7 @@ fun FeedStyleScreen() {
             item {
                 val feedGroupExpand = LocalFeedGroupExpand.current
                 SwitchSettingsItem(
-                    imageVector = Icons.Default.Expand,
+                    imageVector = Icons.Outlined.Expand,
                     text = stringResource(id = R.string.feed_style_screen_feed_group_expand),
                     checked = feedGroupExpand,
                     onCheckedChange = {

@@ -6,5 +6,5 @@ sealed interface SearchIntent : MviIntent {
     data object Init : SearchIntent
     data class SearchAll(val query: String) : SearchIntent
     data class SearchFeed(val query: String) : SearchIntent
-    data class SearchArticle(val feedUrl: String? = null, val query: String) : SearchIntent
+    data class SearchArticle(val feedUrls: List<String>, val query: String) : SearchIntent
 }

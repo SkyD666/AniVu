@@ -44,7 +44,6 @@ class Download1Proxy(
                 else -> Unit
             }
         }
-        holder.binding.btnDownload1Cancel.enable()
         holder.binding.btnDownload1Cancel.setOnClickListener {
             val data = adapter.dataList.getOrNull(holder.bindingAdapterPosition)
             if (data !is DownloadInfoBean) return@setOnClickListener
@@ -64,6 +63,7 @@ class Download1Proxy(
         index: Int,
         action: ((Any?) -> Unit)?
     ) {
+        holder.binding.btnDownload1Cancel.enable()
         updateName(holder, data)
         updateProgress(holder, data)
         updateDescription(holder, data)

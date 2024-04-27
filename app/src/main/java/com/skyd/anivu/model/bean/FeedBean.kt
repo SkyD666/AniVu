@@ -38,5 +38,8 @@ data class FeedBean(
         const val ICON_COLUMN = "icon"
         const val GROUP_ID_COLUMN = "groupId"
         const val NICKNAME_COLUMN = "nickname"
+
+        fun FeedBean.isDefaultGroup(): Boolean =
+            this.groupId == null || this.groupId == GroupBean.DEFAULT_GROUP_ID
     }
 }

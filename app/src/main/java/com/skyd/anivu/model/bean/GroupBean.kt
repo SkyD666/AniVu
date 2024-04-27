@@ -15,12 +15,12 @@ const val GROUP_TABLE_NAME = "Group"
 @Parcelize
 @Serializable
 @Entity(tableName = GROUP_TABLE_NAME)
-data class GroupBean(
+open class GroupBean(
     @PrimaryKey
     @ColumnInfo(name = GROUP_ID_COLUMN)
     val groupId: String,
     @ColumnInfo(name = NAME_COLUMN)
-    val name: String,
+    open val name: String,
 ) : BaseBean, Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -32,16 +32,19 @@ data class GroupBean(
         return groupId.hashCode()
     }
 
+    object DefaultGroup :
+        GroupBean(DEFAULT_GROUP_ID, appContext.getString(R.string.default_feed_group)) {
+        private fun readResolve(): Any = DefaultGroup
+        override val name: String
+            get() = appContext.getString(R.string.default_feed_group)
+    }
+
     companion object {
         const val DEFAULT_GROUP_ID = "default"
 
         const val NAME_COLUMN = "name"
         const val GROUP_ID_COLUMN = "groupId"
 
-        val defaultGroup
-            get() = GroupBean(
-                groupId = DEFAULT_GROUP_ID,
-                name = appContext.getString(R.string.default_feed_group)
-            )
+        fun GroupBean.isDefaultGroup(): Boolean = this.groupId == DEFAULT_GROUP_ID
     }
 }

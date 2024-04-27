@@ -23,8 +23,8 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -87,7 +87,7 @@ class SearchFragment : BaseComposeFragment() {
             private fun readResolve(): Any = Feed
         }
 
-        data class Article(val feedUrl: String?) : SearchDomain
+        data class Article(val feedUrls: List<String>) : SearchDomain
     }
 
     companion object {
@@ -140,7 +140,7 @@ fun SearchScreen(
                     contentDescription = stringResource(R.string.search_screen_list_to_top),
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowUpward,
+                        imageVector = Icons.Outlined.ArrowUpward,
                         contentDescription = null,
                     )
                 }
@@ -220,7 +220,7 @@ private fun doSearch(
         SearchFragment.SearchDomain.All -> onSearch(SearchIntent.SearchAll(query = query))
         SearchFragment.SearchDomain.Feed -> onSearch(SearchIntent.SearchFeed(query = query))
         is SearchFragment.SearchDomain.Article -> {
-            onSearch(SearchIntent.SearchArticle(feedUrl = searchDomain.feedUrl, query = query))
+            onSearch(SearchIntent.SearchArticle(feedUrls = searchDomain.feedUrls, query = query))
         }
     }
 }
@@ -232,7 +232,7 @@ fun TrailingIcon(
 ) {
     if (showClearButton) {
         AniVuIconButton(
-            imageVector = Icons.Default.Clear,
+            imageVector = Icons.Outlined.Clear,
             contentDescription = stringResource(R.string.clear_input_text),
             onClick = { onClick?.invoke() }
         )

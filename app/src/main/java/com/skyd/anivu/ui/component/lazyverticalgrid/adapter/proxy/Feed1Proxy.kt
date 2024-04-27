@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -69,7 +69,7 @@ fun Feed1Item(
                     } else null,
                     onClick = {
                         navController.navigate(R.id.action_to_article_fragment, Bundle().apply {
-                            putString(ArticleFragment.FEED_URL_KEY, data.url)
+                            putStringArrayList(ArticleFragment.FEED_URLS_KEY, arrayListOf(data.url))
                         })
                     },
                 )
@@ -104,7 +104,7 @@ fun Feed1Item(
                 DropdownMenuItem(
                     text = { Text(text = stringResource(id = R.string.remove)) },
                     leadingIcon = {
-                        Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                        Icon(imageVector = Icons.Outlined.Delete, contentDescription = null)
                     },
                     onClick = {
                         onRemove?.invoke(data)
@@ -114,7 +114,7 @@ fun Feed1Item(
                 DropdownMenuItem(
                     text = { Text(text = stringResource(id = R.string.edit)) },
                     leadingIcon = {
-                        Icon(imageVector = Icons.Default.Edit, contentDescription = null)
+                        Icon(imageVector = Icons.Outlined.Edit, contentDescription = null)
                     },
                     onClick = {
                         onEdit?.invoke(data)

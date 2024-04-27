@@ -70,7 +70,7 @@
 
 ## 🌏 Translation
 
-如果你有興趣，請幫我們翻譯，謝謝。
+If you are interested, please help us **translate**, thank you.
 
 <a title="Crowdin" target="_blank" href="https://crowdin.com/project/anivu"><img src="https://badges.crowdin.net/anivu/localized.svg"></a>
 

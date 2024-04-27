@@ -11,10 +11,6 @@ internal sealed interface DownloadPartialStateChange {
         data object Show : LoadingDialog {
             override fun reduce(oldState: DownloadState) = oldState.copy(loadingDialog = true)
         }
-
-        data object Close : LoadingDialog {
-            override fun reduce(oldState: DownloadState) = oldState.copy(loadingDialog = false)
-        }
     }
 
     sealed interface DownloadListResult : DownloadPartialStateChange {
@@ -40,5 +36,22 @@ internal sealed interface DownloadPartialStateChange {
         data class Success(val downloadInfoBeanList: List<DownloadInfoBean>) : DownloadListResult
         data class Failed(val msg: String) : DownloadListResult
         data object Loading : DownloadListResult
+    }
+
+    sealed interface AddDownloadResult : DownloadPartialStateChange {
+        override fun reduce(oldState: DownloadState): DownloadState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : AddDownloadResult
+        data class Failed(val msg: String) : AddDownloadResult
     }
 }

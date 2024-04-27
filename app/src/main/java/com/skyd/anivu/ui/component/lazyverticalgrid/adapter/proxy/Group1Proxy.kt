@@ -5,10 +5,10 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.MoveUp
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.KeyboardArrowDown
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material.icons.outlined.MoveUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -26,14 +26,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 
-class Group1Proxy(
-    private val isExpand: (GroupBean) -> Boolean = { false },
-    private val onExpandChange: (GroupBean, Boolean) -> Unit = { _, _ -> },
-    private val onDelete: ((GroupBean) -> Unit)? = null,
-    private val onMoveFeedsTo: ((from: GroupBean) -> Unit)? = null,
+open class Group1Proxy(
+    val isExpand: (GroupBean) -> Boolean = { false },
+    val onExpandChange: (GroupBean, Boolean) -> Unit = { _, _ -> },
+    val onShowAllArticles: (GroupBean) -> Unit = { },
+    val onDelete: ((GroupBean) -> Unit)? = null,
+    val onMoveFeedsTo: ((from: GroupBean) -> Unit)? = null,
 ) : LazyGridAdapter.Proxy<GroupBean>() {
     @Composable
     override fun Draw(index: Int, data: GroupBean) {
@@ -41,6 +43,7 @@ class Group1Proxy(
             data = data,
             initExpand = isExpand,
             onExpandChange = onExpandChange,
+            onShowAllArticles = onShowAllArticles,
             onDelete = onDelete,
             onFeedsMoveTo = onMoveFeedsTo,
         )
@@ -52,6 +55,7 @@ fun Group1Item(
     data: GroupBean,
     initExpand: (GroupBean) -> Boolean = { false },
     onExpandChange: (GroupBean, Boolean) -> Unit,
+    onShowAllArticles: (GroupBean) -> Unit,
     onDelete: ((GroupBean) -> Unit)? = null,
     onFeedsMoveTo: ((GroupBean) -> Unit)? = null,
 ) {
@@ -63,15 +67,11 @@ fun Group1Item(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .combinedClickable(
-                onLongClick = {
-                    expandMenu = true
-                },
-                onClick = {
-                    expand = !expand
-                    onExpandChange(data, expand)
-                },
+                onLongClick = { expandMenu = true },
+                onClick = { onShowAllArticles(data) },
             )
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(start = 16.dp)
+            .padding(vertical = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -79,8 +79,12 @@ fun Group1Item(
             text = data.name,
             style = MaterialTheme.typography.titleLarge,
         )
-        Icon(
-            imageVector = if (expand) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+        AniVuIconButton(
+            onClick = {
+                expand = !expand
+                onExpandChange(data, expand)
+            },
+            imageVector = if (expand) Icons.Outlined.KeyboardArrowUp else Icons.Outlined.KeyboardArrowDown,
             contentDescription = null,
         )
 
@@ -91,7 +95,7 @@ fun Group1Item(
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.delete)) },
                 leadingIcon = {
-                    Icon(imageVector = Icons.Default.Delete, contentDescription = null)
+                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = null)
                 },
                 enabled = onDelete != null && data.groupId != GroupBean.DEFAULT_GROUP_ID,
                 onClick = {
@@ -102,7 +106,7 @@ fun Group1Item(
             DropdownMenuItem(
                 text = { Text(text = stringResource(id = R.string.feed_screen_group_feeds_move_to)) },
                 leadingIcon = {
-                    Icon(imageVector = Icons.Default.MoveUp, contentDescription = null)
+                    Icon(imageVector = Icons.Outlined.MoveUp, contentDescription = null)
                 },
                 enabled = onFeedsMoveTo != null,
                 onClick = {

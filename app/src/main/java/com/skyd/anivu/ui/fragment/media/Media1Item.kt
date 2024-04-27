@@ -2,7 +2,6 @@ package com.skyd.anivu.ui.fragment.media
 
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -15,11 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.OpenInNew
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Folder
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.automirrored.outlined.OpenInNew
+import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.Movie
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -90,19 +89,17 @@ fun Media1Item(
                         getMediaThumbnail(retriever = retriever, path = data.file.path)
                     }
                 }
-                AnimatedVisibility(visible = bitmap != null) {
-                    OutlinedCard(
-                        modifier = Modifier
-                            .padding(end = 10.dp)
-                            .heightIn(min = 50.dp)
-                            .fillMaxHeight()
-                            .width(70.dp),
-                    ) {
-                        AniVuImage(
-                            model = bitmap,
-                            contentScale = ContentScale.Crop,
-                        )
-                    }
+                OutlinedCard(
+                    modifier = Modifier
+                        .padding(end = 10.dp)
+                        .heightIn(min = 50.dp)
+                        .fillMaxHeight()
+                        .width(70.dp),
+                ) {
+                    AniVuImage(
+                        model = bitmap,
+                        contentScale = ContentScale.Crop,
+                    )
                 }
             }
             Text(text = data.name, maxLines = 3, style = MaterialTheme.typography.titleSmall)
@@ -122,7 +119,7 @@ fun Media1Item(
                 Spacer(modifier = Modifier.width(12.dp))
                 Icon(
                     modifier = Modifier.size(16.dp),
-                    imageVector = if (isMedia) Icons.Default.Movie else Icons.Default.Folder,
+                    imageVector = if (isMedia) Icons.Outlined.Movie else Icons.Outlined.Folder,
                     contentDescription = stringResource(id = R.string.video),
                 )
             }
@@ -136,7 +133,7 @@ fun Media1Item(
                 text = { Text(text = stringResource(id = R.string.open_with)) },
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
+                        imageVector = Icons.AutoMirrored.Outlined.OpenInNew,
                         contentDescription = null,
                     )
                 },
@@ -149,7 +146,7 @@ fun Media1Item(
                 text = { Text(text = stringResource(id = R.string.share)) },
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Default.Share,
+                        imageVector = Icons.Outlined.Share,
                         contentDescription = null,
                     )
                 },
@@ -162,7 +159,7 @@ fun Media1Item(
                 text = { Text(text = stringResource(id = R.string.remove)) },
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Default.Delete,
+                        imageVector = Icons.Outlined.Delete,
                         contentDescription = null,
                     )
                 },

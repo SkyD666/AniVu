@@ -17,11 +17,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoveUp
-import androidx.compose.material.icons.filled.RssFeed
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Workspaces
+import androidx.compose.material.icons.automirrored.outlined.Article
+import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.MoveUp
+import androidx.compose.material.icons.outlined.RssFeed
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -66,7 +67,9 @@ import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.snapshotStateMapSaver
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.FeedBean.Companion.isDefaultGroup
 import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupBean.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTextField
@@ -79,8 +82,10 @@ import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
+import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.DefaultGroup1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Feed1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Group1Proxy
+import com.skyd.anivu.ui.fragment.article.ArticleFragment
 import com.skyd.anivu.ui.fragment.search.SearchFragment
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalNavController
@@ -101,7 +106,7 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
     var openAddDialog by rememberSaveable { mutableStateOf(false) }
     var addDialogUrl by rememberSaveable { mutableStateOf("") }
     var addDialogNickname by rememberSaveable { mutableStateOf("") }
-    var addDialogGroup by rememberSaveable { mutableStateOf(GroupBean.defaultGroup) }
+    var addDialogGroup by rememberSaveable { mutableStateOf<GroupBean>(GroupBean.DefaultGroup) }
     var openEditDialog by rememberSaveable { mutableStateOf<FeedBean?>(null) }
     var editDialogUrl by rememberSaveable { mutableStateOf<String?>(null) }
     var editDialogNickname by rememberSaveable { mutableStateOf("") }
@@ -127,6 +132,24 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                 actions = {
                     AniVuIconButton(
                         onClick = {
+                            navController.navigate(R.id.action_to_article_fragment, Bundle().apply {
+                                putStringArrayList(
+                                    ArticleFragment.FEED_URLS_KEY,
+                                    ArrayList(
+                                        (uiState.groupListState as? GroupListState.Success)
+                                            ?.dataList
+                                            ?.filterIsInstance(FeedBean::class.java)
+                                            ?.map { it.url }
+                                            .orEmpty()
+                                    )
+                                )
+                            })
+                        },
+                        imageVector = Icons.AutoMirrored.Outlined.Article,
+                        contentDescription = stringResource(id = R.string.feed_screen_all_articles),
+                    )
+                    AniVuIconButton(
+                        onClick = {
                             navController.navigate(
                                 resId = R.id.action_to_search_fragment,
                                 args = Bundle().apply {
@@ -137,7 +160,7 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                                 }
                             )
                         },
-                        imageVector = Icons.Default.Search,
+                        imageVector = Icons.Outlined.Search,
                         contentDescription = stringResource(id = R.string.feed_screen_search_feed),
                     )
                 },
@@ -159,7 +182,7 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                 },
                 contentDescription = stringResource(R.string.add),
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = null)
+                Icon(imageVector = Icons.Outlined.Add, contentDescription = null)
             }
         },
         contentWindowInsets = WindowInsets.safeDrawing.only(
@@ -175,6 +198,21 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                     result = groupListState.dataList,
                     contentPadding = innerPadding + PaddingValues(bottom = fabHeight + 16.dp),
                     onRemoveFeed = { feed -> dispatch(FeedIntent.RemoveFeed(feed.url)) },
+                    onShowAllArticles = { group ->
+                        navController.navigate(R.id.action_to_article_fragment, Bundle().apply {
+                            putStringArrayList(
+                                ArticleFragment.FEED_URLS_KEY,
+                                ArrayList(
+                                    (uiState.groupListState as? GroupListState.Success)
+                                        ?.dataList
+                                        ?.filterIsInstance(FeedBean::class.java)
+                                        ?.filter { it.groupId == group.groupId || group.isDefaultGroup() && it.isDefaultGroup() }
+                                        ?.map { it.url }
+                                        .orEmpty()
+                                )
+                            )
+                        })
+                    },
                     onEditFeed = { feed ->
                         openEditDialog = feed
                         editDialogUrl = feed.url
@@ -219,13 +257,13 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                     }
                     addDialogUrl = ""
                     addDialogNickname = ""
-                    addDialogGroup = GroupBean.defaultGroup
+                    addDialogGroup = GroupBean.DefaultGroup
                     openAddDialog = false
                 },
                 onDismissRequest = {
                     addDialogUrl = ""
                     addDialogNickname = ""
-                    addDialogGroup = GroupBean.defaultGroup
+                    addDialogGroup = GroupBean.DefaultGroup
                     openAddDialog = false
                 }
             )
@@ -239,7 +277,7 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                 onUrlChange = { editDialogUrl = it },
                 nickname = editDialogNickname,
                 onNicknameChange = { editDialogNickname = it },
-                group = groups.find { it.groupId == editDialogGroupId } ?: GroupBean.defaultGroup,
+                group = groups.find { it.groupId == editDialogGroupId } ?: GroupBean.DefaultGroup,
                 groups = groups,
                 onGroupChange = { editDialogGroupId = it.groupId },
                 openCreateGroupDialog = {
@@ -333,7 +371,7 @@ private fun EditFeedDialog(
 
     AniVuDialog(
         visible = true,
-        icon = { Icon(imageVector = Icons.Default.RssFeed, contentDescription = null) },
+        icon = { Icon(imageVector = Icons.Outlined.RssFeed, contentDescription = null) },
         title = { Text(text = title) },
         onDismissRequest = onDismissRequest,
         text = {
@@ -413,7 +451,7 @@ private fun EditFeedDialog(
                             else this
                         },
                         onClick = openCreateGroupDialog,
-                        imageVector = Icons.Default.Add,
+                        imageVector = Icons.Outlined.Add,
                         contentDescription = stringResource(id = R.string.feed_screen_add_group),
                     )
                 }
@@ -457,7 +495,7 @@ private fun CreateGroupDialog(
 ) {
     TextFieldDialog(
         visible = visible,
-        icon = { Icon(imageVector = Icons.Default.Workspaces, contentDescription = null) },
+        icon = { Icon(imageVector = Icons.Outlined.Workspaces, contentDescription = null) },
         title = stringResource(id = R.string.feed_screen_add_group),
         placeholder = stringResource(id = R.string.feed_group),
         value = value,
@@ -480,6 +518,7 @@ private fun FeedList(
     contentPadding: PaddingValues = PaddingValues(),
     onRemoveFeed: (FeedBean) -> Unit,
     onEditFeed: (FeedBean) -> Unit,
+    onShowAllArticles: (GroupBean) -> Unit,
     onDeleteGroup: (GroupBean) -> Unit,
     onMoveToGroup: (from: GroupBean, to: GroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
@@ -510,17 +549,20 @@ private fun FeedList(
     var openSelectGroupDialog by rememberSaveable { mutableStateOf<GroupBean?>(null) }
     var selectGroupDialogCurrentGroup by rememberSaveable { mutableStateOf<GroupBean?>(null) }
     val adapter = remember {
+        val group1Proxy = Group1Proxy(
+            isExpand = { feedVisible[it.groupId] ?: false },
+            onExpandChange = { data, expand -> feedVisible[data.groupId] = expand },
+            onShowAllArticles = onShowAllArticles,
+            onDelete = onDeleteGroup,
+            onMoveFeedsTo = {
+                openSelectGroupDialog = it
+                selectGroupDialogCurrentGroup = it
+            },
+        )
         LazyGridAdapter(
             mutableListOf(
-                Group1Proxy(
-                    isExpand = { feedVisible[it.groupId] ?: false },
-                    onExpandChange = { data, expand -> feedVisible[data.groupId] = expand },
-                    onDelete = onDeleteGroup,
-                    onMoveFeedsTo = {
-                        openSelectGroupDialog = it
-                        selectGroupDialogCurrentGroup = it
-                    },
-                ),
+                DefaultGroup1Proxy(group1Proxy),
+                group1Proxy,
                 Feed1Proxy(
                     visible = { feedVisible[it] ?: false },
                     onRemove = onRemoveFeed,
@@ -537,6 +579,7 @@ private fun FeedList(
         contentPadding = contentPadding,
         key = { _, item ->
             when (item) {
+                is GroupBean.DefaultGroup -> item.groupId
                 is GroupBean -> item.groupId
                 is FeedBean -> item.url
                 else -> item
@@ -570,7 +613,7 @@ private fun SelectGroupDialog(
 ) {
     AniVuDialog(
         visible = true,
-        icon = { Icon(imageVector = Icons.Default.MoveUp, contentDescription = null) },
+        icon = { Icon(imageVector = Icons.Outlined.MoveUp, contentDescription = null) },
         title = { Text(stringResource(id = R.string.feed_screen_group_feeds_move_to)) },
         onDismissRequest = onDismissRequest,
         selectable = false,
@@ -588,7 +631,7 @@ private fun SelectGroupDialog(
                 }
                 AniVuIconButton(
                     onClick = { openCreateGroupDialog() },
-                    imageVector = Icons.Default.Add,
+                    imageVector = Icons.Outlined.Add,
                     contentDescription = stringResource(id = R.string.feed_screen_add_group),
                 )
             }

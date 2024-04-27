@@ -17,7 +17,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -136,7 +136,7 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
                 },
                 contentDescription = stringResource(R.string.download_fragment_name),
             ) {
-                Icon(imageVector = Icons.Default.Download, contentDescription = null)
+                Icon(imageVector = Icons.Outlined.Download, contentDescription = null)
             }
         },
         contentWindowInsets = WindowInsets.safeDrawing.run {
