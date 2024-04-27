@@ -33,7 +33,7 @@
         AniVu utilizes the <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> architecture and fully adopts the <b><a href="https://m3.material.io/">Material You</a></b> design style. All pages are developed using <b>Android View</b> and <b>Jetpack Compose</b>.
     </p>
     <p>
-        <b><a href="doc/readme/README-zh-rCN.md">中文</a></b> | <b><a href="doc/readme/README-zh-rTW.md">正體中文</a></b>
+        <b><a href="doc/readme/README-zh-rCN.md">中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="doc/readme/README-zh-rTW.md">正體中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">Help us translate</a></b>
     </p>
 </div>
 
@@ -67,6 +67,12 @@
 <img src="doc/image/en/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="doc/image/en/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
 <img src="doc/image/en/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="doc/image/en/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
 <img src="doc/image/en/ic_player_activity.png" alt="ic_player_activity" style="zoom:80%;" />
+
+## 🌏 Translation
+
+如果你有興趣，請幫我們翻譯，謝謝。
+
+<a title="Crowdin" target="_blank" href="https://crowdin.com/project/anivu"><img src="https://badges.crowdin.net/anivu/localized.svg"></a>
 
 ## 🛠 Primary technology stack
 

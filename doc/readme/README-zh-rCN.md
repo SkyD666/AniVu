@@ -30,10 +30,9 @@
         使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架构，完全采用 <b><a href="https://m3.material.io/">Material You</a></b> 设计风格。使用 <b>Android View</b> 和 <b>Jetpack Compose</b> 混合开发。
     </p>
     <p>
-        <b><a href="../../README.md">English</a></b> | <b>中文</b> | <b><a href="README-zh-rTW.md">正體中文</a></b>
+        <b><a href="../../README.md">English</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b>中文</b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="README-zh-rTW.md">正體中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">帮助我们翻译</a></b>
     </p>
 </div>
-
 
 
 
@@ -66,6 +65,12 @@
 <img src="../image/zh-rCN/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_player_activity.png" alt="ic_player_activity" style="zoom:80%;" />
+
+## 🌏翻译
+
+如果您对此项目感兴趣，请**帮助我们进行翻译**，谢谢。
+
+<a title="Crowdin" target="_blank" href="https://crowdin.com/project/anivu"><img src="https://badges.crowdin.net/anivu/localized.svg"></a>
 
 ## 🛠主要技术栈
 

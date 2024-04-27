@@ -76,7 +76,6 @@ import com.skyd.anivu.ext.getAppVersionName
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.model.bean.OtherWorksBean
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -150,13 +149,7 @@ fun AboutScreen() {
                 item {
                     HelpArea(
                         openSponsorDialog = openSponsorDialog,
-                        onTranslateClick = {
-                            snackbarHostState.showSnackbar(
-                                message = "Coming soon...",
-                                scope = scope,
-                                withDismissAction = true,
-                            )
-                        },
+                        onTranslateClick = { Const.TRANSLATION_URL.openBrowser(context) },
                         onSponsorDialogVisibleChange = { openSponsorDialog = it }
                     )
                     ButtonArea()
@@ -176,13 +169,7 @@ fun AboutScreen() {
                             TextArea()
                             HelpArea(
                                 openSponsorDialog = openSponsorDialog,
-                                onTranslateClick = {
-                                    snackbarHostState.showSnackbar(
-                                        message = "Coming soon...",
-                                        scope = scope,
-                                        withDismissAction = true,
-                                    )
-                                },
+                                onTranslateClick = { Const.TRANSLATION_URL.openBrowser(context) },
                                 onSponsorDialogVisibleChange = { openSponsorDialog = it }
                             )
                         }
