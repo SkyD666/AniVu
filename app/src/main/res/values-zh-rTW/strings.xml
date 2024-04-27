@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AniVu</string>
     <string name="main_fragment_name">主頁</string>
@@ -113,7 +114,7 @@
     <string name="rss_config_fragment_sync_wifi_constraint">僅在 Wi-Fi 連線時</string>
     <string name="rss_config_fragment_sync_charging_constraint">僅在充電時</string>
     <string name="rss_config_fragment_sync_battery_not_low_constraint">僅在電量充足時</string>
-    <string name="crashed">崩潰了</string>
+    <string name="crashed"><![CDATA[崩潰了]]></string>
     <string name="submit_an_issue_on_github">報告</string>
     <string name="copied">已複製</string>
     <string name="read_fragment_article_id_illegal">文章 ID 無效，可能是已被刪除。</string>
@@ -180,6 +181,11 @@
     <string name="feed_style_screen_feed_group_expand">總是展開</string>
     <string name="feed_style_screen_group_list_category">分組列表</string>
     <string name="appearance_fragment_style_category">樣式</string>
+    <string name="normal_text_field_style">Normal</string>
+    <string name="outlined_text_field_style">Outlined</string>
+    <string name="appearance_fragment_text_field_style">Text field style</string>
+    <string name="crash_screen_crash_log">Log</string>
+    <string name="crash_screen_copy_crash_log">Copy log</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分鐘</item>
     </plurals>
