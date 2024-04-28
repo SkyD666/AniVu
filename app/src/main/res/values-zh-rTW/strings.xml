@@ -76,7 +76,7 @@
     <string name="data_fragment_clear_cache_warning">確定要刪除這些快取嗎？</string>
     <string name="clear">清除</string>
     <string name="rss_config_fragment_name">RSS</string>
-    <string name="rss_config_fragment_description">配置 RSS 等</string>
+    <string name="rss_config_fragment_description">Configure RSS sync, parsing rules</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure">解析 Link 為附件</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">解析 Link 標籤，若符合磁力鏈或 Torrent 格式，則顯示為附件</string>
     <string name="rss_config_fragment_parse_category">解析</string>
@@ -129,7 +129,7 @@
     <string name="player_config_fragment_name">播放器</string>
     <string name="player_config_fragment_behavior_category">行為</string>
     <string name="player_config_fragment_double_tap">雙擊</string>
-    <string name="player_config_fragment_description">配置播放器行為等</string>
+    <string name="player_config_fragment_description">Configure player behavior, appearance</string>
     <string name="player_config_fragment_double_tap_description">配置雙擊行為</string>
     <string name="appearance_fragment_name">外觀和樣式</string>
     <string name="appearance_fragment_theme_category">主題</string>
@@ -161,7 +161,7 @@
     <string name="update_check_failed">檢查更新失敗：%s</string>
     <string name="article_screen_read">詳情</string>
     <string name="behavior_screen_name">行為</string>
-    <string name="behavior_screen_description">配置對操作的響應行為</string>
+    <string name="behavior_screen_description">Configure Feed, Article list behavior</string>
     <string name="behavior_screen_article_screen_category">文章列表</string>
     <string name="behavior_screen_article_screen_deduplicate_title_in_desc">標題去重</string>
     <string name="behavior_screen_article_screen_deduplicate_title_in_desc_description">刪除描述文字中與標題相同的子字串</string>
@@ -193,6 +193,9 @@
     <string name="date_style_relative">Relative</string>
     <string name="date_style_full">Full</string>
     <string name="appearance_fragment_date_style">Date style</string>
+    <string name="behavior_screen_feed_screen_category">Feed list</string>
+    <string name="behavior_screen_feed_screen_hide_empty_default">Hide empty Default</string>
+    <string name="behavior_screen_feed_screen_hide_empty_default_description">When the Default grouping is empty, hide it</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分鐘</item>
     </plurals>
