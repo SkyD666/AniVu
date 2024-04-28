@@ -83,11 +83,11 @@ fun Feed1Item(
                 .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                FeedIcon(modifier = Modifier.padding(3.dp), data = feed, size = 23.dp)
+                FeedIcon(modifier = Modifier.padding(3.dp), data = feed, size = 24.dp)
                 val title = rememberSaveable(feed.title, feed.nickname) {
                     feed.nickname.orEmpty().ifBlank { feed.title?.readable().orEmpty() }
                 }
-                Spacer(modifier = Modifier.width(10.dp))
+                Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     modifier = Modifier.weight(1f),
                     text = title,

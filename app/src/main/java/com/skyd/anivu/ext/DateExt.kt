@@ -21,7 +21,16 @@ fun Date.toDateTimeString(
     locale: Locale = Locale.getDefault()
 ): String {
     return if (context.dataStore.getOrDefault(DateStylePreference) == DateStylePreference.RELATIVE) {
-        DateUtils.getRelativeTimeSpanString(this.time, System.currentTimeMillis(), 0).toString()
+        val current = System.currentTimeMillis()
+        val delta = current - this.time
+        DateUtils.getRelativeTimeSpanString(
+            this.time,
+            current,
+            // "DateUtils.WEEK_IN_MILLIS <= .. <= DateUtils.WEEK_IN_MILLIS * 4" is 1~3 weeks ago
+            if (delta in DateUtils.WEEK_IN_MILLIS..DateUtils.WEEK_IN_MILLIS * 4) {
+                DateUtils.WEEK_IN_MILLIS
+            } else 0
+        ).toString()
     } else {
         SimpleDateFormat
             .getDateTimeInstance(dateStyle, timeStyle, locale)

@@ -1,5 +1,6 @@
 package com.skyd.anivu.model.service
 
+import com.skyd.anivu.config.Const
 import com.skyd.anivu.model.bean.FaviconBean
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -11,6 +12,6 @@ interface HttpService {
     @GET
     fun requestGetResponseBody(@Url url: String): Call<ResponseBody>
 
-    @GET("https://besticon-demo.herokuapp.com/allicons.json")
+    @GET(Const.FAVICON_FETCH_URL)
     suspend fun requestFavicon(@Query("url") url: String): FaviconBean
 }

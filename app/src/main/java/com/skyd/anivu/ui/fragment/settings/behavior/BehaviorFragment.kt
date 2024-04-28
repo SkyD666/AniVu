@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.SwipeLeft
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -33,6 +34,7 @@ import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
+import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
@@ -41,6 +43,7 @@ import com.skyd.anivu.ui.component.SwitchSettingsItem
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
+import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -76,6 +79,24 @@ fun BehaviorScreen() {
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             contentPadding = paddingValues,
         ) {
+            item {
+                CategorySettingsItem(text = stringResource(id = R.string.behavior_screen_feed_screen_category))
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.VisibilityOff,
+                    text = stringResource(id = R.string.behavior_screen_feed_screen_hide_empty_default),
+                    description = stringResource(id = R.string.behavior_screen_feed_screen_hide_empty_default_description),
+                    checked = LocalHideEmptyDefault.current,
+                    onCheckedChange = {
+                        HideEmptyDefaultPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
+            }
             item {
                 CategorySettingsItem(text = stringResource(id = R.string.behavior_screen_article_screen_category))
             }

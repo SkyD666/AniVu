@@ -16,12 +16,14 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
+import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalDateStyle
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
+import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
@@ -41,6 +43,7 @@ data class Settings(
     val deduplicateTitleInDesc: Boolean = DeduplicateTitleInDescPreference.default,
     val articleTapAction: String = ArticleTapActionPreference.default,
     val articleSwipeLeftAction: String = ArticleSwipeLeftActionPreference.default,
+    val hideEmptyDefault: Boolean = HideEmptyDefaultPreference.default,
 )
 
 @Composable
@@ -64,6 +67,7 @@ fun SettingsProvider(
         LocalDeduplicateTitleInDesc provides settings.deduplicateTitleInDesc,
         LocalArticleTapAction provides settings.articleTapAction,
         LocalArticleSwipeLeftAction provides settings.articleSwipeLeftAction,
+        LocalHideEmptyDefault provides settings.hideEmptyDefault,
     ) {
         content()
     }

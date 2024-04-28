@@ -1,6 +1,7 @@
 package com.skyd.anivu.model.repository
 
 import android.util.Log
+import androidx.compose.ui.util.fastMaxBy
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
@@ -114,7 +115,7 @@ class RssHelper @Inject constructor(
         return runCatching {
             retrofit.create(HttpService::class.java)
                 .requestFavicon(url)
-                .icons?.firstOrNull { it.width != null && it.width >= 20 }?.url
+                .icons?.fastMaxBy { it.width ?: 0 }?.url
         }.onFailure { it.printStackTrace() }.getOrNull()
     }
 

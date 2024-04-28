@@ -12,6 +12,7 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
+import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 
 val LocalNavController = compositionLocalOf<NavHostController> {
     error("LocalNavController not initialized!")
@@ -35,3 +36,4 @@ val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreferenc
 val LocalDeduplicateTitleInDesc = compositionLocalOf { DeduplicateTitleInDescPreference.default }
 val LocalArticleTapAction = compositionLocalOf { ArticleTapActionPreference.default }
 val LocalArticleSwipeLeftAction = compositionLocalOf { ArticleSwipeLeftActionPreference.default }
+val LocalHideEmptyDefault = compositionLocalOf { HideEmptyDefaultPreference.default }

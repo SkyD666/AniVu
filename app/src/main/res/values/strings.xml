@@ -80,7 +80,7 @@
     <string name="data_fragment_clear_cache_warning">Sure to clear the caches?</string>
     <string name="clear">Clear</string>
     <string name="rss_config_fragment_name">RSS</string>
-    <string name="rss_config_fragment_description">Configure RSS</string>
+    <string name="rss_config_fragment_description">Configure RSS sync, parsing rules</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure">Parse link as enclosure</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">Parses and displays the link tag as an enclosure if it\'s a magnet or torrent link</string>
     <string name="rss_config_fragment_parse_category">Parse</string>
@@ -134,7 +134,7 @@
     <string name="player_config_fragment_name">Player</string>
     <string name="player_config_fragment_behavior_category">Behavior</string>
     <string name="player_config_fragment_double_tap">Double tap</string>
-    <string name="player_config_fragment_description">Configure player behavior</string>
+    <string name="player_config_fragment_description">Configure player behavior, appearance</string>
     <string name="player_config_fragment_double_tap_description">Configure double tap behavior</string>
     <string name="appearance_fragment_name">Appearance &amp; Style</string>
     <string name="appearance_fragment_theme_category">Theme</string>
@@ -168,7 +168,7 @@
     <string name="update_check_failed">Check for update failed: %s</string>
     <string name="article_screen_read">Read</string>
     <string name="behavior_screen_name">Behavior</string>
-    <string name="behavior_screen_description">Configure behavior in response to user operations</string>
+    <string name="behavior_screen_description">Configure Feed, Article list behavior</string>
     <string name="behavior_screen_article_screen_category">Article list</string>
     <string name="behavior_screen_article_screen_deduplicate_title_in_desc">Deduplicate title</string>
     <string name="behavior_screen_article_screen_deduplicate_title_in_desc_description">Remove substrings in the description text that are the same as the title</string>
@@ -200,6 +200,9 @@
     <string name="date_style_relative">Relative</string>
     <string name="date_style_full">Full</string>
     <string name="appearance_fragment_date_style">Date style</string>
+    <string name="behavior_screen_feed_screen_category">Feed list</string>
+    <string name="behavior_screen_feed_screen_hide_empty_default">Hide empty Default</string>
+    <string name="behavior_screen_feed_screen_hide_empty_default_description">When the Default grouping is empty, hide it</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

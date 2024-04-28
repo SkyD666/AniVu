@@ -89,6 +89,7 @@ import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Group1Proxy
 import com.skyd.anivu.ui.fragment.article.ArticleFragment
 import com.skyd.anivu.ui.fragment.search.SearchFragment
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
+import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
@@ -200,19 +201,19 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                     contentPadding = innerPadding + PaddingValues(bottom = fabHeight + 16.dp),
                     onRemoveFeed = { feed -> dispatch(FeedIntent.RemoveFeed(feed.url)) },
                     onShowAllArticles = { group ->
-                        navController.navigate(R.id.action_to_article_fragment, Bundle().apply {
-                            putStringArrayList(
-                                ArticleFragment.FEED_URLS_KEY,
-                                ArrayList(
-                                    (uiState.groupListState as? GroupListState.Success)
-                                        ?.dataList
-                                        ?.filterIsInstance(FeedViewBean::class.java)
-                                        ?.filter { it.feed.groupId == group.groupId || group.isDefaultGroup() && it.feed.isDefaultGroup() }
-                                        ?.map { it.feed.url }
-                                        .orEmpty()
+                        val feedUrls = (uiState.groupListState as? GroupListState.Success)
+                            ?.dataList
+                            ?.filterIsInstance(FeedViewBean::class.java)
+                            ?.filter { it.feed.groupId == group.groupId || group.isDefaultGroup() && it.feed.isDefaultGroup() }
+                            ?.map { it.feed.url }
+                            .orEmpty()
+                        if (feedUrls.isNotEmpty()) {
+                            navController.navigate(R.id.action_to_article_fragment, Bundle().apply {
+                                putStringArrayList(
+                                    ArticleFragment.FEED_URLS_KEY, ArrayList(feedUrls)
                                 )
-                            )
-                        })
+                            })
+                        }
                     },
                     onEditFeed = { feed ->
                         openEditDialog = feed
@@ -524,6 +525,7 @@ private fun FeedList(
     onMoveToGroup: (from: GroupBean, to: GroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
+    val hideEmptyDefault = LocalHideEmptyDefault.current
     val feedGroupExpand = LocalFeedGroupExpand.current
     val groups = rememberSaveable(result) { result.filterIsInstance<GroupBean>() }
     val feedVisible = rememberSaveable(saver = snapshotStateMapSaver()) {
@@ -549,7 +551,11 @@ private fun FeedList(
     }
     var openSelectGroupDialog by rememberSaveable { mutableStateOf<GroupBean?>(null) }
     var selectGroupDialogCurrentGroup by rememberSaveable { mutableStateOf<GroupBean?>(null) }
-    val adapter = remember {
+
+    val shouldHideEmptyDefault: (index: Int) -> Boolean = remember(hideEmptyDefault, result) {
+        { hideEmptyDefault && result.getOrNull(it + 1) !is FeedViewBean }
+    }
+    val adapter = remember(shouldHideEmptyDefault) {
         val group1Proxy = Group1Proxy(
             isExpand = { feedVisible[it.groupId] ?: false },
             onExpandChange = { data, expand -> feedVisible[data.groupId] = expand },
@@ -562,7 +568,10 @@ private fun FeedList(
         )
         LazyGridAdapter(
             mutableListOf(
-                DefaultGroup1Proxy(group1Proxy),
+                DefaultGroup1Proxy(
+                    group1Proxy = group1Proxy,
+                    hide = shouldHideEmptyDefault,
+                ),
                 group1Proxy,
                 Feed1Proxy(
                     visible = { feedVisible[it] ?: false },

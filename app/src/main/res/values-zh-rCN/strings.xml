@@ -75,7 +75,7 @@
     <string name="data_fragment_clear_cache_warning">确定要删除这些缓存吗？</string>
     <string name="clear">清除</string>
     <string name="rss_config_fragment_name">RSS</string>
-    <string name="rss_config_fragment_description">配置 RSS 等</string>
+    <string name="rss_config_fragment_description">配置 RSS 同步、解析规则等</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure">解析 Link 为附件</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">解析 Link 标签，若符合磁力链或 Torrent 格式，则显示为附件</string>
     <string name="rss_config_fragment_parse_category">解析</string>
@@ -128,7 +128,7 @@
     <string name="player_config_fragment_name">播放器</string>
     <string name="player_config_fragment_behavior_category">行为</string>
     <string name="player_config_fragment_double_tap">双击</string>
-    <string name="player_config_fragment_description">配置播放器行为等</string>
+    <string name="player_config_fragment_description">配置播放器行为、外观等</string>
     <string name="player_config_fragment_double_tap_description">配置双击行为</string>
     <string name="appearance_fragment_name">外观和样式</string>
     <string name="appearance_fragment_theme_category">主题</string>
@@ -160,7 +160,7 @@
     <string name="update_check_failed">检查更新失败：%s</string>
     <string name="article_screen_read">详情</string>
     <string name="behavior_screen_name">行为</string>
-    <string name="behavior_screen_description">配置对操作的响应行为</string>
+    <string name="behavior_screen_description">配置订阅、文章列表行为等</string>
     <string name="behavior_screen_article_screen_category">文章列表</string>
     <string name="behavior_screen_article_screen_deduplicate_title_in_desc">标题去重</string>
     <string name="behavior_screen_article_screen_deduplicate_title_in_desc_description">删除描述文本中与标题相同的子字符串</string>
@@ -188,6 +188,13 @@
     <string name="feed_screen_all_articles">所有文章</string>
     <string name="download_fragment_add_download">新建下载</string>
     <string name="download_fragment_add_download_hint">磁力链 / 种子链接</string>
+    <string name="download_fragment_unsupported_link">不支持的链接</string>
+    <string name="date_style_relative">相对日期</string>
+    <string name="date_style_full">完整日期</string>
+    <string name="appearance_fragment_date_style">日期样式</string>
+    <string name="behavior_screen_feed_screen_category">订阅列表</string>
+    <string name="behavior_screen_feed_screen_hide_empty_default">隐藏空默认分组</string>
+    <string name="behavior_screen_feed_screen_hide_empty_default_description">当默认分组为空时，隐藏它</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

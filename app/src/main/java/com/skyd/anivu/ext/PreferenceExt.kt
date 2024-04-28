@@ -11,6 +11,7 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
+import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 
 fun Preferences.toSettings(): Settings {
     return Settings(
@@ -28,5 +29,6 @@ fun Preferences.toSettings(): Settings {
         deduplicateTitleInDesc = DeduplicateTitleInDescPreference.fromPreferences(this),
         articleTapAction = ArticleTapActionPreference.fromPreferences(this),
         articleSwipeLeftAction = ArticleSwipeLeftActionPreference.fromPreferences(this),
+        hideEmptyDefault = HideEmptyDefaultPreference.fromPreferences(this),
     )
 }
