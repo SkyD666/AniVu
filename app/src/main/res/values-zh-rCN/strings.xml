@@ -190,6 +190,9 @@
     <string name="download_fragment_add_download">新建下载</string>
     <string name="download_fragment_add_download_hint">磁力链 / 种子链接</string>
     <string name="download_fragment_unsupported_link">Unsupported link</string>
+    <string name="date_style_relative">Relative</string>
+    <string name="date_style_full">Full</string>
+    <string name="appearance_fragment_date_style">Date style</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>
