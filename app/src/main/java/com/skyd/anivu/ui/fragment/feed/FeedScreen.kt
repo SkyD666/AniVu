@@ -68,6 +68,7 @@ import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.snapshotStateMapSaver
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedBean.Companion.isDefaultGroup
+import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.model.bean.GroupBean.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
@@ -138,8 +139,8 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                                     ArrayList(
                                         (uiState.groupListState as? GroupListState.Success)
                                             ?.dataList
-                                            ?.filterIsInstance(FeedBean::class.java)
-                                            ?.map { it.url }
+                                            ?.filterIsInstance(FeedViewBean::class.java)
+                                            ?.map { it.feed.url }
                                             .orEmpty()
                                     )
                                 )
@@ -205,9 +206,9 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                                 ArrayList(
                                     (uiState.groupListState as? GroupListState.Success)
                                         ?.dataList
-                                        ?.filterIsInstance(FeedBean::class.java)
-                                        ?.filter { it.groupId == group.groupId || group.isDefaultGroup() && it.isDefaultGroup() }
-                                        ?.map { it.url }
+                                        ?.filterIsInstance(FeedViewBean::class.java)
+                                        ?.filter { it.feed.groupId == group.groupId || group.isDefaultGroup() && it.feed.isDefaultGroup() }
+                                        ?.map { it.feed.url }
                                         .orEmpty()
                                 )
                             )
@@ -581,7 +582,7 @@ private fun FeedList(
             when (item) {
                 is GroupBean.DefaultGroup -> item.groupId
                 is GroupBean -> item.groupId
-                is FeedBean -> item.url
+                is FeedViewBean -> item.feed.url
                 else -> item
             }
         },

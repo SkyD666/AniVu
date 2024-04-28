@@ -3,6 +3,7 @@ package com.skyd.anivu.model.repository
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class FeedRepository @Inject constructor(
+    private val articleDao: ArticleDao,
     private val feedDao: FeedDao,
     private val groupDao: GroupDao,
     private val rssHelper: RssHelper,

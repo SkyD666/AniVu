@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.Preferences
 import com.skyd.anivu.model.preference.IgnoreUpdateVersionPreference
 import com.skyd.anivu.model.preference.Settings
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
+import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
@@ -18,6 +19,7 @@ fun Preferences.toSettings(): Settings {
         darkMode = DarkModePreference.fromPreferences(this),
         feedGroupExpand = FeedGroupExpandPreference.fromPreferences(this),
         textFieldStyle = TextFieldStylePreference.fromPreferences(this),
+        dateStyle = DateStylePreference.fromPreferences(this),
 
         // Update
         ignoreUpdateVersion = IgnoreUpdateVersionPreference.fromPreferences(this),

@@ -8,6 +8,7 @@ import androidx.room.TypeConverters
 import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
@@ -23,6 +24,7 @@ import com.skyd.anivu.model.db.dao.TorrentFileDao
 import com.skyd.anivu.model.db.migration.Migration1To2
 import com.skyd.anivu.model.db.migration.Migration2To3
 import com.skyd.anivu.model.db.migration.Migration3To4
+import com.skyd.anivu.model.db.migration.Migration4To5
 
 const val APP_DATA_BASE_FILE_NAME = "app.db"
 
@@ -37,7 +39,8 @@ const val APP_DATA_BASE_FILE_NAME = "app.db"
         TorrentFileBean::class,
         GroupBean::class,
     ],
-    version = 4
+    views = [FeedViewBean::class],
+    version = 5,
 )
 @TypeConverters(
     value = []
@@ -55,7 +58,8 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var instance: AppDatabase? = null
 
-        private val migrations = arrayOf(Migration1To2(), Migration2To3(), Migration3To4())
+        private val migrations =
+            arrayOf(Migration1To2(), Migration2To3(), Migration3To4(), Migration4To5())
 
         fun getInstance(context: Context): AppDatabase {
             return if (instance == null) {

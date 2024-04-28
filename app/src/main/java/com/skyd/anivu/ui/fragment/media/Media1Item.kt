@@ -112,7 +112,7 @@ fun Media1Item(
             )
             Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = data.date.toDateTimeString(),
+                text = data.date.toDateTimeString(context = context),
                 style = MaterialTheme.typography.labelMedium,
             )
             if (isMedia || isDir) {

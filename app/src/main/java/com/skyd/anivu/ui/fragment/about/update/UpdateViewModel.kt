@@ -82,7 +82,8 @@ class UpdateViewModel @Inject constructor(private var updateRepo: UpdateReposito
                         ).apply {
                             timeZone = TimeZone.getTimeZone("UTC")
                         }.parse(data.publishedAt)
-                        val publishedAt: String = date?.toDateTimeString() ?: data.publishedAt
+                        val publishedAt: String =
+                            date?.toDateTimeString(context = appContext) ?: data.publishedAt
 
                         UpdatePartialStateChange.CheckUpdate.HasUpdate(
                             data.copy(publishedAt = publishedAt)

@@ -10,8 +10,11 @@ import androidx.room.RawQuery
 import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
+import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
+import com.skyd.anivu.model.bean.FEED_VIEW_NAME
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.FeedWithArticleBean
 import com.skyd.anivu.model.bean.GROUP_TABLE_NAME
 import com.skyd.anivu.model.bean.GroupBean
@@ -114,20 +117,20 @@ interface FeedDao {
     @Transaction
     @Query(
         """
-            SELECT * FROM $FEED_TABLE_NAME
+            SELECT * FROM $FEED_VIEW_NAME
             WHERE ${FeedBean.GROUP_ID_COLUMN} IS NULL OR 
             ${FeedBean.GROUP_ID_COLUMN} NOT IN (:groupIds)
         """
     )
-    suspend fun getFeedsNotIn(groupIds: List<String>): List<FeedBean>
+    suspend fun getFeedsNotIn(groupIds: List<String>): List<FeedViewBean>
 
     @Transaction
-    @RawQuery(observedEntities = [FeedBean::class])
-    fun getFeedPagingSource(sql: SupportSQLiteQuery): PagingSource<Int, FeedBean>
+    @RawQuery(observedEntities = [FeedBean::class, ArticleBean::class])
+    fun getFeedPagingSource(sql: SupportSQLiteQuery): PagingSource<Int, FeedViewBean>
 
     @Transaction
-    @RawQuery(observedEntities = [FeedBean::class])
-    fun getFeedList(sql: SupportSQLiteQuery): List<FeedBean>
+    @RawQuery(observedEntities = [FeedBean::class, ArticleBean::class])
+    fun getFeedList(sql: SupportSQLiteQuery): List<FeedViewBean>
 
     @Transaction
     @Query("SELECT ${FeedBean.URL_COLUMN} FROM $FEED_TABLE_NAME")

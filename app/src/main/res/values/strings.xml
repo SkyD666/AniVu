@@ -197,6 +197,9 @@
     <string name="download_fragment_add_download">Add</string>
     <string name="download_fragment_add_download_hint">Magnet / Torrent link</string>
     <string name="download_fragment_unsupported_link">Unsupported link</string>
+    <string name="date_style_relative">Relative</string>
+    <string name="date_style_full">Full</string>
+    <string name="appearance_fragment_date_style">Date style</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

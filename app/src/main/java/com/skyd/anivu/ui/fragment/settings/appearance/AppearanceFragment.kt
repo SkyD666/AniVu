@@ -18,6 +18,7 @@ import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.inDarkMode
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
+import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.ui.component.preference.ColorPalettesPreference
@@ -113,6 +114,22 @@ class AppearanceFragment : BasePreferenceFragmentCompat() {
             entryValues = TextFieldStylePreference.values.toTypedArray()
             setOnPreferenceChangeListener { _, newValue ->
                 TextFieldStylePreference.put(requireContext(), lifecycleScope, newValue as String)
+                true
+            }
+            styleCategory.addPreference(this)
+        }
+
+        DropDownPreference(this).apply {
+            key = "dateStyle"
+            title = getString(R.string.appearance_fragment_date_style)
+            value = DateStylePreference.toDisplayName(context)
+            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+            entries = DateStylePreference.values.map {
+                DateStylePreference.toDisplayName(context, it)
+            }.toTypedArray()
+            entryValues = DateStylePreference.values
+            setOnPreferenceChangeListener { _, newValue ->
+                DateStylePreference.put(requireContext(), lifecycleScope, newValue as String)
                 true
             }
             styleCategory.addPreference(this)

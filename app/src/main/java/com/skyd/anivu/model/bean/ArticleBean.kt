@@ -38,7 +38,7 @@ data class ArticleBean(
     @ColumnInfo(name = TITLE_COLUMN)
     val title: String? = null,
     @ColumnInfo(name = DATE_COLUMN)
-    var date: Long? = null,
+    val date: Long? = null,
     @ColumnInfo(name = AUTHOR_COLUMN)
     var author: String? = null,
     @ColumnInfo(name = DESCRIPTION_COLUMN)

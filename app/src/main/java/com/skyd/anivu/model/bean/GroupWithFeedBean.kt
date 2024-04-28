@@ -13,5 +13,5 @@ data class GroupWithFeedBean(
         parentColumn = GroupBean.GROUP_ID_COLUMN,
         entityColumn = FeedBean.GROUP_ID_COLUMN,
     )
-    var feeds: List<FeedBean>,
+    var feeds: List<FeedViewBean>,
 )

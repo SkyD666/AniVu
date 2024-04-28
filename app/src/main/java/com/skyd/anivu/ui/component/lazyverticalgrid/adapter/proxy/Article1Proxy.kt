@@ -2,6 +2,7 @@ package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
 
 import android.content.Context
 import android.os.Bundle
+import android.text.format.DateUtils
 import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
@@ -45,6 +46,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
@@ -54,6 +56,7 @@ import com.skyd.anivu.ext.readable
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.ArticleWithFeed
+import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.ui.component.AniVuImage
@@ -139,7 +142,7 @@ fun Article1Item(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                FeedIcon(data = data)
+                FeedIcon(data = data.feed)
                 val feedName = data.feed.nickname.orEmpty().ifBlank { data.feed.title.orEmpty() }
                 if (feedName.isNotBlank()) {
                     Text(
@@ -153,7 +156,7 @@ fun Article1Item(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
-                val date = article.date?.toDateTimeString()
+                val date = article.date?.toDateTimeString(context = context)
                 if (!date.isNullOrBlank()) {
                     Text(
                         text = date,
@@ -255,12 +258,12 @@ fun Article1Item(
 }
 
 @Composable
-private fun FeedIcon(data: ArticleWithFeed) {
-    val icon = data.feed.icon
+fun FeedIcon(modifier: Modifier = Modifier, data: FeedBean, size: Dp = 22.dp) {
+    val icon = data.icon
     if (icon.isNullOrBlank()) {
         Box(
-            modifier = Modifier
-                .size(22.dp)
+            modifier = modifier
+                .size(size)
                 .background(
                     color = MaterialTheme.colorScheme.primaryContainer,
                     shape = CircleShape,
@@ -268,15 +271,15 @@ private fun FeedIcon(data: ArticleWithFeed) {
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = data.feed.title?.first().toString(),
+                text = data.title?.first().toString(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
         }
     } else {
         AniVuImage(
-            modifier = Modifier
-                .size(20.dp)
+            modifier = modifier
+                .size(size)
                 .clip(CircleShape),
             model = icon,
             contentScale = ContentScale.Crop,
