@@ -12,9 +12,11 @@ class DefaultGroup1Proxy(
     override fun Draw(index: Int, data: GroupBean.DefaultGroup) {
         if (!hide(index)) {
             Group1Item(
+                index = index,
                 data = data,
                 initExpand = group1Proxy.isExpand,
                 onExpandChange = group1Proxy.onExpandChange,
+                isEmpty = group1Proxy.isEmpty,
                 onShowAllArticles = group1Proxy.onShowAllArticles,
                 onDelete = group1Proxy.onDelete,
                 onFeedsMoveTo = group1Proxy.onMoveFeedsTo,

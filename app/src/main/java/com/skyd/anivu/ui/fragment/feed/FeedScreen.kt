@@ -559,6 +559,7 @@ private fun FeedList(
         val group1Proxy = Group1Proxy(
             isExpand = { feedVisible[it.groupId] ?: false },
             onExpandChange = { data, expand -> feedVisible[data.groupId] = expand },
+            isEmpty = { it == result.lastIndex || result[it + 1] is GroupBean },
             onShowAllArticles = onShowAllArticles,
             onDelete = onDeleteGroup,
             onMoveFeedsTo = {
@@ -575,6 +576,8 @@ private fun FeedList(
                 group1Proxy,
                 Feed1Proxy(
                     visible = { feedVisible[it] ?: false },
+                    useCardLayout = { true },
+                    isEnded = { it == result.lastIndex || result[it + 1] is GroupBean },
                     onRemove = onRemoveFeed,
                     onEdit = onEditFeed
                 )
