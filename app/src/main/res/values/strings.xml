@@ -203,6 +203,10 @@
     <string name="behavior_screen_feed_screen_category">Feed list</string>
     <string name="behavior_screen_feed_screen_hide_empty_default">Hide empty Default</string>
     <string name="behavior_screen_feed_screen_hide_empty_default_description">When the Default grouping is empty, hide it</string>
+    <string name="navigation_bar_label_none">None</string>
+    <string name="navigation_bar_label_show">Show</string>
+    <string name="navigation_bar_label_show_on_active">Show on active</string>
+    <string name="appearance_fragment_navigation_bar_label">Navi bar label</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

@@ -376,6 +376,7 @@ private fun EditFeedDialog(
         icon = { Icon(imageVector = Icons.Outlined.RssFeed, contentDescription = null) },
         title = { Text(text = title) },
         onDismissRequest = onDismissRequest,
+        selectable = false,
         text = {
             Column {
                 val focusManager = LocalFocusManager.current

@@ -10,6 +10,7 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.toSettings
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.DateStylePreference
+import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
@@ -25,6 +26,7 @@ import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
+import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
 import kotlinx.coroutines.Dispatchers
@@ -37,6 +39,7 @@ data class Settings(
     val feedGroupExpand: Boolean = FeedGroupExpandPreference.default,
     val textFieldStyle: String = TextFieldStylePreference.default,
     val dateStyle: String = DateStylePreference.default,
+    val navigationBarLabel: String = NavigationBarLabelPreference.default,
     // Update
     val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
     // Behavior
@@ -61,6 +64,7 @@ fun SettingsProvider(
         LocalFeedGroupExpand provides settings.feedGroupExpand,
         LocalTextFieldStyle provides settings.textFieldStyle,
         LocalDateStyle provides settings.dateStyle,
+        LocalNavigationBarLabel provides settings.navigationBarLabel,
         // Update
         LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
         // Behavior

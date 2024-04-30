@@ -19,6 +19,7 @@ import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.inDarkMode
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.DateStylePreference
+import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.ui.component.preference.ColorPalettesPreference
@@ -130,6 +131,26 @@ class AppearanceFragment : BasePreferenceFragmentCompat() {
             entryValues = DateStylePreference.values
             setOnPreferenceChangeListener { _, newValue ->
                 DateStylePreference.put(requireContext(), lifecycleScope, newValue as String)
+                true
+            }
+            styleCategory.addPreference(this)
+        }
+
+        DropDownPreference(this).apply {
+            key = "navigationBarLabel"
+            title = getString(R.string.appearance_fragment_navigation_bar_label)
+            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+            entries = NavigationBarLabelPreference.values.map {
+                NavigationBarLabelPreference.toDisplayName(context, it)
+            }.toTypedArray()
+            entryValues = NavigationBarLabelPreference.values
+            value = NavigationBarLabelPreference.toDisplayName(context)
+            setOnPreferenceChangeListener { _, newValue ->
+                NavigationBarLabelPreference.put(
+                    requireContext(),
+                    lifecycleScope,
+                    newValue as String
+                )
                 true
             }
             styleCategory.addPreference(this)

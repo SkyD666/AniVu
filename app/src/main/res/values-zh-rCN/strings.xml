@@ -195,6 +195,10 @@
     <string name="behavior_screen_feed_screen_category">订阅列表</string>
     <string name="behavior_screen_feed_screen_hide_empty_default">隐藏空默认分组</string>
     <string name="behavior_screen_feed_screen_hide_empty_default_description">当默认分组为空时，隐藏它</string>
+    <string name="navigation_bar_label_none">不显示</string>
+    <string name="navigation_bar_label_show">显示</string>
+    <string name="navigation_bar_label_show_on_active">选中时显示</string>
+    <string name="appearance_fragment_navigation_bar_label">导航栏标签</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

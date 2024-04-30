@@ -5,6 +5,7 @@ import com.skyd.anivu.model.preference.IgnoreUpdateVersionPreference
 import com.skyd.anivu.model.preference.Settings
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.DateStylePreference
+import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
@@ -21,6 +22,7 @@ fun Preferences.toSettings(): Settings {
         feedGroupExpand = FeedGroupExpandPreference.fromPreferences(this),
         textFieldStyle = TextFieldStylePreference.fromPreferences(this),
         dateStyle = DateStylePreference.fromPreferences(this),
+        navigationBarLabel = NavigationBarLabelPreference.fromPreferences(this),
 
         // Update
         ignoreUpdateVersion = IgnoreUpdateVersionPreference.fromPreferences(this),

@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import com.skyd.anivu.model.preference.IgnoreUpdateVersionPreference
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.DateStylePreference
+import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
@@ -28,6 +29,7 @@ val LocalDarkMode = compositionLocalOf { DarkModePreference.default }
 val LocalFeedGroupExpand = compositionLocalOf { FeedGroupExpandPreference.default }
 val LocalTextFieldStyle = compositionLocalOf { TextFieldStylePreference.default }
 val LocalDateStyle = compositionLocalOf { DateStylePreference.default }
+val LocalNavigationBarLabel = compositionLocalOf { NavigationBarLabelPreference.default }
 
 // Update
 val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreference.default }
