@@ -37,4 +37,12 @@ object Const {
     val TORRENT_RESUME_DATA_DIR = File(appContext.filesDir.path, "TorrentResumeData").apply {
         if (!exists()) mkdirs()
     }
+
+    val MPV_CONFIG_DIR = File(appContext.filesDir.path, "MpvConfig").apply {
+        if (!exists()) mkdirs()
+    }
+
+    val MPV_CACHE_DIR = File(appContext.filesDir.path, "MpvCache").apply {
+        if (!exists()) mkdirs()
+    }
 }

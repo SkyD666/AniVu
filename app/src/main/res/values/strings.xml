@@ -207,6 +207,8 @@
     <string name="navigation_bar_label_show">Show</string>
     <string name="navigation_bar_label_show_on_active">Show on active</string>
     <string name="appearance_fragment_navigation_bar_label">Navi bar label</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

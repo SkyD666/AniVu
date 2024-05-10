@@ -13,24 +13,34 @@
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <!--  ExoPlayer  -->
-    <style name="AniVuStyledControls.Button.Center.PlayPause" parent="ExoStyledControls.Button.Center.PlayPause">
-        <item name="android:padding">10dp</item>
-        <item name="android:tint">#FFFFFF</item>
-        <item name="android:layout_marginStart">0dp</item>
-        <item name="android:layout_marginEnd">0dp</item>
+    <!--  Player  -->
+    <style name="AniVuStyledControls.Text" parent="">
+        <item name="textColor">@android:color/white</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="AniVuStyledControls.Button.Center.Next" parent="ExoStyledControls.Button.Center.Next">
+    <style name="AniVuStyledControls.Text.Time" parent="AniVuStyledControls.Text">
+        <item name="android:textSize">15sp</item>
+        <item name="text">00:00</item>
+    </style>
+
+    <style name="AniVuStyledControls.Button" parent="">
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:scaleType">fitXY</item>
         <item name="android:padding">10dp</item>
         <item name="android:tint">#FFFFFF</item>
         <item name="android:layout_width">50dp</item>
-        <item name="android:layout_marginStart">0dp</item>
-        <item name="android:scaleType">centerInside</item>
-        <item name="android:layout_marginEnd">0dp</item>
+        <item name="android:layout_height">50dp</item>
     </style>
 
-    <style name="AniVuStyledControls.Button.Bottom.CC" parent="ExoStyledControls.Button.Bottom.CC">
+    <style name="AniVuStyledControls.Button.PlayPause" parent="AniVuStyledControls.Button">
+        <item name="android:layout_width">70dp</item>
+        <item name="android:layout_height">70dp</item>
+        <item name="android:src">@drawable/ic_play_arrow_24</item>
+    </style>
+
+    <style name="AniVuStyledControls.Button.CC">
         <item name="android:padding">10dp</item>
         <item name="android:tint">#FFFFFF</item>
         <item name="android:layout_width">43dp</item>
@@ -39,14 +49,14 @@
         <item name="android:layout_marginEnd">0dp</item>
     </style>
 
-    <style name="AniVuStyledControls.Button.Top.Settings" parent="ExoStyledControls.Button.Bottom.Settings">
+    <style name="AniVuStyledControls.Button.Settings" parent="AniVuStyledControls.Button">
         <item name="android:tint">#FFFFFF</item>
         <item name="android:padding">17dp</item>
         <item name="android:layout_width">@dimen/exo_top_icon_width</item>
         <item name="android:layout_height">@dimen/exo_top_icon_height</item>
     </style>
 
-    <style name="AniVuStyledControls.Button.Top.Back" parent="AniVuStyledControls.Button.Center.PlayPause">
+    <style name="AniVuStyledControls.Button.Back" parent="AniVuStyledControls.Button.PlayPause">
         <item name="android:src">@drawable/ic_arrow_back_ios_new_24</item>
         <item name="android:contentDescription">@string/back</item>
         <item name="android:tint">#FFFFFF</item>
@@ -55,12 +65,12 @@
         <item name="android:layout_height">@dimen/exo_top_icon_height</item>
     </style>
 
-    <style name="AniVuStyledControls.Button.FloatButton" parent="ExoStyledControls">
+    <style name="AniVuStyledControls.Button.FloatButton" parent="AniVuStyledControls.Button">
         <item name="android:tint">#FFFFFF</item>
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/exo_white</item>
+        <item name="android:textColor">@android:color/white</item>
         <item name="android:background">@drawable/shape_fill_circle_corner_6</item>
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">16dp</item>
@@ -78,7 +88,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:text">@string/player_long_press_playback_speed</item>
         <item name="android:textSize">16sp</item>
-        <item name="android:textColor">@color/exo_white</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 
     <style name="AniVuStyledControls.Button.FloatButton.SeekPreview" parent="AniVuStyledControls.Button.FloatButton" />
@@ -96,7 +106,7 @@
         <item name="android:gravity">center_vertical</item>
     </style>
 
-    <style name="AniVuStyledControls.ScreenShot" parent="ExoStyledControls.Button">
+    <style name="AniVuStyledControls.ScreenShot" parent="AniVuStyledControls.Button">
         <item name="android:padding">10dp</item>
         <item name="android:tint">#FFFFFF</item>
         <item name="android:layout_height">50dp</item>
@@ -108,7 +118,7 @@
         <item name="android:layout_marginEnd">30dp</item>
     </style>
 
-    <style name="ExoStyledControls.TitleText">
+    <style name="AniVuStyledControls.TitleText" parent="">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_gravity">center_vertical</item>
@@ -120,6 +130,6 @@
         <item name="android:singleLine">true</item>
         <item name="android:ellipsize">marquee</item>
         <item name="android:marqueeRepeatLimit">marquee_forever</item>
-        <item name="android:textColor">@color/exo_white</item>
+        <item name="android:textColor">@android:color/white</item>
     </style>
 </resources>

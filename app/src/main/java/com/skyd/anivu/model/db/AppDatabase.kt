@@ -62,23 +62,15 @@ abstract class AppDatabase : RoomDatabase() {
             arrayOf(Migration1To2(), Migration2To3(), Migration3To4(), Migration4To5())
 
         fun getInstance(context: Context): AppDatabase {
-            return if (instance == null) {
-                synchronized(this) {
-                    if (instance == null) {
-                        Room.databaseBuilder(
-                            context.applicationContext,
-                            AppDatabase::class.java,
-                            APP_DATA_BASE_FILE_NAME
-                        )
-                            .addMigrations(*migrations)
-                            .build()
-                            .apply { instance = this }
-                    } else {
-                        instance as AppDatabase
-                    }
-                }
-            } else {
-                instance as AppDatabase
+            return instance ?: synchronized(this) {
+                instance ?: Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                    APP_DATA_BASE_FILE_NAME
+                )
+                    .addMigrations(*migrations)
+                    .build()
+                    .apply { instance = this }
             }
         }
     }

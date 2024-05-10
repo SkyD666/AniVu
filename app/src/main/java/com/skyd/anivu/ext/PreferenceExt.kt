@@ -13,6 +13,7 @@ import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPr
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
+import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 
 fun Preferences.toSettings(): Settings {
     return Settings(
@@ -32,5 +33,8 @@ fun Preferences.toSettings(): Settings {
         articleTapAction = ArticleTapActionPreference.fromPreferences(this),
         articleSwipeLeftAction = ArticleSwipeLeftActionPreference.fromPreferences(this),
         hideEmptyDefault = HideEmptyDefaultPreference.fromPreferences(this),
+
+        // Player
+        playerDoubleTap = PlayerDoubleTapPreference.fromPreferences(this),
     )
 }

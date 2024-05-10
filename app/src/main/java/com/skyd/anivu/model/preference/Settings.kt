@@ -18,6 +18,7 @@ import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPr
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
+import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDarkMode
@@ -27,6 +28,7 @@ import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
+import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
 import kotlinx.coroutines.Dispatchers
@@ -47,6 +49,8 @@ data class Settings(
     val articleTapAction: String = ArticleTapActionPreference.default,
     val articleSwipeLeftAction: String = ArticleSwipeLeftActionPreference.default,
     val hideEmptyDefault: Boolean = HideEmptyDefaultPreference.default,
+    // Player
+    val playerDoubleTap: String = PlayerDoubleTapPreference.default,
 )
 
 @Composable
@@ -72,6 +76,8 @@ fun SettingsProvider(
         LocalArticleTapAction provides settings.articleTapAction,
         LocalArticleSwipeLeftAction provides settings.articleSwipeLeftAction,
         LocalHideEmptyDefault provides settings.hideEmptyDefault,
+        // Player
+        LocalPlayerDoubleTap provides settings.playerDoubleTap,
     ) {
         content()
     }

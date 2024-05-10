@@ -103,7 +103,7 @@ fun InputStream.saveTo(target: File): File {
 
 fun File.md5(): String? {
     var bi: BigInteger? = null
-    try {
+    runCatching {
         val buffer = ByteArray(4096)
         var len: Int
         val md = MessageDigest.getInstance("MD5")
@@ -114,10 +114,12 @@ fun File.md5(): String? {
         }
         val b = md.digest()
         bi = BigInteger(1, b)
-    } catch (e: NoSuchAlgorithmException) {
-        e.printStackTrace()
-    } catch (e: IOException) {
-        e.printStackTrace()
+    }.onFailure {
+        when (it) {
+            is NoSuchAlgorithmException -> it.printStackTrace()
+            is IOException -> it.printStackTrace()
+            else -> throw it
+        }
     }
     return bi?.toString(16)
 }

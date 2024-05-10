@@ -1,11 +1,9 @@
 package com.skyd.anivu.ui.fragment.read
 
-import android.content.Intent
 import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
@@ -15,10 +13,8 @@ import com.skyd.anivu.databinding.BottomSheetEnclosureBinding
 import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
-import com.skyd.anivu.ui.activity.PlayActivity
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
-import com.skyd.anivu.ui.adapter.variety.proxy.Enclosure1Proxy
 import com.skyd.anivu.ui.adapter.variety.proxy.LinkEnclosure1Proxy
 
 class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureBinding>() {
@@ -75,14 +71,6 @@ class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureB
 
     private val adapter = VarietyAdapter(
         mutableListOf(
-            Enclosure1Proxy(onDownload = onDownload, onPlay = {
-                startActivity(
-                    Intent(requireContext(), PlayActivity::class.java).apply {
-                        putExtra(PlayActivity.VIDEO_URI_KEY, it.url.toUri())
-                    }
-                )
-                dismiss()
-            }),
             LinkEnclosure1Proxy(onDownload = onDownload),
         )
     )
