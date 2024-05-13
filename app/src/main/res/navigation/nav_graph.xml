@@ -170,4 +170,12 @@
     <action
         android:id="@+id/action_to_feed_style_fragment"
         app:destination="@id/feed_style_fragment" />
+
+    <fragment
+        android:id="@+id/player_config_advanced_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.playerconfig.advanced.PlayerConfigAdvancedFragment"
+        android:label="@string/player_config_advanced_screen_name" />
+    <action
+        android:id="@+id/action_to_player_config_advanced_fragment"
+        app:destination="@id/player_config_advanced_fragment" />
 </navigation>

@@ -21,7 +21,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 16
-        versionName = "1.1-beta21"
+        versionName = "1.1-beta23"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -92,6 +92,12 @@ android {
             )
         }
     }
+    androidResources {
+        ignoreAssetsPatterns += listOf(
+            "subfont.ttf",  // mpv-android
+            "cacert.pem",   // mpv-android
+        )
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -116,7 +122,17 @@ android {
             "kotlin-tooling-metadata.json",
             "okhttp3/internal/publicsuffix/NOTICE",
         )
+        jniLibs.excludes += mutableSetOf(
+            "lib/*/libffmpegkit.so",                // mpv-android
+            "lib/*/libffmpegkit_abidetect.so",      // mpv-android
+        )
+        dex {
+            // Set to "true" because android:extractNativeLibs
+            // is set to "true" in AndroidManifest.xml
+            useLegacyPackaging = true
+        }
     }
+//    ndkVersion = "26.3.11579264"
 }
 
 tasks.withType(KotlinCompile::class.java).configureEach {
@@ -171,19 +187,19 @@ dependencies {
 
     implementation("com.google.android.material:material:1.12.0")
 
-    implementation("com.google.dagger:hilt-android:2.51")
-    ksp("com.google.dagger:hilt-android-compiler:2.51")
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    ksp("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:okhttp-coroutines-jvm:5.0.0-alpha.12")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-    implementation("com.squareup.retrofit2:retrofit:2.10.0")
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
-    implementation("com.github.aniyomiorg:aniyomi-mpv-lib:1.14.n")
-    implementation("com.github.jmir1:ffmpeg-kit:1.13")
+    implementation("com.github.aniyomiorg:aniyomi-mpv-lib:1.15.n")
+    implementation("com.github.jmir1:ffmpeg-kit:1.14")
 
     implementation("io.coil-kt:coil:2.6.0")
     implementation("io.coil-kt:coil-compose:2.6.0")

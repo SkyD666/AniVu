@@ -24,7 +24,7 @@ fun TextFieldDialog(
     maxLines: Int = Int.MAX_VALUE,
     style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     icon: @Composable (() -> Unit)? = null,
-    title: String = "",
+    title: String? = null,
     value: String = "",
     placeholder: String = "",
     trailingIcon: @Composable (() -> Unit)? = DefaultTrailingIcon,
@@ -44,7 +44,9 @@ fun TextFieldDialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
         icon = icon,
-        title = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
+        title = if (title == null) null else {
+            { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+        },
         text = {
             ClipboardTextField(
                 modifier = modifier,

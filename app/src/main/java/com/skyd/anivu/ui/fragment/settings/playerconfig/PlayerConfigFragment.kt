@@ -5,12 +5,14 @@ import android.os.Bundle
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.DropDownPreference
 import androidx.preference.ListPreference
+import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceScreen
 import androidx.preference.SwitchPreferenceCompat
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BasePreferenceFragmentCompat
 import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
@@ -71,6 +73,22 @@ class PlayerConfigFragment : BasePreferenceFragmentCompat() {
                 true
             }
             playerAppearanceCategory.addPreference(this)
+        }
+
+        val playerAdvancedCategory = PreferenceCategory(this).apply {
+            key = "playerAdvancedCategory"
+            title = getString(R.string.player_config_fragment_advanced_category)
+            screen.addPreference(this)
+        }
+
+        Preference(this).apply {
+            key = "playerAdvanced"
+            title = getString(R.string.player_config_advanced_screen_name)
+            setOnPreferenceClickListener {
+                findMainNavController().navigate(R.id.action_to_player_config_advanced_fragment)
+                true
+            }
+            playerAdvancedCategory.addPreference(this)
         }
     }
 }

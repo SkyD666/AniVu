@@ -199,6 +199,11 @@
     <string name="navigation_bar_label_show">显示</string>
     <string name="navigation_bar_label_show_on_active">选中时显示</string>
     <string name="appearance_fragment_navigation_bar_label">导航栏标签</string>
+    <string name="pause">暂停</string>
+    <string name="play">播放</string>
+    <string name="player_config_fragment_advanced_category">高级</string>
+    <string name="player_config_advanced_screen_name">高级播放器设置</string>
+    <string name="player_config_advanced_screen_mpv_config">编辑 mpv.conf</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

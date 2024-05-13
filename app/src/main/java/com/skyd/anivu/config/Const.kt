@@ -38,11 +38,11 @@ object Const {
         if (!exists()) mkdirs()
     }
 
-    val MPV_CONFIG_DIR = File(appContext.filesDir.path, "MpvConfig").apply {
+    val MPV_CONFIG_DIR = File("${appContext.filesDir.path}/Mpv", "Config").apply {
         if (!exists()) mkdirs()
     }
 
-    val MPV_CACHE_DIR = File(appContext.filesDir.path, "MpvCache").apply {
+    val MPV_CACHE_DIR = File("${appContext.cacheDir.path}/Mpv", "Cache").apply {
         if (!exists()) mkdirs()
     }
 }

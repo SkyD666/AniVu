@@ -15,10 +15,13 @@ import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_INT64
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_NONE
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_STRING
 import `is`.xyz.mpv.R
+import kotlin.math.log
 import kotlin.reflect.KProperty
 
 class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, attrs),
     SurfaceHolder.Callback {
+    private var surfaceCreated = false
+
     fun initialize(configDir: String, cacheDir: String, logLvl: String = "v", vo: String = "gpu") {
         MPVLib.create(this.context, logLvl)
         MPVLib.setOptionString("config", "yes")
@@ -33,7 +36,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         // would crash before the surface is attached
         MPVLib.setOptionString("force-window", "no")
         // "no" wouldn't work and "yes" is not intended by the UI
-        MPVLib.setOptionString("idle", "once")
+        MPVLib.setOptionString("idle", "yes")
 
         holder.addCallback(this)
         observeProperties()
@@ -58,6 +61,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
 
         Log.v(TAG, "Display ${disp.displayId} reports FPS of $refreshRate")
         MPVLib.setOptionString("display-fps-override", refreshRate.toString())
+        MPVLib.setOptionString("video-sync", "audio")
 
         MPVLib.setOptionString("vo", vo)
         MPVLib.setOptionString("gpu-context", "android")
@@ -79,10 +83,6 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
 
     private var filePath: String? = null
 
-    fun playFile(filePath: String) {
-        this.filePath = filePath
-    }
-
     // Called when back button is pressed, or app is shutting down
     fun destroy() {
         // Disable surface callbacks to avoid using unintialized mpv state
@@ -99,6 +99,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             Property("time-pos", MPV_FORMAT_INT64),
             Property("duration", MPV_FORMAT_INT64),
             Property("demuxer-cache-time", MPV_FORMAT_INT64),
+            Property("video-rotate", MPV_FORMAT_INT64),
             Property("paused-for-cache", MPV_FORMAT_FLAG),
             Property("seeking", MPV_FORMAT_FLAG),
             Property("pause", MPV_FORMAT_FLAG),
@@ -107,8 +108,11 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             Property("track-list"),
             // observing double properties is not hooked up in the JNI code, but doing this
             // will restrict updates to when it actually changes
+            Property("video-zoom", MPV_FORMAT_DOUBLE),
             Property("video-params/aspect", MPV_FORMAT_DOUBLE),
-            //
+            Property("video-pan-x", MPV_FORMAT_DOUBLE),
+            Property("video-pan-y", MPV_FORMAT_DOUBLE),
+            Property("speed", MPV_FORMAT_DOUBLE),
             Property("playlist-pos", MPV_FORMAT_INT64),
             Property("playlist-count", MPV_FORMAT_INT64),
             Property("video-format"),
@@ -121,8 +125,9 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             Property("hwdec-current")
         )
 
-        for ((name, format) in p)
+        for ((name, format) in p) {
             MPVLib.observeProperty(name, format)
+        }
     }
 
     fun addObserver(o: MPVLib.EventObserver) {
@@ -211,6 +216,12 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     var paused: Boolean
         get() = MPVLib.getPropertyBoolean("pause")
         set(paused) = MPVLib.setPropertyBoolean("pause", paused)
+    val isIdling: Boolean
+        get() = MPVLib.getPropertyBoolean("idle-active")
+    val eofReached: Boolean
+        get() = MPVLib.getPropertyBoolean("eof-reached")
+    val keepOpen: Boolean
+        get() = MPVLib.getPropertyBoolean("keep-open")
 
     val duration: Int?
         get() = MPVLib.getPropertyInt("duration")
@@ -222,9 +233,21 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     val hwdecActive: String
         get() = MPVLib.getPropertyString("hwdec-current") ?: "no"
 
-    var playbackSpeed: Double?
+    var playbackSpeed: Double
         get() = MPVLib.getPropertyDouble("speed")
-        set(speed) = MPVLib.setPropertyDouble("speed", speed!!)
+        set(speed) = MPVLib.setPropertyDouble("speed", speed)
+
+    val videoRotate: Int
+        get() = MPVLib.getPropertyInt("video-rotate")
+
+    val videoZoom: Double
+        get() = MPVLib.getPropertyDouble("video-zoom")
+
+    val videoPanX: Double
+        get() = MPVLib.getPropertyDouble("video-pan-x")
+
+    val videoPanY: Double
+        get() = MPVLib.getPropertyDouble("video-pan-y")
 
     val estimatedVfFps: Double?
         get() = MPVLib.getPropertyDouble("estimated-vf-fps")
@@ -234,6 +257,12 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
 
     val videoH: Int?
         get() = MPVLib.getPropertyInt("video-params/h")
+
+    val videoDW: Int?
+        get() = MPVLib.getPropertyInt("video-params/dw")
+
+    val videoDH: Int?
+        get() = MPVLib.getPropertyInt("video-params/dh")
 
     val videoAspect: Double?
         get() = MPVLib.getPropertyDouble("video-params/aspect")
@@ -267,7 +296,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
 
     fun cycleSpeed() {
         val speeds = arrayOf(0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0)
-        val currentSpeed = playbackSpeed ?: 1.0
+        val currentSpeed = playbackSpeed
         val index = speeds.indexOfFirst { it > currentSpeed }
         playbackSpeed = speeds[if (index == -1) 0 else index]
     }
@@ -320,6 +349,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         // This forces mpv to render subs/osd/whatever into our surface even if it would ordinarily not
         MPVLib.setOptionString("force-window", "yes")
 
+        surfaceCreated = true
         if (filePath != null) {
             MPVLib.command(arrayOf("loadfile", filePath as String))
             filePath = null
@@ -336,6 +366,11 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.detachSurface()
     }
 
+    fun loadFile(filePath: String) {
+        if (surfaceCreated) MPVLib.command(arrayOf("loadfile", filePath))
+        else this.filePath = filePath
+    }
+
     fun stop() {
         MPVLib.command(arrayOf("stop"))
     }
@@ -346,6 +381,32 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         } else {
             // seek faster than assigning to timePos but less precise
             MPVLib.command(arrayOf("seek", position.toString(), "absolute+keyframes"))
+        }
+    }
+
+    fun zoom(value: Float) {
+        MPVLib.setOptionString("video-zoom", log(value, 2f).toString())
+    }
+
+    fun rotate(value: Int) {
+        var scaledValue = value % 360
+        scaledValue = if (scaledValue >= 0) scaledValue else scaledValue + 360
+        MPVLib.setOptionString("video-rotate", scaledValue.toString())
+    }
+
+    fun offset(x: Int, y: Int) {
+        val dw = videoDW
+        val dh = videoDH
+        if (dw == null || dh == null) return
+        MPVLib.setOptionString("video-pan-x", (x.toFloat() / dw).toString())
+        MPVLib.setOptionString("video-pan-y", (y.toFloat() / dh).toString())
+    }
+
+    fun playMediaAtIndex(index: Int? = null) {
+        when (index) {
+            null -> MPVLib.command(arrayOf("playlist-play-index", "none"))
+            -1 -> MPVLib.command(arrayOf("playlist-play-index", "current"))
+            else -> MPVLib.command(arrayOf("playlist-play-index", index.toString()))
         }
     }
 

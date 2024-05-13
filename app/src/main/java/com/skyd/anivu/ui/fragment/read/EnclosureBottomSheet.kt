@@ -15,6 +15,7 @@ import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import com.skyd.anivu.ui.adapter.variety.AniSpanSize
 import com.skyd.anivu.ui.adapter.variety.VarietyAdapter
+import com.skyd.anivu.ui.adapter.variety.proxy.Enclosure1Proxy
 import com.skyd.anivu.ui.adapter.variety.proxy.LinkEnclosure1Proxy
 
 class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureBinding>() {
@@ -71,6 +72,7 @@ class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureB
 
     private val adapter = VarietyAdapter(
         mutableListOf(
+            Enclosure1Proxy(onDownload = onDownload),
             LinkEnclosure1Proxy(onDownload = onDownload),
         )
     )
