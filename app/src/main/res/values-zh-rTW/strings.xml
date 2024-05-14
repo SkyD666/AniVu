@@ -13,7 +13,6 @@
     <string name="ok">確定</string>
     <string name="info">資訊</string>
     <string name="waiting">請稍後…</string>
-    <string name="input_dialog_error_message">格式非法</string>
     <string name="close">關閉</string>
     <string name="exit">關閉</string>
     <string name="remove">刪除</string>
@@ -200,6 +199,11 @@
     <string name="navigation_bar_label_show">Show</string>
     <string name="navigation_bar_label_show_on_active">Show on active</string>
     <string name="appearance_fragment_navigation_bar_label">Navi bar label</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
+    <string name="player_config_fragment_advanced_category">Advanced</string>
+    <string name="player_config_advanced_screen_name">Advanced config</string>
+    <string name="player_config_advanced_screen_mpv_config">Edit mpv.conf</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分鐘</item>
     </plurals>
