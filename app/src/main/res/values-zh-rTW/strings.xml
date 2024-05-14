@@ -12,7 +12,6 @@
     <string name="ok">確定</string>
     <string name="info">資訊</string>
     <string name="waiting">請稍後…</string>
-    <string name="input_dialog_error_message">格式非法</string>
     <string name="close">關閉</string>
     <string name="exit">關閉</string>
     <string name="remove">刪除</string>

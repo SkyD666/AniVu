@@ -15,7 +15,6 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.skyd.anivu.base.BaseComposeActivity
-import com.skyd.anivu.config.Const
 import com.skyd.anivu.ui.mpv.PlayerView
 
 

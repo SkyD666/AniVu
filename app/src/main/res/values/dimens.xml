@@ -2,13 +2,4 @@
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="divider_inset_start">16dp</dimen>
     <dimen name="divider_inset_end">16dp</dimen>
-
-    <dimen name="exo_icon_size">55dp</dimen>
-    <dimen name="exo_top_icon_height">60dp</dimen>
-    <dimen name="exo_top_icon_width">60dp</dimen>
-    <dimen name="exo_styled_progress_margin_bottom">50dp</dimen>
-    <dimen name="exo_styled_bottom_bar_height">100dp</dimen>
-    <dimen name="exo_styled_top_bar_padding_bottom">40dp</dimen>
-    <dimen name="exo_styled_progress_layout_height">25dp</dimen>
-
 </resources>

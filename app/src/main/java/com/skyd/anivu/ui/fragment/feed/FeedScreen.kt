@@ -140,7 +140,7 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                                     ArrayList(
                                         (uiState.groupListState as? GroupListState.Success)
                                             ?.dataList
-                                            ?.filterIsInstance(FeedViewBean::class.java)
+                                            ?.filterIsInstance<FeedViewBean>()
                                             ?.map { it.feed.url }
                                             .orEmpty()
                                     )
@@ -203,7 +203,7 @@ fun FeedScreen(viewModel: FeedViewModel = hiltViewModel()) {
                     onShowAllArticles = { group ->
                         val feedUrls = (uiState.groupListState as? GroupListState.Success)
                             ?.dataList
-                            ?.filterIsInstance(FeedViewBean::class.java)
+                            ?.filterIsInstance<FeedViewBean>()
                             ?.filter { it.feed.groupId == group.groupId || group.isDefaultGroup() && it.feed.isDefaultGroup() }
                             ?.map { it.feed.url }
                             .orEmpty()

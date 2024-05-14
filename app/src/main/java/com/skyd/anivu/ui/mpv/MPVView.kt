@@ -311,8 +311,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     }
 
     fun cycleRepeat() {
-        val state = getRepeat()
-        when (state) {
+        when (val state = getRepeat()) {
             0, 1 -> {
                 MPVLib.setPropertyString("loop-playlist", if (state == 1) "no" else "inf")
                 MPVLib.setPropertyString("loop-file", if (state == 1) "inf" else "no")

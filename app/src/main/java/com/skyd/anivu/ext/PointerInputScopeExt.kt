@@ -8,7 +8,6 @@ import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateRotation
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.positionChanged
@@ -117,50 +116,6 @@ suspend fun PointerInputScope.detectDoubleFingerTransformGestures(
             if (canceled) onHorizontalDragCancel() else onHorizontalDragEnd()
         } else if (verticalDrag) {
             if (canceled) onVerticalDragCancel() else onVerticalDragEnd()
-        }
-    }
-}
-
-suspend fun PointerInputScope.detectPressGestures(
-    onLongPress: ((Offset) -> Unit)? = null,
-    onPressStart: ((Offset) -> Unit)? = null,
-    onPressEnd: (() -> Unit)? = null,
-    onLongPressEnd: (() -> Unit)? = null,
-) {
-    awaitEachGesture {
-        val down = awaitFirstDown()
-        down.consume()
-
-        val downTime = System.currentTimeMillis()
-        onPressStart?.invoke(down.position)
-
-        val longPressTimeout = onLongPress?.let {
-            viewConfiguration.longPressTimeoutMillis
-        } ?: (Long.MAX_VALUE / 2)
-
-        var longPressInvoked = false
-
-        do {
-            val event: PointerEvent = awaitPointerEvent()
-            val currentTime = System.currentTimeMillis()
-
-            if (!longPressInvoked && currentTime - downTime >= longPressTimeout) {
-                onLongPress?.invoke(event.changes.first().position)
-                longPressInvoked = true
-            }
-
-            event.changes
-                .forEach { pointerInputChange: PointerInputChange ->
-                    pointerInputChange.consume()
-                }
-
-
-        } while (event.changes.any { it.pressed })
-
-        if (longPressInvoked) {
-            onLongPressEnd?.invoke()
-        } else {
-            onPressEnd?.invoke()
         }
     }
 }

@@ -44,6 +44,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.ext.alwaysLight
+import java.util.Locale
 
 val LocalUseColorfulIcon = compositionLocalOf { false }
 val LocalVerticalPadding = compositionLocalOf { 16.dp }
@@ -128,7 +129,7 @@ fun SliderSettingsItem(
                     onValueChange = onValueChange,
                 )
                 Spacer(modifier = Modifier.width(6.dp))
-                Text(text = String.format(valueFormat, value))
+                Text(text = String.format(Locale.getDefault(), valueFormat, value))
             }
         }
     )

@@ -1,15 +1,15 @@
 package com.skyd.anivu.ui.mpv
 
-import android.content.Context
-import android.media.AudioManager
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -39,6 +39,7 @@ import androidx.compose.material.icons.rounded.BrightnessHigh
 import androidx.compose.material.icons.rounded.BrightnessLow
 import androidx.compose.material.icons.rounded.BrightnessMedium
 import androidx.compose.material.icons.rounded.FastForward
+import androidx.compose.material.icons.rounded.FastRewind
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.Icon
@@ -67,12 +68,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -83,14 +84,11 @@ import com.materialkolor.ktx.toColor
 import com.materialkolor.ktx.toHct
 import com.skyd.anivu.R
 import com.skyd.anivu.config.Const
-import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.alwaysLight
-import com.skyd.anivu.ext.detectDoubleFingerTransformGestures
-import com.skyd.anivu.ext.getScreenBrightness
 import com.skyd.anivu.ext.snapshotStateOffsetSaver
 import com.skyd.anivu.ext.startWith
-import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
-import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
+import com.skyd.anivu.ext.toPercentage
+import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import `is`.xyz.mpv.MPVLib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -330,7 +328,7 @@ fun PlayerView(
 }
 
 private val ControllerBarGray = Color(0xAD000000)
-private val ControllerLabelGray = Color(0x70000000)
+internal val ControllerLabelGray = Color(0x70000000)
 
 @Composable
 private fun PlayerController(
@@ -354,8 +352,9 @@ private fun PlayerController(
     onVideoOffset: (Offset) -> Unit,
 ) {
     var showController by rememberSaveable { mutableStateOf(true) }
-    var controllerWidth by remember { mutableStateOf(0) }
-    var controllerHeight by remember { mutableStateOf(0) }
+    var controllerWidth by remember { mutableIntStateOf(0) }
+    var controllerHeight by remember { mutableIntStateOf(0) }
+    var controllerLayoutCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
     val view = LocalView.current
     val autoHideControllerRunnable = remember { Runnable { showController = false } }
@@ -379,6 +378,11 @@ private fun PlayerController(
     var volumeValue by remember { mutableIntStateOf(0) }
     var volumeRange by remember { mutableStateOf(0..0) }
 
+    var showForwardRipple by remember { mutableStateOf(false) }
+    var forwardRippleStartControllerOffset by remember { mutableStateOf(Offset.Zero) }
+    var showBackwardRipple by remember { mutableStateOf(false) }
+    var backwardRippleStartControllerOffset by remember { mutableStateOf(Offset.Zero) }
+
     var isLongPressing by remember { mutableStateOf(false) }
     CompositionLocalProvider(LocalContentColor provides Color.White) {
         Box(
@@ -387,48 +391,88 @@ private fun PlayerController(
                 .onGloballyPositioned {
                     controllerWidth = it.size.width
                     controllerHeight = it.size.height
+                    controllerLayoutCoordinates = it
                 }
                 .detectPressGestures(
                     controllerWidth = { controllerWidth },
                     currentPosition = currentPosition,
                     onSeekTo = onSeekTo,
                     onPlayOrPause = onPlayOrPause,
-                    speed = speed,
-                    onSpeedChanged = onSpeedChanged,
                     showController = { showController },
                     onShowControllerChanged = { showController = it },
+                    speed = speed,
+                    onSpeedChanged = onSpeedChanged,
                     isLongPressing = { isLongPressing },
                     isLongPressingChanged = { isLongPressing = it },
+                    onShowForwardRipple = {
+                        forwardRippleStartControllerOffset = it
+                        showForwardRipple = true
+                    },
+                    onShowBackwardRipple = {
+                        backwardRippleStartControllerOffset = it
+                        showBackwardRipple = true
+                    },
                     cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
                     restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
                 )
-                .run {
-                    if (isLongPressing) this
-                    else detectControllerGestures(
-                        enabled = enabled,
-                        controllerWidth = { controllerWidth },
-                        controllerHeight = { controllerHeight },
-                        onShowBrightness = { showBrightnessPreview = it },
-                        onBrightnessRangeChanged = { brightnessRange = it },
-                        onBrightnessChanged = { brightnessValue = it },
-                        onShowVolume = { showVolumePreview = it },
-                        onVolumeRangeChanged = { volumeRange = it },
-                        onVolumeChanged = { volumeValue = it },
-                        currentPosition = currentPosition,
-                        onShowSeekTimePreview = { showSeekTimePreview = it },
-                        onSeekTo = onSeekTo,
-                        onTimePreviewChanged = { seekTimePreview = it },
-                        videoRotate = videoRotate,
-                        onVideoRotate = onVideoRotate,
-                        videoZoom = videoZoom,
-                        onVideoZoom = onVideoZoom,
-                        videoOffset = videoOffset,
-                        onVideoOffset = onVideoOffset,
-                        cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
-                        restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
-                    )
-                }
+                .detectControllerGestures(
+                    enabled = enabled,
+                    controllerWidth = { controllerWidth },
+                    controllerHeight = { controllerHeight },
+                    onShowBrightness = { showBrightnessPreview = it },
+                    onBrightnessRangeChanged = { brightnessRange = it },
+                    onBrightnessChanged = { brightnessValue = it },
+                    onShowVolume = { showVolumePreview = it },
+                    onVolumeRangeChanged = { volumeRange = it },
+                    onVolumeChanged = { volumeValue = it },
+                    currentPosition = currentPosition,
+                    onShowSeekTimePreview = { showSeekTimePreview = it },
+                    onSeekTo = onSeekTo,
+                    onTimePreviewChanged = { seekTimePreview = it },
+                    videoRotate = videoRotate,
+                    onVideoRotate = onVideoRotate,
+                    videoZoom = videoZoom,
+                    onVideoZoom = onVideoZoom,
+                    videoOffset = videoOffset,
+                    onVideoOffset = onVideoOffset,
+                    cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
+                    restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
+                )
         ) {
+            // Forward ripple
+            AnimatedVisibility(
+                visible = showForwardRipple,
+                modifier = Modifier.align(Alignment.CenterEnd),
+                enter = fadeIn(animationSpec = spring(stiffness = Spring.StiffnessHigh)),
+                exit = fadeOut(),
+            ) {
+                ForwardRipple(
+                    direct = ForwardRippleDirect.Forward,
+                    text = "+10s",
+                    icon = Icons.Rounded.FastForward,
+                    controllerWidth = { controllerWidth },
+                    parentLayoutCoordinates = controllerLayoutCoordinates,
+                    rippleStartControllerOffset = forwardRippleStartControllerOffset,
+                    onHideRipple = { showForwardRipple = false },
+                )
+            }
+            // Backward ripple
+            AnimatedVisibility(
+                visible = showBackwardRipple,
+                modifier = Modifier.align(Alignment.CenterStart),
+                enter = fadeIn(animationSpec = spring(stiffness = Spring.StiffnessHigh)),
+                exit = fadeOut(),
+            ) {
+                ForwardRipple(
+                    direct = ForwardRippleDirect.Backward,
+                    text = "-10s",
+                    icon = Icons.Rounded.FastRewind,
+                    controllerWidth = { controllerWidth },
+                    parentLayoutCoordinates = controllerLayoutCoordinates,
+                    rippleStartControllerOffset = backwardRippleStartControllerOffset,
+                    onHideRipple = { showBackwardRipple = false },
+                )
+            }
             // Auto hide box
             Box {
                 AnimatedVisibility(
@@ -437,7 +481,7 @@ private fun PlayerController(
                     exit = fadeOut(),
                 ) {
                     ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                        val (topBar, bottomBar, resetTransform) = createRefs()
+                        val (topBar, bottomBar, forward85s, resetTransform) = createRefs()
 
                         TopBar(
                             modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
@@ -454,6 +498,19 @@ private fun PlayerController(
                             onPositionChanged = onSeekTo,
                             onRestartAutoHideControllerRunnable = restartAutoHideControllerRunnable
                         )
+
+                        // +85s button
+                        if (LocalPlayerShow85sButton.current) {
+                            Forward85s(
+                                modifier = Modifier
+                                    .constrainAs(forward85s) {
+                                        bottom.linkTo(bottomBar.top)
+                                        end.linkTo(parent.end)
+                                    }
+                                    .padding(end = 50.dp),
+                                onClick = { onSeekTo(currentPosition() + 85) },
+                            )
+                        }
 
                         // Reset transform
                         if (videoZoom() != 1f || videoRotate() != 0f) {
@@ -514,17 +571,20 @@ private fun BoxScope.SeekTimePreview(
                 .coerceIn(0..duration())
                 .toDurationString(),
             style = MaterialTheme.typography.labelLarge,
+            fontSize = TextUnit(18f, TextUnitType.Sp),
             color = Color.White,
         )
         Text(
-            modifier = Modifier.padding(horizontal = 3.dp),
+            modifier = Modifier.padding(horizontal = 6.dp),
             text = "/",
             style = MaterialTheme.typography.labelLarge,
+            fontSize = TextUnit(18f, TextUnitType.Sp),
             color = Color.White,
         )
         Text(
             text = duration().toDurationString(),
             style = MaterialTheme.typography.labelLarge,
+            fontSize = TextUnit(18f, TextUnitType.Sp),
             color = Color.White,
         )
     }
@@ -540,8 +600,7 @@ private fun BoxScope.BrightnessPreview(
             .align(Alignment.Center)
             .clip(RoundedCornerShape(6.dp))
             .background(color = ControllerLabelGray)
-            .padding(horizontal = 16.dp, vertical = 10.dp)
-            .width(120.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val start = range().start
@@ -552,12 +611,21 @@ private fun BoxScope.BrightnessPreview(
             in start + length * 2 / 3..endInclusive -> Icons.Rounded.BrightnessHigh
             else -> Icons.Rounded.BrightnessMedium
         }
-        Icon(imageVector = icon, contentDescription = null)
-        Spacer(modifier = Modifier.width(10.dp))
+        val percentValue = (value() - start) / length
+        Icon(modifier = Modifier.size(30.dp), imageVector = icon, contentDescription = null)
         LinearProgressIndicator(
-            progress = { (value() - start) / length },
-            modifier = Modifier.weight(1f),
+            progress = { percentValue },
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .width(100.dp),
             drawStopIndicator = null,
+        )
+        Text(
+            modifier = Modifier.animateContentSize(),
+            text = percentValue.toPercentage(format = "%.0f%%"),
+            style = MaterialTheme.typography.labelLarge,
+            fontSize = TextUnit(18f, TextUnitType.Sp),
+            color = Color.White,
         )
     }
 }
@@ -572,8 +640,7 @@ private fun BoxScope.VolumePreview(
             .align(Alignment.Center)
             .clip(RoundedCornerShape(6.dp))
             .background(color = ControllerLabelGray)
-            .padding(horizontal = 16.dp, vertical = 10.dp)
-            .width(120.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val start = range().first
@@ -585,12 +652,21 @@ private fun BoxScope.VolumePreview(
             v in start..start + length / 2 -> Icons.AutoMirrored.Rounded.VolumeDown
             else -> Icons.AutoMirrored.Rounded.VolumeUp
         }
-        Icon(imageVector = icon, contentDescription = null)
-        Spacer(modifier = Modifier.width(10.dp))
+        val percentValue = (value() - start).toFloat() / length
+        Icon(modifier = Modifier.size(30.dp), imageVector = icon, contentDescription = null)
         LinearProgressIndicator(
-            progress = { (value() - start).toFloat() / length },
-            modifier = Modifier.weight(1f),
+            progress = { percentValue },
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .width(100.dp),
             drawStopIndicator = null,
+        )
+        Text(
+            modifier = Modifier.animateContentSize(),
+            text = percentValue.toPercentage(format = "%.0f%%"),
+            style = MaterialTheme.typography.labelLarge,
+            fontSize = TextUnit(18f, TextUnitType.Sp),
+            color = Color.White,
         )
     }
 }
@@ -605,11 +681,16 @@ private fun BoxScope.LongPressSpeedPreview(speed: () -> Float) {
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Icon(imageVector = Icons.Rounded.FastForward, contentDescription = null)
-        Spacer(modifier = Modifier.width(6.dp))
+        Icon(
+            modifier = Modifier.size(30.dp),
+            imageVector = Icons.Rounded.FastForward,
+            contentDescription = stringResource(id = R.string.player_long_press_playback_speed),
+        )
+        Spacer(modifier = Modifier.width(12.dp))
         Text(
             text = "${speed()}x",
             style = MaterialTheme.typography.labelLarge,
+            fontSize = TextUnit(18f, TextUnitType.Sp),
             color = Color.White,
         )
     }
@@ -629,227 +710,27 @@ private fun ResetTransform(
             .padding(horizontal = 16.dp, vertical = 10.dp),
         text = stringResource(id = R.string.player_reset_zoom),
         style = MaterialTheme.typography.labelLarge,
+        fontSize = TextUnit(16f, TextUnitType.Sp),
         color = Color.White,
     )
 }
 
-private val inStatusBarArea: PointerInputScope.(y: Float) -> Boolean = { y ->
-    y / density <= 60
-}
-
 @Composable
-private fun Modifier.detectPressGestures(
-    controllerWidth: () -> Int,
-    currentPosition: () -> Int,
-    onSeekTo: (Int) -> Unit,
-    onPlayOrPause: () -> Unit,
-    speed: () -> Float,
-    onSpeedChanged: (Float) -> Unit,
-    showController: () -> Boolean,
-    onShowControllerChanged: (Boolean) -> Unit,
-    isLongPressing: () -> Boolean,
-    isLongPressingChanged: (Boolean) -> Unit,
-    cancelAutoHideControllerRunnable: () -> Boolean,
-    restartAutoHideControllerRunnable: () -> Unit,
-): Modifier {
-    var beforeLongPressingSpeed by remember { mutableStateOf(speed()) }
-
-    val playerDoubleTap = LocalPlayerDoubleTap.current
-    val onDoubleTapPausePlay: () -> Unit = remember { { onPlayOrPause() } }
-
-    val onDoubleTapBackwardForward: (Offset) -> Unit = { offset ->
-        if (offset.x < controllerWidth() / 2f) {
-            onSeekTo(currentPosition() - 10) // -10s.
-        } else {
-            onSeekTo(currentPosition() + 10) // +10s.
-        }
-    }
-    val onDoubleTapBackwardPausePlayForward: (Offset) -> Unit = { offset ->
-        if (offset.x <= controllerWidth() * 0.25f) {
-            onSeekTo(currentPosition() - 10) // -10s.
-        } else if (offset.x >= controllerWidth() * 0.75f) {
-            onSeekTo(currentPosition() + 10) // +10s.
-        } else {
-            onDoubleTapPausePlay()
-        }
-    }
-
-    val onDoubleTap: (Offset) -> Unit = { offset ->
-        when (playerDoubleTap) {
-            PlayerDoubleTapPreference.BACKWARD_FORWARD -> onDoubleTapBackwardForward(offset)
-            PlayerDoubleTapPreference.BACKWARD_PAUSE_PLAY_FORWARD ->
-                onDoubleTapBackwardPausePlayForward(offset)
-
-            else -> onDoubleTapPausePlay()
-        }
-    }
-
-    return pointerInput(playerDoubleTap, speed(), isLongPressing()) {
-        detectTapGestures(
-            onLongPress = {
-                beforeLongPressingSpeed = speed()
-                isLongPressingChanged(true)
-                onSpeedChanged(3f)
-            },
-            onDoubleTap = {
-                restartAutoHideControllerRunnable()
-                onDoubleTap(it)
-            },
-            onPress = {
-                tryAwaitRelease()
-                isLongPressingChanged(false)
-                onSpeedChanged(beforeLongPressingSpeed)
-            },
-            onTap = {
-                cancelAutoHideControllerRunnable()
-                onShowControllerChanged(!showController())
-            }
-        )
-    }
-}
-
-@Composable
-private fun Modifier.detectControllerGestures(
-    enabled: () -> Boolean,
-    controllerWidth: () -> Int,
-    controllerHeight: () -> Int,
-    onShowBrightness: (Boolean) -> Unit,
-    onBrightnessRangeChanged: (ClosedFloatingPointRange<Float>) -> Unit,
-    onBrightnessChanged: (Float) -> Unit,
-    onShowVolume: (Boolean) -> Unit,
-    onVolumeRangeChanged: (IntRange) -> Unit,
-    onVolumeChanged: (Int) -> Unit,
-    currentPosition: () -> Int,
-    onShowSeekTimePreview: (Boolean) -> Unit,
-    onTimePreviewChanged: (Int) -> Unit,
-    onSeekTo: (Int) -> Unit,
-    videoRotate: () -> Float,
-    onVideoRotate: (Float) -> Unit,
-    videoZoom: () -> Float,
-    onVideoZoom: (Float) -> Unit,
-    videoOffset: () -> Offset,
-    onVideoOffset: (Offset) -> Unit,
-    cancelAutoHideControllerRunnable: () -> Boolean,
-    restartAutoHideControllerRunnable: () -> Unit,
-): Modifier {
-    if (!enabled()) {
-        onShowBrightness(false)
-        onShowVolume(false)
-        onShowSeekTimePreview(false)
-        restartAutoHideControllerRunnable()
-        return this
-    }
-
-    var pointerStartX by rememberSaveable { mutableFloatStateOf(0f) }
-    var pointerStartY by rememberSaveable { mutableFloatStateOf(0f) }
-
-    val context = LocalContext.current
-    val activity = remember(context) { context.activity }
-    val audioManager = remember { context.getSystemService(Context.AUDIO_SERVICE) as AudioManager }
-    val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-    val minVolume = audioManager.getStreamMinVolume(AudioManager.STREAM_MUSIC)
-
-    var startBrightness by rememberSaveable { mutableFloatStateOf(0f) }
-    var startVolume by rememberSaveable { mutableIntStateOf(0) }
-
-    var seekTimePreviewStartPosition by remember { mutableIntStateOf(0) }
-    var seekTimePreviewPositionDelta by remember { mutableIntStateOf(0) }
-
-    return pointerInput(Unit) {
-        detectDoubleFingerTransformGestures(
-            onVerticalDragStart = onVerticalDragStart@{
-                cancelAutoHideControllerRunnable()
-                pointerStartX = it.x
-                pointerStartY = it.y
-                if (inStatusBarArea(it.y)) return@onVerticalDragStart
-                when (pointerStartX) {
-                    in 0f..controllerWidth() / 3f -> {
-                        onBrightnessRangeChanged(0.01f..1f)
-                        startBrightness = activity.window.attributes.apply {
-                            if (screenBrightness <= 0.00f) {
-                                val brightness = activity.getScreenBrightness()
-                                if (brightness != null) {
-                                    screenBrightness = brightness / 255.0f
-                                    activity.window.setAttributes(this)
-                                }
-                            }
-                        }.screenBrightness
-                        onBrightnessChanged(startBrightness)
-                        onShowBrightness(true)
-                    }
-
-                    in controllerWidth() * 2 / 3f..controllerWidth().toFloat() -> {
-                        onVolumeRangeChanged(minVolume..maxVolume)
-                        startVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-                        onVolumeChanged(startVolume)
-                        onShowVolume(true)
-                    }
-                }
-            },
-            onVerticalDragEnd = {
-                restartAutoHideControllerRunnable()
-                onShowBrightness(false)
-                onShowVolume(false)
-            },
-            onVerticalDragCancel = {
-                restartAutoHideControllerRunnable()
-                onShowBrightness(false)
-                onShowVolume(false)
-            },
-            onVerticalDrag = onVerticalDrag@{ change, _ ->
-                val deltaY = change.position.y - pointerStartY
-                if (inStatusBarArea(pointerStartY) || abs(deltaY) < 50) return@onVerticalDrag
-
-                when (pointerStartX) {
-                    in 0f..controllerWidth() / 3f -> {
-                        val layoutParams = activity.window.attributes
-                        layoutParams.screenBrightness =
-                            (startBrightness - deltaY / controllerHeight())
-                                .coerceIn(0.01f..1f)
-                        activity.window.setAttributes(layoutParams)
-                        onBrightnessChanged(layoutParams.screenBrightness)
-                    }
-
-                    in controllerWidth() * 2 / 3f..controllerWidth().toFloat() -> {
-                        val desiredVolume =
-                            (startVolume - deltaY / controllerHeight() * 1.2f * (maxVolume - minVolume)).toInt()
-                        onVolumeChanged(desiredVolume)
-                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, desiredVolume, 0)
-                    }
-                }
-            },
-            onHorizontalDragStart = onHorizontalDragStart@{
-                cancelAutoHideControllerRunnable()
-                pointerStartX = it.x
-                pointerStartY = it.y
-                if (inStatusBarArea(it.y)) return@onHorizontalDragStart
-                seekTimePreviewStartPosition = currentPosition()
-                seekTimePreviewPositionDelta = 0
-                onShowSeekTimePreview(true)
-            },
-            onHorizontalDragEnd = onHorizontalDragEnd@{
-                onShowSeekTimePreview(false)
-                restartAutoHideControllerRunnable()
-                if (inStatusBarArea(pointerStartY)) return@onHorizontalDragEnd
-                onSeekTo(seekTimePreviewStartPosition + seekTimePreviewPositionDelta)
-            },
-            onHorizontalDragCancel = {
-                onShowSeekTimePreview(false)
-                restartAutoHideControllerRunnable()
-            },
-            onHorizontalDrag = onHorizontalDrag@{ change, _ ->
-                if (inStatusBarArea(pointerStartY)) return@onHorizontalDrag
-                seekTimePreviewPositionDelta =
-                    ((change.position.x - pointerStartX) / density / 8).toInt()
-                onTimePreviewChanged(seekTimePreviewStartPosition + seekTimePreviewPositionDelta)
-            },
-            onGesture = onGesture@{ _: Offset, pan: Offset, zoom: Float, rotation: Float ->
-                onVideoOffset(videoOffset() + pan)
-                onVideoRotate(videoRotate() + rotation)
-                onVideoZoom(videoZoom() * zoom)
-            }
-        )
-    }
+private fun Forward85s(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Text(
+        modifier = modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(color = ControllerLabelGray)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 10.dp),
+        text = stringResource(id = R.string.player_forward_85s),
+        style = MaterialTheme.typography.labelLarge,
+        fontSize = TextUnit(16f, TextUnitType.Sp),
+        color = Color.White,
+    )
 }
 
 @Composable
@@ -872,7 +753,7 @@ private fun TopBar(
                 )
             )
             .padding(bottom = 30.dp)
-            .padding(horizontal = 6.dp),
+            .padding(horizontal = 6.dp, vertical = 3.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
@@ -890,7 +771,7 @@ private fun TopBar(
                 .weight(1f)
                 .basicMarquee(),
             text = title,
-            style = MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleMedium,
             color = Color.White,
             maxLines = 1,
         )
@@ -930,7 +811,7 @@ private fun BottomBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val sliderInteractionSource = remember { MutableInteractionSource() }
-            var sliderValue by rememberSaveable { mutableStateOf(currentPosition().toFloat()) }
+            var sliderValue by rememberSaveable { mutableFloatStateOf(currentPosition().toFloat()) }
             var valueIsChanging by rememberSaveable { mutableStateOf(false) }
             if (!valueIsChanging && !isSeeking() && sliderValue != currentPosition().toFloat()) {
                 sliderValue = currentPosition().toFloat()

@@ -15,6 +15,7 @@ import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreferen
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
+import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 
 val LocalNavController = compositionLocalOf<NavHostController> {
     error("LocalNavController not initialized!")
@@ -43,3 +44,4 @@ val LocalHideEmptyDefault = compositionLocalOf { HideEmptyDefaultPreference.defa
 
 // Player
 val LocalPlayerDoubleTap = compositionLocalOf { PlayerDoubleTapPreference.default }
+val LocalPlayerShow85sButton = compositionLocalOf { PlayerShow85sButtonPreference.default }

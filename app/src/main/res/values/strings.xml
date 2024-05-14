@@ -12,7 +12,6 @@
     <string name="ok">OK</string>
     <string name="info">Info</string>
     <string name="waiting">Waiting…</string>
-    <string name="input_dialog_error_message">Illegal format</string>
     <string name="close">Close</string>
     <string name="exit">Exit</string>
     <string name="remove">Remove</string>

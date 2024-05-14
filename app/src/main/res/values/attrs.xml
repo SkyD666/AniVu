@@ -2,19 +2,6 @@
 <resources>
     <attr name="bannerSwitchPreferenceStyle" format="reference" />
 
-    <declare-styleable name="ForwardRippleView">
-        <attr name="text" format="string" />
-        <attr name="drawable" format="reference" />
-        <attr name="drawableTint" format="reference|color" />
-        <attr name="textColor" format="reference|color" />
-        <attr name="expandSpeed" format="dimension" />
-        <attr name="rippleColor" format="color" />
-        <attr name="center" format="enum">
-            <enum name="startCenter" value="0" />
-            <enum name="endCenter" value="1" />
-        </attr>
-    </declare-styleable>
-
     <declare-styleable name="ColorPaletteView">
         <attr name="icon" format="reference" />
         <attr name="android:padding" format="dimension" />
