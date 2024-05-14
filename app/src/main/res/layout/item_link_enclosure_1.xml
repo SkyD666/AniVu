@@ -24,9 +24,11 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_enclosure_1_download"
+        style="?attr/materialIconButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/download"
+        android:contentDescription="@string/download"
+        app:icon="@drawable/ic_download_2_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

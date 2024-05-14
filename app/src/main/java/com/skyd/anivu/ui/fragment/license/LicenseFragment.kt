@@ -145,7 +145,6 @@ private fun getLicenseList(): List<LicenseBean> {
             license = "Apache-2.0",
             link = "https://github.com/Kotlin/kotlinx.serialization",
         ),
-
         LicenseBean(
             name = "MaterialKolor",
             license = "MIT",
@@ -180,6 +179,11 @@ private fun getLicenseList(): List<LicenseBean> {
             name = "libtorrent4j",
             license = "MIT",
             link = "https://github.com/aldenml/libtorrent4j",
+        ),
+        LicenseBean(
+            name = "mpv-android",
+            license = "MIT",
+            link = "https://github.com/mpv-android/mpv-android",
         ),
     ).sortedBy { it.name }
 }

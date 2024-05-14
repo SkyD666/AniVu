@@ -109,4 +109,4 @@ jobs:
           Commit details [here](${{ github.event.head_commit.url }})
       run: |
         ESCAPED=`python3 -c 'import json,os,urllib.parse; print(urllib.parse.quote(json.dumps(os.environ["COMMIT_MESSAGE"])))'`
-        curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2Fpre_release_arm64_v8%22%7D%2C%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2Fpre_release_arm_v7%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22%3A${ESCAPED}%7D%5D"  -F pre_release_arm64_v8="@$PRE_RELEASE_ARM64_V8" -F pre_release_arm_v7="@$PRE_RELEASE_ARM_V7"
+        curl -v "https://api.telegram.org/bot${BOT_TOKEN}/sendMediaGroup?chat_id=${CHANNEL_ID}&media=%5B%7B%22type%22%3A%22document%22%2C%20%22media%22%3A%22attach%3A%2F%2Fpre_release_arm64_v8%22%2C%22parse_mode%22%3A%22MarkdownV2%22%2C%22caption%22%3A${ESCAPED}%7D%5D"  -F pre_release_arm64_v8="@$PRE_RELEASE_ARM64_V8"

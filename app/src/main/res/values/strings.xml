@@ -12,7 +12,6 @@
     <string name="ok">OK</string>
     <string name="info">Info</string>
     <string name="waiting">Waiting…</string>
-    <string name="input_dialog_error_message">Illegal format</string>
     <string name="close">Close</string>
     <string name="exit">Exit</string>
     <string name="remove">Remove</string>
@@ -207,6 +206,11 @@
     <string name="navigation_bar_label_show">Show</string>
     <string name="navigation_bar_label_show_on_active">Show on active</string>
     <string name="appearance_fragment_navigation_bar_label">Navi bar label</string>
+    <string name="pause">Pause</string>
+    <string name="play">Play</string>
+    <string name="player_config_fragment_advanced_category">Advanced</string>
+    <string name="player_config_advanced_screen_name">Advanced config</string>
+    <string name="player_config_advanced_screen_mpv_config">Edit mpv.conf</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

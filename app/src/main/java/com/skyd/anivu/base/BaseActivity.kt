@@ -24,9 +24,9 @@ abstract class BaseActivity<T : ViewBinding> : AppCompatActivity() {
         binding.initView()
     }
 
-    protected open fun T.initView() {}
+    protected open fun T.initView() = Unit
 
-    protected open fun beforeSetContentView() {}
+    protected open fun beforeSetContentView() = Unit
 
     private fun initTheme() {
         setTheme(ThemePreference.toResId(this))

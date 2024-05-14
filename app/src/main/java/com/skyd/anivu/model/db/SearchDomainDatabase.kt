@@ -31,22 +31,15 @@ abstract class SearchDomainDatabase : RoomDatabase() {
         private val migrations = arrayOf<Migration>()
 
         fun getInstance(context: Context): SearchDomainDatabase {
-            return if (instance == null) {
-                synchronized(this) {
-                    if (instance == null) {
-                        Room.databaseBuilder(
-                            context.applicationContext,
-                            SearchDomainDatabase::class.java,
-                            SEARCH_DOMAIN_DATA_BASE_FILE_NAME
-                        )
-                            .addMigrations(*migrations)
-                            .build()
-                    } else {
-                        instance as SearchDomainDatabase
-                    }
-                }
-            } else {
-                instance as SearchDomainDatabase
+            return instance ?: synchronized(this) {
+                instance ?: Room.databaseBuilder(
+                    context.applicationContext,
+                    SearchDomainDatabase::class.java,
+                    SEARCH_DOMAIN_DATA_BASE_FILE_NAME
+                )
+                    .addMigrations(*migrations)
+                    .build()
+                    .apply { instance = this }
             }
         }
     }

@@ -52,7 +52,7 @@ class RssHelper @Inject constructor(
         feed: FeedBean,
         latestLink: String?,        // 日期最新的文章链接，更新时不会take比这个文章更旧的文章
     ): List<ArticleWithEnclosureBean> =
-        try {
+        runCatching {
             inputStream(okHttpClient, feed.url).use { inputStream ->
                 SyndFeedInput().apply { isPreserveWireFeed = true }
                     .build(XmlReader(inputStream))
@@ -62,11 +62,11 @@ class RssHelper @Inject constructor(
                     .map { article(feed, it) }
                     .toList()
             }
-        } catch (e: Exception) {
+        }.onFailure { e ->
             e.printStackTrace()
             Log.e("RLog", "queryRssXml[${feed.title}]: ${e.message}")
             throw e
-        }
+        }.getOrDefault(emptyList())
 
     private fun article(
         feed: FeedBean,

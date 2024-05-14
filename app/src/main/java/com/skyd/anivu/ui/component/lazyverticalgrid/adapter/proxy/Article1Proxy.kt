@@ -2,7 +2,6 @@ package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
 
 import android.content.Context
 import android.os.Bundle
-import android.text.format.DateUtils
 import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
