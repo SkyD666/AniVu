@@ -38,6 +38,7 @@ import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.BrightnessHigh
 import androidx.compose.material.icons.rounded.BrightnessLow
 import androidx.compose.material.icons.rounded.BrightnessMedium
+import androidx.compose.material.icons.rounded.ClosedCaption
 import androidx.compose.material.icons.rounded.FastForward
 import androidx.compose.material.icons.rounded.FastRewind
 import androidx.compose.material.icons.rounded.Pause
@@ -114,13 +115,18 @@ sealed interface PlayerCommand {
     data object GetVideoOffsetX : PlayerCommand
     data object GetVideoOffsetY : PlayerCommand
     data class SetSpeed(val speed: Float) : PlayerCommand
+    data class SetSubtitleTrack(val trackId: Int) : PlayerCommand
     data object GetSpeed : PlayerCommand
+    data object LoadAllTracks : PlayerCommand
+    data object GetSubtitleTrack : PlayerCommand
 }
 
 private fun MPVView.solveCommand(
     command: PlayerCommand,
     uri: () -> Uri,
     isPlayingChanged: (Boolean) -> Unit,
+    onSubtitleTrack: (subtitleTrack: List<MPVView.Track>) -> Unit,
+    onSubtitleTrackChanged: (Int) -> Unit,
     onVideoZoom: (Float) -> Unit,
     videoOffset: () -> Offset,
     onVideoOffset: (Offset) -> Unit,
@@ -164,6 +170,12 @@ private fun MPVView.solveCommand(
             command.speed.toDouble()
 
         PlayerCommand.GetSpeed -> onSpeedChanged(playbackSpeed.toFloat())
+        PlayerCommand.LoadAllTracks -> loadTracks()
+        PlayerCommand.GetSubtitleTrack -> onSubtitleTrack(subtitleTrack)
+        is PlayerCommand.SetSubtitleTrack -> {
+            sid = command.trackId
+            onSubtitleTrackChanged(command.trackId)
+        }
     }
 }
 
@@ -184,6 +196,15 @@ fun PlayerView(
     var currentPosition by rememberSaveable { mutableIntStateOf(0) }
     var isSeeking by rememberSaveable { mutableStateOf(false) }
     var speed by rememberSaveable { mutableFloatStateOf(1f) }
+    var subtitleTrackMenuState by remember {
+        mutableStateOf(
+            SubtitleTrackMenuState(
+                expanded = false,
+                currentSubtitleTrack = MPVView.Track(0, ""),
+                subtitleTrack = emptyList(),
+            )
+        )
+    }
     var videoRotate by rememberSaveable { mutableIntStateOf(0) }
     var videoZoom by rememberSaveable { mutableFloatStateOf(1f) }
     var videoOffset by rememberSaveable(saver = snapshotStateOffsetSaver()) { mutableStateOf(Offset.Zero) }
@@ -196,6 +217,7 @@ fun PlayerView(
                     "video-pan-x" -> commandQueue.trySend(PlayerCommand.GetVideoOffsetX)
                     "video-pan-y" -> commandQueue.trySend(PlayerCommand.GetVideoOffsetY)
                     "speed" -> commandQueue.trySend(PlayerCommand.GetSpeed)
+                    "track-list" -> commandQueue.trySend(PlayerCommand.LoadAllTracks)
                 }
             }
 
@@ -255,6 +277,19 @@ fun PlayerView(
                                 command = command,
                                 uri = { uri },
                                 isPlayingChanged = { isPlaying = it },
+                                onSubtitleTrack = {
+                                    subtitleTrackMenuState = subtitleTrackMenuState.copy(
+                                        expanded = true,
+                                        currentSubtitleTrack = subtitleTrack.find { it.trackId == sid }!!,
+                                        subtitleTrack = subtitleTrack,
+                                    )
+                                },
+                                onSubtitleTrackChanged = { newTrackId ->
+                                    subtitleTrackMenuState = subtitleTrackMenuState.copy(
+                                        expanded = false,
+                                        currentSubtitleTrack = subtitleTrack.find { it.trackId == newTrackId }!!,
+                                    )
+                                },
                                 onVideoZoom = { videoZoom = it },
                                 videoOffset = { videoOffset },
                                 onVideoOffset = { videoOffset = it },
@@ -284,14 +319,16 @@ fun PlayerView(
         onPlayOrPause = { commandQueue.trySend(PlayerCommand.PlayOrPause) },
         speed = { speed },
         onSpeedChanged = { commandQueue.trySend(PlayerCommand.SetSpeed(it)) },
+        subtitleTrackMenuState = { subtitleTrackMenuState },
+        onDismissSubtitleTrackMenu = {
+            subtitleTrackMenuState = subtitleTrackMenuState.copy(expanded = false)
+        },
+        onRequestSubtitleTrack = { commandQueue.trySend(PlayerCommand.GetSubtitleTrack) },
+        onSubtitleTrackChanged = { commandQueue.trySend(PlayerCommand.SetSubtitleTrack(it.trackId)) },
         videoRotate = { videoRotate.toFloat() },
         videoZoom = { videoZoom },
-        onVideoRotate = {
-            commandQueue.trySend(PlayerCommand.Rotate(it.toInt()))
-        },
-        onVideoZoom = {
-            commandQueue.trySend(PlayerCommand.Zoom(it))
-        },
+        onVideoRotate = { commandQueue.trySend(PlayerCommand.Rotate(it.toInt())) },
+        onVideoZoom = { commandQueue.trySend(PlayerCommand.Zoom(it)) },
         videoOffset = { videoOffset },
         onVideoOffset = { commandQueue.trySend(PlayerCommand.VideoOffset(it)) }
     )
@@ -344,6 +381,10 @@ private fun PlayerController(
     onPlayOrPause: () -> Unit,
     speed: () -> Float,
     onSpeedChanged: (Float) -> Unit,
+    subtitleTrackMenuState: () -> SubtitleTrackMenuState,
+    onDismissSubtitleTrackMenu: () -> Unit,
+    onRequestSubtitleTrack: () -> Unit,
+    onSubtitleTrackChanged: (MPVView.Track) -> Unit,
     videoRotate: () -> Float,
     onVideoRotate: (Float) -> Unit,
     videoZoom: () -> Float,
@@ -384,6 +425,12 @@ private fun PlayerController(
     var backwardRippleStartControllerOffset by remember { mutableStateOf(Offset.Zero) }
 
     var isLongPressing by remember { mutableStateOf(false) }
+
+    LaunchedEffect(subtitleTrackMenuState()) {
+        if (subtitleTrackMenuState().expanded) cancelAutoHideControllerRunnable()
+        else restartAutoHideControllerRunnable()
+    }
+
     CompositionLocalProvider(LocalContentColor provides Color.White) {
         Box(
             modifier = Modifier
@@ -496,7 +543,11 @@ private fun PlayerController(
                             currentPosition = currentPosition,
                             duration = duration,
                             onPositionChanged = onSeekTo,
-                            onRestartAutoHideControllerRunnable = restartAutoHideControllerRunnable
+                            subtitleTrackMenuState = subtitleTrackMenuState,
+                            onDismissSubtitleTrackMenu = onDismissSubtitleTrackMenu,
+                            onRequestSubtitleTrack = onRequestSubtitleTrack,
+                            onSubtitleTrackChanged = onSubtitleTrackChanged,
+                            onRestartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
                         )
 
                         // +85s button
@@ -728,7 +779,7 @@ private fun Forward85s(
             .padding(horizontal = 16.dp, vertical = 10.dp),
         text = stringResource(id = R.string.player_forward_85s),
         style = MaterialTheme.typography.labelLarge,
-        fontSize = TextUnit(16f, TextUnitType.Sp),
+        fontSize = TextUnit(18f, TextUnitType.Sp),
         color = Color.White,
     )
 }
@@ -788,6 +839,10 @@ private fun BottomBar(
     currentPosition: () -> Int,
     duration: () -> Int,
     onPositionChanged: (position: Int) -> Unit,
+    subtitleTrackMenuState: () -> SubtitleTrackMenuState,
+    onDismissSubtitleTrackMenu: () -> Unit,
+    onRequestSubtitleTrack: () -> Unit,
+    onSubtitleTrackChanged: (MPVView.Track) -> Unit,
     onRestartAutoHideControllerRunnable: () -> Unit,
 ) {
     Column(
@@ -807,7 +862,7 @@ private fun BottomBar(
             .padding(horizontal = 6.dp)
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp),
+            modifier = Modifier.padding(horizontal = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val sliderInteractionSource = remember { MutableInteractionSource() }
@@ -889,7 +944,26 @@ private fun BottomBar(
                 imageVector = if (isPlaying()) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                 contentDescription = stringResource(if (isPlaying()) R.string.pause else R.string.play),
             )
-            Spacer(modifier = Modifier.width(10.dp))
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Box {
+                Icon(
+                    modifier = Modifier
+                        .clip(CircleShape)
+                        .size(45.dp)
+                        .clickable(onClick = onRequestSubtitleTrack)
+                        .padding(9.dp),
+                    imageVector = Icons.Rounded.ClosedCaption,
+                    contentDescription = stringResource(R.string.player_subtitle_track),
+                )
+
+                SubtitleTrackMenu(
+                    onDismissRequest = onDismissSubtitleTrackMenu,
+                    subtitleTrackMenuState = subtitleTrackMenuState,
+                    onSubtitleTrackChanged = onSubtitleTrackChanged,
+                )
+            }
         }
     }
 }

@@ -203,6 +203,8 @@
     <string name="player_config_fragment_advanced_category">高级</string>
     <string name="player_config_advanced_screen_name">高级播放器设置</string>
     <string name="player_config_advanced_screen_mpv_config">编辑 mpv.conf</string>
+    <string name="player_subtitle_track">字幕轨道</string>
+    <string name="item_selected">已选</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

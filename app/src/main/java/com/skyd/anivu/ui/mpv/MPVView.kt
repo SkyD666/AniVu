@@ -138,13 +138,16 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.removeObserver(o)
     }
 
-    data class Track(val mpvId: Int, val name: String)
+    data class Track(val trackId: Int, val name: String)
 
     var tracks = mapOf<String, MutableList<Track>>(
         "audio" to arrayListOf(),
         "video" to arrayListOf(),
         "sub" to arrayListOf()
     )
+
+    val subtitleTrack: List<Track>
+        get() = tracks["sub"].orEmpty().toList()
 
     fun loadTracks() {
         for (list in tracks.values) {
@@ -173,7 +176,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
                 context.getString(R.string.ui_track, mpvId)
             tracks.getValue(type).add(
                 Track(
-                    mpvId = mpvId,
+                    trackId = mpvId,
                     name = trackName
                 )
             )
