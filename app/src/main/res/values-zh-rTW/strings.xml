@@ -204,6 +204,8 @@
     <string name="player_config_fragment_advanced_category">Advanced</string>
     <string name="player_config_advanced_screen_name">Advanced config</string>
     <string name="player_config_advanced_screen_mpv_config">Edit mpv.conf</string>
+    <string name="player_subtitle_track">Subtitle track</string>
+    <string name="item_selected">Selected</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分鐘</item>
     </plurals>
