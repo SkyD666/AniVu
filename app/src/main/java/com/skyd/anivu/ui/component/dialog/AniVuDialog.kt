@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.component.dialog
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -26,6 +27,7 @@ fun AniVuDialog(
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
     selectable: Boolean = true,
+    scrollable: Boolean = true,
     confirmButton: @Composable () -> Unit,
     dismissButton: @Composable (() -> Unit)? = null,
 ) {
@@ -38,11 +40,21 @@ fun AniVuDialog(
             title = title,
             text = {
                 if (selectable) {
-                    SelectionContainer(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    SelectionContainer(
+                        modifier = Modifier.run {
+                            if (scrollable) verticalScroll(rememberScrollState()) else this
+                        },
+                    ) {
                         text?.invoke()
                     }
                 } else {
-                    text?.invoke()
+                    if (scrollable) {
+                        Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                            text?.invoke()
+                        }
+                    } else {
+                        text?.invoke()
+                    }
                 }
             },
             confirmButton = confirmButton,

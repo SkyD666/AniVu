@@ -21,7 +21,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 16
-        versionName = "1.1-beta25"
+        versionName = "1.1-beta26"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -92,12 +92,6 @@ android {
             )
         }
     }
-    androidResources {
-        ignoreAssetsPatterns += listOf(
-            "subfont.ttf",  // mpv-android
-            "cacert.pem",   // mpv-android
-        )
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -122,13 +116,14 @@ android {
             "kotlin-tooling-metadata.json",
             "okhttp3/internal/publicsuffix/NOTICE",
         )
-        jniLibs.excludes += mutableSetOf(
-            "lib/*/libffmpegkit.so",                // mpv-android
-            "lib/*/libffmpegkit_abidetect.so",      // mpv-android
-        )
+        jniLibs {
+            excludes += mutableSetOf(
+                "lib/*/libffmpegkit.so",                // mpv-android
+                "lib/*/libffmpegkit_abidetect.so",      // mpv-android
+            )
+            useLegacyPackaging = true
+        }
         dex {
-            // Set to "true" because android:extractNativeLibs
-            // is set to "true" in AndroidManifest.xml
             useLegacyPackaging = true
         }
     }
@@ -162,7 +157,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
     implementation("androidx.compose.ui:ui:1.6.7")
     implementation("androidx.compose.material:material:1.6.7")
     implementation("androidx.compose.material3:material3:1.3.0-alpha05")
@@ -177,8 +172,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.paging:paging-runtime-ktx:3.2.1")
-    implementation("androidx.paging:paging-compose:3.3.0-beta01")
+    implementation("androidx.paging:paging-runtime-ktx:3.3.0")
+    implementation("androidx.paging:paging-compose:3.3.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
 
     implementation("com.google.android.material:material:1.12.0")
@@ -196,7 +191,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
 
     implementation("com.github.aniyomiorg:aniyomi-mpv-lib:1.15.n")
-    implementation("com.github.jmir1:ffmpeg-kit:1.14")
+    implementation("com.github.jmir1:ffmpeg-kit:1.15")
 
     implementation("io.coil-kt:coil:2.6.0")
     implementation("io.coil-kt:coil-compose:2.6.0")

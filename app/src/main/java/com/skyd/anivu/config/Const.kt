@@ -38,11 +38,10 @@ object Const {
         if (!exists()) mkdirs()
     }
 
-    val MPV_CONFIG_DIR = File("${appContext.filesDir.path}/Mpv", "Config").apply {
-        if (!exists()) mkdirs()
-    }
-
-    val MPV_CACHE_DIR = File("${appContext.cacheDir.path}/Mpv", "Cache").apply {
-        if (!exists()) mkdirs()
-    }
+    val MPV_CONFIG_DIR = File("${appContext.filesDir.path}/Mpv", "Config")
+        .apply { if (!exists()) mkdirs() }
+    val MPV_CACHE_DIR = File("${appContext.cacheDir.path}/Mpv", "Cache")
+        .apply { if (!exists()) mkdirs() }
+    val MPV_FONT_DIR = File(MPV_CONFIG_DIR, "Font")
+        .apply { if (!exists()) mkdirs() }
 }

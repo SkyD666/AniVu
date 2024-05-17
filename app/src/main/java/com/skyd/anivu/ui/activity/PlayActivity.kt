@@ -16,6 +16,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.skyd.anivu.base.BaseComposeActivity
 import com.skyd.anivu.ui.mpv.PlayerView
+import com.skyd.anivu.ui.mpv.copyAssetsForMpv
 
 
 class PlayActivity : BaseComposeActivity() {
@@ -24,6 +25,8 @@ class PlayActivity : BaseComposeActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        copyAssetsForMpv(this)
+
         super.onCreate(savedInstanceState)
 
         val windowInsetsController =

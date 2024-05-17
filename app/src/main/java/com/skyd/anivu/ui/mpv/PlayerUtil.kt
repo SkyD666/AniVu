@@ -1,11 +1,15 @@
 package com.skyd.anivu.ui.mpv
 
 import android.content.Context
+import android.content.res.AssetManager
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.util.Log
+import com.skyd.anivu.config.Const
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
 import java.io.InputStream
 
 internal fun Uri.resolveUri(context: Context): String? {
@@ -58,4 +62,30 @@ fun findRealPath(fd: Int): String? {
         ins?.close()
     }
     return null
+}
+
+fun copyAssetsForMpv(context: Context) {
+    val assetManager = context.assets
+    arrayOf(
+        "subfont.ttf", "cacert.pem"
+    ).forEach { filename ->
+        try {
+            assetManager.open(filename, AssetManager.ACCESS_STREAMING).use { ins ->
+                val outFile = File("${Const.MPV_CONFIG_DIR.path}/$filename")
+                // Note that .available() officially returns an *estimated* number of bytes available
+                // this is only true for generic streams, asset streams return the full file size
+                if (outFile.length() == ins.available().toLong()) {
+                    Log.v(
+                        "copyAssetsForMpv",
+                        "Skipping copy of asset file (exists same size): $filename"
+                    )
+                    return@forEach
+                }
+                FileOutputStream(outFile).use { out -> ins.copyTo(out) }
+                Log.w("copyAssetsForMpv", "Copied asset file: $filename")
+            }
+        } catch (e: IOException) {
+            Log.e("copyAssetsForMpv", "Failed to copy asset file: $filename", e)
+        }
+    }
 }

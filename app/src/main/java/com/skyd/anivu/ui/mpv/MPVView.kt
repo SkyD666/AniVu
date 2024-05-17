@@ -22,7 +22,13 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     SurfaceHolder.Callback {
     private var surfaceCreated = false
 
-    fun initialize(configDir: String, cacheDir: String, logLvl: String = "v", vo: String = "gpu") {
+    fun initialize(
+        configDir: String,
+        cacheDir: String,
+        fontDir: String,
+        logLvl: String = "v",
+        vo: String = "gpu",
+    ) {
         MPVLib.create(this.context, logLvl)
         MPVLib.setOptionString("config", "yes")
         MPVLib.setOptionString("config-dir", configDir)
@@ -37,6 +43,8 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.setOptionString("force-window", "no")
         // "no" wouldn't work and "yes" is not intended by the UI
         MPVLib.setOptionString("idle", "yes")
+        MPVLib.setPropertyString("sub-fonts-dir", fontDir)
+        MPVLib.setPropertyString("osd-fonts-dir", fontDir)
 
         holder.addCallback(this)
         observeProperties()
@@ -67,7 +75,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.setOptionString("gpu-context", "android")
         MPVLib.setOptionString("opengl-es", "yes")
         MPVLib.setOptionString("hwdec", hwdec)
-        MPVLib.setOptionString("hwdec-codecs", "h264,hevc,mpeg4,mpeg2video,vp8,vp9,av1")
+//        MPVLib.setOptionString("hwdec-codecs", "h264,hevc,mpeg4,mpeg2video,vp8,vp9,av1")
         MPVLib.setOptionString("ao", "audiotrack,opensles")
         MPVLib.setOptionString("input-default-bindings", "yes")
         // Limit demuxer cache since the defaults are too high for mobile devices

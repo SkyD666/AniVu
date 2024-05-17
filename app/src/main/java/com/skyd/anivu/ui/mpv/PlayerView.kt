@@ -185,6 +185,7 @@ fun PlayerView(
     onBack: () -> Unit,
     configDir: String = Const.MPV_CONFIG_DIR.path,
     cacheDir: String = Const.MPV_CACHE_DIR.path,
+    fontDir: String = Const.MPV_FONT_DIR.path,
 ) {
     val commandQueue = remember { Channel<PlayerCommand>(capacity = UNLIMITED) }
     val scope = rememberCoroutineScope()
@@ -196,10 +197,10 @@ fun PlayerView(
     var currentPosition by rememberSaveable { mutableIntStateOf(0) }
     var isSeeking by rememberSaveable { mutableStateOf(false) }
     var speed by rememberSaveable { mutableFloatStateOf(1f) }
-    var subtitleTrackMenuState by remember {
+    var subtitleTrackDialogState by remember {
         mutableStateOf(
-            SubtitleTrackMenuState(
-                expanded = false,
+            SubtitleTrackDialogState(
+                show = false,
                 currentSubtitleTrack = MPVView.Track(0, ""),
                 subtitleTrack = emptyList(),
             )
@@ -266,7 +267,11 @@ fun PlayerView(
         modifier = Modifier.fillMaxSize(),
         factory = { context ->
             MPVView(context, null).apply {
-                initialize(configDir, cacheDir)
+                initialize(
+                    configDir = configDir,
+                    cacheDir = cacheDir,
+                    fontDir = fontDir,
+                )
                 addObserver(mpvObserver)
                 scope.launch(Dispatchers.Main.immediate) {
                     commandQueue
@@ -278,15 +283,14 @@ fun PlayerView(
                                 uri = { uri },
                                 isPlayingChanged = { isPlaying = it },
                                 onSubtitleTrack = {
-                                    subtitleTrackMenuState = subtitleTrackMenuState.copy(
-                                        expanded = true,
+                                    subtitleTrackDialogState = subtitleTrackDialogState.copy(
+                                        show = true,
                                         currentSubtitleTrack = subtitleTrack.find { it.trackId == sid }!!,
                                         subtitleTrack = subtitleTrack,
                                     )
                                 },
                                 onSubtitleTrackChanged = { newTrackId ->
-                                    subtitleTrackMenuState = subtitleTrackMenuState.copy(
-                                        expanded = false,
+                                    subtitleTrackDialogState = subtitleTrackDialogState.copy(
                                         currentSubtitleTrack = subtitleTrack.find { it.trackId == newTrackId }!!,
                                     )
                                 },
@@ -319,9 +323,9 @@ fun PlayerView(
         onPlayOrPause = { commandQueue.trySend(PlayerCommand.PlayOrPause) },
         speed = { speed },
         onSpeedChanged = { commandQueue.trySend(PlayerCommand.SetSpeed(it)) },
-        subtitleTrackMenuState = { subtitleTrackMenuState },
-        onDismissSubtitleTrackMenu = {
-            subtitleTrackMenuState = subtitleTrackMenuState.copy(expanded = false)
+        subtitleTrackDialogState = { subtitleTrackDialogState },
+        onDismissSubtitleTrackDialog = {
+            subtitleTrackDialogState = subtitleTrackDialogState.copy(show = false)
         },
         onRequestSubtitleTrack = { commandQueue.trySend(PlayerCommand.GetSubtitleTrack) },
         onSubtitleTrackChanged = { commandQueue.trySend(PlayerCommand.SetSubtitleTrack(it.trackId)) },
@@ -381,8 +385,8 @@ private fun PlayerController(
     onPlayOrPause: () -> Unit,
     speed: () -> Float,
     onSpeedChanged: (Float) -> Unit,
-    subtitleTrackMenuState: () -> SubtitleTrackMenuState,
-    onDismissSubtitleTrackMenu: () -> Unit,
+    subtitleTrackDialogState: () -> SubtitleTrackDialogState,
+    onDismissSubtitleTrackDialog: () -> Unit,
     onRequestSubtitleTrack: () -> Unit,
     onSubtitleTrackChanged: (MPVView.Track) -> Unit,
     videoRotate: () -> Float,
@@ -426,8 +430,8 @@ private fun PlayerController(
 
     var isLongPressing by remember { mutableStateOf(false) }
 
-    LaunchedEffect(subtitleTrackMenuState()) {
-        if (subtitleTrackMenuState().expanded) cancelAutoHideControllerRunnable()
+    LaunchedEffect(subtitleTrackDialogState()) {
+        if (subtitleTrackDialogState().show) cancelAutoHideControllerRunnable()
         else restartAutoHideControllerRunnable()
     }
 
@@ -521,69 +525,26 @@ private fun PlayerController(
                 )
             }
             // Auto hide box
-            Box {
-                AnimatedVisibility(
-                    visible = showController,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
-                ) {
-                    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                        val (topBar, bottomBar, forward85s, resetTransform) = createRefs()
-
-                        TopBar(
-                            modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
-                            title = title(),
-                            onBack = onBack,
-                        )
-                        BottomBar(
-                            modifier = Modifier.constrainAs(bottomBar) { bottom.linkTo(parent.bottom) },
-                            isPlaying = isPlaying,
-                            onPlayStateChanged = onPlayStateChanged,
-                            isSeeking = isSeeking,
-                            currentPosition = currentPosition,
-                            duration = duration,
-                            onPositionChanged = onSeekTo,
-                            subtitleTrackMenuState = subtitleTrackMenuState,
-                            onDismissSubtitleTrackMenu = onDismissSubtitleTrackMenu,
-                            onRequestSubtitleTrack = onRequestSubtitleTrack,
-                            onSubtitleTrackChanged = onSubtitleTrackChanged,
-                            onRestartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
-                        )
-
-                        // +85s button
-                        if (LocalPlayerShow85sButton.current) {
-                            Forward85s(
-                                modifier = Modifier
-                                    .constrainAs(forward85s) {
-                                        bottom.linkTo(bottomBar.top)
-                                        end.linkTo(parent.end)
-                                    }
-                                    .padding(end = 50.dp),
-                                onClick = { onSeekTo(currentPosition() + 85) },
-                            )
-                        }
-
-                        // Reset transform
-                        if (videoZoom() != 1f || videoRotate() != 0f) {
-                            ResetTransform(
-                                modifier = Modifier.constrainAs(resetTransform) {
-                                    bottom.linkTo(bottomBar.top)
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                    verticalBias = 1f
-                                },
-                                enabled = enabled,
-                                onClick = {
-                                    onVideoOffset(Offset.Zero)
-                                    onVideoZoom(1f)
-                                    onVideoRotate(0f)
-                                }
-                            )
-                        }
-                    }
-                }
-            }
+            AutoHiddenBox(
+                enabled = enabled,
+                show = { showController },
+                onBack = onBack,
+                title = title,
+                isPlaying = isPlaying,
+                onPlayStateChanged = onPlayStateChanged,
+                isSeeking = isSeeking,
+                currentPosition = currentPosition,
+                duration = duration,
+                onSeekTo = onSeekTo,
+                onSubtitleTrackClick = onRequestSubtitleTrack,
+                onRestartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
+                videoRotate = videoRotate,
+                onVideoRotate = onVideoRotate,
+                videoZoom = videoZoom,
+                onVideoZoom = onVideoZoom,
+                videoOffset = videoOffset,
+                onVideoOffset = onVideoOffset,
+            )
 
             // Seek time preview
             if (showSeekTimePreview) {
@@ -600,6 +561,95 @@ private fun PlayerController(
             // Long press speed preview
             if (isLongPressing) {
                 LongPressSpeedPreview(speed = speed)
+            }
+
+            SubtitleTrackDialog(
+                onDismissRequest = onDismissSubtitleTrackDialog,
+                subtitleTrackDialogState = subtitleTrackDialogState,
+                onSubtitleTrackChanged = onSubtitleTrackChanged,
+            )
+        }
+    }
+}
+
+@Composable
+private fun AutoHiddenBox(
+    enabled: () -> Boolean,
+    show: () -> Boolean,
+    onBack: () -> Unit,
+    title: () -> String,
+    isPlaying: () -> Boolean,
+    onPlayStateChanged: () -> Unit,
+    isSeeking: () -> Boolean,
+    currentPosition: () -> Int,
+    duration: () -> Int,
+    onSeekTo: (position: Int) -> Unit,
+    onSubtitleTrackClick: () -> Unit,
+    onRestartAutoHideControllerRunnable: () -> Unit,
+    videoRotate: () -> Float,
+    onVideoRotate: (Float) -> Unit,
+    videoZoom: () -> Float,
+    onVideoZoom: (Float) -> Unit,
+    videoOffset: () -> Offset,
+    onVideoOffset: (Offset) -> Unit,
+) {
+    Box {
+        AnimatedVisibility(
+            visible = show(),
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+                val (topBar, bottomBar, forward85s, resetTransform) = createRefs()
+
+                TopBar(
+                    modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
+                    title = title(),
+                    onBack = onBack,
+                )
+                BottomBar(
+                    modifier = Modifier.constrainAs(bottomBar) { bottom.linkTo(parent.bottom) },
+                    isPlaying = isPlaying,
+                    onPlayStateChanged = onPlayStateChanged,
+                    isSeeking = isSeeking,
+                    currentPosition = currentPosition,
+                    duration = duration,
+                    onSeekTo = onSeekTo,
+                    onSubtitleTrackClick = onSubtitleTrackClick,
+                    onRestartAutoHideControllerRunnable = onRestartAutoHideControllerRunnable,
+                )
+
+                // +85s button
+                if (LocalPlayerShow85sButton.current) {
+                    Forward85s(
+                        modifier = Modifier
+                            .constrainAs(forward85s) {
+                                bottom.linkTo(bottomBar.top)
+                                end.linkTo(parent.end)
+                            }
+                            .padding(end = 50.dp),
+                        onClick = { onSeekTo(currentPosition() + 85) },
+                    )
+                }
+
+                // Reset transform
+                if (videoZoom() != 1f || videoRotate() != 0f || videoOffset() != Offset.Zero) {
+                    ResetTransform(
+                        modifier = Modifier.constrainAs(resetTransform) {
+                            bottom.linkTo(bottomBar.top)
+                            top.linkTo(parent.top)
+                            start.linkTo(parent.start)
+                            end.linkTo(parent.end)
+                            verticalBias = 1f
+                        },
+                        enabled = enabled,
+                        onClick = {
+                            onVideoOffset(Offset.Zero)
+                            onVideoZoom(1f)
+                            onVideoRotate(0f)
+                        }
+                    )
+                }
             }
         }
     }
@@ -838,11 +888,8 @@ private fun BottomBar(
     isSeeking: () -> Boolean,
     currentPosition: () -> Int,
     duration: () -> Int,
-    onPositionChanged: (position: Int) -> Unit,
-    subtitleTrackMenuState: () -> SubtitleTrackMenuState,
-    onDismissSubtitleTrackMenu: () -> Unit,
-    onRequestSubtitleTrack: () -> Unit,
-    onSubtitleTrackChanged: (MPVView.Track) -> Unit,
+    onSeekTo: (position: Int) -> Unit,
+    onSubtitleTrackClick: () -> Unit,
     onRestartAutoHideControllerRunnable: () -> Unit,
 ) {
     Column(
@@ -888,7 +935,7 @@ private fun BottomBar(
                     sliderValue = it
                 },
                 onValueChangeFinished = {
-                    onPositionChanged(sliderValue.toInt())
+                    onSeekTo(sliderValue.toInt())
                     valueIsChanging = false
                 },
                 valueRange = 0f..duration().toFloat(),
@@ -947,23 +994,15 @@ private fun BottomBar(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            Box {
-                Icon(
-                    modifier = Modifier
-                        .clip(CircleShape)
-                        .size(45.dp)
-                        .clickable(onClick = onRequestSubtitleTrack)
-                        .padding(9.dp),
-                    imageVector = Icons.Rounded.ClosedCaption,
-                    contentDescription = stringResource(R.string.player_subtitle_track),
-                )
-
-                SubtitleTrackMenu(
-                    onDismissRequest = onDismissSubtitleTrackMenu,
-                    subtitleTrackMenuState = subtitleTrackMenuState,
-                    onSubtitleTrackChanged = onSubtitleTrackChanged,
-                )
-            }
+            Icon(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(45.dp)
+                    .clickable(onClick = onSubtitleTrackClick)
+                    .padding(9.dp),
+                imageVector = Icons.Rounded.ClosedCaption,
+                contentDescription = stringResource(R.string.player_subtitle_track),
+            )
         }
     }
 }
