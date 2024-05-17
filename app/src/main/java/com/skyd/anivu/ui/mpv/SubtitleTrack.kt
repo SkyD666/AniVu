@@ -25,12 +25,8 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
+import com.skyd.anivu.ui.mpv.state.SubtitleTrackDialogState
 
-data class SubtitleTrackDialogState(
-    val show: Boolean,
-    val currentSubtitleTrack: MPVView.Track,
-    val subtitleTrack: List<MPVView.Track>,
-)
 
 @Composable
 internal fun SubtitleTrackDialog(

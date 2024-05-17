@@ -86,10 +86,12 @@ import com.materialkolor.ktx.toHct
 import com.skyd.anivu.R
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.alwaysLight
-import com.skyd.anivu.ext.snapshotStateOffsetSaver
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.toPercentage
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
+import com.skyd.anivu.ui.mpv.state.PlayState
+import com.skyd.anivu.ui.mpv.state.SubtitleTrackDialogState
+import com.skyd.anivu.ui.mpv.state.TransformState
 import `is`.xyz.mpv.MPVLib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -127,15 +129,13 @@ private fun MPVView.solveCommand(
     isPlayingChanged: (Boolean) -> Unit,
     onSubtitleTrack: (subtitleTrack: List<MPVView.Track>) -> Unit,
     onSubtitleTrackChanged: (Int) -> Unit,
+    transformState: () -> TransformState,
     onVideoZoom: (Float) -> Unit,
-    videoOffset: () -> Offset,
     onVideoOffset: (Offset) -> Unit,
     onSpeedChanged: (Float) -> Unit,
 ) {
     when (command) {
-        is PlayerCommand.SetUri -> uri().resolveUri(context)
-            ?.let { loadFile(it) }
-
+        is PlayerCommand.SetUri -> uri().resolveUri(context)?.let { loadFile(it) }
         PlayerCommand.Destroy -> destroy()
         is PlayerCommand.Paused -> {
             if (!command.paused) {
@@ -154,21 +154,16 @@ private fun MPVView.solveCommand(
         is PlayerCommand.Rotate -> rotate(command.rotate)
         is PlayerCommand.Zoom -> zoom(command.zoom)
         PlayerCommand.GetZoom -> onVideoZoom(2.0.pow(videoZoom).toFloat())
-        is PlayerCommand.VideoOffset -> offset(
-            command.offset.x.toInt(), command.offset.y.toInt()
-        )
-
+        is PlayerCommand.VideoOffset -> offset(command.offset.x.toInt(), command.offset.y.toInt())
         PlayerCommand.GetVideoOffsetX -> videoDW?.let { dw ->
-            onVideoOffset(videoOffset().copy(x = (videoPanX * dw).toFloat()))
+            onVideoOffset(transformState().videoOffset.copy(x = (videoPanX * dw).toFloat()))
         }
 
         PlayerCommand.GetVideoOffsetY -> videoDH?.let { dh ->
-            onVideoOffset(videoOffset().copy(y = (videoPanY * dh).toFloat()))
+            onVideoOffset(transformState().videoOffset.copy(y = (videoPanY * dh).toFloat()))
         }
 
-        is PlayerCommand.SetSpeed -> playbackSpeed =
-            command.speed.toDouble()
-
+        is PlayerCommand.SetSpeed -> playbackSpeed = command.speed.toDouble()
         PlayerCommand.GetSpeed -> onSpeedChanged(playbackSpeed.toFloat())
         PlayerCommand.LoadAllTracks -> loadTracks()
         PlayerCommand.GetSubtitleTrack -> onSubtitleTrack(subtitleTrack)
@@ -191,24 +186,9 @@ fun PlayerView(
     val scope = rememberCoroutineScope()
 
     var mediaLoaded by rememberSaveable { mutableStateOf(false) }
-    var isPlaying by rememberSaveable { mutableStateOf(false) }
-    var title by rememberSaveable { mutableStateOf("") }
-    var duration by rememberSaveable { mutableIntStateOf(0) }
-    var currentPosition by rememberSaveable { mutableIntStateOf(0) }
-    var isSeeking by rememberSaveable { mutableStateOf(false) }
-    var speed by rememberSaveable { mutableFloatStateOf(1f) }
-    var subtitleTrackDialogState by remember {
-        mutableStateOf(
-            SubtitleTrackDialogState(
-                show = false,
-                currentSubtitleTrack = MPVView.Track(0, ""),
-                subtitleTrack = emptyList(),
-            )
-        )
-    }
-    var videoRotate by rememberSaveable { mutableIntStateOf(0) }
-    var videoZoom by rememberSaveable { mutableFloatStateOf(1f) }
-    var videoOffset by rememberSaveable(saver = snapshotStateOffsetSaver()) { mutableStateOf(Offset.Zero) }
+    var subtitleTrackDialogState by remember { mutableStateOf(SubtitleTrackDialogState.initial) }
+    var playState by remember { mutableStateOf(PlayState.initial) }
+    var transformState by remember { mutableStateOf(TransformState.initial) }
 
     val mpvObserver = remember {
         object : MPVLib.EventObserver {
@@ -224,30 +204,33 @@ fun PlayerView(
 
             override fun eventProperty(property: String, value: Long) {
                 when (property) {
-                    "time-pos" -> currentPosition = value.toInt()
-                    "duration" -> duration = value.toInt()
-                    "video-rotate" -> videoRotate = value.toInt()
+                    "time-pos" -> playState = playState.copy(currentPosition = value.toInt())
+                    "duration" -> playState = playState.copy(duration = value.toInt())
+                    "video-rotate" -> transformState =
+                        transformState.copy(videoRotate = value.toFloat())
                 }
             }
 
             override fun eventProperty(property: String, value: Boolean) {
                 when (property) {
-                    "pause" -> isPlaying = !value
+                    "pause" -> playState = playState.copy(isPlaying = !value)
                 }
             }
 
             override fun eventProperty(property: String, value: String) {
                 when (property) {
-                    "media-title" -> title = value
+                    "media-title" -> playState = playState.copy(title = value)
                 }
             }
 
             override fun event(eventId: Int) {
                 when (eventId) {
-                    MPVLib.mpvEventId.MPV_EVENT_SEEK -> isSeeking = false
+                    MPVLib.mpvEventId.MPV_EVENT_SEEK -> playState =
+                        playState.copy(isSeeking = false)
+
                     MPVLib.mpvEventId.MPV_EVENT_END_FILE -> {
                         mediaLoaded = false
-                        isPlaying = false
+                        playState = playState.copy(isPlaying = false)
                     }
 
                     MPVLib.mpvEventId.MPV_EVENT_FILE_LOADED,
@@ -281,7 +264,9 @@ fun PlayerView(
                             solveCommand(
                                 command = command,
                                 uri = { uri },
-                                isPlayingChanged = { isPlaying = it },
+                                isPlayingChanged = {
+                                    playState = playState.copy(isPlaying = it)
+                                },
                                 onSubtitleTrack = {
                                     subtitleTrackDialogState = subtitleTrackDialogState.copy(
                                         show = true,
@@ -294,10 +279,14 @@ fun PlayerView(
                                         currentSubtitleTrack = subtitleTrack.find { it.trackId == newTrackId }!!,
                                     )
                                 },
-                                onVideoZoom = { videoZoom = it },
-                                videoOffset = { videoOffset },
-                                onVideoOffset = { videoOffset = it },
-                                onSpeedChanged = { speed = it },
+                                transformState = { transformState },
+                                onVideoZoom = {
+                                    transformState = transformState.copy(videoZoom = it)
+                                },
+                                onVideoOffset = {
+                                    transformState = transformState.copy(videoOffset = it)
+                                },
+                                onSpeedChanged = { playState = playState.copy(speed = it) },
                             )
                         }
                         .collect()
@@ -309,19 +298,14 @@ fun PlayerView(
 
     PlayerController(
         enabled = { mediaLoaded },
-        isPlaying = { isPlaying },
-        title = { title },
         onBack = onBack,
-        onPlayStateChanged = { commandQueue.trySend(PlayerCommand.Paused(isPlaying)) },
-        currentPosition = { currentPosition },
-        duration = { duration },
-        isSeeking = { isSeeking },
+        onPlayStateChanged = { commandQueue.trySend(PlayerCommand.Paused(playState.isPlaying)) },
+        playState = { playState },
         onSeekTo = {
-            isSeeking = true
+            playState = playState.copy(isSeeking = true)
             commandQueue.trySend(PlayerCommand.SeekTo(it))
         },
         onPlayOrPause = { commandQueue.trySend(PlayerCommand.PlayOrPause) },
-        speed = { speed },
         onSpeedChanged = { commandQueue.trySend(PlayerCommand.SetSpeed(it)) },
         subtitleTrackDialogState = { subtitleTrackDialogState },
         onDismissSubtitleTrackDialog = {
@@ -329,11 +313,9 @@ fun PlayerView(
         },
         onRequestSubtitleTrack = { commandQueue.trySend(PlayerCommand.GetSubtitleTrack) },
         onSubtitleTrackChanged = { commandQueue.trySend(PlayerCommand.SetSubtitleTrack(it.trackId)) },
-        videoRotate = { videoRotate.toFloat() },
-        videoZoom = { videoZoom },
+        transformState = { transformState },
         onVideoRotate = { commandQueue.trySend(PlayerCommand.Rotate(it.toInt())) },
         onVideoZoom = { commandQueue.trySend(PlayerCommand.Zoom(it)) },
-        videoOffset = { videoOffset },
         onVideoOffset = { commandQueue.trySend(PlayerCommand.VideoOffset(it)) }
     )
 
@@ -350,8 +332,8 @@ fun PlayerView(
                 }
 
                 Lifecycle.Event.ON_PAUSE -> {
-                    needPlayWhenResume = isPlaying
-                    if (isPlaying) {
+                    needPlayWhenResume = playState.isPlaying
+                    if (playState.isPlaying) {
                         commandQueue.trySend(PlayerCommand.Paused(true))
                     }
                 }
@@ -374,26 +356,19 @@ internal val ControllerLabelGray = Color(0x70000000)
 @Composable
 private fun PlayerController(
     enabled: () -> Boolean,
-    isPlaying: () -> Boolean,
-    title: () -> String,
     onBack: () -> Unit,
     onPlayStateChanged: () -> Unit,
-    isSeeking: () -> Boolean,
-    currentPosition: () -> Int,
-    duration: () -> Int,
-    onSeekTo: (Int) -> Unit,
+    playState: () -> PlayState,
+    onSeekTo: (position: Int) -> Unit,
     onPlayOrPause: () -> Unit,
-    speed: () -> Float,
     onSpeedChanged: (Float) -> Unit,
     subtitleTrackDialogState: () -> SubtitleTrackDialogState,
     onDismissSubtitleTrackDialog: () -> Unit,
     onRequestSubtitleTrack: () -> Unit,
     onSubtitleTrackChanged: (MPVView.Track) -> Unit,
-    videoRotate: () -> Float,
+    transformState: () -> TransformState,
     onVideoRotate: (Float) -> Unit,
-    videoZoom: () -> Float,
     onVideoZoom: (Float) -> Unit,
-    videoOffset: () -> Offset,
     onVideoOffset: (Offset) -> Unit,
 ) {
     var showController by rememberSaveable { mutableStateOf(true) }
@@ -446,12 +421,11 @@ private fun PlayerController(
                 }
                 .detectPressGestures(
                     controllerWidth = { controllerWidth },
-                    currentPosition = currentPosition,
+                    playState = playState,
                     onSeekTo = onSeekTo,
                     onPlayOrPause = onPlayOrPause,
                     showController = { showController },
                     onShowControllerChanged = { showController = it },
-                    speed = speed,
                     onSpeedChanged = onSpeedChanged,
                     isLongPressing = { isLongPressing },
                     isLongPressingChanged = { isLongPressing = it },
@@ -476,15 +450,13 @@ private fun PlayerController(
                     onShowVolume = { showVolumePreview = it },
                     onVolumeRangeChanged = { volumeRange = it },
                     onVolumeChanged = { volumeValue = it },
-                    currentPosition = currentPosition,
-                    onShowSeekTimePreview = { showSeekTimePreview = it },
+                    playState = playState,
                     onSeekTo = onSeekTo,
+                    onShowSeekTimePreview = { showSeekTimePreview = it },
                     onTimePreviewChanged = { seekTimePreview = it },
-                    videoRotate = videoRotate,
+                    transformState = transformState,
                     onVideoRotate = onVideoRotate,
-                    videoZoom = videoZoom,
                     onVideoZoom = onVideoZoom,
-                    videoOffset = videoOffset,
                     onVideoOffset = onVideoOffset,
                     cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
                     restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
@@ -529,26 +501,23 @@ private fun PlayerController(
                 enabled = enabled,
                 show = { showController },
                 onBack = onBack,
-                title = title,
-                isPlaying = isPlaying,
                 onPlayStateChanged = onPlayStateChanged,
-                isSeeking = isSeeking,
-                currentPosition = currentPosition,
-                duration = duration,
+                playState = playState,
                 onSeekTo = onSeekTo,
                 onSubtitleTrackClick = onRequestSubtitleTrack,
                 onRestartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
-                videoRotate = videoRotate,
+                transformState = transformState,
                 onVideoRotate = onVideoRotate,
-                videoZoom = videoZoom,
                 onVideoZoom = onVideoZoom,
-                videoOffset = videoOffset,
                 onVideoOffset = onVideoOffset,
             )
 
             // Seek time preview
             if (showSeekTimePreview) {
-                SeekTimePreview(value = { seekTimePreview }, duration = duration)
+                SeekTimePreview(
+                    value = { seekTimePreview },
+                    duration = { playState().duration },
+                )
             }
             // Brightness preview
             if (showBrightnessPreview) {
@@ -560,7 +529,7 @@ private fun PlayerController(
             }
             // Long press speed preview
             if (isLongPressing) {
-                LongPressSpeedPreview(speed = speed)
+                LongPressSpeedPreview(speed = { playState().speed })
             }
 
             SubtitleTrackDialog(
@@ -577,20 +546,14 @@ private fun AutoHiddenBox(
     enabled: () -> Boolean,
     show: () -> Boolean,
     onBack: () -> Unit,
-    title: () -> String,
-    isPlaying: () -> Boolean,
     onPlayStateChanged: () -> Unit,
-    isSeeking: () -> Boolean,
-    currentPosition: () -> Int,
-    duration: () -> Int,
+    playState: () -> PlayState,
     onSeekTo: (position: Int) -> Unit,
     onSubtitleTrackClick: () -> Unit,
     onRestartAutoHideControllerRunnable: () -> Unit,
-    videoRotate: () -> Float,
+    transformState: () -> TransformState,
     onVideoRotate: (Float) -> Unit,
-    videoZoom: () -> Float,
     onVideoZoom: (Float) -> Unit,
-    videoOffset: () -> Offset,
     onVideoOffset: (Offset) -> Unit,
 ) {
     Box {
@@ -604,16 +567,13 @@ private fun AutoHiddenBox(
 
                 TopBar(
                     modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
-                    title = title(),
+                    title = playState().title,
                     onBack = onBack,
                 )
                 BottomBar(
                     modifier = Modifier.constrainAs(bottomBar) { bottom.linkTo(parent.bottom) },
-                    isPlaying = isPlaying,
                     onPlayStateChanged = onPlayStateChanged,
-                    isSeeking = isSeeking,
-                    currentPosition = currentPosition,
-                    duration = duration,
+                    playState = playState,
                     onSeekTo = onSeekTo,
                     onSubtitleTrackClick = onSubtitleTrackClick,
                     onRestartAutoHideControllerRunnable = onRestartAutoHideControllerRunnable,
@@ -628,12 +588,17 @@ private fun AutoHiddenBox(
                                 end.linkTo(parent.end)
                             }
                             .padding(end = 50.dp),
-                        onClick = { onSeekTo(currentPosition() + 85) },
+                        onClick = {
+                            with(playState()) { onSeekTo(currentPosition + 85) }
+                        },
                     )
                 }
 
                 // Reset transform
-                if (videoZoom() != 1f || videoRotate() != 0f || videoOffset() != Offset.Zero) {
+                if (transformState().run {
+                        videoZoom != 1f || videoRotate != 0f || videoOffset != Offset.Zero
+                    }
+                ) {
                     ResetTransform(
                         modifier = Modifier.constrainAs(resetTransform) {
                             bottom.linkTo(bottomBar.top)
@@ -883,15 +848,14 @@ private fun TopBar(
 @Composable
 private fun BottomBar(
     modifier: Modifier = Modifier,
-    isPlaying: () -> Boolean,
     onPlayStateChanged: () -> Unit,
-    isSeeking: () -> Boolean,
-    currentPosition: () -> Int,
-    duration: () -> Int,
+    playState: () -> PlayState,
     onSeekTo: (position: Int) -> Unit,
     onSubtitleTrackClick: () -> Unit,
     onRestartAutoHideControllerRunnable: () -> Unit,
 ) {
+    val playPositionStateValue = playState()
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -913,13 +877,17 @@ private fun BottomBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             val sliderInteractionSource = remember { MutableInteractionSource() }
-            var sliderValue by rememberSaveable { mutableFloatStateOf(currentPosition().toFloat()) }
+            var sliderValue by rememberSaveable {
+                mutableFloatStateOf(playPositionStateValue.currentPosition.toFloat())
+            }
             var valueIsChanging by rememberSaveable { mutableStateOf(false) }
-            if (!valueIsChanging && !isSeeking() && sliderValue != currentPosition().toFloat()) {
-                sliderValue = currentPosition().toFloat()
+            if (!valueIsChanging && !playPositionStateValue.isSeeking &&
+                sliderValue != playPositionStateValue.currentPosition.toFloat()
+            ) {
+                sliderValue = playPositionStateValue.currentPosition.toFloat()
             }
             Text(
-                text = currentPosition().toDurationString(),
+                text = playPositionStateValue.currentPosition.toDurationString(),
                 style = MaterialTheme.typography.labelLarge,
                 color = Color.White,
             )
@@ -938,7 +906,7 @@ private fun BottomBar(
                     onSeekTo(sliderValue.toInt())
                     valueIsChanging = false
                 },
-                valueRange = 0f..duration().toFloat(),
+                valueRange = 0f..playPositionStateValue.duration.toFloat(),
                 interactionSource = sliderInteractionSource,
                 thumb = {
                     Box(
@@ -971,7 +939,7 @@ private fun BottomBar(
                 },
             )
             Text(
-                text = duration().toDurationString(),
+                text = playPositionStateValue.duration.toDurationString(),
                 style = MaterialTheme.typography.labelLarge,
                 color = Color.White,
             )
@@ -988,8 +956,8 @@ private fun BottomBar(
                     .size(52.dp)
                     .clickable(onClick = onPlayStateChanged)
                     .padding(9.dp),
-                imageVector = if (isPlaying()) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                contentDescription = stringResource(if (isPlaying()) R.string.pause else R.string.play),
+                imageVector = if (playPositionStateValue.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                contentDescription = stringResource(if (playPositionStateValue.isPlaying) R.string.pause else R.string.play),
             )
 
             Spacer(modifier = Modifier.weight(1f))

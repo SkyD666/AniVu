@@ -21,6 +21,8 @@ import com.skyd.anivu.ext.detectDoubleFingerTransformGestures
 import com.skyd.anivu.ext.getScreenBrightness
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
+import com.skyd.anivu.ui.mpv.state.PlayState
+import com.skyd.anivu.ui.mpv.state.TransformState
 import kotlin.math.abs
 
 private val inStatusBarArea: PointerInputScope.(y: Float) -> Boolean = { y ->
@@ -30,10 +32,9 @@ private val inStatusBarArea: PointerInputScope.(y: Float) -> Boolean = { y ->
 @Composable
 internal fun Modifier.detectPressGestures(
     controllerWidth: () -> Int,
-    currentPosition: () -> Int,
-    onSeekTo: (Int) -> Unit,
+    playState: () -> PlayState,
+    onSeekTo: (position: Int) -> Unit,
     onPlayOrPause: () -> Unit,
-    speed: () -> Float,
     onSpeedChanged: (Float) -> Unit,
     showController: () -> Boolean,
     onShowControllerChanged: (Boolean) -> Unit,
@@ -44,26 +45,26 @@ internal fun Modifier.detectPressGestures(
     cancelAutoHideControllerRunnable: () -> Boolean,
     restartAutoHideControllerRunnable: () -> Unit,
 ): Modifier {
-    var beforeLongPressingSpeed by remember { mutableFloatStateOf(speed()) }
+    var beforeLongPressingSpeed by remember { mutableFloatStateOf(playState().speed) }
 
     val playerDoubleTap = LocalPlayerDoubleTap.current
     val onDoubleTapPausePlay: () -> Unit = remember { { onPlayOrPause() } }
 
-    val onDoubleTapBackwardForward: (Offset) -> Unit = { offset ->
+    val onDoubleTapBackwardForward: PlayState.(Offset) -> Unit = { offset ->
         if (offset.x < controllerWidth() / 2f) {
-            onSeekTo(currentPosition() - 10) // -10s.
+            onSeekTo(currentPosition - 10) // -10s.
             onShowBackwardRipple(offset)
         } else {
-            onSeekTo(currentPosition() + 10) // +10s.
+            onSeekTo(currentPosition + 10) // +10s.
             onShowForwardRipple(offset)
         }
     }
-    val onDoubleTapBackwardPausePlayForward: (Offset) -> Unit = { offset ->
+    val onDoubleTapBackwardPausePlayForward: PlayState.(Offset) -> Unit = { offset ->
         if (offset.x <= controllerWidth() * 0.25f) {
-            onSeekTo(currentPosition() - 10) // -10s.
+            onSeekTo(currentPosition - 10) // -10s.
             onShowBackwardRipple(offset)
         } else if (offset.x >= controllerWidth() * 0.75f) {
-            onSeekTo(currentPosition() + 10) // +10s.
+            onSeekTo(currentPosition + 10) // +10s.
             onShowForwardRipple(offset)
         } else {
             onDoubleTapPausePlay()
@@ -72,9 +73,11 @@ internal fun Modifier.detectPressGestures(
 
     val onDoubleTap: (Offset) -> Unit = { offset ->
         when (playerDoubleTap) {
-            PlayerDoubleTapPreference.BACKWARD_FORWARD -> onDoubleTapBackwardForward(offset)
+            PlayerDoubleTapPreference.BACKWARD_FORWARD ->
+                playState().onDoubleTapBackwardForward(offset)
+
             PlayerDoubleTapPreference.BACKWARD_PAUSE_PLAY_FORWARD ->
-                onDoubleTapBackwardPausePlayForward(offset)
+                playState().onDoubleTapBackwardPausePlayForward(offset)
 
             else -> onDoubleTapPausePlay()
         }
@@ -83,7 +86,7 @@ internal fun Modifier.detectPressGestures(
     return pointerInput(playerDoubleTap) {
         detectTapGestures(
             onLongPress = {
-                beforeLongPressingSpeed = speed()
+                beforeLongPressingSpeed = playState().speed
                 isLongPressingChanged(true)
                 onSpeedChanged(3f)
             },
@@ -117,15 +120,13 @@ internal fun Modifier.detectControllerGestures(
     onShowVolume: (Boolean) -> Unit,
     onVolumeRangeChanged: (IntRange) -> Unit,
     onVolumeChanged: (Int) -> Unit,
-    currentPosition: () -> Int,
+    playState: () -> PlayState,
+    onSeekTo: (position: Int) -> Unit,
     onShowSeekTimePreview: (Boolean) -> Unit,
     onTimePreviewChanged: (Int) -> Unit,
-    onSeekTo: (Int) -> Unit,
-    videoRotate: () -> Float,
+    transformState: () -> TransformState,
     onVideoRotate: (Float) -> Unit,
-    videoZoom: () -> Float,
     onVideoZoom: (Float) -> Unit,
-    videoOffset: () -> Offset,
     onVideoOffset: (Offset) -> Unit,
     cancelAutoHideControllerRunnable: () -> Boolean,
     restartAutoHideControllerRunnable: () -> Unit,
@@ -224,7 +225,7 @@ internal fun Modifier.detectControllerGestures(
                 pointerStartX = it.x
                 pointerStartY = it.y
                 if (inStatusBarArea(it.y)) return@onHorizontalDragStart
-                seekTimePreviewStartPosition = currentPosition()
+                seekTimePreviewStartPosition = playState().currentPosition
                 seekTimePreviewPositionDelta = 0
                 onShowSeekTimePreview(true)
             },
@@ -245,9 +246,11 @@ internal fun Modifier.detectControllerGestures(
                 onTimePreviewChanged(seekTimePreviewStartPosition + seekTimePreviewPositionDelta)
             },
             onGesture = onGesture@{ _: Offset, pan: Offset, zoom: Float, rotation: Float ->
-                onVideoOffset(videoOffset() + pan)
-                onVideoRotate(videoRotate() + rotation)
-                onVideoZoom(videoZoom() * zoom)
+                with(transformState()) {
+                    onVideoOffset(videoOffset + pan)
+                    onVideoRotate(videoRotate + rotation)
+                    onVideoZoom(videoZoom * zoom)
+                }
             }
         )
     }
