@@ -206,6 +206,9 @@
     <string name="player_config_advanced_screen_mpv_config">编辑 mpv.conf</string>
     <string name="player_subtitle_track">字幕轨道</string>
     <string name="item_selected">已选</string>
+    <string name="player_screenshot">截图</string>
+    <string name="player_no_permission_cannot_save_screenshot">无权限。无法保存截图。</string>
+    <string name="player_config_fragment_show_screenshot_button">截图按钮</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>
