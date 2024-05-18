@@ -16,6 +16,7 @@ import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
+import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -66,6 +67,23 @@ class PlayerConfigFragment : BasePreferenceFragmentCompat() {
             isChecked = requireContext().dataStore.getOrDefault(PlayerShow85sButtonPreference)
             setOnPreferenceChangeListener { _, newValue ->
                 PlayerShow85sButtonPreference.put(
+                    context = requireContext(),
+                    scope = lifecycleScope,
+                    value = newValue as Boolean,
+                )
+                true
+            }
+            playerAppearanceCategory.addPreference(this)
+        }
+
+        SwitchPreferenceCompat(this).apply {
+            key = "playerShowScreenshotButton"
+            title = getString(R.string.player_config_fragment_show_screenshot_button)
+            setIcon(R.drawable.ic_photo_camera_24)
+            isChecked =
+                requireContext().dataStore.getOrDefault(PlayerShowScreenshotButtonPreference)
+            setOnPreferenceChangeListener { _, newValue ->
+                PlayerShowScreenshotButtonPreference.put(
                     context = requireContext(),
                     scope = lifecycleScope,
                     value = newValue as Boolean,

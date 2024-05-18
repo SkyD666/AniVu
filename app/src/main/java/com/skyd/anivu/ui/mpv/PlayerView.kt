@@ -38,6 +38,7 @@ import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.BrightnessHigh
 import androidx.compose.material.icons.rounded.BrightnessLow
 import androidx.compose.material.icons.rounded.BrightnessMedium
+import androidx.compose.material.icons.rounded.CameraAlt
 import androidx.compose.material.icons.rounded.ClosedCaption
 import androidx.compose.material.icons.rounded.FastForward
 import androidx.compose.material.icons.rounded.FastRewind
@@ -89,9 +90,12 @@ import com.skyd.anivu.ext.alwaysLight
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.toPercentage
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
+import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.mpv.state.PlayState
+import com.skyd.anivu.ui.mpv.state.PlayStateCallback
 import com.skyd.anivu.ui.mpv.state.SubtitleTrackDialogState
 import com.skyd.anivu.ui.mpv.state.TransformState
+import com.skyd.anivu.ui.mpv.state.TransformStateCallback
 import `is`.xyz.mpv.MPVLib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -100,6 +104,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.io.File
 import kotlin.math.abs
 import kotlin.math.pow
 
@@ -121,6 +126,7 @@ sealed interface PlayerCommand {
     data object GetSpeed : PlayerCommand
     data object LoadAllTracks : PlayerCommand
     data object GetSubtitleTrack : PlayerCommand
+    data object Screenshot : PlayerCommand
 }
 
 private fun MPVView.solveCommand(
@@ -133,6 +139,7 @@ private fun MPVView.solveCommand(
     onVideoZoom: (Float) -> Unit,
     onVideoOffset: (Offset) -> Unit,
     onSpeedChanged: (Float) -> Unit,
+    onSaveScreenshot: (File) -> Unit,
 ) {
     when (command) {
         is PlayerCommand.SetUri -> uri().resolveUri(context)?.let { loadFile(it) }
@@ -171,6 +178,8 @@ private fun MPVView.solveCommand(
             sid = command.trackId
             onSubtitleTrackChanged(command.trackId)
         }
+
+        PlayerCommand.Screenshot -> screenshot(onSaveScreenshot = onSaveScreenshot)
     }
 }
 
@@ -178,6 +187,7 @@ private fun MPVView.solveCommand(
 fun PlayerView(
     uri: Uri,
     onBack: () -> Unit,
+    onSaveScreenshot: (File) -> Unit,
     configDir: String = Const.MPV_CONFIG_DIR.path,
     cacheDir: String = Const.MPV_CACHE_DIR.path,
     fontDir: String = Const.MPV_FONT_DIR.path,
@@ -189,6 +199,25 @@ fun PlayerView(
     var subtitleTrackDialogState by remember { mutableStateOf(SubtitleTrackDialogState.initial) }
     var playState by remember { mutableStateOf(PlayState.initial) }
     var transformState by remember { mutableStateOf(TransformState.initial) }
+
+    val playStateCallback = remember {
+        PlayStateCallback(
+            onPlayStateChanged = { commandQueue.trySend(PlayerCommand.Paused(playState.isPlaying)) },
+            onPlayOrPause = { commandQueue.trySend(PlayerCommand.PlayOrPause) },
+            onSeekTo = {
+                playState = playState.copy(isSeeking = true)
+                commandQueue.trySend(PlayerCommand.SeekTo(it))
+            },
+            onSpeedChanged = { commandQueue.trySend(PlayerCommand.SetSpeed(it)) },
+        )
+    }
+    val transformStateCallback = remember {
+        TransformStateCallback(
+            onVideoRotate = { commandQueue.trySend(PlayerCommand.Rotate(it.toInt())) },
+            onVideoZoom = { commandQueue.trySend(PlayerCommand.Zoom(it)) },
+            onVideoOffset = { commandQueue.trySend(PlayerCommand.VideoOffset(it)) },
+        )
+    }
 
     val mpvObserver = remember {
         object : MPVLib.EventObserver {
@@ -287,6 +316,7 @@ fun PlayerView(
                                     transformState = transformState.copy(videoOffset = it)
                                 },
                                 onSpeedChanged = { playState = playState.copy(speed = it) },
+                                onSaveScreenshot = onSaveScreenshot,
                             )
                         }
                         .collect()
@@ -299,14 +329,8 @@ fun PlayerView(
     PlayerController(
         enabled = { mediaLoaded },
         onBack = onBack,
-        onPlayStateChanged = { commandQueue.trySend(PlayerCommand.Paused(playState.isPlaying)) },
         playState = { playState },
-        onSeekTo = {
-            playState = playState.copy(isSeeking = true)
-            commandQueue.trySend(PlayerCommand.SeekTo(it))
-        },
-        onPlayOrPause = { commandQueue.trySend(PlayerCommand.PlayOrPause) },
-        onSpeedChanged = { commandQueue.trySend(PlayerCommand.SetSpeed(it)) },
+        playStateCallback = playStateCallback,
         subtitleTrackDialogState = { subtitleTrackDialogState },
         onDismissSubtitleTrackDialog = {
             subtitleTrackDialogState = subtitleTrackDialogState.copy(show = false)
@@ -314,9 +338,8 @@ fun PlayerView(
         onRequestSubtitleTrack = { commandQueue.trySend(PlayerCommand.GetSubtitleTrack) },
         onSubtitleTrackChanged = { commandQueue.trySend(PlayerCommand.SetSubtitleTrack(it.trackId)) },
         transformState = { transformState },
-        onVideoRotate = { commandQueue.trySend(PlayerCommand.Rotate(it.toInt())) },
-        onVideoZoom = { commandQueue.trySend(PlayerCommand.Zoom(it)) },
-        onVideoOffset = { commandQueue.trySend(PlayerCommand.VideoOffset(it)) }
+        transformStateCallback = transformStateCallback,
+        onScreenshot = { commandQueue.trySend(PlayerCommand.Screenshot) },
     )
 
     var needPlayWhenResume by rememberSaveable { mutableStateOf(false) }
@@ -357,19 +380,15 @@ internal val ControllerLabelGray = Color(0x70000000)
 private fun PlayerController(
     enabled: () -> Boolean,
     onBack: () -> Unit,
-    onPlayStateChanged: () -> Unit,
     playState: () -> PlayState,
-    onSeekTo: (position: Int) -> Unit,
-    onPlayOrPause: () -> Unit,
-    onSpeedChanged: (Float) -> Unit,
+    playStateCallback: PlayStateCallback,
     subtitleTrackDialogState: () -> SubtitleTrackDialogState,
     onDismissSubtitleTrackDialog: () -> Unit,
     onRequestSubtitleTrack: () -> Unit,
     onSubtitleTrackChanged: (MPVView.Track) -> Unit,
     transformState: () -> TransformState,
-    onVideoRotate: (Float) -> Unit,
-    onVideoZoom: (Float) -> Unit,
-    onVideoOffset: (Offset) -> Unit,
+    transformStateCallback: TransformStateCallback,
+    onScreenshot: () -> Unit,
 ) {
     var showController by rememberSaveable { mutableStateOf(true) }
     var controllerWidth by remember { mutableIntStateOf(0) }
@@ -422,11 +441,9 @@ private fun PlayerController(
                 .detectPressGestures(
                     controllerWidth = { controllerWidth },
                     playState = playState,
-                    onSeekTo = onSeekTo,
-                    onPlayOrPause = onPlayOrPause,
+                    playStateCallback = playStateCallback,
                     showController = { showController },
                     onShowControllerChanged = { showController = it },
-                    onSpeedChanged = onSpeedChanged,
                     isLongPressing = { isLongPressing },
                     isLongPressingChanged = { isLongPressing = it },
                     onShowForwardRipple = {
@@ -451,13 +468,11 @@ private fun PlayerController(
                     onVolumeRangeChanged = { volumeRange = it },
                     onVolumeChanged = { volumeValue = it },
                     playState = playState,
-                    onSeekTo = onSeekTo,
+                    playStateCallback = playStateCallback,
                     onShowSeekTimePreview = { showSeekTimePreview = it },
                     onTimePreviewChanged = { seekTimePreview = it },
                     transformState = transformState,
-                    onVideoRotate = onVideoRotate,
-                    onVideoZoom = onVideoZoom,
-                    onVideoOffset = onVideoOffset,
+                    transformStateCallback = transformStateCallback,
                     cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
                     restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
                 )
@@ -501,15 +516,13 @@ private fun PlayerController(
                 enabled = enabled,
                 show = { showController },
                 onBack = onBack,
-                onPlayStateChanged = onPlayStateChanged,
                 playState = playState,
-                onSeekTo = onSeekTo,
+                playStateCallback = playStateCallback,
                 onSubtitleTrackClick = onRequestSubtitleTrack,
-                onRestartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
                 transformState = transformState,
-                onVideoRotate = onVideoRotate,
-                onVideoZoom = onVideoZoom,
-                onVideoOffset = onVideoOffset,
+                transformStateCallback = transformStateCallback,
+                onScreenshot = onScreenshot,
+                onRestartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
             )
 
             // Seek time preview
@@ -546,15 +559,13 @@ private fun AutoHiddenBox(
     enabled: () -> Boolean,
     show: () -> Boolean,
     onBack: () -> Unit,
-    onPlayStateChanged: () -> Unit,
     playState: () -> PlayState,
-    onSeekTo: (position: Int) -> Unit,
+    playStateCallback: PlayStateCallback,
     onSubtitleTrackClick: () -> Unit,
-    onRestartAutoHideControllerRunnable: () -> Unit,
     transformState: () -> TransformState,
-    onVideoRotate: (Float) -> Unit,
-    onVideoZoom: (Float) -> Unit,
-    onVideoOffset: (Offset) -> Unit,
+    transformStateCallback: TransformStateCallback,
+    onScreenshot: () -> Unit,
+    onRestartAutoHideControllerRunnable: () -> Unit,
 ) {
     Box {
         AnimatedVisibility(
@@ -563,7 +574,7 @@ private fun AutoHiddenBox(
             exit = fadeOut(),
         ) {
             ConstraintLayout(modifier = Modifier.fillMaxSize()) {
-                val (topBar, bottomBar, forward85s, resetTransform) = createRefs()
+                val (topBar, bottomBar, screenshot, forward85s, resetTransform) = createRefs()
 
                 TopBar(
                     modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
@@ -572,12 +583,24 @@ private fun AutoHiddenBox(
                 )
                 BottomBar(
                     modifier = Modifier.constrainAs(bottomBar) { bottom.linkTo(parent.bottom) },
-                    onPlayStateChanged = onPlayStateChanged,
+                    playStateCallback = playStateCallback,
                     playState = playState,
-                    onSeekTo = onSeekTo,
                     onSubtitleTrackClick = onSubtitleTrackClick,
                     onRestartAutoHideControllerRunnable = onRestartAutoHideControllerRunnable,
                 )
+
+                if (LocalPlayerShowScreenshotButton.current) {
+                    Screenshot(
+                        modifier = Modifier
+                            .constrainAs(screenshot) {
+                                bottom.linkTo(parent.bottom)
+                                top.linkTo(parent.top)
+                                end.linkTo(parent.end)
+                            }
+                            .padding(end = 20.dp),
+                        onClick = onScreenshot,
+                    )
+                }
 
                 // +85s button
                 if (LocalPlayerShow85sButton.current) {
@@ -587,9 +610,9 @@ private fun AutoHiddenBox(
                                 bottom.linkTo(bottomBar.top)
                                 end.linkTo(parent.end)
                             }
-                            .padding(end = 50.dp),
+                            .padding(end = 20.dp),
                         onClick = {
-                            with(playState()) { onSeekTo(currentPosition + 85) }
+                            with(playState()) { playStateCallback.onSeekTo(currentPosition + 85) }
                         },
                     )
                 }
@@ -609,9 +632,11 @@ private fun AutoHiddenBox(
                         },
                         enabled = enabled,
                         onClick = {
-                            onVideoOffset(Offset.Zero)
-                            onVideoZoom(1f)
-                            onVideoRotate(0f)
+                            with(transformStateCallback) {
+                                onVideoOffset(Offset.Zero)
+                                onVideoZoom(1f)
+                                onVideoRotate(0f)
+                            }
                         }
                     )
                 }
@@ -782,6 +807,23 @@ private fun ResetTransform(
 }
 
 @Composable
+private fun Screenshot(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+) {
+    Icon(
+        modifier = modifier
+            .clip(RoundedCornerShape(6.dp))
+            .background(color = ControllerLabelGray)
+            .clickable(onClick = onClick)
+            .padding(10.dp),
+        imageVector = Icons.Rounded.CameraAlt,
+        contentDescription = stringResource(id = R.string.player_screenshot),
+        tint = Color.White,
+    )
+}
+
+@Composable
 private fun Forward85s(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
@@ -848,9 +890,8 @@ private fun TopBar(
 @Composable
 private fun BottomBar(
     modifier: Modifier = Modifier,
-    onPlayStateChanged: () -> Unit,
     playState: () -> PlayState,
-    onSeekTo: (position: Int) -> Unit,
+    playStateCallback: PlayStateCallback,
     onSubtitleTrackClick: () -> Unit,
     onRestartAutoHideControllerRunnable: () -> Unit,
 ) {
@@ -903,7 +944,7 @@ private fun BottomBar(
                     sliderValue = it
                 },
                 onValueChangeFinished = {
-                    onSeekTo(sliderValue.toInt())
+                    playStateCallback.onSeekTo(sliderValue.toInt())
                     valueIsChanging = false
                 },
                 valueRange = 0f..playPositionStateValue.duration.toFloat(),
@@ -953,9 +994,9 @@ private fun BottomBar(
             Icon(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .size(52.dp)
-                    .clickable(onClick = onPlayStateChanged)
-                    .padding(9.dp),
+                    .size(50.dp)
+                    .clickable(onClick = playStateCallback.onPlayStateChanged)
+                    .padding(7.dp),
                 imageVector = if (playPositionStateValue.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
                 contentDescription = stringResource(if (playPositionStateValue.isPlaying) R.string.pause else R.string.play),
             )
@@ -975,12 +1016,12 @@ private fun BottomBar(
     }
 }
 
-fun Int.toDurationString(sign: Boolean = false): String {
+fun Int.toDurationString(sign: Boolean = false, splitter: String = ":"): String {
     if (sign) return (if (this >= 0) "+" else "-") + abs(this).toDurationString()
 
     val hours = this / 3600
     val minutes = this % 3600 / 60
     val seconds = this % 60
-    return if (hours == 0) "%02d:%02d".format(minutes, seconds)
-    else "%d:%02d:%02d".format(hours, minutes, seconds)
+    return if (hours == 0) "%02d$splitter%02d".format(minutes, seconds)
+    else "%d$splitter%02d$splitter%02d".format(hours, minutes, seconds)
 }

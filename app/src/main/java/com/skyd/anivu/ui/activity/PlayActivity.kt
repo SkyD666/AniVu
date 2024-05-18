@@ -2,8 +2,10 @@ package com.skyd.anivu.ui.activity
 
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,13 +17,28 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.skyd.anivu.base.BaseComposeActivity
+import com.skyd.anivu.ext.savePictureToMediaStore
+import com.skyd.anivu.ui.component.showToast
 import com.skyd.anivu.ui.mpv.PlayerView
 import com.skyd.anivu.ui.mpv.copyAssetsForMpv
+import java.io.File
 
 
 class PlayActivity : BaseComposeActivity() {
     companion object {
         const val VIDEO_URI_KEY = "videoUri"
+    }
+
+
+    private lateinit var picture: File
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            picture.savePictureToMediaStore(this)
+        } else {
+            getString(com.skyd.anivu.R.string.player_no_permission_cannot_save_screenshot).showToast()
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,6 +73,10 @@ class PlayActivity : BaseComposeActivity() {
                 PlayerView(
                     uri = uri,
                     onBack = { finish() },
+                    onSaveScreenshot = {
+                        picture = it
+                        saveScreenshot()
+                    }
                 )
             }
         }
@@ -65,5 +86,13 @@ class PlayActivity : BaseComposeActivity() {
         intent ?: return null
         return IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
             ?: intent.data
+    }
+
+    private fun saveScreenshot() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            picture.savePictureToMediaStore(this)
+        } else {
+            requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
     }
 }

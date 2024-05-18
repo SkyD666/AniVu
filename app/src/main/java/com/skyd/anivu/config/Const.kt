@@ -1,5 +1,6 @@
 package com.skyd.anivu.config
 
+import android.os.Environment
 import com.skyd.anivu.appContext
 import java.io.File
 
@@ -44,4 +45,6 @@ object Const {
         .apply { if (!exists()) mkdirs() }
     val MPV_FONT_DIR = File(MPV_CONFIG_DIR, "Font")
         .apply { if (!exists()) mkdirs() }
+
+    val PICTURES_DIR = appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
 }

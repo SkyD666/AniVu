@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.mpv.state
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.geometry.Offset
 
 data class TransformState(
@@ -15,3 +16,10 @@ data class TransformState(
         )
     }
 }
+
+@Immutable
+data class TransformStateCallback(
+    val onVideoRotate: (Float) -> Unit,
+    val onVideoZoom: (Float) -> Unit,
+    val onVideoOffset: (Offset) -> Unit,
+)

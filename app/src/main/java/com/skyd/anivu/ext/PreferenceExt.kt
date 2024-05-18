@@ -15,6 +15,7 @@ import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPr
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
+import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 
 fun Preferences.toSettings(): Settings {
     return Settings(
@@ -38,5 +39,6 @@ fun Preferences.toSettings(): Settings {
         // Player
         playerDoubleTap = PlayerDoubleTapPreference.fromPreferences(this),
         playerShow85sButton = PlayerShow85sButtonPreference.fromPreferences(this),
+        playerShowScreenshotButton = PlayerShowScreenshotButtonPreference.fromPreferences(this),
     )
 }

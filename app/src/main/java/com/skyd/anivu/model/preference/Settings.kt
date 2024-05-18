@@ -20,6 +20,7 @@ import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPr
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
+import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDarkMode
@@ -31,6 +32,7 @@ import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
+import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +56,7 @@ data class Settings(
     // Player
     val playerDoubleTap: String = PlayerDoubleTapPreference.default,
     val playerShow85sButton: Boolean = PlayerShow85sButtonPreference.default,
+    val playerShowScreenshotButton: Boolean = PlayerShowScreenshotButtonPreference.default,
 )
 
 @Composable
@@ -82,6 +85,7 @@ fun SettingsProvider(
         // Player
         LocalPlayerDoubleTap provides settings.playerDoubleTap,
         LocalPlayerShow85sButton provides settings.playerShow85sButton,
+        LocalPlayerShowScreenshotButton provides settings.playerShowScreenshotButton,
     ) {
         content()
     }

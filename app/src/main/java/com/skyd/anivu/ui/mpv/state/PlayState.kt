@@ -1,5 +1,7 @@
 package com.skyd.anivu.ui.mpv.state
 
+import androidx.compose.runtime.Immutable
+
 data class PlayState(
     val isPlaying: Boolean,
     val isSeeking: Boolean,
@@ -19,3 +21,11 @@ data class PlayState(
         )
     }
 }
+
+@Immutable
+data class PlayStateCallback(
+    val onPlayStateChanged: () -> Unit,
+    val onPlayOrPause: () -> Unit,
+    val onSeekTo: (position: Int) -> Unit,
+    val onSpeedChanged: (Float) -> Unit,
+)

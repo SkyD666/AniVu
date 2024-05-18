@@ -2,12 +2,12 @@ package com.skyd.anivu.ui.mpv
 
 import android.content.Context
 import android.os.Build
-import android.os.Environment
 import android.util.AttributeSet
 import android.util.Log
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
+import com.skyd.anivu.config.Const
 import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_DOUBLE
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_FLAG
@@ -15,12 +15,22 @@ import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_INT64
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_NONE
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_STRING
 import `is`.xyz.mpv.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
+import java.io.File
 import kotlin.math.log
+import kotlin.random.Random
 import kotlin.reflect.KProperty
 
 class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, attrs),
     SurfaceHolder.Callback {
     private var surfaceCreated = false
+
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     fun initialize(
         configDir: String,
@@ -82,11 +92,8 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         val cacheMegs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) 64 else 32
         MPVLib.setOptionString("demuxer-max-bytes", "${cacheMegs * 1024 * 1024}")
         MPVLib.setOptionString("demuxer-max-back-bytes", "${cacheMegs * 1024 * 1024}")
-        //
-        val screenshotDir =
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
-        screenshotDir.mkdirs()
-        MPVLib.setOptionString("screenshot-directory", screenshotDir.path)
+
+        MPVLib.setOptionString("screenshot-directory", Const.PICTURES_DIR.path)
     }
 
     private var filePath: String? = null
@@ -224,6 +231,8 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     }
 
     // Property getters/setters
+    val filename: String
+        get() = MPVLib.getPropertyString("filename")
     var paused: Boolean
         get() = MPVLib.getPropertyBoolean("pause")
         set(paused) = MPVLib.setPropertyBoolean("pause", paused)
@@ -417,6 +426,27 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             null -> MPVLib.command(arrayOf("playlist-play-index", "none"))
             -1 -> MPVLib.command(arrayOf("playlist-play-index", "current"))
             else -> MPVLib.command(arrayOf("playlist-play-index", index.toString()))
+        }
+    }
+
+    fun screenshot(onSaveScreenshot: (File) -> Unit) {
+        val format = "jpg"
+        val filename = "$filename-(${timePos.toDurationString(splitter = "-")})-${Random.nextInt()}"
+        MPVLib.setOptionString("screenshot-format", format)
+        MPVLib.setOptionString("screenshot-template", filename)
+        MPVLib.command(arrayOf("screenshot"))
+
+        scope.launch {
+            val picture = File(Const.PICTURES_DIR, "$filename.$format")
+            try {
+                withTimeout(10000) {
+                    while (!picture.exists()) delay(100)
+                }
+            } catch (e: TimeoutCancellationException) {
+                Log.e(TAG, "Failed to save screenshot")
+                return@launch
+            }
+            onSaveScreenshot(picture)
         }
     }
 
