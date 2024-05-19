@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.mpv.state
 
+import androidx.compose.runtime.Immutable
 import com.skyd.anivu.ui.mpv.MPVView
 
 data class SubtitleTrackDialogState(
@@ -15,3 +16,9 @@ data class SubtitleTrackDialogState(
         )
     }
 }
+
+@Immutable
+data class SubtitleTrackDialogCallback(
+    val onSubtitleTrackChanged: (MPVView.Track) -> Unit,
+    val onAddSubtitle: (String) -> Unit,
+)

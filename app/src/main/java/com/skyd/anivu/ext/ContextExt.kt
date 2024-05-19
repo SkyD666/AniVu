@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Point
 import android.os.Build
+import android.view.Window
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.PackageInfoCompat
 
@@ -23,6 +24,18 @@ val Context.tryActivity: Activity?
         while (ctx is ContextWrapper) {
             if (ctx is Activity) {
                 return ctx
+            }
+            ctx = ctx.baseContext
+        }
+        return null
+    }
+
+val Context.tryWindow: Window?
+    get() {
+        var ctx = this
+        while (ctx is ContextWrapper) {
+            if (ctx is Activity) {
+                return ctx.window
             }
             ctx = ctx.baseContext
         }

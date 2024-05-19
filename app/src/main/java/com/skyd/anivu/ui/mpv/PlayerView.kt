@@ -79,6 +79,7 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -89,10 +90,12 @@ import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.alwaysLight
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.toPercentage
+import com.skyd.anivu.ui.component.rememberSystemUiController
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.mpv.state.PlayState
 import com.skyd.anivu.ui.mpv.state.PlayStateCallback
+import com.skyd.anivu.ui.mpv.state.SubtitleTrackDialogCallback
 import com.skyd.anivu.ui.mpv.state.SubtitleTrackDialogState
 import com.skyd.anivu.ui.mpv.state.TransformState
 import com.skyd.anivu.ui.mpv.state.TransformStateCallback
@@ -100,6 +103,7 @@ import `is`.xyz.mpv.MPVLib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.Channel.Factory.UNLIMITED
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.onEach
@@ -127,6 +131,7 @@ sealed interface PlayerCommand {
     data object LoadAllTracks : PlayerCommand
     data object GetSubtitleTrack : PlayerCommand
     data object Screenshot : PlayerCommand
+    data class AddSubtitle(val filePath: String) : PlayerCommand
 }
 
 private fun MPVView.solveCommand(
@@ -180,6 +185,10 @@ private fun MPVView.solveCommand(
         }
 
         PlayerCommand.Screenshot -> screenshot(onSaveScreenshot = onSaveScreenshot)
+        is PlayerCommand.AddSubtitle -> {
+            addSubtitle(command.filePath)
+            onSubtitleTrack(subtitleTrack)
+        }
     }
 }
 
@@ -192,6 +201,11 @@ fun PlayerView(
     cacheDir: String = Const.MPV_CACHE_DIR.path,
     fontDir: String = Const.MPV_FONT_DIR.path,
 ) {
+    rememberSystemUiController().apply {
+        isSystemBarsVisible = false
+        systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
     val commandQueue = remember { Channel<PlayerCommand>(capacity = UNLIMITED) }
     val scope = rememberCoroutineScope()
 
@@ -216,6 +230,12 @@ fun PlayerView(
             onVideoRotate = { commandQueue.trySend(PlayerCommand.Rotate(it.toInt())) },
             onVideoZoom = { commandQueue.trySend(PlayerCommand.Zoom(it)) },
             onVideoOffset = { commandQueue.trySend(PlayerCommand.VideoOffset(it)) },
+        )
+    }
+    val subtitleTrackDialogCallback = remember {
+        SubtitleTrackDialogCallback(
+            onAddSubtitle = { commandQueue.trySend(PlayerCommand.AddSubtitle(it)) },
+            onSubtitleTrackChanged = { commandQueue.trySend(PlayerCommand.SetSubtitleTrack(it.trackId)) },
         )
     }
 
@@ -336,7 +356,7 @@ fun PlayerView(
             subtitleTrackDialogState = subtitleTrackDialogState.copy(show = false)
         },
         onRequestSubtitleTrack = { commandQueue.trySend(PlayerCommand.GetSubtitleTrack) },
-        onSubtitleTrackChanged = { commandQueue.trySend(PlayerCommand.SetSubtitleTrack(it.trackId)) },
+        subtitleTrackDialogCallback = subtitleTrackDialogCallback,
         transformState = { transformState },
         transformStateCallback = transformStateCallback,
         onScreenshot = { commandQueue.trySend(PlayerCommand.Screenshot) },
@@ -385,7 +405,7 @@ private fun PlayerController(
     subtitleTrackDialogState: () -> SubtitleTrackDialogState,
     onDismissSubtitleTrackDialog: () -> Unit,
     onRequestSubtitleTrack: () -> Unit,
-    onSubtitleTrackChanged: (MPVView.Track) -> Unit,
+    subtitleTrackDialogCallback: SubtitleTrackDialogCallback,
     transformState: () -> TransformState,
     transformStateCallback: TransformStateCallback,
     onScreenshot: () -> Unit,
@@ -548,8 +568,16 @@ private fun PlayerController(
             SubtitleTrackDialog(
                 onDismissRequest = onDismissSubtitleTrackDialog,
                 subtitleTrackDialogState = subtitleTrackDialogState,
-                onSubtitleTrackChanged = onSubtitleTrackChanged,
+                subtitleTrackDialogCallback = subtitleTrackDialogCallback,
             )
+
+            val systemUiController = rememberSystemUiController()
+            LaunchedEffect(subtitleTrackDialogState().show) {
+                delay(200)
+                systemUiController.isSystemBarsVisible = false
+                systemUiController.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
         }
     }
 }

@@ -121,6 +121,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             Property("eof-reached", MPV_FORMAT_FLAG),
             Property("paused-for-cache", MPV_FORMAT_FLAG),
             Property("track-list"),
+            Property("sub-add"),
             // observing double properties is not hooked up in the JNI code, but doing this
             // will restrict updates to when it actually changes
             Property("video-zoom", MPV_FORMAT_DOUBLE),
@@ -164,6 +165,16 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     val subtitleTrack: List<Track>
         get() = tracks["sub"].orEmpty().toList()
 
+    private fun getTrackDisplayName(mpvId: Int, lang: String?, title: String?): String {
+        return if (!lang.isNullOrEmpty() && !title.isNullOrEmpty()) {
+            context.getString(R.string.ui_track_title_lang, mpvId, title, lang)
+        } else if (!lang.isNullOrEmpty() || !title.isNullOrEmpty()) {
+            context.getString(R.string.ui_track_text, mpvId, lang.orEmpty() + title.orEmpty())
+        } else {
+            context.getString(R.string.ui_track, mpvId)
+        }
+    }
+
     fun loadTracks() {
         for (list in tracks.values) {
             list.clear()
@@ -183,18 +194,31 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             val lang = MPVLib.getPropertyString("track-list/$i/lang")
             val title = MPVLib.getPropertyString("track-list/$i/title")
 
-            val trackName = if (!lang.isNullOrEmpty() && !title.isNullOrEmpty())
-                context.getString(R.string.ui_track_title_lang, mpvId, title, lang)
-            else if (!lang.isNullOrEmpty() || !title.isNullOrEmpty())
-                context.getString(R.string.ui_track_text, mpvId, (lang ?: "") + (title ?: ""))
-            else
-                context.getString(R.string.ui_track, mpvId)
             tracks.getValue(type).add(
-                Track(
-                    trackId = mpvId,
-                    name = trackName
-                )
+                Track(trackId = mpvId, name = getTrackDisplayName(mpvId, lang, title))
             )
+        }
+    }
+
+    fun loadSubtitleTrack() {
+        tracks["sub"]!!.apply {
+            clear()
+            add(Track(-1, context.getString(R.string.track_off)))
+        }
+        val count = MPVLib.getPropertyInt("track-list/count")
+        // Note that because events are async, properties might disappear at any moment
+        // so use ?: continue instead of !!
+        for (i in 0 until count) {
+            val type = MPVLib.getPropertyString("track-list/$i/type") ?: continue
+            if (type == "sub") {
+                val mpvId = MPVLib.getPropertyInt("track-list/$i/id") ?: continue
+                val lang = MPVLib.getPropertyString("track-list/$i/lang")
+                val title = MPVLib.getPropertyString("track-list/$i/title")
+
+                tracks.getValue(type).add(
+                    Track(trackId = mpvId, name = getTrackDisplayName(mpvId, lang, title))
+                )
+            }
         }
     }
 
@@ -448,6 +472,11 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             }
             onSaveScreenshot(picture)
         }
+    }
+
+    fun addSubtitle(filePath: String) {
+        MPVLib.command(arrayOf("sub-add", filePath, "cached"))
+        loadSubtitleTrack()
     }
 
     companion object {

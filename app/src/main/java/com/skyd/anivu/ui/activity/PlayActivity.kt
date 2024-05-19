@@ -13,9 +13,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.IntentCompat
 import androidx.core.util.Consumer
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
 import com.skyd.anivu.base.BaseComposeActivity
 import com.skyd.anivu.ext.savePictureToMediaStore
 import com.skyd.anivu.ui.component.showToast
@@ -46,16 +43,6 @@ class PlayActivity : BaseComposeActivity() {
 
         super.onCreate(savedInstanceState)
 
-        val windowInsetsController =
-            WindowCompat.getInsetsController(window, window.decorView)
-        // Configure the behavior of the hidden system bars.
-        windowInsetsController.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-
-        window.decorView.setOnApplyWindowInsetsListener { view, windowInsets ->
-            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-            view.onApplyWindowInsets(windowInsets)
-        }
         // Keep screen on
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 

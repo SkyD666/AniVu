@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.view.Window
 import android.view.animation.AlphaAnimation
 import android.view.inputmethod.InputMethodManager
+import androidx.compose.ui.window.DialogWindowProvider
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
@@ -66,6 +67,9 @@ val View.activity: Activity
 
 val View.tryActivity: Activity?
     get() = context.tryActivity
+
+val View.tryWindow: Window?
+    get() = (parent as? DialogWindowProvider)?.window ?: context.tryWindow
 
 /**
  * 判断View和给定的Rect是否重叠（边和点不计入）

@@ -216,6 +216,7 @@
     <string name="player_screenshot">Screenshot</string>
     <string name="player_no_permission_cannot_save_screenshot">No permission. Can\'t save screenshot.</string>
     <string name="player_config_fragment_show_screenshot_button">Screenshot button</string>
+    <string name="player_add_external_subtitle">Add subtitle file</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>
