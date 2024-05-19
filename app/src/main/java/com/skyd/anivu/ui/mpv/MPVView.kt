@@ -8,6 +8,9 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
 import com.skyd.anivu.config.Const
+import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.getOrDefault
+import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_DOUBLE
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_FLAG
@@ -69,9 +72,6 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         // vo
         voInUse = vo
 
-        // hwdec
-        val hwdec = "auto"//"no"
-
         // vo: set display fps as reported by android
         val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
         val disp = wm.defaultDisplay
@@ -84,8 +84,10 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.setOptionString("vo", vo)
         MPVLib.setOptionString("gpu-context", "android")
         MPVLib.setOptionString("opengl-es", "yes")
-        MPVLib.setOptionString("hwdec", hwdec)
-//        MPVLib.setOptionString("hwdec-codecs", "h264,hevc,mpeg4,mpeg2video,vp8,vp9,av1")
+        MPVLib.setOptionString(
+            "hwdec",
+            if (context.dataStore.getOrDefault(HardwareDecodePreference)) "auto" else "no"
+        )
         MPVLib.setOptionString("ao", "audiotrack,opensles")
         MPVLib.setOptionString("input-default-bindings", "yes")
         // Limit demuxer cache since the defaults are too high for mobile devices
@@ -121,7 +123,6 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             Property("eof-reached", MPV_FORMAT_FLAG),
             Property("paused-for-cache", MPV_FORMAT_FLAG),
             Property("track-list"),
-            Property("sub-add"),
             // observing double properties is not hooked up in the JNI code, but doing this
             // will restrict updates to when it actually changes
             Property("video-zoom", MPV_FORMAT_DOUBLE),

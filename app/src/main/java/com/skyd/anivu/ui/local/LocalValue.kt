@@ -14,6 +14,7 @@ import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPr
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
+import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
@@ -47,3 +48,4 @@ val LocalHideEmptyDefault = compositionLocalOf { HideEmptyDefaultPreference.defa
 val LocalPlayerDoubleTap = compositionLocalOf { PlayerDoubleTapPreference.default }
 val LocalPlayerShow85sButton = compositionLocalOf { PlayerShow85sButtonPreference.default }
 val LocalPlayerShowScreenshotButton = compositionLocalOf { PlayerShowScreenshotButtonPreference.default }
+val LocalHardwareDecode = compositionLocalOf { HardwareDecodePreference.default }
