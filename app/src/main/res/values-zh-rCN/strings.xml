@@ -209,6 +209,7 @@
     <string name="player_screenshot">截图</string>
     <string name="player_no_permission_cannot_save_screenshot">无权限。无法保存截图。</string>
     <string name="player_config_fragment_show_screenshot_button">截图按钮</string>
+    <string name="player_add_external_subtitle">Add subtitle file</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>
