@@ -24,7 +24,7 @@
         </a>
     </p>
     <p>
-        <b>AniVu</b>，一个集<b> RSS 番剧订阅与更新、比特洪流下载、视频播放</b>为一体的工具。
+        <b>AniVu</b>，一个集<b> RSS 订阅与更新、比特洪流下载、视频播放</b>为一体的工具。
     </p>
     <p>
         使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架构，完全采用 <b><a href="https://m3.material.io/">Material You</a></b> 设计风格。使用 <b>Android View</b> 和 <b>Jetpack Compose</b> 混合开发。
@@ -33,7 +33,6 @@
         <b><a href="../../README.md">English</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b>中文</b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="README-zh-rTW.md">正體中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">帮助我们翻译</a></b>
     </p>
 </div>
-
 
 
 ## 💡主要功能
@@ -63,8 +62,9 @@
 <img src="../image/zh-rCN/ic_rss_fragment.jpg" alt="ic_rss_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_media_fragment.jpg" alt="ic_media_fragment" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_article_fragment.jpg" alt="ic_article_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_read_fragment.jpg" alt="ic_read_fragment" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
+<img src="../image/zh-rCN/ic_setting_fragment.jpg" alt="ic_setting_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_appearance_fragment.jpg" alt="ic_appearance_fragment" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
-<img src="../image/zh-rCN/ic_player_activity.png" alt="ic_player_activity" style="zoom:80%;" />
+<img src="../image/zh-rCN/ic_player_activity.jpg" alt="ic_player_activity" style="zoom:80%;" />
 
 ## 🌏翻译
 
@@ -89,7 +89,11 @@
 - Navigation
 - Coil
 
-## ✨其他应用
+## ✨Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=SkyD666/AniVu)](https://star-history.com/?repos=SkyD666/AniVu#SkyD666/AniVu&Date)
+
+## 🎈其他应用
 
 <table>
 <thead>
