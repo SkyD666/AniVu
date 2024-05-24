@@ -211,6 +211,7 @@
     <string name="player_add_external_subtitle">添加字幕文件</string>
     <string name="player_config_advanced_screen_hardware_decode">硬件解码</string>
     <string name="player_config_advanced_screen_hardware_decode_description">优先使用硬件解码，失败时改用软件解码。</string>
+    <string name="player_audio_track">音轨</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>

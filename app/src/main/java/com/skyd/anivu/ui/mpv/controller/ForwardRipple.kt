@@ -1,4 +1,4 @@
-package com.skyd.anivu.ui.mpv
+package com.skyd.anivu.ui.mpv.controller
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState

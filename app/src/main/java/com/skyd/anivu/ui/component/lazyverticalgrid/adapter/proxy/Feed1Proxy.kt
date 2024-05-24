@@ -46,6 +46,7 @@ import com.skyd.anivu.ui.local.LocalNavController
 
 class Feed1Proxy(
     private val visible: (groupId: String) -> Boolean = { true },
+    private val selected: (FeedBean) -> Boolean = { false },
     private val isEnded: (index: Int) -> Boolean = { false },
     private val useCardLayout: () -> Boolean = { false },
     private val onClick: ((FeedBean) -> Unit)? = null,
@@ -58,6 +59,7 @@ class Feed1Proxy(
             index = index,
             data = data,
             visible = visible,
+            selected = selected,
             isEnded = isEnded,
             useCardLayout = useCardLayout,
             onClick = onClick,
@@ -72,6 +74,7 @@ fun Feed1Item(
     index: Int,
     data: FeedViewBean,
     visible: (groupId: String) -> Boolean,
+    selected: (FeedBean) -> Boolean,
     useCardLayout: () -> Boolean,
     onClick: ((FeedBean) -> Unit)? = null,
     isEnded: (index: Int) -> Boolean,
@@ -97,8 +100,12 @@ fun Feed1Item(
                     } else RectangleShape
                 )
                 .run {
-                    if (useCardLayout()) background(color = MaterialTheme.colorScheme.surfaceContainer)
-                    else this
+                    if (useCardLayout()) {
+                        background(
+                            if (selected(feed)) MaterialTheme.colorScheme.surfaceContainerHighest
+                            else MaterialTheme.colorScheme.surfaceContainer
+                        )
+                    } else this
                 }
                 .combinedClickable(
                     onLongClick = if (onRemove != null && onEdit != null) {

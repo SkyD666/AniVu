@@ -1,4 +1,4 @@
-package com.skyd.anivu.ui.mpv
+package com.skyd.anivu.ui.mpv.controller
 
 import android.content.Context
 import android.media.AudioManager
@@ -21,10 +21,10 @@ import com.skyd.anivu.ext.detectDoubleFingerTransformGestures
 import com.skyd.anivu.ext.getScreenBrightness
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
-import com.skyd.anivu.ui.mpv.state.PlayState
-import com.skyd.anivu.ui.mpv.state.PlayStateCallback
-import com.skyd.anivu.ui.mpv.state.TransformState
-import com.skyd.anivu.ui.mpv.state.TransformStateCallback
+import com.skyd.anivu.ui.mpv.controller.state.PlayState
+import com.skyd.anivu.ui.mpv.controller.state.PlayStateCallback
+import com.skyd.anivu.ui.mpv.controller.state.TransformState
+import com.skyd.anivu.ui.mpv.controller.state.TransformStateCallback
 import kotlin.math.abs
 
 private val inStatusBarArea: PointerInputScope.(y: Float) -> Boolean = { y ->

@@ -39,6 +39,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowSize
 import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
@@ -61,6 +62,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -116,10 +118,21 @@ fun FeedScreen() {
     )
     val navController = LocalNavController.current
     val windowSizeClass = LocalWindowSizeClass.current
+    val density = LocalDensity.current
+
+    var listPaneSelectedFeedUrls by remember { mutableStateOf<List<String>?>(null) }
+
+    val onNavigatorBack: () -> Unit = {
+        navigator.navigateBack()
+        listPaneSelectedFeedUrls = navigator.currentDestination?.content
+    }
 
     BackHandler(navigator.canNavigateBack()) {
-        navigator.navigateBack()
+        onNavigatorBack()
     }
+
+    val windowWidth = with(density) { currentWindowSize().width.toDp() }
+    val feedListWidth by remember(windowWidth) { mutableStateOf(windowWidth * 0.36f) }
 
     ListDetailPaneScaffold(
         modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(
@@ -130,17 +143,21 @@ fun FeedScreen() {
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
         listPane = {
-            AnimatedPane {
+            AnimatedPane(modifier = Modifier.preferredWidth(feedListWidth)) {
                 FeedList(
+                    listPaneSelectedFeedUrls = listPaneSelectedFeedUrls,
                     onShowArticleList = { feedUrls ->
                         if (navigator.scaffoldDirective.maxHorizontalPartitions > 1) {
                             navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, feedUrls)
                         } else {
-                            navController.navigate(R.id.action_to_article_fragment, Bundle().apply {
-                                putStringArrayList(
-                                    ArticleFragment.FEED_URLS_KEY, ArrayList(feedUrls),
-                                )
-                            })
+                            navController.navigate(
+                                R.id.action_to_article_fragment,
+                                Bundle().apply {
+                                    putStringArrayList(
+                                        ArticleFragment.FEED_URLS_KEY, ArrayList(feedUrls),
+                                    )
+                                }
+                            )
                         }
                     },
                 )
@@ -149,7 +166,8 @@ fun FeedScreen() {
         detailPane = {
             AnimatedPane {
                 navigator.currentDestination?.content?.let {
-                    ArticleScreen(feedUrls = it, onBackClick = { navigator.navigateBack() })
+                    listPaneSelectedFeedUrls = it
+                    ArticleScreen(feedUrls = it, onBackClick = onNavigatorBack)
                 }
             }
         },
@@ -158,6 +176,7 @@ fun FeedScreen() {
 
 @Composable
 private fun FeedList(
+    listPaneSelectedFeedUrls: List<String>? = null,
     onShowArticleList: (List<String>) -> Unit,
     viewModel: FeedViewModel = hiltViewModel(),
 ) {
@@ -250,6 +269,7 @@ private fun FeedList(
                 FeedList(
                     result = groupListState.dataList,
                     contentPadding = innerPadding + PaddingValues(bottom = fabHeight + 16.dp),
+                    selectedFeedUrls = listPaneSelectedFeedUrls,
                     onRemoveFeed = { feed -> dispatch(FeedIntent.RemoveFeed(feed.url)) },
                     onShowArticleList = { feedUrls -> onShowArticleList(feedUrls) },
                     onEditFeed = { feed ->
@@ -556,6 +576,7 @@ private fun CreateGroupDialog(
 private fun FeedList(
     result: List<Any>,
     contentPadding: PaddingValues = PaddingValues(),
+    selectedFeedUrls: List<String>? = null,
     onShowArticleList: (List<String>) -> Unit,
     onRemoveFeed: (FeedBean) -> Unit,
     onEditFeed: (FeedBean) -> Unit,
@@ -593,7 +614,7 @@ private fun FeedList(
     val shouldHideEmptyDefault: (index: Int) -> Boolean = remember(hideEmptyDefault, result) {
         { hideEmptyDefault && result.getOrNull(it + 1) !is FeedViewBean }
     }
-    val adapter = remember(shouldHideEmptyDefault) {
+    val adapter = remember(shouldHideEmptyDefault, selectedFeedUrls) {
         val group1Proxy = Group1Proxy(
             isExpand = { feedVisible[it.groupId] ?: false },
             onExpandChange = { data, expand -> feedVisible[data.groupId] = expand },
@@ -620,6 +641,7 @@ private fun FeedList(
                 group1Proxy,
                 Feed1Proxy(
                     visible = { feedVisible[it] ?: false },
+                    selected = { selectedFeedUrls != null && it.url in selectedFeedUrls },
                     useCardLayout = { true },
                     onClick = { onShowArticleList(listOf(it.url)) },
                     isEnded = { it == result.lastIndex || result[it + 1] is GroupBean },

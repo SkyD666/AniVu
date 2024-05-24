@@ -184,7 +184,7 @@ private fun ArticleList(
     }
     AniVuLazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
-        columns = GridCells.Adaptive(300.dp),
+        columns = GridCells.Adaptive(360.dp),
         dataList = articles,
         adapter = adapter,
         contentPadding = contentPadding,

@@ -11,6 +11,7 @@ import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
+import com.skyd.anivu.ui.mpv.controller.bar.toDurationString
 import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_DOUBLE
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_FLAG
@@ -165,6 +166,8 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
 
     val subtitleTrack: List<Track>
         get() = tracks["sub"].orEmpty().toList()
+    val audioTrack: List<Track>
+        get() = tracks["audio"].orEmpty().toList()
 
     private fun getTrackDisplayName(mpvId: Int, lang: String?, title: String?): String {
         return if (!lang.isNullOrEmpty() && !title.isNullOrEmpty()) {
