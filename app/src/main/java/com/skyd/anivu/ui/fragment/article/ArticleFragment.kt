@@ -44,6 +44,7 @@ import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.BackIcon
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
@@ -69,8 +70,14 @@ class ArticleFragment : BaseComposeFragment() {
     ): View = setContentBase { ArticleScreen(feedUrls = feedUrls, viewModel = feedViewModel) }
 }
 
+private val DefaultBackClick = { }
+
 @Composable
-fun ArticleScreen(feedUrls: List<String>, viewModel: ArticleViewModel = hiltViewModel()) {
+fun ArticleScreen(
+    feedUrls: List<String>,
+    onBackClick: () -> Unit = DefaultBackClick,
+    viewModel: ArticleViewModel = hiltViewModel(),
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val navController = LocalNavController.current
@@ -86,6 +93,10 @@ fun ArticleScreen(feedUrls: List<String>, viewModel: ArticleViewModel = hiltView
             AniVuTopBar(
                 style = AniVuTopBarStyle.CenterAligned,
                 title = { Text(text = stringResource(R.string.article_screen_name)) },
+                navigationIcon = {
+                    if (onBackClick == DefaultBackClick) BackIcon()
+                    else BackIcon(onClick = onBackClick)
+                },
                 actions = {
                     AniVuIconButton(
                         onClick = {
@@ -118,7 +129,8 @@ fun ArticleScreen(feedUrls: List<String>, viewModel: ArticleViewModel = hiltView
                 }
             )
         } else {
-            val dispatch = viewModel.getDispatcher(startWith = ArticleIntent.Init(feedUrls))
+            val dispatch =
+                viewModel.getDispatcher(feedUrls, startWith = ArticleIntent.Init(feedUrls))
             val state = rememberPullRefreshState(
                 refreshing = uiState.articleListState.loading,
                 onRefresh = { dispatch(ArticleIntent.Refresh(feedUrls)) },
@@ -172,7 +184,7 @@ private fun ArticleList(
     }
     AniVuLazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
-        columns = GridCells.Adaptive(250.dp),
+        columns = GridCells.Adaptive(300.dp),
         dataList = articles,
         adapter = adapter,
         contentPadding = contentPadding,

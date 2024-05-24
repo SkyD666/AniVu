@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
@@ -34,7 +35,7 @@ class ArticleViewModel @Inject constructor(
         val initialVS = ArticleState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<ArticleIntent.Init>().take(1),
+            intentSharedFlow.filterIsInstance<ArticleIntent.Init>().distinctUntilChanged(),
             intentSharedFlow.filterNot { it is ArticleIntent.Init }
         )
             .shareWhileSubscribed()

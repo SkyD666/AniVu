@@ -48,6 +48,7 @@ class Feed1Proxy(
     private val visible: (groupId: String) -> Boolean = { true },
     private val isEnded: (index: Int) -> Boolean = { false },
     private val useCardLayout: () -> Boolean = { false },
+    private val onClick: ((FeedBean) -> Unit)? = null,
     private val onRemove: ((FeedBean) -> Unit)? = null,
     private val onEdit: ((FeedBean) -> Unit)? = null,
 ) : LazyGridAdapter.Proxy<FeedViewBean>() {
@@ -59,6 +60,7 @@ class Feed1Proxy(
             visible = visible,
             isEnded = isEnded,
             useCardLayout = useCardLayout,
+            onClick = onClick,
             onRemove = onRemove,
             onEdit = onEdit,
         )
@@ -71,6 +73,7 @@ fun Feed1Item(
     data: FeedViewBean,
     visible: (groupId: String) -> Boolean,
     useCardLayout: () -> Boolean,
+    onClick: ((FeedBean) -> Unit)? = null,
     isEnded: (index: Int) -> Boolean,
     onRemove: ((FeedBean) -> Unit)? = null,
     onEdit: ((FeedBean) -> Unit)? = null,
@@ -102,9 +105,14 @@ fun Feed1Item(
                         { expandMenu = true }
                     } else null,
                     onClick = {
-                        navController.navigate(R.id.action_to_article_fragment, Bundle().apply {
-                            putStringArrayList(ArticleFragment.FEED_URLS_KEY, arrayListOf(feed.url))
-                        })
+                        if (onClick == null) {
+                            navController.navigate(R.id.action_to_article_fragment, Bundle().apply {
+                                putStringArrayList(
+                                    ArticleFragment.FEED_URLS_KEY,
+                                    arrayListOf(feed.url)
+                                )
+                            })
+                        } else onClick(feed)
                     },
                 )
                 .padding(horizontal = if (useCardLayout()) 20.dp else 16.dp, vertical = 10.dp)

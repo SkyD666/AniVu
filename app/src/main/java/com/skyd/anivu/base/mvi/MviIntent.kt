@@ -19,8 +19,20 @@ interface MviIntent
 @Composable
 fun <I : MviIntent, S : MviViewState, E : MviSingleEvent>
         AbstractMviViewModel<I, S, E>.getDispatcher(startWith: I): (I) -> Unit {
-    val intentChannel = remember { Channel<I>(Channel.UNLIMITED) }
-    LaunchedEffect(Unit) {
+    return getDispatcher(Unit, startWith = startWith)
+}
+
+@Composable
+fun <I : MviIntent, S : MviViewState, E : MviSingleEvent>
+        AbstractMviViewModel<I, S, E>.getDispatcher(key1: Any?, startWith: I): (I) -> Unit {
+    return getDispatcher(*arrayOf(key1), startWith = startWith)
+}
+
+@Composable
+fun <I : MviIntent, S : MviViewState, E : MviSingleEvent>
+        AbstractMviViewModel<I, S, E>.getDispatcher(vararg keys: Any?, startWith: I): (I) -> Unit {
+    val intentChannel = remember(*keys) { Channel<I>(Channel.UNLIMITED) }
+    LaunchedEffect(*keys, intentChannel) {
         withContext(Dispatchers.Main.immediate) {
             intentChannel
                 .consumeAsFlow()
@@ -29,7 +41,7 @@ fun <I : MviIntent, S : MviViewState, E : MviSingleEvent>
                 .collect()
         }
     }
-    return remember {
+    return remember(*keys, intentChannel) {
         { intent: I ->
             intentChannel.trySend(intent).getOrThrow()
         }

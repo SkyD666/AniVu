@@ -21,7 +21,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 16
-        versionName = "1.1-beta31"
+        versionName = "1.1-beta32"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -134,6 +134,7 @@ tasks.withType(KotlinCompile::class.java).configureEach {
     kotlinOptions {
         freeCompilerArgs += listOf(
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-opt-in=androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi",
             "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
             "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
             "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
@@ -158,10 +159,13 @@ dependencies {
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
-    implementation("androidx.compose.ui:ui:1.6.7")
-    implementation("androidx.compose.material:material:1.6.7")
+    implementation("androidx.compose.ui:ui:1.7.0-beta01")
+    implementation("androidx.compose.material:material:1.7.0-beta01")
     implementation("androidx.compose.material3:material3:1.3.0-alpha05")
     implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
+    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta01")
+    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta01")
+    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta01")
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
     implementation("com.materialkolor:material-kolor:1.4.4")
     implementation("androidx.room:room-runtime:2.6.1")

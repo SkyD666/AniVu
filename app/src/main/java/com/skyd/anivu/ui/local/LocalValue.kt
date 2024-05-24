@@ -47,5 +47,6 @@ val LocalHideEmptyDefault = compositionLocalOf { HideEmptyDefaultPreference.defa
 // Player
 val LocalPlayerDoubleTap = compositionLocalOf { PlayerDoubleTapPreference.default }
 val LocalPlayerShow85sButton = compositionLocalOf { PlayerShow85sButtonPreference.default }
-val LocalPlayerShowScreenshotButton = compositionLocalOf { PlayerShowScreenshotButtonPreference.default }
+val LocalPlayerShowScreenshotButton =
+    compositionLocalOf { PlayerShowScreenshotButtonPreference.default }
 val LocalHardwareDecode = compositionLocalOf { HardwareDecodePreference.default }
