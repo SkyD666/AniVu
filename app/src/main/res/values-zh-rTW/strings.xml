@@ -212,6 +212,7 @@
     <string name="player_add_external_subtitle">Add subtitle file</string>
     <string name="player_config_advanced_screen_hardware_decode">Hardware decoding</string>
     <string name="player_config_advanced_screen_hardware_decode_description">Try hardware decoding first; fallback to software if it fails</string>
+    <string name="player_audio_track">Audio track</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分鐘</item>
     </plurals>
