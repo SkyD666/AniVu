@@ -57,7 +57,6 @@
 ## 🚧 Todo
 
 1. Automatically **download new videos**
-2. **Customize player settings**, such as default screen scale, surface type used by the player, and more
 3. **Float** video playback **window**
 4. **Automatically** play the **next video**
 
@@ -86,7 +85,7 @@ If you are interested, please help us **translate**, thank you.
 - **Room**
 - **Paging 3**
 - **Hilt**
-- Media3 **ExoPlayer**
+- **MPV**
 - **WorkManager**
 - **DataStore**
 - Splash Screen

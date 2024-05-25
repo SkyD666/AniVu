@@ -36,6 +36,9 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
+    @Volatile
+    private var initialized = false
+
     fun initialize(
         configDir: String,
         cacheDir: String,
@@ -43,6 +46,12 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         logLvl: String = "v",
         vo: String = "gpu",
     ) {
+        if (initialized) return
+        synchronized(MPVView::class) {
+            if (initialized) return
+            initialized = true
+        }
+
         MPVLib.create(this.context, logLvl)
         MPVLib.setOptionString("config", "yes")
         MPVLib.setOptionString("config-dir", configDir)
@@ -131,6 +140,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             Property("video-pan-x", MPV_FORMAT_DOUBLE),
             Property("video-pan-y", MPV_FORMAT_DOUBLE),
             Property("speed", MPV_FORMAT_DOUBLE),
+            Property("demuxer-cache-duration", MPV_FORMAT_DOUBLE),
             Property("playlist-pos", MPV_FORMAT_INT64),
             Property("playlist-count", MPV_FORMAT_INT64),
             Property("video-format"),
@@ -314,6 +324,9 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
 
     val videoAspect: Double?
         get() = MPVLib.getPropertyDouble("video-params/aspect")
+
+    val demuxerCacheDuration: Double
+        get() = MPVLib.getPropertyDouble("demuxer-cache-duration") ?: 0.0
 
     class TrackDelegate(private val name: String) {
         operator fun getValue(thisRef: Any?, property: KProperty<*>): Int {

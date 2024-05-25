@@ -7,6 +7,7 @@ data class PlayState(
     val isSeeking: Boolean,
     val currentPosition: Int,
     val duration: Int,
+    val bufferDuration: Int,
     val speed: Float,
     val title: String,
 ) {
@@ -16,6 +17,7 @@ data class PlayState(
             isSeeking = false,
             currentPosition = 0,
             duration = 0,
+            bufferDuration = 0,
             speed = 1f,
             title = "",
         )

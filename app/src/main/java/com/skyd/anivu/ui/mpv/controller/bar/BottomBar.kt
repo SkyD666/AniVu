@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ClosedCaption
 import androidx.compose.material.icons.rounded.MusicNote
@@ -44,10 +43,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.materialkolor.ktx.toColor
-import com.materialkolor.ktx.toHct
 import com.skyd.anivu.R
-import com.skyd.anivu.ext.alwaysLight
 import com.skyd.anivu.ui.mpv.controller.ControllerBarGray
 import com.skyd.anivu.ui.mpv.controller.state.PlayState
 import com.skyd.anivu.ui.mpv.controller.state.PlayStateCallback
@@ -68,7 +64,7 @@ fun BottomBar(
     bottomBarCallback: BottomBarCallback,
     onRestartAutoHideControllerRunnable: () -> Unit,
 ) {
-    val playPositionStateValue = playState()
+    val playStateValue = playState()
 
     Column(
         modifier = modifier
@@ -92,16 +88,16 @@ fun BottomBar(
         ) {
             val sliderInteractionSource = remember { MutableInteractionSource() }
             var sliderValue by rememberSaveable {
-                mutableFloatStateOf(playPositionStateValue.currentPosition.toFloat())
+                mutableFloatStateOf(playStateValue.currentPosition.toFloat())
             }
             var valueIsChanging by rememberSaveable { mutableStateOf(false) }
-            if (!valueIsChanging && !playPositionStateValue.isSeeking &&
-                sliderValue != playPositionStateValue.currentPosition.toFloat()
+            if (!valueIsChanging && !playStateValue.isSeeking &&
+                sliderValue != playStateValue.currentPosition.toFloat()
             ) {
-                sliderValue = playPositionStateValue.currentPosition.toFloat()
+                sliderValue = playStateValue.currentPosition.toFloat()
             }
             Text(
-                text = playPositionStateValue.currentPosition.toDurationString(),
+                text = playStateValue.currentPosition.toDurationString(),
                 style = MaterialTheme.typography.labelLarge,
                 color = Color.White,
             )
@@ -120,40 +116,26 @@ fun BottomBar(
                     playStateCallback.onSeekTo(sliderValue.toInt())
                     valueIsChanging = false
                 },
-                valueRange = 0f..playPositionStateValue.duration.toFloat(),
+                colors = SliderDefaults.colors(),
                 interactionSource = sliderInteractionSource,
                 thumb = {
                     Box(
                         modifier = Modifier.fillMaxHeight(),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Spacer(
-                            modifier = Modifier
-                                .padding(horizontal = 3.dp)
-                                .clip(CircleShape)
-                                .size(14.dp)
-                                .background(
-                                    MaterialTheme.colorScheme.primary
-                                        .alwaysLight(true)
-                                        .toHct()
-                                        .withTone(90.0)
-                                        .toColor()
-                                )
-                        )
+                        Thumb(interactionSource = sliderInteractionSource)
                     }
                 },
-                track = {
-                    Spacer(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(6.dp))
-                            .fillMaxWidth()
-                            .height(3.dp)
-                            .background(SliderDefaults.colors().activeTrackColor)
+                track = { sliderState ->
+                    Track(
+                        sliderState = sliderState,
+                        bufferDurationValue = playStateValue.bufferDuration.toFloat()
                     )
                 },
+                valueRange = 0f..playStateValue.duration.toFloat(),
             )
             Text(
-                text = playPositionStateValue.duration.toDurationString(),
+                text = playStateValue.duration.toDurationString(),
                 style = MaterialTheme.typography.labelLarge,
                 color = Color.White,
             )
@@ -170,8 +152,8 @@ fun BottomBar(
                     .size(50.dp)
                     .clickable(onClick = playStateCallback.onPlayStateChanged)
                     .padding(7.dp),
-                imageVector = if (playPositionStateValue.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                contentDescription = stringResource(if (playPositionStateValue.isPlaying) R.string.pause else R.string.play),
+                imageVector = if (playStateValue.isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                contentDescription = stringResource(if (playStateValue.isPlaying) R.string.pause else R.string.play),
             )
 
             Spacer(modifier = Modifier.weight(1f))

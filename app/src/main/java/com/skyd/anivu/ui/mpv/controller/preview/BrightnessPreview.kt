@@ -55,7 +55,6 @@ internal fun BoxScope.BrightnessPreview(
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .width(100.dp),
-            drawStopIndicator = null,
         )
         Text(
             modifier = Modifier.animateContentSize(),

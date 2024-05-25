@@ -56,6 +56,7 @@ private fun MPVView.solveCommand(
     onVideoOffset: (Offset) -> Unit,
     onSpeedChanged: (Float) -> Unit,
     onSaveScreenshot: (File) -> Unit,
+    onCacheBufferStateChanged: (Float) -> Unit,
 ) {
     when (command) {
         is PlayerCommand.SetUri -> uri().resolveUri(context)?.let { loadFile(it) }
@@ -106,6 +107,8 @@ private fun MPVView.solveCommand(
             addSubtitle(command.filePath)
             onSubtitleTrack(subtitleTrack)
         }
+
+        PlayerCommand.GetBuffer -> onCacheBufferStateChanged(demuxerCacheDuration.toFloat())
     }
 }
 
@@ -185,6 +188,7 @@ fun PlayerView(
                     "video-pan-y" -> commandQueue.trySend(PlayerCommand.GetVideoOffsetY)
                     "speed" -> commandQueue.trySend(PlayerCommand.GetSpeed)
                     "track-list" -> commandQueue.trySend(PlayerCommand.LoadAllTracks)
+                    "demuxer-cache-duration" -> commandQueue.trySend(PlayerCommand.GetBuffer)
                 }
             }
 
@@ -286,6 +290,9 @@ fun PlayerView(
                                 },
                                 onSpeedChanged = { playState = playState.copy(speed = it) },
                                 onSaveScreenshot = onSaveScreenshot,
+                                onCacheBufferStateChanged = {
+                                    playState = playState.copy(bufferDuration = it.toInt())
+                                }
                             )
                         }
                         .collect()

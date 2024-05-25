@@ -44,25 +44,25 @@ jobs:
         bash ./gradlew assembleGitHubRelease
     # Upload apk (arm64-v8a)
     - name: Upload Pre-Release Apk (arm64-v8a)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Pre-Release Apk (arm64-v8a)
         path: app/build/outputs/apk/GitHub/release/*arm64-v8a*.apk
     # Upload apk (armeabi-v7a)
     - name: Upload Pre-Release Apk (armeabi-v7a)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Pre-Release Apk (armeabi-v7a)
         path: app/build/outputs/apk/GitHub/release/*armeabi-v7a*.apk
     # Upload apk (x86_64)
     - name: Upload Pre-Release Apk (x86_64)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Pre-Release Apk (x86_64)
         path: app/build/outputs/apk/GitHub/release/*x86_64*.apk
     # Upload apk (x86)
     - name: Upload Pre-Release Apk (x86)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Pre-Release Apk (x86)
         path: |
@@ -70,13 +70,13 @@ jobs:
           !app/build/outputs/apk/GitHub/release/*x86_64*.apk
     # Upload apk (universal)
     - name: Upload Pre-Release Apk (universal)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Pre-Release Apk (universal)
         path: app/build/outputs/apk/GitHub/release/*universal*.apk
     # Upload mapping
     - name: Upload Pre-Release Mapping
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Pre-Release Mapping
         path: app/build/outputs/mapping/GitHubRelease/mapping.txt

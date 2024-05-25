@@ -53,7 +53,6 @@
 ## 🚧待實現
 
 1. **自動下載訂閱中的新影片**
-2. **自定義播放器配置**，例如：預設的畫面比例、播放器使用的 Surface type 等等
 3. **懸浮窗播放影片**
 4. **自動播放**下一個影片
 
@@ -82,7 +81,7 @@
 - **Room**
 - **Paging 3**
 - **Hilt**
-- Media3 **ExoPlayer**
+- **MPV**
 - **WorkManager**
 - **DataStore**
 - Splash Screen

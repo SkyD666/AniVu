@@ -53,7 +53,6 @@
 ## 🚧待实现
 
 1. **自动下载订阅中的新视频**
-2. **自定义播放器配置**，例如：默认的画面比例、播放器使用的 Surface type 等等
 3. **悬浮窗播放视频**
 4. **自动播放**下一个视频
 
@@ -82,7 +81,7 @@
 - **Room**
 - **Paging 3**
 - **Hilt**
-- Media3 **ExoPlayer**
+- **MPV**
 - **WorkManager**
 - **DataStore**
 - Splash Screen
