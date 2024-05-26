@@ -32,6 +32,7 @@ fun TextFieldDialog(
     errorText: String = "",
     dismissText: String = stringResource(R.string.cancel),
     confirmText: String = stringResource(R.string.ok),
+    enableConfirm: (String) -> Boolean = { it.isNotBlank() },
     onValueChange: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {},
     onConfirm: (String) -> Unit = {},
@@ -66,7 +67,7 @@ fun TextFieldDialog(
         },
         confirmButton = {
             TextButton(
-                enabled = value.isNotBlank(),
+                enabled = enableConfirm(value),
                 onClick = {
                     focusManager.clearFocus()
                     onConfirm(value)
@@ -74,7 +75,7 @@ fun TextFieldDialog(
             ) {
                 Text(
                     text = confirmText,
-                    color = if (value.isNotBlank()) {
+                    color = if (enableConfirm(value)) {
                         Color.Unspecified
                     } else {
                         MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)

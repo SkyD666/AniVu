@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.doOnAttach
+import androidx.core.view.doOnDetach
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -120,6 +122,7 @@ fun PlayerView(
     configDir: String = Const.MPV_CONFIG_DIR.path,
     cacheDir: String = Const.MPV_CACHE_DIR.path,
     fontDir: String = Const.MPV_FONT_DIR.path,
+    onPlayerChanged: (MPVView?) -> Unit,
 ) {
     rememberSystemUiController().apply {
         isSystemBarsVisible = false
@@ -297,6 +300,8 @@ fun PlayerView(
                         }
                         .collect()
                 }
+                doOnAttach { onPlayerChanged(this) }
+                doOnDetach { onPlayerChanged(null) }
             }
         },
     )

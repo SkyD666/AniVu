@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
+import android.view.KeyCharacterMap
+import android.view.KeyEvent
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.WindowManager
@@ -47,7 +49,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         vo: String = "gpu",
     ) {
         if (initialized) return
-        synchronized(MPVView::class) {
+        synchronized(this) {
             if (initialized) return
             initialized = true
         }
@@ -116,6 +118,45 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         holder.removeCallback(this)
 
         MPVLib.destroy()
+    }
+
+    fun onKey(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_MULTIPLE)
+            return false
+        if (KeyEvent.isModifierKey(event.keyCode))
+            return false
+
+        var mapped = KeyMapping.map.get(event.keyCode)
+        if (mapped == null) {
+            // Fallback to produced glyph
+            if (!event.isPrintingKey) {
+                if (event.repeatCount == 0) {
+                    Log.d(TAG, "Unmapped non-printable key ${event.keyCode}")
+                }
+                return false
+            }
+
+            val ch = event.unicodeChar
+            if (ch.and(KeyCharacterMap.COMBINING_ACCENT) != 0) {
+                return false // dead key
+            }
+            mapped = ch.toChar().toString()
+        }
+
+        if (event.repeatCount > 0)
+            return true // eat event but ignore it, mpv has its own key repeat
+
+        val mod: MutableList<String> = mutableListOf()
+        event.isShiftPressed && mod.add("shift")
+        event.isCtrlPressed && mod.add("ctrl")
+        event.isAltPressed && mod.add("alt")
+        event.isMetaPressed && mod.add("meta")
+
+        val action = if (event.action == KeyEvent.ACTION_DOWN) "keydown" else "keyup"
+        mod.add(mapped)
+        MPVLib.command(arrayOf(action, mod.joinToString("+")))
+
+        return true
     }
 
     private fun observeProperties() {

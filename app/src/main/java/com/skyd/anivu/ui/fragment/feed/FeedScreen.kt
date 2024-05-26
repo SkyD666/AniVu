@@ -132,7 +132,7 @@ fun FeedScreen() {
     }
 
     val windowWidth = with(density) { currentWindowSize().width.toDp() }
-    val feedListWidth by remember(windowWidth) { mutableStateOf(windowWidth * 0.31f) }
+    val feedListWidth by remember(windowWidth) { mutableStateOf(windowWidth * 0.335f) }
 
     ListDetailPaneScaffold(
         modifier = Modifier.windowInsetsPadding(WindowInsets.safeDrawing.only(

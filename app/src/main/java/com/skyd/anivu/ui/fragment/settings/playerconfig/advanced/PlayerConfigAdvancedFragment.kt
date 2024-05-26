@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Keyboard
 import androidx.compose.material.icons.outlined.PlayCircle
 import androidx.compose.material.icons.rounded.DeveloperBoard
 import androidx.compose.material3.Scaffold
@@ -27,6 +28,7 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.MpvConfigPreference
+import com.skyd.anivu.model.preference.player.MpvInputConfigPreference
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
@@ -52,6 +54,8 @@ fun PlayerConfigAdvancedScreen() {
     val scope = rememberCoroutineScope()
     var mpvConfEditDialogValue by rememberSaveable { mutableStateOf("") }
     var openMpvConfEditDialog by rememberSaveable { mutableStateOf(false) }
+    var mpvInputConfEditDialogValue by rememberSaveable { mutableStateOf("") }
+    var openMpvInputConfEditDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -94,6 +98,17 @@ fun PlayerConfigAdvancedScreen() {
                     }
                 )
             }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(Icons.Outlined.Keyboard),
+                    text = stringResource(id = R.string.player_config_advanced_screen_mpv_input_config),
+                    descriptionText = null,
+                    onClick = {
+                        mpvInputConfEditDialogValue = MpvInputConfigPreference.getValue()
+                        openMpvInputConfEditDialog = true
+                    }
+                )
+            }
         }
 
         TextFieldDialog(
@@ -107,7 +122,23 @@ fun PlayerConfigAdvancedScreen() {
                 )
                 openMpvConfEditDialog = false
             },
+            enableConfirm = { true },
             onDismissRequest = { openMpvConfEditDialog = false },
+        )
+
+        TextFieldDialog(
+            visible = openMpvInputConfEditDialog,
+            value = mpvInputConfEditDialogValue,
+            onValueChange = { mpvInputConfEditDialogValue = it },
+            onConfirm = {
+                MpvInputConfigPreference.put(
+                    scope = scope,
+                    value = it,
+                )
+                openMpvInputConfEditDialog = false
+            },
+            enableConfirm = { true },
+            onDismissRequest = { openMpvInputConfEditDialog = false },
         )
     }
 }

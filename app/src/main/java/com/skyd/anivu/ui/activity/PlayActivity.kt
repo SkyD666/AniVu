@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.DisposableEffect
@@ -16,6 +17,7 @@ import androidx.core.util.Consumer
 import com.skyd.anivu.base.BaseComposeActivity
 import com.skyd.anivu.ext.savePictureToMediaStore
 import com.skyd.anivu.ui.component.showToast
+import com.skyd.anivu.ui.mpv.MPVView
 import com.skyd.anivu.ui.mpv.PlayerView
 import com.skyd.anivu.ui.mpv.copyAssetsForMpv
 import java.io.File
@@ -26,7 +28,7 @@ class PlayActivity : BaseComposeActivity() {
         const val VIDEO_URI_KEY = "videoUri"
     }
 
-
+    private var player: MPVView? = null
     private lateinit var picture: File
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -63,7 +65,8 @@ class PlayActivity : BaseComposeActivity() {
                     onSaveScreenshot = {
                         picture = it
                         saveScreenshot()
-                    }
+                    },
+                    onPlayerChanged = { player = it }
                 )
             }
         }
@@ -81,5 +84,12 @@ class PlayActivity : BaseComposeActivity() {
         } else {
             requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
+    }
+
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (player?.onKey(event) == true) {
+            return true
+        }
+        return super.dispatchKeyEvent(event)
     }
 }
