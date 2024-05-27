@@ -48,6 +48,7 @@ import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaf
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
@@ -62,6 +63,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -72,6 +74,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.getDispatcher
+import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.showSnackbar
@@ -81,6 +85,7 @@ import com.skyd.anivu.model.bean.FeedBean.Companion.isDefaultGroup
 import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.model.bean.GroupBean.Companion.isDefaultGroup
+import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTextField
@@ -584,9 +589,10 @@ private fun FeedList(
     onMoveToGroup: (from: GroupBean, to: GroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
+    val context = LocalContext.current
     val hideEmptyDefault = LocalHideEmptyDefault.current
     val feedGroupExpand = LocalFeedGroupExpand.current
-    val groups = rememberSaveable(result) { result.filterIsInstance<GroupBean>() }
+    val groups by remember { derivedStateOf { result.filterIsInstance<GroupBean>() } }
     val feedVisible = rememberSaveable(saver = snapshotStateMapSaver()) {
         mutableStateMapOf(
             GroupBean.DEFAULT_GROUP_ID to feedGroupExpand,
@@ -604,17 +610,15 @@ private fun FeedList(
                 feedVisible[t] = u
             }
         }
+        val defaultExpand = context.dataStore.getOrDefault(FeedGroupExpandPreference)
         groups.forEach {
-            feedVisible[it.groupId] = feedVisible[it.groupId] ?: false
+            feedVisible[it.groupId] = feedVisible[it.groupId] ?: defaultExpand
         }
     }
     var openSelectGroupDialog by rememberSaveable { mutableStateOf<GroupBean?>(null) }
     var selectGroupDialogCurrentGroup by rememberSaveable { mutableStateOf<GroupBean?>(null) }
 
-    val shouldHideEmptyDefault: (index: Int) -> Boolean = remember(hideEmptyDefault, result) {
-        { hideEmptyDefault && result.getOrNull(it + 1) !is FeedViewBean }
-    }
-    val adapter = remember(shouldHideEmptyDefault, selectedFeedUrls) {
+    val adapter = remember(result, hideEmptyDefault, selectedFeedUrls) {
         val group1Proxy = Group1Proxy(
             isExpand = { feedVisible[it.groupId] ?: false },
             onExpandChange = { data, expand -> feedVisible[data.groupId] = expand },
@@ -636,7 +640,7 @@ private fun FeedList(
             mutableListOf(
                 DefaultGroup1Proxy(
                     group1Proxy = group1Proxy,
-                    hide = shouldHideEmptyDefault,
+                    hide = { hideEmptyDefault && result.getOrNull(it + 1) !is FeedViewBean },
                 ),
                 group1Proxy,
                 Feed1Proxy(

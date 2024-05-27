@@ -21,7 +21,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 16
-        versionName = "1.1-beta35"
+        versionName = "1.1-beta36"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -201,6 +201,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("io.coil-kt:coil-gif:2.6.0")
     implementation("com.rometools:rome:2.1.0")
+    implementation("be.ceau:opml-parser:3.1.0")
     implementation("net.dankito.readability4j:readability4j:1.0.8")
 
     implementation("org.libtorrent4j:libtorrent4j-android-arm64:2.1.0-31")

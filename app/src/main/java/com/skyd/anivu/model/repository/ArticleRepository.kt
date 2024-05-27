@@ -38,10 +38,12 @@ class ArticleRepository @Inject constructor(
                             rssHelper.queryRssXml(
                                 feed = feedDao.getFeed(feedUrl),
                                 latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link
-                            )
+                            )?.also { feedWithArticle ->
+                                feedDao.updateFeed(feedWithArticle.feed)
+                            }?.articles
                         }
                         val iconAsync = async { rssHelper.getRssIcon(feedUrl) }
-                        val articleBeanList = articleBeanListAsync.await()
+                        val articleBeanList = articleBeanListAsync.await() ?: return@async
 
                         if (articleBeanList.isEmpty()) return@async
 

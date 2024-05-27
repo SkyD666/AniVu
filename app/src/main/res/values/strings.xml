@@ -69,6 +69,7 @@
     <string name="read_fragment_open_browser">Open in browser</string>
     <string name="play_activity_label">Play</string>
     <string name="failed_msg">Failed: %s</string>
+    <string name="success_time_msg">Success: takes %.2fs</string>
     <string name="open_with">Open with</string>
     <string name="settings_screen_name">Settings</string>
     <string name="data_fragment_name">Data</string>
@@ -221,6 +222,25 @@
     <string name="player_config_advanced_screen_hardware_decode">Hardware decoding</string>
     <string name="player_config_advanced_screen_hardware_decode_description">Try hardware decoding first; fallback to software if it fails</string>
     <string name="player_audio_track">Audio track</string>
+    <string name="import_export_screen_name"><![CDATA[Import & Export]]></string>
+    <string name="import_opml_screen_name">Import OPML</string>
+    <string name="export_opml_screen_name">Export OPML</string>
+    <string name="export_opml_screen_export">Export</string>
+    <string name="export_opml_screen_dir_not_selected">Please select the export folder</string>
+    <string name="export_opml_screen_select_dir">Select export folder</string>
+    <string name="import_opml_screen_import">Import</string>
+    <string name="import_opml_screen_select_file">Select OPML file</string>
+    <string name="import_opml_screen_on_conflict">On conflict</string>
+    <string name="import_opml_screen_desc">\"Conflict\" means that the Feed subscription link that will be imported already exists.\n\nIf the Group name already exists, the Feeds of these group will be merged.</string>
+    <string name="import_opml_conflict_strategy_replace">Replace</string>
+    <string name="import_opml_conflict_strategy_skip">Skip</string>
+    <string name="import_opml_screen_opml_not_selected">Please select an OPML file</string>
+    <string name="data_fragment_sync_category">Sync</string>
+    <string name="import_export_screen_description">Import and Export RSS data via OPML files</string>
+    <plurals name="import_opml_result">
+        <item quantity="one">Imported %d item, takes %.2f seconds</item>
+        <item quantity="other">Imported %d items, takes %.2f seconds</item>
+    </plurals>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="one">Every %d minute</item>
         <item quantity="other">Every %d minutes</item>

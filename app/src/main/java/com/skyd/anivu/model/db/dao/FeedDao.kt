@@ -8,6 +8,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.Transaction
+import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.ArticleBean
@@ -36,8 +37,16 @@ interface FeedDao {
     suspend fun setFeed(feedBean: FeedBean)
 
     @Transaction
+    @Update
+    suspend fun updateFeed(feedBean: FeedBean)
+
+    @Transaction
     suspend fun setFeedWithArticle(feedWithArticleBean: FeedWithArticleBean) {
-        setFeed(feedWithArticleBean.feed)
+        if (containsByUrl(feedWithArticleBean.feed.url) == 0) {
+            setFeed(feedWithArticleBean.feed)
+        } else {
+            updateFeed(feedWithArticleBean.feed)
+        }
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(appContext, FeedDaoEntryPoint::class.java)
         val feedUrl = feedWithArticleBean.feed.url
@@ -135,4 +144,8 @@ interface FeedDao {
     @Transaction
     @Query("SELECT ${FeedBean.URL_COLUMN} FROM $FEED_TABLE_NAME")
     fun getAllFeedUrl(): List<String>
+
+    @Transaction
+    @Query("SELECT COUNT(*) FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} LIKE :url")
+    fun containsByUrl(url: String): Int
 }

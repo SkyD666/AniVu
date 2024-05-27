@@ -58,4 +58,16 @@ interface GroupDao {
     @Transaction
     @Query("SELECT DISTINCT ${GroupBean.GROUP_ID_COLUMN} FROM `$GROUP_TABLE_NAME`")
     fun getGroupIds(): Flow<List<String>>
+
+    @Transaction
+    @Query("SELECT COUNT(*) FROM `$GROUP_TABLE_NAME` WHERE ${GroupBean.NAME_COLUMN} LIKE :name")
+    fun containsByName(name: String): Int
+
+    @Transaction
+    @Query(
+        "SELECT ${GroupBean.GROUP_ID_COLUMN} FROM `$GROUP_TABLE_NAME` " +
+                "WHERE ${GroupBean.NAME_COLUMN} LIKE :name " +
+                "LIMIT 1"
+    )
+    fun queryGroupIdByName(name: String): String
 }

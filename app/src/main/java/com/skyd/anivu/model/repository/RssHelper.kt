@@ -51,22 +51,34 @@ class RssHelper @Inject constructor(
     suspend fun queryRssXml(
         feed: FeedBean,
         latestLink: String?,        // 日期最新的文章链接，更新时不会take比这个文章更旧的文章
-    ): List<ArticleWithEnclosureBean> =
+    ): FeedWithArticleBean? = withContext(Dispatchers.IO) {
         runCatching {
+            val iconAsync = async { getRssIcon(feed.url) }
             inputStream(okHttpClient, feed.url).use { inputStream ->
                 SyndFeedInput().apply { isPreserveWireFeed = true }
                     .build(XmlReader(inputStream))
-                    .entries
-                    .asSequence()
-                    .takeWhile { latestLink == null || latestLink != it.link }
-                    .map { article(feed, it) }
-                    .toList()
+                    .let { syndFeed ->
+                        FeedWithArticleBean(
+                            feed = feed.copy(
+                                title = syndFeed.title,
+                                description = syndFeed.description,
+                                link = syndFeed.link,
+                                icon = syndFeed.icon?.link ?: iconAsync.await(),
+                            ),
+                            articles = syndFeed.entries
+                                .asSequence()
+                                .takeWhile { latestLink == null || latestLink != it.link }
+                                .map { article(feed, it) }
+                                .toList(),
+                        )
+                    }
             }
         }.onFailure { e ->
             e.printStackTrace()
             Log.e("RLog", "queryRssXml[${feed.title}]: ${e.message}")
             throw e
-        }.getOrDefault(emptyList())
+        }.getOrNull()
+    }
 
     private fun article(
         feed: FeedBean,

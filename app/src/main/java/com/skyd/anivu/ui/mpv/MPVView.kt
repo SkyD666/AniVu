@@ -121,10 +121,9 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     }
 
     fun onKey(event: KeyEvent): Boolean {
-        if (event.action == KeyEvent.ACTION_MULTIPLE)
+        if (KeyEvent.isModifierKey(event.keyCode)) {
             return false
-        if (KeyEvent.isModifierKey(event.keyCode))
-            return false
+        }
 
         var mapped = KeyMapping.map.get(event.keyCode)
         if (mapped == null) {
@@ -143,17 +142,19 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             mapped = ch.toChar().toString()
         }
 
-        if (event.repeatCount > 0)
-            return true // eat event but ignore it, mpv has its own key repeat
+        if (event.repeatCount > 0) {
+            return true // consume event but ignore it, mpv has its own key repeat
+        }
 
-        val mod: MutableList<String> = mutableListOf()
-        event.isShiftPressed && mod.add("shift")
-        event.isCtrlPressed && mod.add("ctrl")
-        event.isAltPressed && mod.add("alt")
-        event.isMetaPressed && mod.add("meta")
+        val mod = mutableListOf<String>().apply {
+            event.isShiftPressed && add("shift")
+            event.isCtrlPressed && add("ctrl")
+            event.isAltPressed && add("alt")
+            event.isMetaPressed && add("meta")
+            add(mapped)
+        }
 
         val action = if (event.action == KeyEvent.ACTION_DOWN) "keydown" else "keyup"
-        mod.add(mapped)
         MPVLib.command(arrayOf(action, mod.joinToString("+")))
 
         return true

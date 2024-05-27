@@ -178,4 +178,28 @@
     <action
         android:id="@+id/action_to_player_config_advanced_fragment"
         app:destination="@id/player_config_advanced_fragment" />
+
+    <fragment
+        android:id="@+id/import_export_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.data.importexport.ImportExportFragment"
+        android:label="@string/import_export_screen_name" />
+    <action
+        android:id="@+id/action_to_import_export_fragment"
+        app:destination="@id/import_export_fragment" />
+
+    <fragment
+        android:id="@+id/export_opml_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.data.importexport.exportopml.ExportOpmlFragment"
+        android:label="@string/export_opml_screen_name" />
+    <action
+        android:id="@+id/action_to_export_opml_fragment"
+        app:destination="@id/export_opml_fragment" />
+
+    <fragment
+        android:id="@+id/import_opml_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.data.importexport.importopml.ImportOpmlFragment"
+        android:label="@string/import_opml_screen_name" />
+    <action
+        android:id="@+id/action_to_import_opml_fragment"
+        app:destination="@id/import_opml_fragment" />
 </navigation>
