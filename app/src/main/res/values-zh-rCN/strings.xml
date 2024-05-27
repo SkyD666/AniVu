@@ -65,6 +65,7 @@
     <string name="read_fragment_open_browser">在浏览器中打开</string>
     <string name="play_activity_label">播放</string>
     <string name="failed_msg">操作失败：%s</string>
+    <string name="success_time_msg">操作成功：耗时 %.2f 秒</string>
     <string name="open_with">打开方式</string>
     <string name="settings_screen_name">设置</string>
     <string name="data_fragment_name">数据</string>
@@ -214,6 +215,24 @@
     <string name="player_config_advanced_screen_hardware_decode">硬件解码</string>
     <string name="player_config_advanced_screen_hardware_decode_description">优先使用硬件解码，失败时改用软件解码。</string>
     <string name="player_audio_track">音轨</string>
+    <string name="import_export_screen_name"><![CDATA[导入与导出]]></string>
+    <string name="import_opml_screen_name">导入 OPML</string>
+    <string name="export_opml_screen_name">导出 OPML</string>
+    <string name="export_opml_screen_export">导出</string>
+    <string name="export_opml_screen_dir_not_selected">请选择导出目录</string>
+    <string name="export_opml_screen_select_dir">选择导出目录</string>
+    <string name="import_opml_screen_import">导入</string>
+    <string name="import_opml_screen_select_file">选择 OPML 文件</string>
+    <string name="import_opml_screen_on_conflict">冲突时</string>
+    <string name="import_opml_screen_desc">“冲突”意味着将导入的 RSS 订阅链接已存在。\n\n如果某个组名已经存在，则该组的 RSS 将被合并。</string>
+    <string name="import_opml_conflict_strategy_replace">覆盖</string>
+    <string name="import_opml_conflict_strategy_skip">跳过</string>
+    <string name="import_opml_screen_opml_not_selected">请选择一个 OPML 文件</string>
+    <string name="data_fragment_sync_category">同步</string>
+    <string name="import_export_screen_description">通过 OPML 文件来导入与导出订阅数据</string>
+    <plurals name="import_opml_result">
+        <item quantity="other">导入了 %d 项，花费 %.2f 秒</item>
+    </plurals>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分钟</item>
     </plurals>
