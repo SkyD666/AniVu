@@ -201,7 +201,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("io.coil-kt:coil-gif:2.6.0")
     implementation("com.rometools:rome:2.1.0")
-    implementation("be.ceau:opml-parser:3.1.0")
+    implementation("be.ceau:opml-parser:3.1.0") {
+        exclude(group = "net.sf.kxml", module = "kxml2")
+    }
     implementation("net.dankito.readability4j:readability4j:1.0.8")
 
     implementation("org.libtorrent4j:libtorrent4j-android-arm64:2.1.0-31")

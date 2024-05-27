@@ -114,3 +114,7 @@ public static final ** CREATOR;
 
 # MPV
 -keep,allowoptimization class is.xyz.mpv.MPVLib { public protected *; }
+
+-dontwarn org.xmlpull.v1.**
+-keep class org.xmlpull.** { *; }
+-keepclassmembers class org.xmlpull.** { *; }
