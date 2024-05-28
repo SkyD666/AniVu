@@ -7,10 +7,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import coil.EventListener
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
+import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 
 
@@ -40,7 +42,7 @@ fun AniVuImage(
 }
 
 @Composable
-private fun rememberAniVuImageLoader(): ImageLoader {
+fun rememberAniVuImageLoader(listener: EventListener? = null): ImageLoader {
     val context = LocalContext.current
     return remember(context) {
         ImageLoader.Builder(context)
@@ -50,7 +52,9 @@ private fun rememberAniVuImageLoader(): ImageLoader {
                 } else {
                     add(GifDecoder.Factory())
                 }
+                add(SvgDecoder.Factory())
             }
+            .run { if (listener != null) eventListener(listener) else this }
             .build()
     }
 }

@@ -1,7 +1,6 @@
 package com.skyd.anivu.model.repository
 
 import android.util.Log
-import androidx.compose.ui.util.fastMaxBy
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
@@ -11,14 +10,13 @@ import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedWithArticleBean
-import com.skyd.anivu.model.service.HttpService
+import com.skyd.anivu.util.favicon.FaviconExtractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.executeAsync
-import retrofit2.Retrofit
 import java.io.InputStream
 import java.util.*
 import javax.inject.Inject
@@ -27,8 +25,8 @@ import javax.inject.Inject
  * Some operations on RSS.
  */
 class RssHelper @Inject constructor(
-    private val retrofit: Retrofit,
     private val okHttpClient: OkHttpClient,
+    private val faviconExtractor: FaviconExtractor,
 ) {
 
     @Throws(Exception::class)
@@ -123,11 +121,9 @@ class RssHelper @Inject constructor(
         )
     }
 
-    suspend fun getRssIcon(url: String): String? {
+    fun getRssIcon(url: String): String? {
         return runCatching {
-            retrofit.create(HttpService::class.java)
-                .requestFavicon(url)
-                .icons?.fastMaxBy { it.width ?: 0 }?.url
+            faviconExtractor.extractFavicon(url).apply { Log.e("TAG", "getRssIcon: $this", ) }
         }.onFailure { it.printStackTrace() }.getOrNull()
     }
 

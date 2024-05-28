@@ -42,13 +42,9 @@ class ArticleRepository @Inject constructor(
                                 feedDao.updateFeed(feedWithArticle.feed)
                             }?.articles
                         }
-                        val iconAsync = async { rssHelper.getRssIcon(feedUrl) }
                         val articleBeanList = articleBeanListAsync.await() ?: return@async
 
                         if (articleBeanList.isEmpty()) return@async
-
-                        val icon = iconAsync.await()
-                        if (icon != null) feedDao.updateFeedIcon(feedUrl, icon)
 
                         articleDao.insertListIfNotExist(articleBeanList.map { articleWithEnclosure ->
                             if (articleWithEnclosure.article.feedUrl != feedUrl) {

@@ -14,13 +14,13 @@ import com.skyd.anivu.ext.getAppName
 import com.skyd.anivu.ext.toAbsoluteDateTimeString
 import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.model.bean.GroupWithFeedBean
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -35,17 +35,14 @@ class ImportExportRepository @Inject constructor(
     private val feedDao: FeedDao,
     private val groupDao: GroupDao,
 ) : BaseRepository() {
-    private suspend fun requestGroupWithFeedsList(): Flow<List<GroupWithFeedBean>> {
-        return combine(
-            groupDao.getGroupWithFeeds(),
-            groupDao.getGroupIds(),
-        ) { groupList, groupIds ->
-            groupList to feedDao.getFeedsNotIn(groupIds)
-        }.map { (groupList, defaultFeeds) ->
-            mutableListOf<GroupWithFeedBean>().apply {
-                add(GroupWithFeedBean(GroupBean.DefaultGroup, defaultFeeds))
-                addAll(groupList)
-            }
+    private fun groupWithFeedsWithoutDefaultGroup(): Flow<List<GroupWithFeedBean>> {
+        return groupDao.getGroupWithFeeds()
+            .flowOn(Dispatchers.IO)
+    }
+
+    private suspend fun defaultGroupFeeds(): Flow<List<FeedViewBean>> {
+        return groupDao.getGroupIds().map { groupIds ->
+            feedDao.getFeedsNotIn(groupIds)
         }.flowOn(Dispatchers.IO)
     }
 
@@ -161,6 +158,26 @@ class ImportExportRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
+    private fun createFeedOutlineList(feeds: List<FeedViewBean>): List<Outline> {
+        return feeds.map { feedView ->
+            val feed = feedView.feed
+            Outline(
+                mutableMapOf(
+                    "text" to feed.title,
+                    "title" to feed.title,
+                    "xmlUrl" to feed.url,
+                    "htmlUrl" to feed.url,
+                ).apply {
+                    feed.description?.let { put("description", it) }
+                    feed.link?.let { put("link", it) }
+                    feed.icon?.let { put("icon", it) }
+                    feed.nickname?.let { put("nickname", it) }
+                },
+                listOf()
+            )
+        }
+    }
+
     private suspend fun exportOpml(outputDir: Uri) {
         val text = OpmlWriter().write(
             Opml(
@@ -171,32 +188,22 @@ class ImportExportRepository @Inject constructor(
                     null, null, null, null,
                     null, null, null, null,
                 ),
-                Body(requestGroupWithFeedsList().first().map { groupWithFeeds ->
-                    Outline(
-                        mutableMapOf(
-                            "text" to groupWithFeeds.group.name,
-                            "title" to groupWithFeeds.group.name,
-                            "isDefault" to (groupWithFeeds.group.groupId == GroupBean.DefaultGroup.groupId).toString(),
-                        ),
-                        groupWithFeeds.feeds.map { feedView ->
-                            val feed = feedView.feed
+                Body(
+                    mutableListOf(
+                        // Default group feeds (No group)
+                        *createFeedOutlineList(defaultGroupFeeds().first()).toTypedArray(),
+                        // Other groups
+                        *groupWithFeedsWithoutDefaultGroup().first().map { groupWithFeeds ->
                             Outline(
                                 mutableMapOf(
-                                    "text" to feed.title,
-                                    "title" to feed.title,
-                                    "xmlUrl" to feed.url,
-                                    "htmlUrl" to feed.url,
-                                ).apply {
-                                    feed.description?.let { put("description", it) }
-                                    feed.link?.let { put("link", it) }
-                                    feed.icon?.let { put("icon", it) }
-                                    feed.nickname?.let { put("nickname", it) }
-                                },
-                                listOf()
+                                    "text" to groupWithFeeds.group.name,
+                                    "title" to groupWithFeeds.group.name,
+                                ),
+                                createFeedOutlineList(groupWithFeeds.feeds)
                             )
-                        }
+                        }.toTypedArray()
                     )
-                })
+                )
             )
         )!!
 

@@ -49,8 +49,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
+import coil.EventListener
+import coil.request.ErrorResult
+import coil.request.ImageRequest
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.activity
+import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
@@ -60,6 +65,7 @@ import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPr
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.ui.component.AniVuImage
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
+import com.skyd.anivu.ui.component.rememberAniVuImageLoader
 import com.skyd.anivu.ui.fragment.read.EnclosureBottomSheet
 import com.skyd.anivu.ui.fragment.read.ReadFragment
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
@@ -90,7 +96,9 @@ fun Article1Item(
         confirmValueChange = { dismissValue ->
             if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
                 swipeLeftAction(
-                    articleSwipeLeftAction,
+                    // rememberSwipeToDismissBoxState does not update the variable
+                    // when the outer recompose, so don't use the outer articleSwipeLeftAction
+                    context.dataStore.getOrDefault(ArticleSwipeLeftActionPreference),
                     context,
                     navController,
                     articleWithEnclosure,
@@ -259,7 +267,7 @@ fun Article1Item(
 @Composable
 fun FeedIcon(modifier: Modifier = Modifier, data: FeedBean, size: Dp = 22.dp) {
     val icon = data.icon
-    if (icon.isNullOrBlank()) {
+    val defaultIcon: @Composable () -> Unit = {
         Box(
             modifier = modifier
                 .size(size)
@@ -270,17 +278,27 @@ fun FeedIcon(modifier: Modifier = Modifier, data: FeedBean, size: Dp = 22.dp) {
             contentAlignment = Alignment.Center,
         ) {
             Text(
-                text = data.title?.first().toString(),
+                text = (data.nickname.orEmpty().ifBlank { data.title }?.firstOrNull() ?: "")
+                    .toString(),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
             )
         }
+    }
+    var imageLoadError by rememberSaveable { mutableStateOf(false) }
+    if (icon.isNullOrBlank() || imageLoadError) {
+        defaultIcon()
     } else {
         AniVuImage(
             modifier = modifier
                 .size(size)
                 .clip(CircleShape),
             model = icon,
+            imageLoader = rememberAniVuImageLoader(listener = object : EventListener {
+                override fun onError(request: ImageRequest, result: ErrorResult) {
+                    imageLoadError = true
+                }
+            }),
             contentScale = ContentScale.Crop,
         )
     }
@@ -295,7 +313,7 @@ private fun SwipeBackgroundContent(
 ) {
     val containerColor = MaterialTheme.colorScheme.background
     val containerColorElevated = MaterialTheme.colorScheme.tertiaryContainer
-    val backgroundColor = remember { Animatable(containerColor) }
+    val backgroundColor = remember(isActive) { Animatable(containerColor) }
 
     LaunchedEffect(isActive) {
         backgroundColor.animateTo(if (isActive) containerColorElevated else containerColor)

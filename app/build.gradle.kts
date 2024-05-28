@@ -21,7 +21,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 16
-        versionName = "1.1-beta36"
+        versionName = "1.1-beta37"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -161,13 +161,13 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
     implementation("androidx.compose.ui:ui:1.7.0-beta01")
     implementation("androidx.compose.material:material:1.7.0-beta01")
-    implementation("androidx.compose.material3:material3:1.3.0-alpha05")
+    implementation("androidx.compose.material3:material3:1.3.0-beta01")
     implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
     implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta01")
     implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta01")
     implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta01")
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
-    implementation("com.materialkolor:material-kolor:1.4.4")
+    implementation("com.materialkolor:material-kolor:1.6.1")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-paging:2.6.1")
@@ -192,7 +192,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.7.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.1")
 
     implementation("com.github.aniyomiorg:aniyomi-mpv-lib:1.15.n")
     implementation("com.github.jmir1:ffmpeg-kit:1.15")
@@ -200,6 +200,7 @@ dependencies {
     implementation("io.coil-kt:coil:2.6.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("io.coil-kt:coil-gif:2.6.0")
+    implementation("io.coil-kt:coil-svg:2.6.0")
     implementation("com.rometools:rome:2.1.0")
     implementation("be.ceau:opml-parser:3.1.0") {
         exclude(group = "net.sf.kxml", module = "kxml2")

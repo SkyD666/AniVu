@@ -21,7 +21,6 @@ object Const {
     const val NIGHT_SCREEN_URL = "https://github.com/SkyD666/NightScreen"
 
     const val BASE_URL = "https://github.com/SkyD666/"
-    const val FAVICON_FETCH_URL = "https://besticon-demo.herokuapp.com/allicons.json"
 
     val TEMP_TORRENT_DIR = File(appContext.cacheDir.path, "Torrent").apply {
         if (!exists()) mkdirs()
