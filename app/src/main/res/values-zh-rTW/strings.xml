@@ -230,6 +230,7 @@
     <string name="import_opml_screen_opml_not_selected">Please select an OPML file</string>
     <string name="data_fragment_sync_category">Sync</string>
     <string name="import_export_screen_description">Import and Export RSS data via OPML files</string>
+    <string name="player_speed">Speed</string>
     <plurals name="import_opml_result">
         <item quantity="other">Imported %d items, takes %.2f seconds</item>
     </plurals>
