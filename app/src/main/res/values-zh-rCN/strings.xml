@@ -229,6 +229,7 @@
     <string name="import_opml_screen_opml_not_selected">请选择一个 OPML 文件</string>
     <string name="data_fragment_sync_category">同步</string>
     <string name="import_export_screen_description">通过 OPML 文件来导入与导出订阅数据</string>
+    <string name="player_speed">速度</string>
     <plurals name="import_opml_result">
         <item quantity="other">导入了 %d 项，花费 %.2f 秒</item>
     </plurals>

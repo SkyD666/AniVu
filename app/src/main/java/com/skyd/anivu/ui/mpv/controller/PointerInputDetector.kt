@@ -256,7 +256,7 @@ internal fun Modifier.detectControllerGestures(
             },
             onGesture = onGesture@{ _: Offset, pan: Offset, zoom: Float, rotation: Float ->
                 with(transformState()) {
-                    transformStateCallback.onVideoOffset(videoOffset + pan)
+                    transformStateCallback.onVideoOffset(videoOffset + pan / videoZoom)
                     transformStateCallback.onVideoRotate(videoRotate + rotation)
                     transformStateCallback.onVideoZoom(videoZoom * zoom)
                 }
