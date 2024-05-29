@@ -4,8 +4,6 @@ import androidx.compose.ui.util.fastMaxBy
 import com.skyd.anivu.util.favicon.interceptor.BaseUrlIconTagInterceptor
 import com.skyd.anivu.util.favicon.interceptor.HardCodedInterceptor
 import com.skyd.anivu.util.favicon.interceptor.IconTagInterceptor
-import com.skyd.anivu.util.favicon.interceptor.Interceptor
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import retrofit2.Retrofit

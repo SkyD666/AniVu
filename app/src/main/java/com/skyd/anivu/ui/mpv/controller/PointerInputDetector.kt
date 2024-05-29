@@ -16,6 +16,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.window.layout.WindowMetricsCalculator
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.detectDoubleFingerTransformGestures
 import com.skyd.anivu.ext.getScreenBrightness
@@ -27,9 +28,14 @@ import com.skyd.anivu.ui.mpv.controller.state.TransformState
 import com.skyd.anivu.ui.mpv.controller.state.TransformStateCallback
 import kotlin.math.abs
 
-private val inStatusBarArea: PointerInputScope.(y: Float) -> Boolean = { y ->
-    y / density <= 60
-}
+private val inSystemBarArea: PointerInputScope.(context: Context, x: Float, y: Float) -> Boolean =
+    { context, x, y ->
+        val width = WindowMetricsCalculator
+            .getOrCreate()
+            .computeCurrentWindowMetrics(context)
+            .bounds.width()
+        y / density <= 60 || (width - x) / density <= 60
+    }
 
 @Composable
 internal fun Modifier.detectPressGestures(
@@ -45,7 +51,7 @@ internal fun Modifier.detectPressGestures(
     cancelAutoHideControllerRunnable: () -> Boolean,
     restartAutoHideControllerRunnable: () -> Unit,
 ): Modifier {
-    var beforeLongPressingSpeed by remember { mutableFloatStateOf(playState().speed) }
+    var beforeLongPressingSpeed by rememberSaveable { mutableFloatStateOf(playState().speed) }
 
     val playerDoubleTap = LocalPlayerDoubleTap.current
     val onDoubleTapPausePlay: () -> Unit = remember { { playStateCallback.onPlayOrPause() } }
@@ -160,7 +166,7 @@ internal fun Modifier.detectControllerGestures(
                 cancelAutoHideControllerRunnable()
                 pointerStartX = it.x
                 pointerStartY = it.y
-                if (inStatusBarArea(it.y)) return@onVerticalDragStart
+                if (inSystemBarArea(context, it.x, it.y)) return@onVerticalDragStart
                 when (pointerStartX) {
                     in 0f..controllerWidth() / 3f -> {
                         onBrightnessRangeChanged(0.01f..1f)
@@ -197,8 +203,9 @@ internal fun Modifier.detectControllerGestures(
             },
             onVerticalDrag = onVerticalDrag@{ change, _ ->
                 val deltaY = change.position.y - pointerStartY
-                if (inStatusBarArea(pointerStartY) || abs(deltaY) < 50) return@onVerticalDrag
-
+                if (inSystemBarArea(context, pointerStartX, pointerStartY) || abs(deltaY) < 50) {
+                    return@onVerticalDrag
+                }
                 when (pointerStartX) {
                     in 0f..controllerWidth() / 3f -> {
                         val layoutParams = activity.window.attributes
@@ -222,7 +229,9 @@ internal fun Modifier.detectControllerGestures(
                 cancelAutoHideControllerRunnable()
                 pointerStartX = it.x
                 pointerStartY = it.y
-                if (inStatusBarArea(it.y)) return@onHorizontalDragStart
+                if (inSystemBarArea(context, it.x, it.y)) {
+                    return@onHorizontalDragStart
+                }
                 seekTimePreviewStartPosition = playState().currentPosition
                 seekTimePreviewPositionDelta = 0
                 onShowSeekTimePreview(true)
@@ -230,7 +239,9 @@ internal fun Modifier.detectControllerGestures(
             onHorizontalDragEnd = onHorizontalDragEnd@{
                 onShowSeekTimePreview(false)
                 restartAutoHideControllerRunnable()
-                if (inStatusBarArea(pointerStartY)) return@onHorizontalDragEnd
+                if (inSystemBarArea(context, pointerStartX, pointerStartY)) {
+                    return@onHorizontalDragEnd
+                }
                 playStateCallback.onSeekTo(seekTimePreviewStartPosition + seekTimePreviewPositionDelta)
             },
             onHorizontalDragCancel = {
@@ -238,7 +249,7 @@ internal fun Modifier.detectControllerGestures(
                 restartAutoHideControllerRunnable()
             },
             onHorizontalDrag = onHorizontalDrag@{ change, _ ->
-                if (inStatusBarArea(pointerStartY)) return@onHorizontalDrag
+                if (inSystemBarArea(context, pointerStartX, pointerStartY)) return@onHorizontalDrag
                 seekTimePreviewPositionDelta =
                     ((change.position.x - pointerStartX) / density / 8).toInt()
                 onTimePreviewChanged(seekTimePreviewStartPosition + seekTimePreviewPositionDelta)

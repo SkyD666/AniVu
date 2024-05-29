@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.mpv.controller.bar
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ClosedCaption
@@ -42,6 +44,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.ui.mpv.controller.ControllerBarGray
@@ -52,6 +57,7 @@ import kotlin.math.abs
 
 @Immutable
 data class BottomBarCallback(
+    val onSpeedClick: () -> Unit,
     val onAudioTrackClick: () -> Unit,
     val onSubtitleTrackClick: () -> Unit,
 )
@@ -158,11 +164,30 @@ fun BottomBar(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            // Speed button
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 3.dp)
+                    .clip(CircleShape)
+                    .height(45.dp)
+                    .clickable(onClick = bottomBarCallback.onSpeedClick)
+                    .padding(9.dp)
+                    .animateContentSize()
+                    // For vertical centering
+                    .wrapContentHeight(),
+                text = "${playStateValue.speed}x",
+                style = MaterialTheme.typography.labelLarge,
+                fontSize = TextUnit(16f, TextUnitType.Sp),
+                textAlign = TextAlign.Center,
+                color = Color.White,
+            )
+            // Audio track button
             BarIconButton(
                 onClick = bottomBarCallback.onAudioTrackClick,
                 imageVector = Icons.Rounded.MusicNote,
                 contentDescription = stringResource(R.string.player_audio_track),
             )
+            // Audio track button
             BarIconButton(
                 onClick = bottomBarCallback.onSubtitleTrackClick,
                 imageVector = Icons.Rounded.ClosedCaption,

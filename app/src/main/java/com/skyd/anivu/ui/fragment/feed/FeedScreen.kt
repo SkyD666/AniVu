@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
@@ -445,7 +446,9 @@ private fun EditFeedDialog(
                 val focusRequester = remember { FocusRequester() }
                 val keyboard = LocalSoftwareKeyboardController.current
                 ClipboardTextField(
-                    modifier = Modifier.focusRequester(focusRequester),
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .fillMaxWidth(),
                     value = url,
                     onValueChange = onUrlChange,
                     autoRequestFocus = false,
@@ -458,6 +461,7 @@ private fun EditFeedDialog(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
                 ClipboardTextField(
+                    modifier = Modifier.fillMaxWidth(),
                     value = nickname,
                     onValueChange = onNicknameChange,
                     autoRequestFocus = false,
@@ -478,7 +482,9 @@ private fun EditFeedDialog(
                             // The `menuAnchor` modifier must be passed to the text field to handle
                             // expanding/collapsing the menu on click. A read-only text field has
                             // the anchor type `PrimaryNotEditable`.
-                            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+                            modifier = Modifier
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
+                                .fillMaxWidth(),
                             value = group.name,
                             onValueChange = {},
                             readOnly = true,

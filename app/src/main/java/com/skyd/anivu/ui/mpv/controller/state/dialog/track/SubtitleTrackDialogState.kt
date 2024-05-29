@@ -1,4 +1,4 @@
-package com.skyd.anivu.ui.mpv.controller.state.track
+package com.skyd.anivu.ui.mpv.controller.state.dialog.track
 
 import androidx.compose.runtime.Immutable
 import com.skyd.anivu.ui.mpv.MPVView

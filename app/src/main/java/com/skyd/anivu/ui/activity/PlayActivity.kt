@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.activity
 
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -26,6 +27,14 @@ import java.io.File
 class PlayActivity : BaseComposeActivity() {
     companion object {
         const val VIDEO_URI_KEY = "videoUri"
+
+        fun play(activity: Activity, uri: Uri) {
+            activity.startActivity(
+                Intent(activity, PlayActivity::class.java).apply {
+                    putExtra(VIDEO_URI_KEY, uri)
+                }
+            )
+        }
     }
 
     private var player: MPVView? = null

@@ -41,6 +41,9 @@ import com.skyd.anivu.ui.mpv.controller.bar.TopBar
 import com.skyd.anivu.ui.mpv.controller.button.Forward85s
 import com.skyd.anivu.ui.mpv.controller.button.ResetTransform
 import com.skyd.anivu.ui.mpv.controller.button.Screenshot
+import com.skyd.anivu.ui.mpv.controller.dialog.AudioTrackDialog
+import com.skyd.anivu.ui.mpv.controller.dialog.SpeedDialog
+import com.skyd.anivu.ui.mpv.controller.dialog.SubtitleTrackDialog
 import com.skyd.anivu.ui.mpv.controller.preview.BrightnessPreview
 import com.skyd.anivu.ui.mpv.controller.preview.LongPressSpeedPreview
 import com.skyd.anivu.ui.mpv.controller.preview.SeekTimePreview
@@ -49,11 +52,9 @@ import com.skyd.anivu.ui.mpv.controller.state.PlayState
 import com.skyd.anivu.ui.mpv.controller.state.PlayStateCallback
 import com.skyd.anivu.ui.mpv.controller.state.TransformState
 import com.skyd.anivu.ui.mpv.controller.state.TransformStateCallback
-import com.skyd.anivu.ui.mpv.controller.state.track.AudioTrackDialogCallback
-import com.skyd.anivu.ui.mpv.controller.state.track.SubtitleTrackDialogCallback
-import com.skyd.anivu.ui.mpv.controller.state.track.TrackDialogState
-import com.skyd.anivu.ui.mpv.controller.dialog.AudioTrackDialog
-import com.skyd.anivu.ui.mpv.controller.dialog.SubtitleTrackDialog
+import com.skyd.anivu.ui.mpv.controller.state.dialog.DialogCallback
+import com.skyd.anivu.ui.mpv.controller.state.dialog.DialogState
+import com.skyd.anivu.ui.mpv.controller.state.dialog.OnDismissDialog
 import kotlinx.coroutines.delay
 
 
@@ -67,11 +68,9 @@ internal fun PlayerController(
     playState: () -> PlayState,
     playStateCallback: PlayStateCallback,
     bottomBarCallback: BottomBarCallback,
-    trackDialogState: TrackDialogState,
-    onDismissSubtitleTrackDialog: () -> Unit,
-    onDismissAudioTrackDialog: () -> Unit,
-    subtitleTrackDialogCallback: SubtitleTrackDialogCallback,
-    audioTrackDialogCallback: AudioTrackDialogCallback,
+    dialogState: DialogState,
+    dialogCallback: DialogCallback,
+    onDismissDialog: OnDismissDialog,
     transformState: () -> TransformState,
     transformStateCallback: TransformStateCallback,
     onScreenshot: () -> Unit,
@@ -110,8 +109,8 @@ internal fun PlayerController(
 
     var isLongPressing by remember { mutableStateOf(false) }
 
-    LaunchedEffect(trackDialogState.subtitleTrackDialogState()) {
-        if (trackDialogState.subtitleTrackDialogState().show) cancelAutoHideControllerRunnable()
+    LaunchedEffect(dialogState.subtitleTrackDialogState()) {
+        if (dialogState.subtitleTrackDialogState().show) cancelAutoHideControllerRunnable()
         else restartAutoHideControllerRunnable()
     }
 
@@ -231,21 +230,26 @@ internal fun PlayerController(
                 LongPressSpeedPreview(speed = { playState().speed })
             }
 
+            SpeedDialog(
+                onDismissRequest = onDismissDialog.onDismissSpeedDialog,
+                speedDialogState = dialogState.speedDialogState,
+                speedDialogCallback = dialogCallback.speedDialogCallback,
+            )
             AudioTrackDialog(
-                onDismissRequest = onDismissAudioTrackDialog,
-                audioTrackDialogState = trackDialogState.audioTrackDialogState,
-                audioTrackDialogCallback = audioTrackDialogCallback,
+                onDismissRequest = onDismissDialog.onDismissAudioTrackDialog,
+                audioTrackDialogState = dialogState.audioTrackDialogState,
+                audioTrackDialogCallback = dialogCallback.audioTrackDialogCallback,
             )
             SubtitleTrackDialog(
-                onDismissRequest = onDismissSubtitleTrackDialog,
-                subtitleTrackDialogState = trackDialogState.subtitleTrackDialogState,
-                subtitleTrackDialogCallback = subtitleTrackDialogCallback,
+                onDismissRequest = onDismissDialog.onDismissSubtitleTrackDialog,
+                subtitleTrackDialogState = dialogState.subtitleTrackDialogState,
+                subtitleTrackDialogCallback = dialogCallback.subtitleTrackDialogCallback,
             )
 
             val systemUiController = rememberSystemUiController()
             LaunchedEffect(
-                trackDialogState.subtitleTrackDialogState().show,
-                trackDialogState.audioTrackDialogState().show,
+                dialogState.subtitleTrackDialogState().show,
+                dialogState.audioTrackDialogState().show,
             ) {
                 delay(200)
                 systemUiController.isSystemBarsVisible = false

@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.fragment.media
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -56,7 +55,6 @@ import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.activity.PlayActivity
-import com.skyd.anivu.ui.activity.PlayActivity.Companion.VIDEO_URI_KEY
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
@@ -141,9 +139,10 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
         },
         contentWindowInsets = WindowInsets.safeDrawing.run {
             val leftPadding = hasParentDir || windowSizeClass.isCompact
+            val bottomPadding = hasParentDir || !windowSizeClass.isCompact
             var sides = WindowInsetsSides.Top + WindowInsetsSides.Right
             if (leftPadding) sides += WindowInsetsSides.Left
-            if (hasParentDir) sides += WindowInsetsSides.Bottom
+            if (bottomPadding) sides += WindowInsetsSides.Bottom
             only(sides)
         },
     ) { innerPadding ->
@@ -177,11 +176,7 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
                             data = mediaListState.list,
                             contentPadding = innerPadding,
                             onPlay = {
-                                (context.activity).startActivity(
-                                    Intent(context, PlayActivity::class.java).apply {
-                                        putExtra(VIDEO_URI_KEY, it.file.toUri(context))
-                                    }
-                                )
+                                PlayActivity.play(context.activity, it.file.toUri(context))
                             },
                             onOpenDir = {
                                 navController.navigate(
@@ -232,7 +227,7 @@ private fun MediaList(
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        columns = GridCells.Adaptive(300.dp),
+        columns = GridCells.Adaptive(360.dp),
     ) {
         items(data) { item ->
             if (item is VideoBean) {

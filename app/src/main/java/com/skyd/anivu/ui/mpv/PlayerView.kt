@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,11 +29,15 @@ import com.skyd.anivu.ui.mpv.controller.state.PlayState
 import com.skyd.anivu.ui.mpv.controller.state.PlayStateCallback
 import com.skyd.anivu.ui.mpv.controller.state.TransformState
 import com.skyd.anivu.ui.mpv.controller.state.TransformStateCallback
-import com.skyd.anivu.ui.mpv.controller.state.track.AudioTrackDialogCallback
-import com.skyd.anivu.ui.mpv.controller.state.track.AudioTrackDialogState
-import com.skyd.anivu.ui.mpv.controller.state.track.SubtitleTrackDialogCallback
-import com.skyd.anivu.ui.mpv.controller.state.track.SubtitleTrackDialogState
-import com.skyd.anivu.ui.mpv.controller.state.track.TrackDialogState
+import com.skyd.anivu.ui.mpv.controller.state.dialog.DialogCallback
+import com.skyd.anivu.ui.mpv.controller.state.dialog.DialogState
+import com.skyd.anivu.ui.mpv.controller.state.dialog.OnDismissDialog
+import com.skyd.anivu.ui.mpv.controller.state.dialog.SpeedDialogCallback
+import com.skyd.anivu.ui.mpv.controller.state.dialog.SpeedDialogState
+import com.skyd.anivu.ui.mpv.controller.state.dialog.track.AudioTrackDialogCallback
+import com.skyd.anivu.ui.mpv.controller.state.dialog.track.AudioTrackDialogState
+import com.skyd.anivu.ui.mpv.controller.state.dialog.track.SubtitleTrackDialogCallback
+import com.skyd.anivu.ui.mpv.controller.state.dialog.track.SubtitleTrackDialogState
 import `is`.xyz.mpv.MPVLib
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -124,7 +129,7 @@ fun PlayerView(
     fontDir: String = Const.MPV_FONT_DIR.path,
     onPlayerChanged: (MPVView?) -> Unit,
 ) {
-    rememberSystemUiController().apply {
+    val systemUiController = rememberSystemUiController().apply {
         isSystemBarsVisible = false
         systemBarsBehavior =
             WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
@@ -133,18 +138,25 @@ fun PlayerView(
     val scope = rememberCoroutineScope()
 
     var mediaLoaded by rememberSaveable { mutableStateOf(false) }
+
+    var playState by remember { mutableStateOf(PlayState.initial) }
+    var transformState by remember { mutableStateOf(TransformState.initial) }
+
     var subtitleTrackDialogState by remember { mutableStateOf(SubtitleTrackDialogState.initial) }
     var audioTrackDialogState by remember { mutableStateOf(AudioTrackDialogState.initial) }
-    val trackDialogState by remember {
+    var speedDialogState by remember { mutableStateOf(SpeedDialogState.initial) }
+    LaunchedEffect(playState.speed) {
+        speedDialogState = speedDialogState.copy(currentSpeed = playState.speed)
+    }
+    val dialogState by remember {
         mutableStateOf(
-            TrackDialogState(
+            DialogState(
+                speedDialogState = { speedDialogState },
                 audioTrackDialogState = { audioTrackDialogState },
                 subtitleTrackDialogState = { subtitleTrackDialogState },
             )
         )
     }
-    var playState by remember { mutableStateOf(PlayState.initial) }
-    var transformState by remember { mutableStateOf(TransformState.initial) }
 
     val playStateCallback = remember {
         PlayStateCallback(
@@ -164,19 +176,23 @@ fun PlayerView(
             onVideoOffset = { commandQueue.trySend(PlayerCommand.VideoOffset(it)) },
         )
     }
-    val subtitleTrackDialogCallback = remember {
-        SubtitleTrackDialogCallback(
-            onAddSubtitle = { commandQueue.trySend(PlayerCommand.AddSubtitle(it)) },
-            onSubtitleTrackChanged = { commandQueue.trySend(PlayerCommand.SetSubtitleTrack(it.trackId)) },
-        )
-    }
-    val audioTrackDialogCallback = remember {
-        AudioTrackDialogCallback(
-            onAudioTrackChanged = { commandQueue.trySend(PlayerCommand.SetAudioTrack(it.trackId)) },
+    val dialogCallback = remember {
+        DialogCallback(
+            speedDialogCallback = SpeedDialogCallback(
+                onSpeedChanged = { commandQueue.trySend(PlayerCommand.SetSpeed(it)) },
+            ),
+            audioTrackDialogCallback = AudioTrackDialogCallback(
+                onAudioTrackChanged = { commandQueue.trySend(PlayerCommand.SetAudioTrack(it.trackId)) },
+            ),
+            subtitleTrackDialogCallback = SubtitleTrackDialogCallback(
+                onAddSubtitle = { commandQueue.trySend(PlayerCommand.AddSubtitle(it)) },
+                onSubtitleTrackChanged = { commandQueue.trySend(PlayerCommand.SetSubtitleTrack(it.trackId)) },
+            )
         )
     }
     val bottomBarCallback = remember {
         BottomBarCallback(
+            onSpeedClick = { speedDialogState = speedDialogState.copy(show = true) },
             onAudioTrackClick = { commandQueue.trySend(PlayerCommand.GetAudioTrack) },
             onSubtitleTrackClick = { commandQueue.trySend(PlayerCommand.GetSubtitleTrack) },
         )
@@ -312,15 +328,21 @@ fun PlayerView(
         playState = { playState },
         playStateCallback = playStateCallback,
         bottomBarCallback = bottomBarCallback,
-        trackDialogState = trackDialogState,
-        onDismissSubtitleTrackDialog = {
-            subtitleTrackDialogState = subtitleTrackDialogState.copy(show = false)
+        dialogState = dialogState,
+        dialogCallback = dialogCallback,
+        onDismissDialog = remember {
+            OnDismissDialog(
+                onDismissSpeedDialog = {
+                    speedDialogState = speedDialogState.copy(show = false)
+                },
+                onDismissAudioTrackDialog = {
+                    audioTrackDialogState = audioTrackDialogState.copy(show = false)
+                },
+                onDismissSubtitleTrackDialog = {
+                    subtitleTrackDialogState = subtitleTrackDialogState.copy(show = false)
+                },
+            )
         },
-        onDismissAudioTrackDialog = {
-            audioTrackDialogState = audioTrackDialogState.copy(show = false)
-        },
-        subtitleTrackDialogCallback = subtitleTrackDialogCallback,
-        audioTrackDialogCallback = audioTrackDialogCallback,
         transformState = { transformState },
         transformStateCallback = transformStateCallback,
         onScreenshot = { commandQueue.trySend(PlayerCommand.Screenshot) },
@@ -336,6 +358,9 @@ fun PlayerView(
                     if (needPlayWhenResume) {
                         commandQueue.trySend(PlayerCommand.Paused(false))
                     }
+                    systemUiController.isSystemBarsVisible = false
+                    systemUiController.systemBarsBehavior =
+                        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
                 }
 
                 Lifecycle.Event.ON_PAUSE -> {

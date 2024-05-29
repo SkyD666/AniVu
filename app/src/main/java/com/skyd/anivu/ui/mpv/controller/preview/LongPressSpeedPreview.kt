@@ -34,7 +34,7 @@ internal fun BoxScope.LongPressSpeedPreview(speed: () -> Float) {
             .align(BiasAlignment(0f, -0.6f))
             .clip(RoundedCornerShape(6.dp))
             .background(color = ControllerLabelGray)
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = 12.dp, vertical = 7.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(

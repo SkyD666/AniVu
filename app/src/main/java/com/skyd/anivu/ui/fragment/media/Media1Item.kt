@@ -2,6 +2,7 @@ package com.skyd.anivu.ui.fragment.media
 
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Delete
@@ -34,9 +36,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
@@ -48,6 +53,7 @@ import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.component.AniVuImage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 @Composable
 fun Media1Item(
@@ -62,6 +68,9 @@ fun Media1Item(
 
     val isMedia = rememberSaveable(data) { data.isMedia(context) }
     val isDir = rememberSaveable(data) { data.isDir }
+
+    val fileNameWithoutExtension = data.name.substringBeforeLast(".")
+    val fileExtension = data.name.substringAfterLast(".", "")
 
     Column(
         modifier = Modifier
@@ -94,7 +103,7 @@ fun Media1Item(
                         .padding(end = 10.dp)
                         .heightIn(min = 50.dp)
                         .fillMaxHeight()
-                        .width(70.dp),
+                        .width(80.dp),
                 ) {
                     AniVuImage(
                         model = bitmap,
@@ -102,17 +111,28 @@ fun Media1Item(
                     )
                 }
             }
-            Text(text = data.name, maxLines = 3, style = MaterialTheme.typography.titleSmall)
+            Text(
+                text = fileNameWithoutExtension,
+                maxLines = 3,
+                style = MaterialTheme.typography.titleSmall,
+            )
         }
-        Spacer(modifier = Modifier.height(6.dp))
+        Spacer(modifier = Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
+            if (fileExtension.isNotBlank()) {
+                Text(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(3.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                        .padding(horizontal = 4.dp),
+                    text = fileExtension.uppercase(Locale.getDefault()),
+                    style = MaterialTheme.typography.labelSmall,
+                    fontSize = TextUnit(10f, TextUnitType.Sp),
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+            }
             Text(
                 text = data.size.fileSize(context),
-                style = MaterialTheme.typography.labelMedium,
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = data.date.toDateTimeString(context = context),
                 style = MaterialTheme.typography.labelMedium,
             )
             if (isMedia || isDir) {
@@ -123,6 +143,11 @@ fun Media1Item(
                     contentDescription = stringResource(id = R.string.video),
                 )
             }
+            Spacer(modifier = Modifier.weight(1f))
+            Text(
+                text = data.date.toDateTimeString(context = context),
+                style = MaterialTheme.typography.labelMedium,
+            )
         }
 
         DropdownMenu(
