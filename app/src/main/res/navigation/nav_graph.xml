@@ -134,7 +134,7 @@
     <fragment
         android:id="@+id/auto_delete_article_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.data.autodelete.AutoDeleteArticleFragment"
-        android:label="@string/auto_delete_article_fragment_name" />
+        android:label="@string/auto_delete_screen_name" />
     <action
         android:id="@+id/action_to_auto_delete_article_fragment"
         app:destination="@id/auto_delete_article_fragment" />

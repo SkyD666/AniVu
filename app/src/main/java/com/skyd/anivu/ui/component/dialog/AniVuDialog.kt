@@ -15,7 +15,7 @@ import androidx.compose.ui.window.DialogProperties
 @Composable
 fun AniVuDialog(
     modifier: Modifier = Modifier,
-    visible: Boolean,
+    visible: Boolean = true,
     properties: DialogProperties = DialogProperties(),
     onDismissRequest: () -> Unit = {},
     icon: @Composable (() -> Unit)? = {

@@ -14,6 +14,9 @@ import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
+import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleBeforePreference
+import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleFrequencyPreference
+import com.skyd.anivu.model.preference.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
@@ -24,6 +27,8 @@ import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
+import com.skyd.anivu.ui.local.LocalAutoDeleteArticleBefore
+import com.skyd.anivu.ui.local.LocalAutoDeleteArticleFrequency
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalDateStyle
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
@@ -37,6 +42,7 @@ import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
+import com.skyd.anivu.ui.local.LocalUseAutoDelete
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 
@@ -60,6 +66,10 @@ data class Settings(
     val playerShow85sButton: Boolean = PlayerShow85sButtonPreference.default,
     val playerShowScreenshotButton: Boolean = PlayerShowScreenshotButtonPreference.default,
     val hardwareDecode: Boolean = HardwareDecodePreference.default,
+    // Data
+    val useAutoDelete: Boolean = UseAutoDeletePreference.default,
+    val autoDeleteArticleFrequency: Long = AutoDeleteArticleFrequencyPreference.default,
+    val autoDeleteArticleBefore: Long = AutoDeleteArticleBeforePreference.default,
 )
 
 @Composable
@@ -90,6 +100,10 @@ fun SettingsProvider(
         LocalPlayerShow85sButton provides settings.playerShow85sButton,
         LocalPlayerShowScreenshotButton provides settings.playerShowScreenshotButton,
         LocalHardwareDecode provides settings.hardwareDecode,
+        // Data
+        LocalUseAutoDelete provides settings.useAutoDelete,
+        LocalAutoDeleteArticleFrequency provides settings.autoDeleteArticleFrequency,
+        LocalAutoDeleteArticleBefore provides settings.autoDeleteArticleBefore,
     ) {
         content()
     }

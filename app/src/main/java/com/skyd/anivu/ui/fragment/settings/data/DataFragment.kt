@@ -128,7 +128,7 @@ class DataFragment : BasePreferenceFragmentCompat() {
         }
         Preference(this).apply {
             key = "autoDeleteArticle"
-            title = getString(R.string.auto_delete_article_fragment_name)
+            title = getString(R.string.auto_delete_screen_name)
             summary = getString(R.string.auto_delete_article_fragment_description)
             setIcon(R.drawable.ic_auto_delete_24)
             setOnPreferenceClickListener {

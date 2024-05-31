@@ -123,9 +123,9 @@
     <string name="submit_an_issue_on_github">Report on GitHub</string>
     <string name="copied">Copied</string>
     <string name="read_fragment_article_id_illegal">Article ID is invalid, probably it has been deleted.</string>
-    <string name="auto_delete_article_fragment_name">Auto delete</string>
+    <string name="auto_delete_screen_name">Auto delete</string>
     <string name="auto_delete_article_fragment_description">Auto delete articles from a period of time ago</string>
-    <string name="auto_delete_article_fragment_use">Enable</string>
+    <string name="enable">Enable</string>
     <string name="auto_delete_article_fragment_delete_frequency">Execution frequency</string>
     <string name="auto_delete_article_fragment_delete_before">Delete range</string>
     <string name="player_pause">Pause/Play</string>

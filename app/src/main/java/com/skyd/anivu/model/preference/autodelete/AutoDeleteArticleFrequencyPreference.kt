@@ -17,23 +17,7 @@ import kotlin.time.Duration.Companion.milliseconds
 object AutoDeleteArticleFrequencyPreference : BasePreference<Long> {
     private const val AUTO_DELETE_ARTICLE_FREQUENCY = "autoDeleteArticleFrequency"
 
-    val EVERY_1_DAY = 1.days.inWholeMilliseconds
-    val EVERY_2_DAY = 2.days.inWholeMilliseconds
-    val EVERY_3_DAY = 3.days.inWholeMilliseconds
-    val EVERY_5_DAY = 5.days.inWholeMilliseconds
-    val EVERY_7_DAY = 7.days.inWholeMilliseconds
-    val EVERY_10_DAY = 10.days.inWholeMilliseconds
-
-    val frequencies = listOf(
-        EVERY_1_DAY,
-        EVERY_2_DAY,
-        EVERY_3_DAY,
-        EVERY_5_DAY,
-        EVERY_7_DAY,
-        EVERY_10_DAY,
-    )
-
-    override val default = EVERY_5_DAY
+    override val default = 14.days.inWholeMilliseconds
 
     val key = longPreferencesKey(AUTO_DELETE_ARTICLE_FREQUENCY)
 
@@ -45,17 +29,21 @@ object AutoDeleteArticleFrequencyPreference : BasePreference<Long> {
 
     override fun fromPreferences(preferences: Preferences): Long = preferences[key] ?: default
 
-    fun toDisplayName(
+    fun toDisplayNameMilliseconds(
         context: Context,
-        value: Long = context.dataStore.getOrDefault(this),
-    ): String = when (value) {
-        EVERY_1_DAY, EVERY_2_DAY, EVERY_3_DAY,
-        EVERY_5_DAY, EVERY_7_DAY, EVERY_10_DAY -> context.resources.getQuantityString(
-            R.plurals.frequency_day,
-            value.milliseconds.inWholeDays.toInt(),
-            value.milliseconds.inWholeDays.toInt(),
-        )
+        milliseconds: Long = context.dataStore.getOrDefault(this),
+    ): String = context.resources.getQuantityString(
+        R.plurals.frequency_day,
+        milliseconds.milliseconds.inWholeDays.toInt(),
+        milliseconds.milliseconds.inWholeDays.toInt(),
+    )
 
-        else -> context.getString(R.string.frequency_manual)
-    }
+    fun toDisplayNameDays(
+        context: Context,
+        days: Long = context.dataStore.getOrDefault(this).milliseconds.inWholeDays,
+    ): String = context.resources.getQuantityString(
+        R.plurals.frequency_day,
+        days.toInt(),
+        days.toInt(),
+    )
 }

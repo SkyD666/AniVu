@@ -116,9 +116,9 @@
     <string name="submit_an_issue_on_github">報告</string>
     <string name="copied">已複製</string>
     <string name="read_fragment_article_id_illegal">文章 ID 無效，可能是已被刪除。</string>
-    <string name="auto_delete_article_fragment_name">自動刪除</string>
+    <string name="auto_delete_screen_name">自動刪除</string>
     <string name="auto_delete_article_fragment_description">自動刪除一段時間之前的文章</string>
-    <string name="auto_delete_article_fragment_use">啟用</string>
+    <string name="enable">啟用</string>
     <string name="auto_delete_article_fragment_delete_frequency">執行頻率</string>
     <string name="auto_delete_article_fragment_delete_before">刪除範圍</string>
     <string name="player_pause">暫停/播放</string>
