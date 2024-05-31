@@ -21,7 +21,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 16
-        versionName = "1.1-beta39"
+        versionName = "1.1-beta40"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -152,17 +152,17 @@ tasks.withType(KotlinCompile::class.java).configureEach {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha13")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
     implementation("androidx.compose.ui:ui:1.7.0-beta01")
     implementation("androidx.compose.material:material:1.7.0-beta01")
     implementation("androidx.compose.material3:material3:1.3.0-beta01")
-    implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
+    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-beta01")
     implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta01")
     implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta01")
     implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta01")

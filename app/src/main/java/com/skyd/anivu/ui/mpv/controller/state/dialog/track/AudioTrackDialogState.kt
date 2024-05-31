@@ -20,4 +20,5 @@ data class AudioTrackDialogState(
 @Immutable
 data class AudioTrackDialogCallback(
     val onAudioTrackChanged: (MPVView.Track) -> Unit,
+    val onAddAudioTrack: (String) -> Unit,
 )

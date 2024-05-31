@@ -25,5 +25,6 @@ sealed interface PlayerCommand {
     data class SetAudioTrack(val trackId: Int) : PlayerCommand
     data object Screenshot : PlayerCommand
     data class AddSubtitle(val filePath: String) : PlayerCommand
+    data class AddAudio(val filePath: String) : PlayerCommand
     data object GetBuffer : PlayerCommand
 }

@@ -28,24 +28,24 @@ internal fun Uri.resolveUri(context: Context): String? {
     return filepath
 }
 
-private fun Uri.openContentFd(context: Context): String? =
-    context.contentResolver.openFileDescriptor(this, "r")!!.use { fileDescriptor ->
-        val fd = try {
-            fileDescriptor.detachFd()
-        } catch (e: Exception) {
-            Log.e("openContentFd", "Failed to open content fd: $e")
-            return@use null
-        }
-        // See if we skip the indirection and read the real file directly
-        val path = findRealPath(fd)
-        if (path != null) {
-            Log.v("openContentFd", "Found real file path: $path")
-            ParcelFileDescriptor.adoptFd(fd).close() // we don't need that anymore
-            return@use path
-        }
-        // Else, pass the fd to mpv
-        return@use "fd://${fd}"
+private fun Uri.openContentFd(context: Context): String? {
+    val resolver = context.contentResolver
+    val fd = try {
+        resolver.openFileDescriptor(this, "r")!!.detachFd()
+    } catch (e: Exception) {
+        Log.e("openContentFd", "Failed to open content fd: $e")
+        return null
     }
+    // See if we skip the indirection and read the real file directly
+    val path = findRealPath(fd)
+    if (path != null) {
+        Log.v("openContentFd", "Found real file path: $path")
+        ParcelFileDescriptor.adoptFd(fd).close() // we don't need that anymore
+        return path
+    }
+    // Else, pass the fd to mpv
+    return "fd://${fd}"
+}
 
 fun findRealPath(fd: Int): String? {
     var ins: InputStream? = null

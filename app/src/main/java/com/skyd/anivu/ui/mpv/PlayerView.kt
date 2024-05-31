@@ -115,6 +115,11 @@ private fun MPVView.solveCommand(
             onSubtitleTrack(subtitleTrack)
         }
 
+        is PlayerCommand.AddAudio -> {
+            addAudio(command.filePath)
+            onAudioTrack(audioTrack)
+        }
+
         PlayerCommand.GetBuffer -> onCacheBufferStateChanged(demuxerCacheDuration.toFloat())
     }
 }
@@ -183,10 +188,11 @@ fun PlayerView(
             ),
             audioTrackDialogCallback = AudioTrackDialogCallback(
                 onAudioTrackChanged = { commandQueue.trySend(PlayerCommand.SetAudioTrack(it.trackId)) },
+                onAddAudioTrack = { commandQueue.trySend(PlayerCommand.AddAudio(it)) },
             ),
             subtitleTrackDialogCallback = SubtitleTrackDialogCallback(
-                onAddSubtitle = { commandQueue.trySend(PlayerCommand.AddSubtitle(it)) },
                 onSubtitleTrackChanged = { commandQueue.trySend(PlayerCommand.SetSubtitleTrack(it.trackId)) },
+                onAddSubtitle = { commandQueue.trySend(PlayerCommand.AddSubtitle(it)) },
             )
         )
     }

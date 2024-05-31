@@ -256,8 +256,11 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         }
     }
 
-    fun loadSubtitleTrack() {
-        tracks["sub"]!!.apply {
+    fun loadSubtitleTrack() = loadTrack("sub")
+    fun loadAudioTrack() = loadTrack("audio")
+
+    private fun loadTrack(trackType: String) {
+        tracks[trackType]!!.apply {
             clear()
             add(Track(-1, context.getString(R.string.track_off)))
         }
@@ -266,7 +269,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         // so use ?: continue instead of !!
         for (i in 0 until count) {
             val type = MPVLib.getPropertyString("track-list/$i/type") ?: continue
-            if (type == "sub") {
+            if (type == trackType) {
                 val mpvId = MPVLib.getPropertyInt("track-list/$i/id") ?: continue
                 val lang = MPVLib.getPropertyString("track-list/$i/lang")
                 val title = MPVLib.getPropertyString("track-list/$i/title")
@@ -536,6 +539,11 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     fun addSubtitle(filePath: String) {
         MPVLib.command(arrayOf("sub-add", filePath, "cached"))
         loadSubtitleTrack()
+    }
+
+    fun addAudio(filePath: String) {
+        MPVLib.command(arrayOf("audio-add", filePath, "cached"))
+        loadAudioTrack()
     }
 
     companion object {
