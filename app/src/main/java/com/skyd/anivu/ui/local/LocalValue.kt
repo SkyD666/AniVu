@@ -13,6 +13,7 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleFrequencyPreference
 import com.skyd.anivu.model.preference.autodelete.UseAutoDeletePreference
+import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
@@ -46,6 +47,7 @@ val LocalDeduplicateTitleInDesc = compositionLocalOf { DeduplicateTitleInDescPre
 val LocalArticleTapAction = compositionLocalOf { ArticleTapActionPreference.default }
 val LocalArticleSwipeLeftAction = compositionLocalOf { ArticleSwipeLeftActionPreference.default }
 val LocalHideEmptyDefault = compositionLocalOf { HideEmptyDefaultPreference.default }
+val LocalPickImageMethod = compositionLocalOf { PickImageMethodPreference.default }
 
 // Player
 val LocalPlayerDoubleTap = compositionLocalOf { PlayerDoubleTapPreference.default }

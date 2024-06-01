@@ -19,7 +19,7 @@ import com.skyd.anivu.ui.local.LocalTextFieldStyle
 @Composable
 fun TextFieldDialog(
     modifier: Modifier = Modifier,
-    visible: Boolean = false,
+    visible: Boolean = true,
     readOnly: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),

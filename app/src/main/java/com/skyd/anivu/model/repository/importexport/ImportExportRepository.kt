@@ -87,6 +87,20 @@ class ImportExportRepository @Inject constructor(
         fun MutableList<OpmlGroupWithFeed>.addFeedToDefault(feed: FeedBean) =
             first().feeds.add(feed)
 
+        fun Outline.toFeed(groupId: String) = FeedBean(
+            url = attributes["xmlUrl"]!!,
+            title = attributes["title"] ?: text.toString(),
+            description = attributes["description"],
+            link = attributes["link"],
+            icon = attributes["icon"],
+            groupId = groupId,
+            nickname = attributes["nickname"],
+            customDescription = attributes["customDescription"],
+            customIcon = attributes["customIcon"]?.let {
+                if (it.startsWith("http://") || it.startsWith("https://")) it
+                else null
+            }
+        )
 
         val opml = OpmlParser().parse(inputStream)
         val groupWithFeedList = mutableListOf<OpmlGroupWithFeed>().apply {
@@ -107,17 +121,7 @@ class ImportExportRepository @Inject constructor(
                         )
                     }
                 } else {
-                    groupWithFeedList.addFeedToDefault(
-                        FeedBean(
-                            url = it.attributes["xmlUrl"]!!,
-                            title = it.attributes["title"] ?: it.text.toString(),
-                            description = it.attributes["description"],
-                            link = it.attributes["link"],
-                            icon = it.attributes["icon"],
-                            groupId = GroupBean.DefaultGroup.groupId,
-                            nickname = it.attributes["nickname"],
-                        )
-                    )
+                    groupWithFeedList.addFeedToDefault(it.toFeed(groupId = GroupBean.DefaultGroup.groupId))
                 }
             } else {
                 if (!it.attributes["isDefault"].toBoolean()) {
@@ -129,17 +133,7 @@ class ImportExportRepository @Inject constructor(
                     )
                 }
                 it.subElements.forEach { outline ->
-                    groupWithFeedList.addFeed(
-                        FeedBean(
-                            url = outline.attributes["xmlUrl"]!!,
-                            title = outline.attributes["title"] ?: outline.text!!,
-                            description = outline.attributes["description"],
-                            link = outline.attributes["link"],
-                            icon = outline.attributes["icon"],
-                            groupId = "",
-                            nickname = outline.attributes["nickname"],
-                        )
-                    )
+                    groupWithFeedList.addFeed(outline.toFeed(groupId = ""))
                 }
             }
         }
@@ -172,6 +166,12 @@ class ImportExportRepository @Inject constructor(
                     feed.link?.let { put("link", it) }
                     feed.icon?.let { put("icon", it) }
                     feed.nickname?.let { put("nickname", it) }
+                    feed.customDescription?.let { put("customDescription", it) }
+                    feed.customIcon?.let {
+                        if (it.startsWith("http://") || it.startsWith("https://")) {
+                            put("customIcon", it)
+                        }
+                    }
                 },
                 listOf()
             )

@@ -1,6 +1,12 @@
 package com.skyd.anivu.model.repository
 
+import android.net.Uri
+import android.webkit.URLUtil
 import com.skyd.anivu.base.BaseRepository
+import com.skyd.anivu.config.Const
+import com.skyd.anivu.ext.copyTo
+import com.skyd.anivu.ext.isLocal
+import com.skyd.anivu.ext.isNetwork
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.model.db.dao.FeedDao
@@ -12,6 +18,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import java.io.File
+import java.util.UUID
 import javax.inject.Inject
 
 class FeedRepository @Inject constructor(
@@ -62,7 +70,7 @@ class FeedRepository @Inject constructor(
         return flow {
             val realNickname = if (nickname.isNullOrBlank()) null else nickname
             val realGroupId =
-                if (nickname.isNullOrBlank() || groupId == GroupBean.DEFAULT_GROUP_ID) null else groupId
+                if (groupId.isNullOrBlank() || groupId == GroupBean.DEFAULT_GROUP_ID) null else groupId
             val feedWithArticleBean = rssHelper.searchFeed(url = url).run {
                 copy(
                     feed = feed.copy(
@@ -75,42 +83,100 @@ class FeedRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun editFeed(
+    suspend fun editFeedUrl(
         oldUrl: String,
         newUrl: String,
-        nickname: String?,
-        groupId: String?,
-    ): Flow<Unit> {
-        return flow {
-            val realNickname = if (nickname.isNullOrBlank()) null else nickname
-            val realGroupId =
-                if (groupId.isNullOrBlank() || groupId == GroupBean.DEFAULT_GROUP_ID) null else groupId
-            if (oldUrl != newUrl) {
-                val feedWithArticleBean = rssHelper.searchFeed(url = newUrl).run {
-                    copy(
-                        feed = feed.copy(
-                            groupId = realGroupId,
-                            nickname = realNickname,
-                        )
-                    )
-                }
-                feedDao.removeFeed(oldUrl)
-                feedDao.setFeedWithArticle(feedWithArticleBean)
-                emit(Unit)
-            } else {
-                feedDao.updateFeedGroupId(oldUrl, realNickname, realGroupId)
-                emit(Unit)
+    ): Flow<FeedBean> = flow {
+        val oldFeed = feedDao.getFeed(oldUrl)
+        var newFeed = oldFeed
+        if (oldUrl != newUrl) {
+            val feedWithArticleBean = rssHelper.searchFeed(url = newUrl).run {
+                newFeed = feed.copy(
+                    groupId = oldFeed.groupId,
+                    nickname = oldFeed.nickname,
+                    customDescription = oldFeed.customDescription,
+                    customIcon = oldFeed.customIcon,
+                )
+                copy(feed = newFeed)
             }
-        }.flowOn(Dispatchers.IO)
-    }
+            feedDao.removeFeed(oldUrl)
+            feedDao.setFeedWithArticle(feedWithArticleBean)
+        }
+        emit(newFeed)
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun editFeedNickname(
+        url: String,
+        nickname: String?,
+    ): Flow<FeedBean> = flow {
+        val realNickname = if (nickname.isNullOrBlank()) null else nickname
+        feedDao.updateFeed(feedDao.getFeed(url).copy(nickname = realNickname))
+        emit(feedDao.getFeed(url))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun editFeedGroup(
+        url: String,
+        groupId: String?,
+    ): Flow<FeedBean> = flow {
+        val realGroupId =
+            if (groupId.isNullOrBlank() || groupId == GroupBean.DEFAULT_GROUP_ID) null
+            else groupId
+
+        feedDao.updateFeed(feedDao.getFeed(url).copy(groupId = realGroupId))
+        emit(feedDao.getFeed(url))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun editFeedCustomDescription(
+        url: String,
+        customDescription: String?,
+    ): Flow<FeedBean> = flow {
+        val realCustomDescription =
+            if (customDescription.isNullOrBlank()) null else customDescription
+        feedDao.updateFeed(feedDao.getFeed(url).copy(customDescription = realCustomDescription))
+        emit(feedDao.getFeed(url))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun editFeedCustomIcon(
+        url: String,
+        customIcon: Uri?,
+    ): Flow<FeedBean> = flow {
+        var filePath: String? = null
+        if (customIcon != null) {
+            if (customIcon.isLocal()) {
+                customIcon.copyTo(
+                    File(Const.FEED_ICON_DIR, UUID.randomUUID().toString()).apply {
+                        filePath = path
+                    }
+                )
+            } else if (customIcon.isNetwork()) {
+                filePath = customIcon.toString()
+            }
+        }
+        val oldFeed = feedDao.getFeed(url)
+        oldFeed.customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
+        feedDao.updateFeed(oldFeed.copy(customIcon = filePath))
+        emit(feedDao.getFeed(url))
+    }.flowOn(Dispatchers.IO)
 
     suspend fun removeFeed(url: String): Flow<Int> {
-        return flowOf(feedDao.removeFeed(url))
-            .flowOn(Dispatchers.IO)
+        return flow {
+            feedDao.getFeed(url).customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
+            emit(feedDao.removeFeed(url))
+        }.flowOn(Dispatchers.IO)
     }
 
     suspend fun createGroup(group: GroupBean): Flow<Unit> {
         return flowOf(groupDao.setGroup(group))
             .flowOn(Dispatchers.IO)
+    }
+}
+
+fun tryDeleteFeedIconFile(path: String?) {
+    if (path != null && !URLUtil.isNetworkUrl(path)) {
+        try {
+            File(path).delete()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }

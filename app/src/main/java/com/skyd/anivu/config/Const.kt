@@ -22,6 +22,10 @@ object Const {
 
     const val BASE_URL = "https://github.com/SkyD666/"
 
+    val FEED_ICON_DIR = File(appContext.filesDir.path, "Pictures/FeedIcon").apply {
+        if (!exists()) mkdirs()
+    }
+
     val TEMP_TORRENT_DIR = File(appContext.cacheDir.path, "Torrent").apply {
         if (!exists()) mkdirs()
     }

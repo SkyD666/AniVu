@@ -1,6 +1,7 @@
 package com.skyd.anivu.util.favicon.interceptor
 
 import com.skyd.anivu.model.service.HttpService
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import okio.BufferedSource
 import okio.ByteString.Companion.decodeHex
@@ -33,6 +34,16 @@ open class IconTagInterceptor @Inject constructor(
                         else -> it.url
                     },
                 )
+            }.map {
+                async {
+                    runCatching {
+                        retrofit.create(HttpService::class.java).head(it.url).run {
+                            if (isSuccessful && isImage()) it else null
+                        }
+                    }.getOrNull()
+                }
+            }.mapNotNull {
+                it.await()
             }
         } catch (e: Exception) {
             e.printStackTrace()

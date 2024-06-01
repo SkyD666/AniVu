@@ -12,6 +12,7 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleFrequencyPreference
 import com.skyd.anivu.model.preference.autodelete.UseAutoDeletePreference
+import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
@@ -39,6 +40,7 @@ fun Preferences.toSettings(): Settings {
         articleTapAction = ArticleTapActionPreference.fromPreferences(this),
         articleSwipeLeftAction = ArticleSwipeLeftActionPreference.fromPreferences(this),
         hideEmptyDefault = HideEmptyDefaultPreference.fromPreferences(this),
+        pickImageMethod = PickImageMethodPreference.fromPreferences(this),
 
         // Player
         playerDoubleTap = PlayerDoubleTapPreference.fromPreferences(this),

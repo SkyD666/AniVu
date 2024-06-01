@@ -17,6 +17,7 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleFrequencyPreference
 import com.skyd.anivu.model.preference.autodelete.UseAutoDeletePreference
+import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
@@ -37,6 +38,7 @@ import com.skyd.anivu.ui.local.LocalHardwareDecode
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
+import com.skyd.anivu.ui.local.LocalPickImageMethod
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
@@ -61,6 +63,7 @@ data class Settings(
     val articleTapAction: String = ArticleTapActionPreference.default,
     val articleSwipeLeftAction: String = ArticleSwipeLeftActionPreference.default,
     val hideEmptyDefault: Boolean = HideEmptyDefaultPreference.default,
+    val pickImageMethod: String = PickImageMethodPreference.default,
     // Player
     val playerDoubleTap: String = PlayerDoubleTapPreference.default,
     val playerShow85sButton: Boolean = PlayerShow85sButtonPreference.default,
@@ -95,6 +98,7 @@ fun SettingsProvider(
         LocalArticleTapAction provides settings.articleTapAction,
         LocalArticleSwipeLeftAction provides settings.articleSwipeLeftAction,
         LocalHideEmptyDefault provides settings.hideEmptyDefault,
+        LocalPickImageMethod provides settings.pickImageMethod,
         // Player
         LocalPlayerDoubleTap provides settings.playerDoubleTap,
         LocalPlayerShow85sButton provides settings.playerShow85sButton,

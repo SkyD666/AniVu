@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.skyd.anivu.R
@@ -88,6 +89,10 @@ private fun Uri.openChooser(context: Context, action: String, chooserTitle: Char
         context.getString(R.string.failed_msg, e.message).showToast(Toast.LENGTH_LONG)
     }
 }
+
+fun Uri.isLocal(): Boolean = URLUtil.isFileUrl(toString()) || URLUtil.isContentUrl(toString())
+
+fun Uri.isNetwork(): Boolean = URLUtil.isNetworkUrl(toString())
 
 fun InputStream.saveTo(target: File): File {
     val parentFile = target.parentFile

@@ -5,7 +5,7 @@
     <string name="media_screen_name">媒體</string>
     <string name="more_screen_name">更多</string>
     <string name="add">新增</string>
-    <string name="feed_screen_add_rss_hint">RSS 訂閱連結</string>
+    <string name="feed_screen_rss_url">RSS 訂閱連結</string>
     <string name="paste">貼上</string>
     <string name="warning">警告</string>
     <string name="cancel">取消</string>
@@ -179,6 +179,11 @@
     <string name="feed_style_screen_feed_group_expand">總是展開</string>
     <string name="feed_style_screen_group_list_category">分組列表</string>
     <string name="appearance_fragment_style_category">樣式</string>
+    <string name="pick_image_method_pick_visual_media">相片挑選工具（%s）</string>
+    <string name="pick_image_method_open_document">來自檔案（%s）</string>
+    <string name="pick_image_method_get_content">來自內容（%s）</string>
+    <string name="pick_image_method_pick_from_gallery">來自相簿（%s）</string>
+    <string name="use_the_following_to_open">使用以下方式開啟</string>
     <plurals name="rss_sync_frequency_minute">
         <item quantity="other">每 %d 分鐘</item>
     </plurals>

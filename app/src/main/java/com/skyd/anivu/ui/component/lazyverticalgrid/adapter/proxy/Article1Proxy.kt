@@ -266,7 +266,6 @@ fun Article1Item(
 
 @Composable
 fun FeedIcon(modifier: Modifier = Modifier, data: FeedBean, size: Dp = 22.dp) {
-    val icon = data.icon
     val defaultIcon: @Composable () -> Unit = {
         Box(
             modifier = modifier
@@ -285,18 +284,25 @@ fun FeedIcon(modifier: Modifier = Modifier, data: FeedBean, size: Dp = 22.dp) {
             )
         }
     }
-    var imageLoadError by rememberSaveable { mutableStateOf(false) }
+    var imageLoadError by rememberSaveable(data) { mutableStateOf(false) }
+
+    var icon by remember(data) { mutableStateOf(data.customIcon.orEmpty().ifBlank { data.icon }) }
     if (icon.isNullOrBlank() || imageLoadError) {
         defaultIcon()
     } else {
         AniVuImage(
             modifier = modifier
                 .size(size)
-                .clip(CircleShape),
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceDim),
             model = icon,
             imageLoader = rememberAniVuImageLoader(listener = object : EventListener {
                 override fun onError(request: ImageRequest, result: ErrorResult) {
-                    imageLoadError = true
+                    if (icon == data.customIcon) {
+                        icon = data.icon
+                    } else {
+                        imageLoadError = true
+                    }
                 }
             }),
             contentScale = ContentScale.Crop,

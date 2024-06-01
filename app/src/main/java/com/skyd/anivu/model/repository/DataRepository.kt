@@ -4,6 +4,7 @@ import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.deleteRecursivelyExclude
 import com.skyd.anivu.model.db.dao.ArticleDao
+import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.TorrentFileDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -13,6 +14,7 @@ import javax.inject.Inject
 
 class DataRepository @Inject constructor(
     private val torrentFileDao: TorrentFileDao,
+    private val feedDao: FeedDao,
     private val articleDao: ArticleDao,
 ) : BaseRepository() {
     fun requestClearCache(): Flow<Long> {
@@ -29,6 +31,17 @@ class DataRepository @Inject constructor(
                     val s = it.length()
                     if (it.delete()) {
                         size += s
+                    }
+                }
+            }
+            Const.FEED_ICON_DIR.walkBottomUp().forEach {
+                if (it.path!=Const.FEED_ICON_DIR.path) {
+                    val contains = feedDao.containsByCustomIcon(it.path)
+                    if (contains == 0) {
+                        val s = it.length()
+                        if (it.delete()) {
+                            size += s
+                        }
                     }
                 }
             }

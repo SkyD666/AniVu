@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
+import com.skyd.anivu.model.repository.ArticleRepository
 import com.skyd.anivu.model.repository.FeedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -23,7 +24,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class FeedViewModel @Inject constructor(
-    private val feedRepo: FeedRepository
+    private val feedRepo: FeedRepository,
+    private val articleRepo: ArticleRepository,
 ) : AbstractMviViewModel<FeedIntent, FeedState, FeedEvent>() {
 
     override val viewState: StateFlow<FeedState>
@@ -60,7 +62,7 @@ class FeedViewModel @Inject constructor(
                 }
 
                 is FeedPartialStateChange.EditFeed.Success -> {
-                    FeedEvent.EditFeedResultEvent.Success
+                    FeedEvent.EditFeedResultEvent.Success(change.feed)
                 }
 
                 is FeedPartialStateChange.EditFeed.Failed -> {
@@ -73,6 +75,14 @@ class FeedViewModel @Inject constructor(
 
                 is FeedPartialStateChange.RemoveFeed.Failed -> {
                     FeedEvent.RemoveFeedResultEvent.Failed(change.msg)
+                }
+
+                is FeedPartialStateChange.RefreshFeed.Success -> {
+                    FeedEvent.RefreshFeedResultEvent.Success
+                }
+
+                is FeedPartialStateChange.RefreshFeed.Failed -> {
+                    FeedEvent.RefreshFeedResultEvent.Failed(change.msg)
                 }
 
                 is FeedPartialStateChange.FeedList.Failed -> {
@@ -126,16 +136,37 @@ class FeedViewModel @Inject constructor(
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.AddFeed.Failed(it.message.toString()) }
             },
-            filterIsInstance<FeedIntent.EditFeed>().flatMapConcat { intent ->
-                feedRepo.editFeed(
-                    oldUrl = intent.oldUrl,
-                    newUrl = intent.newUrl,
-                    nickname = intent.nickname,
-                    groupId = intent.groupId,
-                )
-                    .map {
-                        FeedPartialStateChange.EditFeed.Success
-                    }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+            filterIsInstance<FeedIntent.EditFeedUrl>().flatMapConcat { intent ->
+                feedRepo.editFeedUrl(oldUrl = intent.oldUrl, newUrl = intent.newUrl).map {
+                    FeedPartialStateChange.EditFeed.Success(it)
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
+            },
+            filterIsInstance<FeedIntent.EditFeedGroup>().flatMapConcat { intent ->
+                feedRepo.editFeedGroup(url = intent.url, groupId = intent.groupId).map {
+                    FeedPartialStateChange.EditFeed.Success(it)
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
+            },
+            filterIsInstance<FeedIntent.EditFeedCustomDescription>().flatMapConcat { intent ->
+                feedRepo.editFeedCustomDescription(
+                    url = intent.url,
+                    customDescription = intent.customDescription,
+                ).map {
+                    FeedPartialStateChange.EditFeed.Success(it)
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
+            },
+            filterIsInstance<FeedIntent.EditFeedCustomIcon>().flatMapConcat { intent ->
+                feedRepo.editFeedCustomIcon(url = intent.url, customIcon = intent.customIcon).map {
+                    FeedPartialStateChange.EditFeed.Success(it)
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
+            },
+            filterIsInstance<FeedIntent.EditFeedNickname>().flatMapConcat { intent ->
+                feedRepo.editFeedNickname(url = intent.url, nickname = intent.nickname).map {
+                    FeedPartialStateChange.EditFeed.Success(it)
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.RemoveFeed>().flatMapConcat { intent ->
@@ -143,6 +174,12 @@ class FeedViewModel @Inject constructor(
                     if (it > 0) FeedPartialStateChange.RemoveFeed.Success
                     else FeedPartialStateChange.RemoveFeed.Failed("Remove failed!")
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+            },
+            filterIsInstance<FeedIntent.RefreshFeed>().flatMapConcat { intent ->
+                articleRepo.refreshArticleList(listOf(intent.url)).map {
+                    FeedPartialStateChange.RefreshFeed.Success
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.RefreshFeed.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.CreateGroup>().flatMapConcat { intent ->
                 feedRepo.createGroup(intent.group).map {

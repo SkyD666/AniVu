@@ -276,7 +276,6 @@ private fun FeedList(
                     result = groupListState.dataList,
                     contentPadding = innerPadding + PaddingValues(bottom = fabHeight + 16.dp),
                     selectedFeedUrls = listPaneSelectedFeedUrls,
-                    onRemoveFeed = { feed -> dispatch(FeedIntent.RemoveFeed(feed.url)) },
                     onShowArticleList = { feedUrls -> onShowArticleList(feedUrls) },
                     onEditFeed = { feed ->
                         openEditDialog = feed
@@ -335,37 +334,42 @@ private fun FeedList(
         }
 
         if (openEditDialog != null) {
-            val groups = (uiState.groupListState as? GroupListState.Success)
-                ?.dataList?.filterIsInstance<GroupBean>().orEmpty()
-            EditFeedDialog(
-                url = editDialogUrl!!,
-                onUrlChange = { editDialogUrl = it },
-                nickname = editDialogNickname,
-                onNicknameChange = { editDialogNickname = it },
-                group = groups.find { it.groupId == editDialogGroupId } ?: GroupBean.DefaultGroup,
+            val groups = remember(uiState.groupListState) {
+                (uiState.groupListState as? GroupListState.Success)
+                    ?.dataList?.filterIsInstance<GroupBean>().orEmpty()
+            }
+            EditFeedSheet(
+                onDismissRequest = { openEditDialog = null },
+                feed = openEditDialog!!,
                 groups = groups,
-                onGroupChange = { editDialogGroupId = it.groupId },
+                onDelete = { dispatch(FeedIntent.RemoveFeed(it)) },
+                onRefresh = { dispatch(FeedIntent.RefreshFeed(it)) },
+                onUrlChange = {
+                    dispatch(FeedIntent.EditFeedUrl(oldUrl = openEditDialog!!.url, newUrl = it))
+                },
+                onNicknameChange = {
+                    dispatch(FeedIntent.EditFeedNickname(url = openEditDialog!!.url, nickname = it))
+                },
+                onCustomDescriptionChange = {
+                    dispatch(
+                        FeedIntent.EditFeedCustomDescription(
+                            url = openEditDialog!!.url, customDescription = it,
+                        )
+                    )
+                },
+                onCustomIconChange = {
+                    dispatch(
+                        FeedIntent.EditFeedCustomIcon(url = openEditDialog!!.url, customIcon = it)
+                    )
+                },
+                onGroupChange = {
+                    dispatch(
+                        FeedIntent.EditFeedGroup(url = openEditDialog!!.url, groupId = it.groupId)
+                    )
+                },
                 openCreateGroupDialog = {
                     openCreateGroupDialog = true
                     createGroupDialogGroup = ""
-                },
-                onConfirm = { newUrl, nickname, group ->
-                    dispatch(
-                        FeedIntent.EditFeed(
-                            oldUrl = openEditDialog!!.url,
-                            newUrl = newUrl,
-                            nickname = nickname,
-                            groupId = group.groupId,
-                        )
-                    )
-                    openEditDialog = null
-                    editDialogNickname = ""
-                    editDialogUrl = null
-                },
-                onDismissRequest = {
-                    openEditDialog = null
-                    editDialogNickname = ""
-                    editDialogUrl = null
                 },
             )
         }
@@ -398,6 +402,9 @@ private fun FeedList(
             is FeedEvent.RemoveFeedResultEvent.Failed ->
                 snackbarHostState.showSnackbar(message = event.msg, scope = scope)
 
+            is FeedEvent.RefreshFeedResultEvent.Failed ->
+                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+
             is FeedEvent.CreateGroupResultEvent.Failed ->
                 snackbarHostState.showSnackbar(message = event.msg, scope = scope)
 
@@ -407,9 +414,13 @@ private fun FeedList(
             is FeedEvent.DeleteGroupResultEvent.Failed ->
                 snackbarHostState.showSnackbar(message = event.msg, scope = scope)
 
+            is FeedEvent.EditFeedResultEvent.Success -> LaunchedEffect(event) {
+                if (openEditDialog != null) openEditDialog = event.feed
+            }
+
             FeedEvent.AddFeedResultEvent.Success,
-            FeedEvent.EditFeedResultEvent.Success,
             FeedEvent.RemoveFeedResultEvent.Success,
+            FeedEvent.RefreshFeedResultEvent.Success,
             FeedEvent.CreateGroupResultEvent.Success,
             FeedEvent.MoveFeedsToGroupResultEvent.Success,
             FeedEvent.DeleteGroupResultEvent.Success,
@@ -452,7 +463,7 @@ private fun EditFeedDialog(
                     value = url,
                     onValueChange = onUrlChange,
                     autoRequestFocus = false,
-                    label = stringResource(id = R.string.feed_screen_add_rss_hint),
+                    label = stringResource(id = R.string.feed_screen_rss_url),
                     focusManager = focusManager,
                     imeAction = ImeAction.Next,
                     keyboardAction = { _, _ ->
@@ -589,7 +600,6 @@ private fun FeedList(
     contentPadding: PaddingValues = PaddingValues(),
     selectedFeedUrls: List<String>? = null,
     onShowArticleList: (List<String>) -> Unit,
-    onRemoveFeed: (FeedBean) -> Unit,
     onEditFeed: (FeedBean) -> Unit,
     onDeleteGroup: (GroupBean) -> Unit,
     onMoveToGroup: (from: GroupBean, to: GroupBean) -> Unit,
@@ -655,7 +665,6 @@ private fun FeedList(
                     useCardLayout = { true },
                     onClick = { onShowArticleList(listOf(it.url)) },
                     isEnded = { it == result.lastIndex || result[it + 1] is GroupBean },
-                    onRemove = onRemoveFeed,
                     onEdit = onEditFeed
                 )
             )
