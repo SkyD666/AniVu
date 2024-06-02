@@ -293,8 +293,7 @@ fun FeedIcon(modifier: Modifier = Modifier, data: FeedBean, size: Dp = 22.dp) {
         AniVuImage(
             modifier = modifier
                 .size(size)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceDim),
+                .clip(CircleShape),
             model = icon,
             imageLoader = rememberAniVuImageLoader(listener = object : EventListener {
                 override fun onError(request: ImageRequest, result: ErrorResult) {

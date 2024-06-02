@@ -24,7 +24,54 @@ fun TextFieldDialog(
     maxLines: Int = Int.MAX_VALUE,
     style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     icon: @Composable (() -> Unit)? = null,
-    title: String? = null,
+    titleText: String? = null,
+    value: String = "",
+    placeholder: String = "",
+    trailingIcon: @Composable (() -> Unit)? = DefaultTrailingIcon,
+    isPassword: Boolean = false,
+    errorText: String = "",
+    dismissText: String = stringResource(R.string.cancel),
+    confirmText: String = stringResource(R.string.ok),
+    enableConfirm: (String) -> Boolean = { it.isNotBlank() },
+    onValueChange: (String) -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+    onConfirm: (String) -> Unit = {},
+    imeAction: ImeAction = if (maxLines == 1) ImeAction.Done else ImeAction.Default,
+) {
+    TextFieldDialog(
+        modifier = modifier,
+        visible = visible,
+        readOnly = readOnly,
+        maxLines = maxLines,
+        style = style,
+        icon = icon,
+        title = if (titleText == null) null else {
+            { Text(text = titleText, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+        },
+        value = value,
+        placeholder = placeholder,
+        trailingIcon = trailingIcon,
+        isPassword = isPassword,
+        errorText = errorText,
+        dismissText = dismissText,
+        confirmText = confirmText,
+        enableConfirm = enableConfirm,
+        onValueChange = onValueChange,
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm,
+        imeAction = imeAction,
+    )
+}
+
+@Composable
+fun TextFieldDialog(
+    modifier: Modifier = Modifier,
+    visible: Boolean = true,
+    readOnly: Boolean = false,
+    maxLines: Int = Int.MAX_VALUE,
+    style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
+    icon: @Composable (() -> Unit)? = null,
+    title: @Composable (() -> Unit)? = null,
     value: String = "",
     placeholder: String = "",
     trailingIcon: @Composable (() -> Unit)? = DefaultTrailingIcon,
@@ -45,9 +92,7 @@ fun TextFieldDialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
         icon = icon,
-        title = if (title == null) null else {
-            { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) }
-        },
+        title = title,
         text = {
             ClipboardTextField(
                 modifier = modifier,

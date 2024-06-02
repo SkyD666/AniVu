@@ -130,9 +130,7 @@ class FeedRepository @Inject constructor(
         url: String,
         customDescription: String?,
     ): Flow<FeedBean> = flow {
-        val realCustomDescription =
-            if (customDescription.isNullOrBlank()) null else customDescription
-        feedDao.updateFeed(feedDao.getFeed(url).copy(customDescription = realCustomDescription))
+        feedDao.updateFeed(feedDao.getFeed(url).copy(customDescription = customDescription))
         emit(feedDao.getFeed(url))
     }.flowOn(Dispatchers.IO)
 
@@ -166,8 +164,13 @@ class FeedRepository @Inject constructor(
     }
 
     suspend fun createGroup(group: GroupBean): Flow<Unit> {
-        return flowOf(groupDao.setGroup(group))
-            .flowOn(Dispatchers.IO)
+        return flow {
+            if (groupDao.containsByName(group.name) == 0) {
+                emit(groupDao.setGroup(group))
+            } else {
+                emit(Unit)
+            }
+        }.flowOn(Dispatchers.IO)
     }
 }
 

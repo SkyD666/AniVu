@@ -578,7 +578,7 @@ private fun CreateGroupDialog(
     TextFieldDialog(
         visible = visible,
         icon = { Icon(imageVector = Icons.Outlined.Workspaces, contentDescription = null) },
-        title = stringResource(id = R.string.feed_screen_add_group),
+        titleText = stringResource(id = R.string.feed_screen_add_group),
         placeholder = stringResource(id = R.string.feed_group),
         value = value,
         onValueChange = onValueChange,

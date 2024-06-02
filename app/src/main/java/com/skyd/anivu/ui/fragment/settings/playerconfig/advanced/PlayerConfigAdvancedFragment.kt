@@ -115,6 +115,7 @@ fun PlayerConfigAdvancedScreen() {
             visible = openMpvConfEditDialog,
             value = mpvConfEditDialogValue,
             onValueChange = { mpvConfEditDialogValue = it },
+            title = null,
             onConfirm = {
                 MpvConfigPreference.put(
                     scope = scope,
@@ -130,6 +131,7 @@ fun PlayerConfigAdvancedScreen() {
             visible = openMpvInputConfEditDialog,
             value = mpvInputConfEditDialogValue,
             onValueChange = { mpvInputConfEditDialogValue = it },
+            title = null,
             onConfirm = {
                 MpvInputConfigPreference.put(
                     scope = scope,

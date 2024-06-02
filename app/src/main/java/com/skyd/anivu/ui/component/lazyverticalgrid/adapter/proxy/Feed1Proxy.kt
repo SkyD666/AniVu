@@ -141,8 +141,10 @@ fun Feed1Item(
                     }
                 }
                 val description = rememberSaveable(feed.customDescription, feed.description) {
-                    feed.customDescription.orEmpty().ifBlank {
+                    if (feed.customDescription == null) {
                         feed.description?.readable().orEmpty()
+                    } else {
+                        feed.customDescription.readable()
                     }
                 }
                 if (description.isNotBlank()) {

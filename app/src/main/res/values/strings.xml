@@ -185,6 +185,7 @@
     <string name="feed_screen_delete_group_warning_title">Delete group</string>
     <string name="feed_screen_delete_feed_warning">Delete the feed and articles it contains</string>
     <string name="feed_screen_rss_nickname">Name (Optional)</string>
+    <string name="feed_screen_rss_title">Title</string>
     <string name="feed_style_screen_name">Feed screen</string>
     <string name="feed_style_screen_feed_group_expand">Always expand</string>
     <string name="feed_style_screen_group_list_category">Group list</string>
@@ -253,6 +254,7 @@
     <string name="feed_screen_rss_edit_icon">Edit icon</string>
     <string name="feed_screen_rss_icon_source_network">From network</string>
     <string name="feed_screen_rss_icon_source_network_hint">URLs starting with http or https</string>
+    <string name="reset">Reset</string>
     <plurals name="import_opml_result">
         <item quantity="one">Imported %d item, takes %.2f seconds</item>
         <item quantity="other">Imported %d items, takes %.2f seconds</item>

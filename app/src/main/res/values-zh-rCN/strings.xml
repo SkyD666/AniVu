@@ -176,7 +176,8 @@
     <string name="feed_screen_delete_group_warning">删除“%s”分组及其所有订阅和文章</string>
     <string name="feed_screen_delete_group_warning_title">删除分组</string>
     <string name="feed_screen_delete_feed_warning">删除当前订阅及其所有文章</string>
-    <string name="feed_screen_rss_nickname">名称（可选）</string>
+    <string name="feed_screen_rss_nickname">标题（可选）</string>
+    <string name="feed_screen_rss_title">标题</string>
     <string name="feed_style_screen_name">订阅页面</string>
     <string name="feed_style_screen_feed_group_expand">总是展开</string>
     <string name="feed_style_screen_group_list_category">分组列表</string>
@@ -245,6 +246,7 @@
     <string name="feed_screen_rss_edit_icon">编辑图标</string>
     <string name="feed_screen_rss_icon_source_network">来自网络</string>
     <string name="feed_screen_rss_icon_source_network_hint">以 http 或 https 开头的网址</string>
+    <string name="reset">重置</string>
     <plurals name="import_opml_result">
         <item quantity="other">导入了 %d 项，花费 %.2f 秒</item>
     </plurals>

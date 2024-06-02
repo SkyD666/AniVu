@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.PhoneAndroid
@@ -63,6 +64,7 @@ import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
@@ -79,8 +81,8 @@ fun EditFeedSheet(
     onRefresh: (String) -> Unit,
     onDelete: (String) -> Unit,
     onUrlChange: (String) -> Unit,
-    onNicknameChange: (String) -> Unit,
-    onCustomDescriptionChange: (String) -> Unit,
+    onNicknameChange: (String?) -> Unit,
+    onCustomDescriptionChange: (String?) -> Unit,
     onCustomIconChange: (Uri?) -> Unit,
     onGroupChange: (GroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
@@ -88,10 +90,12 @@ fun EditFeedSheet(
     var openUrlDialog by rememberSaveable { mutableStateOf(false) }
     var url by rememberSaveable(feed.url) { mutableStateOf(feed.url) }
     var openNicknameDialog by rememberSaveable { mutableStateOf(false) }
-    var nickname by rememberSaveable(feed.nickname) { mutableStateOf(feed.nickname) }
+    var nickname by rememberSaveable(feed.nickname, feed.title) {
+        mutableStateOf(feed.nickname ?: feed.title)
+    }
     var openCustomDescriptionDialog by rememberSaveable { mutableStateOf(false) }
-    var customDescription by rememberSaveable(feed.customDescription) {
-        mutableStateOf(feed.customDescription)
+    var customDescription by rememberSaveable(feed.customDescription, feed.description) {
+        mutableStateOf(feed.customDescription ?: feed.description)
     }
 
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
@@ -139,7 +143,7 @@ fun EditFeedSheet(
             url = feed.url
         },
         visible = openUrlDialog,
-        title = stringResource(id = R.string.feed_screen_rss_url),
+        titleText = stringResource(id = R.string.feed_screen_rss_url),
         value = url,
         onValueChange = { url = it },
         onConfirm = {
@@ -155,10 +159,24 @@ fun EditFeedSheet(
         },
         visible = openNicknameDialog,
         maxLines = 1,
-        title = stringResource(id = R.string.feed_screen_rss_nickname),
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = stringResource(id = R.string.feed_screen_rss_nickname))
+                Spacer(modifier = Modifier.weight(1f))
+                AniVuIconButton(
+                    onClick = {
+                        onNicknameChange(null)
+                        nickname = null
+                        openNicknameDialog = false
+                    },
+                    imageVector = Icons.Outlined.History,
+                    contentDescription = stringResource(id = R.string.reset),
+                )
+            }
+        },
         value = nickname.orEmpty(),
         onValueChange = { nickname = it },
-        enableConfirm = { true },
+        enableConfirm = { !nickname.isNullOrBlank() },
         onConfirm = {
             onNicknameChange(it)
             openNicknameDialog = false
@@ -172,7 +190,21 @@ fun EditFeedSheet(
         },
         visible = openCustomDescriptionDialog,
         maxLines = 1,
-        title = stringResource(id = R.string.feed_screen_rss_description),
+        title = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = stringResource(id = R.string.feed_screen_rss_description))
+                Spacer(modifier = Modifier.weight(1f))
+                AniVuIconButton(
+                    onClick = {
+                        onCustomDescriptionChange(null)
+                        customDescription = null
+                        openCustomDescriptionDialog = false
+                    },
+                    imageVector = Icons.Outlined.History,
+                    contentDescription = stringResource(id = R.string.reset),
+                )
+            }
+        },
         value = customDescription.orEmpty(),
         onValueChange = { customDescription = it },
         enableConfirm = { true },
@@ -227,22 +259,19 @@ private fun InfoArea(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
-            val description = feed.customDescription
-                .orEmpty()
-                .ifBlank { feed.description }
-                ?.readable()
-                ?.trim()
+            val description = (feed.customDescription ?: feed.description.orEmpty())
+                .readable().trim()
             Spacer(modifier = Modifier.height(3.dp))
             Text(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(6.dp))
                     .clickable(onClick = onCustomDescriptionChanged),
-                text = if (description.isNullOrBlank()) {
+                text = description.ifBlank {
                     stringResource(id = R.string.feed_screen_rss_description_hint)
-                } else description,
+                },
                 style = MaterialTheme.typography.bodyMedium,
-                color = if (description.isNullOrBlank()) MaterialTheme.colorScheme.outline
+                color = if (description.isBlank()) MaterialTheme.colorScheme.outline
                 else MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
@@ -271,7 +300,7 @@ private fun InfoArea(
         if (openNetworkIconDialog) {
             TextFieldDialog(
                 onDismissRequest = { openNetworkIconDialog = false },
-                title = stringResource(id = R.string.feed_screen_rss_icon_source_network),
+                titleText = stringResource(id = R.string.feed_screen_rss_icon_source_network),
                 value = networkIcon,
                 onValueChange = { networkIcon = it },
                 placeholder = stringResource(id = R.string.feed_screen_rss_icon_source_network_hint),
@@ -323,7 +352,7 @@ private fun OptionArea(
     FlowRow(
         modifier = Modifier.padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         overflow = FlowRowOverflow.Visible
     ) {
         SheetChip(
@@ -367,7 +396,7 @@ private fun GroupArea(
     FlowRow(
         modifier = Modifier.padding(vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
         overflow = FlowRowOverflow.Visible
     ) {
         groups.forEach { group ->
@@ -380,16 +409,11 @@ private fun GroupArea(
                 onClick = { onGroupChange(group) },
             )
         }
-        Icon(
-            modifier = Modifier
-                .size(35.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .clickable { openCreateGroupDialog() }
-                .padding(7.dp),
-            imageVector = Icons.Outlined.Add,
+        SheetChip(
+            icon = Icons.Outlined.Add,
+            text = null,
             contentDescription = stringResource(id = R.string.feed_screen_add_group),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+            onClick = openCreateGroupDialog,
         )
     }
 }
@@ -400,7 +424,7 @@ private fun SheetChip(
     icon: ImageVector?,
     iconTint: Color = MaterialTheme.colorScheme.onPrimary,
     iconBackgroundColor: Color = MaterialTheme.colorScheme.primary,
-    text: String,
+    text: String?,
     contentDescription: String? = null,
     onClick: () -> Unit,
     onLongClick: (() -> Unit)? = null,
@@ -409,7 +433,7 @@ private fun SheetChip(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(100))
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f))
             .height(35.dp)
             .combinedClickable(onLongClick = onLongClick, onClick = onClick)
             .padding(5.dp),
@@ -428,17 +452,21 @@ private fun SheetChip(
                 contentDescription = contentDescription,
                 tint = iconTint,
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            if (text != null) {
+                Spacer(modifier = Modifier.width(4.dp))
+            }
         }
-        Text(
-            modifier = Modifier.padding(horizontal = 6.dp),
-            text = text,
-            style = MaterialTheme.typography.labelLarge,
-            fontSize = TextUnit(15f, TextUnitType.Sp),
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-        )
+        if (text != null) {
+            Text(
+                modifier = Modifier.padding(horizontal = 6.dp),
+                text = text,
+                style = MaterialTheme.typography.labelLarge,
+                fontSize = TextUnit(15f, TextUnitType.Sp),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
 
