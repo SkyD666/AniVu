@@ -6,7 +6,7 @@
     <string name="media_screen_name">媒體</string>
     <string name="more_screen_name">更多</string>
     <string name="add">新增</string>
-    <string name="feed_screen_add_rss_hint">RSS 訂閱連結</string>
+    <string name="feed_screen_rss_url">RSS 訂閱連結</string>
     <string name="paste">貼上</string>
     <string name="warning">警告</string>
     <string name="cancel">取消</string>
@@ -176,7 +176,9 @@
     <string name="feed_screen_group_feeds_move_to">移動到組</string>
     <string name="feed_screen_delete_group_warning">刪除“%s”分組及其所有訂閱和文章</string>
     <string name="feed_screen_delete_group_warning_title">刪除分組</string>
+    <string name="feed_screen_delete_feed_warning">Delete the feed and articles it contains</string>
     <string name="feed_screen_rss_nickname">名稱（可選）</string>
+    <string name="feed_screen_rss_title">Title</string>
     <string name="feed_style_screen_name">訂閱頁面</string>
     <string name="feed_style_screen_feed_group_expand">總是展開</string>
     <string name="feed_style_screen_group_list_category">分組列表</string>
@@ -232,6 +234,20 @@
     <string name="import_export_screen_description">Import and Export RSS data via OPML files</string>
     <string name="player_speed">Speed</string>
     <string name="player_add_external_audio">Add audio file</string>
+    <string name="feed_screen_rss_description_hint">Click to set a description</string>
+    <string name="feed_screen_rss_description">Description</string>
+    <string name="refresh">Refresh</string>
+    <string name="feed_options">Options</string>
+    <string name="pick_image_method_pick_visual_media">相片挑選工具（%s）</string>
+    <string name="pick_image_method_open_document">來自檔案（%s）</string>
+    <string name="pick_image_method_get_content">來自內容（%s）</string>
+    <string name="pick_image_method_pick_from_gallery">來自相簿（%s）</string>
+    <string name="use_the_following_to_open">使用以下方式開啟</string>
+    <string name="feed_screen_rss_icon_source_local">From local</string>
+    <string name="feed_screen_rss_edit_icon">Edit icon</string>
+    <string name="feed_screen_rss_icon_source_network">From network</string>
+    <string name="feed_screen_rss_icon_source_network_hint">URLs starting with http or https</string>
+    <string name="reset">Reset</string>
     <plurals name="import_opml_result">
         <item quantity="other">Imported %d items, takes %.2f seconds</item>
     </plurals>
