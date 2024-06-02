@@ -175,9 +175,7 @@
     <string name="feed_screen_add_group">新增分組</string>
     <string name="feed_screen_group_feeds_move_to">移動到組</string>
     <string name="feed_screen_delete_group_warning">刪除“%s”分組及其所有訂閱和文章</string>
-    <string name="feed_screen_delete_group_warning_title">刪除分組</string>
     <string name="feed_screen_delete_feed_warning">Delete the feed and articles it contains</string>
-    <string name="feed_screen_rss_nickname">名稱（可選）</string>
     <string name="feed_screen_rss_title">Title</string>
     <string name="feed_style_screen_name">訂閱頁面</string>
     <string name="feed_style_screen_feed_group_expand">總是展開</string>
