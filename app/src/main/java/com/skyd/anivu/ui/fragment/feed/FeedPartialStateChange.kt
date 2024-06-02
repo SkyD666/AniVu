@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.fragment.feed
 
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.GroupBean
 
 
 internal sealed interface FeedPartialStateChange {
@@ -9,10 +10,6 @@ internal sealed interface FeedPartialStateChange {
     sealed interface LoadingDialog : FeedPartialStateChange {
         data object Show : LoadingDialog {
             override fun reduce(oldState: FeedState) = oldState.copy(loadingDialog = true)
-        }
-
-        data object Close : LoadingDialog {
-            override fun reduce(oldState: FeedState) = oldState.copy(loadingDialog = false)
         }
     }
 
@@ -29,7 +26,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data object Success : AddFeed
+        data class Success(val feed: FeedBean) : AddFeed
         data class Failed(val msg: String) : AddFeed
     }
 
@@ -135,22 +132,36 @@ internal sealed interface FeedPartialStateChange {
         data class Failed(val msg: String) : MoveFeedsToGroup
     }
 
+    sealed interface EditGroup : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val group: GroupBean) : EditGroup
+        data class Failed(val msg: String) : EditGroup
+    }
+
     sealed interface FeedList : FeedPartialStateChange {
         override fun reduce(oldState: FeedState): FeedState {
             return when (this) {
                 is Success -> oldState.copy(
                     groupListState = GroupListState.Success(dataList = dataList),
-                    loadingDialog = false,
                 )
 
                 is Failed -> oldState.copy(
                     groupListState = GroupListState.Failed(msg = msg),
-                    loadingDialog = false,
                 )
 
                 Loading -> oldState.copy(
                     groupListState = GroupListState.Loading,
-                    loadingDialog = false,
                 )
             }
         }

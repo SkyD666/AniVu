@@ -182,9 +182,7 @@
     <string name="feed_screen_add_group">Add a group</string>
     <string name="feed_screen_group_feeds_move_to">Move to</string>
     <string name="feed_screen_delete_group_warning">Delete the \"%s\" group and all the feeds and articles it contains</string>
-    <string name="feed_screen_delete_group_warning_title">Delete group</string>
     <string name="feed_screen_delete_feed_warning">Delete the feed and articles it contains</string>
-    <string name="feed_screen_rss_nickname">Name (Optional)</string>
     <string name="feed_screen_rss_title">Title</string>
     <string name="feed_style_screen_name">Feed screen</string>
     <string name="feed_style_screen_feed_group_expand">Always expand</string>

@@ -174,9 +174,7 @@
     <string name="feed_screen_add_group">添加分组</string>
     <string name="feed_screen_group_feeds_move_to">移动到组</string>
     <string name="feed_screen_delete_group_warning">删除“%s”分组及其所有订阅和文章</string>
-    <string name="feed_screen_delete_group_warning_title">删除分组</string>
     <string name="feed_screen_delete_feed_warning">删除当前订阅及其所有文章</string>
-    <string name="feed_screen_rss_nickname">标题（可选）</string>
     <string name="feed_screen_rss_title">标题</string>
     <string name="feed_style_screen_name">订阅页面</string>
     <string name="feed_style_screen_feed_group_expand">总是展开</string>

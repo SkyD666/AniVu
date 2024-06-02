@@ -25,11 +25,17 @@ open class GroupBean(
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is GroupBean) return false
-        return groupId == other.groupId
+
+        if (groupId != other.groupId) return false
+        if (name != other.name) return false
+
+        return true
     }
 
     override fun hashCode(): Int {
-        return groupId.hashCode()
+        var result = groupId.hashCode()
+        result = 31 * result + name.hashCode()
+        return result
     }
 
     object DefaultGroup :

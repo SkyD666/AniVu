@@ -50,6 +50,15 @@ class FeedRepository @Inject constructor(
         else flowOf(groupDao.removeGroupWithFeed(groupId)).flowOn(Dispatchers.IO)
     }
 
+    suspend fun renameGroup(groupId: String, name: String): Flow<GroupBean> {
+        return if (groupId == GroupBean.DEFAULT_GROUP_ID) flow {
+            emit(GroupBean.DefaultGroup)
+        } else flow {
+            groupDao.renameGroup(groupId, name)
+            emit(groupDao.getGroupById(groupId))
+        }.flowOn(Dispatchers.IO)
+    }
+
     suspend fun moveGroupFeedsTo(fromGroupId: String, toGroupId: String): Flow<Int> {
         val realFromGroupId = if (fromGroupId == GroupBean.DEFAULT_GROUP_ID) null else fromGroupId
         val realToGroupId = if (toGroupId == GroupBean.DEFAULT_GROUP_ID) null else toGroupId
@@ -66,7 +75,7 @@ class FeedRepository @Inject constructor(
         url: String,
         groupId: String?,
         nickname: String?,
-    ): Flow<Unit> {
+    ): Flow<FeedBean> {
         return flow {
             val realNickname = if (nickname.isNullOrBlank()) null else nickname
             val realGroupId =
@@ -79,7 +88,8 @@ class FeedRepository @Inject constructor(
                     )
                 )
             }
-            emit(feedDao.setFeedWithArticle(feedWithArticleBean))
+            feedDao.setFeedWithArticle(feedWithArticleBean)
+            emit(feedWithArticleBean.feed)
         }.flowOn(Dispatchers.IO)
     }
 

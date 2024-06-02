@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.SwipeLeft
+import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -84,7 +85,11 @@ fun BehaviorScreen() {
             }
             item {
                 SwitchSettingsItem(
-                    imageVector = Icons.Outlined.VisibilityOff,
+                    imageVector = if (LocalHideEmptyDefault.current) {
+                        Icons.Outlined.VisibilityOff
+                    } else {
+                        Icons.Outlined.Visibility
+                    },
                     text = stringResource(id = R.string.behavior_screen_feed_screen_hide_empty_default),
                     description = stringResource(id = R.string.behavior_screen_feed_screen_hide_empty_default_description),
                     checked = LocalHideEmptyDefault.current,

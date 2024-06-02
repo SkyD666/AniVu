@@ -54,7 +54,7 @@ class FeedViewModel @Inject constructor(
         return onEach { change ->
             val event = when (change) {
                 is FeedPartialStateChange.AddFeed.Success -> {
-                    FeedEvent.AddFeedResultEvent.Success
+                    FeedEvent.AddFeedResultEvent.Success(change.feed)
                 }
 
                 is FeedPartialStateChange.AddFeed.Failed -> {
@@ -113,6 +113,14 @@ class FeedViewModel @Inject constructor(
                     FeedEvent.MoveFeedsToGroupResultEvent.Failed(change.msg)
                 }
 
+                is FeedPartialStateChange.EditGroup.Success -> {
+                    FeedEvent.EditGroupResultEvent.Success(change.group)
+                }
+
+                is FeedPartialStateChange.EditGroup.Failed -> {
+                    FeedEvent.EditGroupResultEvent.Failed(change.msg)
+                }
+
                 else -> return@onEach
             }
             sendEvent(event)
@@ -132,7 +140,7 @@ class FeedViewModel @Inject constructor(
                     nickname = intent.nickname,
                     groupId = intent.group.groupId,
                 ).map {
-                    FeedPartialStateChange.AddFeed.Success
+                    FeedPartialStateChange.AddFeed.Success(it)
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.AddFeed.Failed(it.message.toString()) }
             },
@@ -181,6 +189,12 @@ class FeedViewModel @Inject constructor(
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.RefreshFeed.Failed(it.message.toString()) }
             },
+            filterIsInstance<FeedIntent.RefreshGroupFeed>().flatMapConcat { intent ->
+                articleRepo.refreshGroupArticles(intent.groupId).map {
+                    FeedPartialStateChange.RefreshFeed.Success
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.RefreshFeed.Failed(it.message.toString()) }
+            },
             filterIsInstance<FeedIntent.CreateGroup>().flatMapConcat { intent ->
                 feedRepo.createGroup(intent.group).map {
                     FeedPartialStateChange.CreateGroup.Success
@@ -192,6 +206,12 @@ class FeedViewModel @Inject constructor(
                     FeedPartialStateChange.DeleteGroup.Success
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.DeleteGroup.Failed(it.message.toString()) }
+            },
+            filterIsInstance<FeedIntent.RenameGroup>().flatMapConcat { intent ->
+                feedRepo.renameGroup(intent.groupId, intent.name).map {
+                    FeedPartialStateChange.EditGroup.Success(it)
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.EditGroup.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.MoveFeedsToGroup>().flatMapConcat { intent ->
                 feedRepo.moveGroupFeedsTo(intent.fromGroupId, intent.toGroupId).map {

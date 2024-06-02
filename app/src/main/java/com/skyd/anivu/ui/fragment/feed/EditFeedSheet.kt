@@ -161,12 +161,12 @@ fun EditFeedSheet(
         maxLines = 1,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = stringResource(id = R.string.feed_screen_rss_nickname))
+                Text(text = stringResource(id = R.string.feed_screen_rss_title))
                 Spacer(modifier = Modifier.weight(1f))
                 AniVuIconButton(
                     onClick = {
                         onNicknameChange(null)
-                        nickname = null
+                        nickname = feed.title
                         openNicknameDialog = false
                     },
                     imageVector = Icons.Outlined.History,
@@ -189,7 +189,6 @@ fun EditFeedSheet(
             customDescription = feed.customDescription
         },
         visible = openCustomDescriptionDialog,
-        maxLines = 1,
         title = {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = stringResource(id = R.string.feed_screen_rss_description))
@@ -197,7 +196,7 @@ fun EditFeedSheet(
                 AniVuIconButton(
                     onClick = {
                         onCustomDescriptionChange(null)
-                        customDescription = null
+                        customDescription = feed.description
                         openCustomDescriptionDialog = false
                     },
                     imageVector = Icons.Outlined.History,
@@ -239,7 +238,7 @@ private fun InfoArea(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f))
+                    .background(MaterialTheme.colorScheme.primary)
                     .size(20.dp)
                     .padding(4.dp),
                 imageVector = Icons.Filled.Edit,
@@ -338,7 +337,9 @@ private fun LinkArea(link: String, onLinkClick: () -> Unit) {
 }
 
 @Composable
-private fun OptionArea(
+internal fun OptionArea(
+    deleteEnabled: Boolean = true,
+    deleteWarningText: String = stringResource(id = R.string.feed_screen_delete_feed_warning),
     onRefresh: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -360,18 +361,20 @@ private fun OptionArea(
             text = stringResource(id = R.string.refresh),
             onClick = onRefresh,
         )
-        SheetChip(
-            icon = Icons.Outlined.Delete,
-            iconTint = MaterialTheme.colorScheme.onError,
-            iconBackgroundColor = MaterialTheme.colorScheme.error,
-            text = stringResource(id = R.string.delete),
-            onClick = { openDeleteWarningDialog = true },
-        )
+        if (deleteEnabled) {
+            SheetChip(
+                icon = Icons.Outlined.Delete,
+                iconTint = MaterialTheme.colorScheme.onError,
+                iconBackgroundColor = MaterialTheme.colorScheme.error,
+                text = stringResource(id = R.string.delete),
+                onClick = { openDeleteWarningDialog = true },
+            )
+        }
     }
 
     DeleteWarningDialog(
         visible = openDeleteWarningDialog,
-        text = stringResource(id = R.string.feed_screen_delete_feed_warning),
+        text = deleteWarningText,
         onDismissRequest = { openDeleteWarningDialog = false },
         onDismiss = { openDeleteWarningDialog = false },
         onConfirm = {
@@ -382,14 +385,15 @@ private fun OptionArea(
 }
 
 @Composable
-private fun GroupArea(
+internal fun GroupArea(
+    title: String = stringResource(id = R.string.feed_group),
     currentGroupId: String?,
     groups: List<GroupBean>,
     onGroupChange: (GroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
     Text(
-        text = stringResource(id = R.string.feed_group),
+        text = title,
         style = MaterialTheme.typography.titleMedium,
         color = MaterialTheme.colorScheme.onPrimaryContainer,
     )
@@ -419,7 +423,7 @@ private fun GroupArea(
 }
 
 @Composable
-private fun SheetChip(
+internal fun SheetChip(
     modifier: Modifier = Modifier,
     icon: ImageVector?,
     iconTint: Color = MaterialTheme.colorScheme.onPrimary,

@@ -8,30 +8,21 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
-import androidx.compose.material.icons.outlined.MoveUp
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.skyd.anivu.R
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 
 open class Group1Proxy(
@@ -39,8 +30,7 @@ open class Group1Proxy(
     val onExpandChange: (GroupBean, Boolean) -> Unit = { _, _ -> },
     val isEmpty: (index: Int) -> Boolean,
     val onShowAllArticles: (GroupBean) -> Unit = { },
-    val onDelete: ((GroupBean) -> Unit)? = null,
-    val onMoveFeedsTo: ((from: GroupBean) -> Unit)? = null,
+    val onEdit: ((GroupBean) -> Unit)? = null,
 ) : LazyGridAdapter.Proxy<GroupBean>() {
     @Composable
     override fun Draw(index: Int, data: GroupBean) {
@@ -51,8 +41,7 @@ open class Group1Proxy(
             onExpandChange = onExpandChange,
             isEmpty = isEmpty,
             onShowAllArticles = onShowAllArticles,
-            onDelete = onDelete,
-            onFeedsMoveTo = onMoveFeedsTo,
+            onEdit = onEdit,
         )
     }
 }
@@ -67,12 +56,9 @@ fun Group1Item(
     onExpandChange: (GroupBean, Boolean) -> Unit,
     isEmpty: (index: Int) -> Boolean,
     onShowAllArticles: (GroupBean) -> Unit,
-    onDelete: ((GroupBean) -> Unit)? = null,
-    onFeedsMoveTo: ((GroupBean) -> Unit)? = null,
+    onEdit: ((GroupBean) -> Unit)? = null,
 ) {
     var expand by remember(data) { mutableStateOf(initExpand(data)) }
-    var expandMenu by rememberSaveable { mutableStateOf(false) }
-    var openDeleteWarningDialog by rememberSaveable { mutableStateOf(false) }
 
     val backgroundShapeCorner: Dp by animateDpAsState(
         targetValue = if (expand && !isEmpty(index)) 0.dp else SHAPE_CORNER_DP,
@@ -93,7 +79,9 @@ fun Group1Item(
             )
             .background(color = MaterialTheme.colorScheme.surfaceContainer)
             .combinedClickable(
-                onLongClick = { expandMenu = true },
+                onLongClick = if (onEdit == null) null else {
+                    { onEdit(data) }
+                },
                 onClick = { onShowAllArticles(data) },
             )
             .padding(start = 20.dp, end = 8.dp)
@@ -120,43 +108,5 @@ fun Group1Item(
             contentDescription = null,
             rotate = expandIconRotate,
         )
-
-        DropdownMenu(
-            expanded = expandMenu,
-            onDismissRequest = { expandMenu = false },
-        ) {
-            DropdownMenuItem(
-                text = { Text(text = stringResource(id = R.string.delete)) },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = null)
-                },
-                enabled = onDelete != null && data.groupId != GroupBean.DEFAULT_GROUP_ID,
-                onClick = {
-                    openDeleteWarningDialog = true
-                    expandMenu = false
-                },
-            )
-            DropdownMenuItem(
-                text = { Text(text = stringResource(id = R.string.feed_screen_group_feeds_move_to)) },
-                leadingIcon = {
-                    Icon(imageVector = Icons.Outlined.MoveUp, contentDescription = null)
-                },
-                enabled = onFeedsMoveTo != null,
-                onClick = {
-                    onFeedsMoveTo?.invoke(data)
-                    expandMenu = false
-                },
-            )
-        }
     }
-
-    DeleteWarningDialog(
-        visible = openDeleteWarningDialog,
-        title = stringResource(id = R.string.feed_screen_delete_group_warning_title),
-        text = stringResource(id = R.string.feed_screen_delete_group_warning, data.name),
-        confirmText = stringResource(id = R.string.delete),
-        onConfirm = { onDelete?.invoke(data) },
-        onDismiss = { openDeleteWarningDialog = false },
-        onDismissRequest = { openDeleteWarningDialog = false },
-    )
 }

@@ -30,12 +30,23 @@ interface GroupDao {
     suspend fun setGroup(groupBean: GroupBean)
 
     @Transaction
+    @Query("SELECT * FROM `$GROUP_TABLE_NAME` WHERE ${GroupBean.GROUP_ID_COLUMN} = :groupId")
+    suspend fun getGroupById(groupId: String): GroupBean
+
+    @Transaction
     @Delete
     suspend fun removeGroup(groupBean: GroupBean): Int
 
     @Transaction
     @Query("DELETE FROM `$GROUP_TABLE_NAME` WHERE ${GroupBean.GROUP_ID_COLUMN} = :groupId")
     suspend fun removeGroup(groupId: String): Int
+
+    @Transaction
+    @Query(
+        "UPDATE `$GROUP_TABLE_NAME` SET ${GroupBean.NAME_COLUMN} = :name " +
+                "WHERE ${GroupBean.GROUP_ID_COLUMN} = :groupId"
+    )
+    suspend fun renameGroup(groupId: String, name: String): Int
 
     @Transaction
     suspend fun removeGroupWithFeed(groupId: String): Int {

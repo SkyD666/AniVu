@@ -18,8 +18,7 @@ class DefaultGroup1Proxy(
                 onExpandChange = group1Proxy.onExpandChange,
                 isEmpty = group1Proxy.isEmpty,
                 onShowAllArticles = group1Proxy.onShowAllArticles,
-                onDelete = group1Proxy.onDelete,
-                onFeedsMoveTo = group1Proxy.onMoveFeedsTo,
+                onEdit = group1Proxy.onEdit,
             )
         }
     }

@@ -133,6 +133,16 @@ interface FeedDao {
     suspend fun getFeedsNotIn(groupIds: List<String>): List<FeedViewBean>
 
     @Transaction
+    @Query(
+        """
+            SELECT * FROM $FEED_VIEW_NAME
+            WHERE :groupId IS NULL AND ${FeedBean.GROUP_ID_COLUMN} IS NULL OR
+            ${FeedBean.GROUP_ID_COLUMN} = :groupId
+        """
+    )
+    suspend fun getFeedsByGroupId(groupId: String?): List<FeedViewBean>
+
+    @Transaction
     @RawQuery(observedEntities = [FeedBean::class, ArticleBean::class])
     fun getFeedPagingSource(sql: SupportSQLiteQuery): PagingSource<Int, FeedViewBean>
 

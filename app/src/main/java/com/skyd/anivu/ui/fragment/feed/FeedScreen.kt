@@ -2,37 +2,24 @@ package com.skyd.anivu.ui.fragment.feed
 
 import android.os.Bundle
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.FlowRowOverflow
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.MoveUp
 import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Workspaces
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -57,7 +44,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
@@ -89,8 +75,6 @@ import com.skyd.anivu.model.bean.GroupBean.Companion.isDefaultGroup
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuTextField
-import com.skyd.anivu.ui.component.AniVuTextFieldStyle
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.ClipboardTextField
@@ -108,7 +92,6 @@ import com.skyd.anivu.ui.fragment.search.SearchFragment
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalNavController
-import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import kotlinx.coroutines.android.awaitFrame
 import java.util.UUID
@@ -193,12 +176,8 @@ private fun FeedList(
     val scope = rememberCoroutineScope()
     var openAddDialog by rememberSaveable { mutableStateOf(false) }
     var addDialogUrl by rememberSaveable { mutableStateOf("") }
-    var addDialogNickname by rememberSaveable { mutableStateOf("") }
-    var addDialogGroup by rememberSaveable { mutableStateOf<GroupBean>(GroupBean.DefaultGroup) }
-    var openEditDialog by rememberSaveable { mutableStateOf<FeedBean?>(null) }
-    var editDialogUrl by rememberSaveable { mutableStateOf<String?>(null) }
-    var editDialogNickname by rememberSaveable { mutableStateOf("") }
-    var editDialogGroupId by rememberSaveable { mutableStateOf<String?>(null) }
+    var openEditFeedDialog by rememberSaveable { mutableStateOf<FeedBean?>(null) }
+    var openEditGroupDialog by rememberSaveable { mutableStateOf<GroupBean?>(value = null) }
 
     var openCreateGroupDialog by rememberSaveable { mutableStateOf(false) }
     var createGroupDialogGroup by rememberSaveable { mutableStateOf("") }
@@ -277,117 +256,11 @@ private fun FeedList(
                     contentPadding = innerPadding + PaddingValues(bottom = fabHeight + 16.dp),
                     selectedFeedUrls = listPaneSelectedFeedUrls,
                     onShowArticleList = { feedUrls -> onShowArticleList(feedUrls) },
-                    onEditFeed = { feed ->
-                        openEditDialog = feed
-                        editDialogUrl = feed.url
-                        editDialogNickname = feed.nickname.orEmpty()
-                        editDialogGroupId = feed.groupId
-                    },
-                    onDeleteGroup = { dispatch(FeedIntent.DeleteGroup(it.groupId)) },
-                    onMoveToGroup = { from, to ->
-                        if (from.groupId != to.groupId) {
-                            dispatch(FeedIntent.MoveFeedsToGroup(from.groupId, to.groupId))
-                        }
-                    },
-                    openCreateGroupDialog = {
-                        openCreateGroupDialog = true
-                        createGroupDialogGroup = ""
-                    }
+                    onEditFeed = { feed -> openEditFeedDialog = feed },
+                    onEditGroup = { group -> openEditGroupDialog = group },
                 )
             }
         }
-
-        if (openAddDialog) {
-            val groups = (uiState.groupListState as? GroupListState.Success)
-                ?.dataList?.filterIsInstance<GroupBean>().orEmpty()
-            EditFeedDialog(
-                title = stringResource(id = R.string.add),
-                url = addDialogUrl,
-                onUrlChange = { text -> addDialogUrl = text },
-                nickname = addDialogNickname,
-                onNicknameChange = { addDialogNickname = it },
-                group = addDialogGroup,
-                groups = groups,
-                onGroupChange = { addDialogGroup = it },
-                openCreateGroupDialog = {
-                    openCreateGroupDialog = true
-                    createGroupDialogGroup = ""
-                },
-                onConfirm = { newUrl, nickname, group ->
-                    if (newUrl.isNotBlank()) {
-                        dispatch(
-                            FeedIntent.AddFeed(url = newUrl, nickname = nickname, group = group)
-                        )
-                    }
-                    addDialogUrl = ""
-                    addDialogNickname = ""
-                    addDialogGroup = GroupBean.DefaultGroup
-                    openAddDialog = false
-                },
-                onDismissRequest = {
-                    addDialogUrl = ""
-                    addDialogNickname = ""
-                    addDialogGroup = GroupBean.DefaultGroup
-                    openAddDialog = false
-                }
-            )
-        }
-
-        if (openEditDialog != null) {
-            val groups = remember(uiState.groupListState) {
-                (uiState.groupListState as? GroupListState.Success)
-                    ?.dataList?.filterIsInstance<GroupBean>().orEmpty()
-            }
-            EditFeedSheet(
-                onDismissRequest = { openEditDialog = null },
-                feed = openEditDialog!!,
-                groups = groups,
-                onDelete = { dispatch(FeedIntent.RemoveFeed(it)) },
-                onRefresh = { dispatch(FeedIntent.RefreshFeed(it)) },
-                onUrlChange = {
-                    dispatch(FeedIntent.EditFeedUrl(oldUrl = openEditDialog!!.url, newUrl = it))
-                },
-                onNicknameChange = {
-                    dispatch(FeedIntent.EditFeedNickname(url = openEditDialog!!.url, nickname = it))
-                },
-                onCustomDescriptionChange = {
-                    dispatch(
-                        FeedIntent.EditFeedCustomDescription(
-                            url = openEditDialog!!.url, customDescription = it,
-                        )
-                    )
-                },
-                onCustomIconChange = {
-                    dispatch(
-                        FeedIntent.EditFeedCustomIcon(url = openEditDialog!!.url, customIcon = it)
-                    )
-                },
-                onGroupChange = {
-                    dispatch(
-                        FeedIntent.EditFeedGroup(url = openEditDialog!!.url, groupId = it.groupId)
-                    )
-                },
-                openCreateGroupDialog = {
-                    openCreateGroupDialog = true
-                    createGroupDialogGroup = ""
-                },
-            )
-        }
-
-        WaitingDialog(visible = uiState.loadingDialog)
-
-        CreateGroupDialog(
-            visible = openCreateGroupDialog,
-            value = createGroupDialogGroup,
-            onValueChange = { text -> createGroupDialogGroup = text },
-            onCreateGroup = {
-                dispatch(FeedIntent.CreateGroup(it))
-                openCreateGroupDialog = false
-            },
-            onDismissRequest = {
-                openCreateGroupDialog = false
-            }
-        )
 
         when (val event = uiEvent) {
             is FeedEvent.AddFeedResultEvent.Failed ->
@@ -414,41 +287,158 @@ private fun FeedList(
             is FeedEvent.DeleteGroupResultEvent.Failed ->
                 snackbarHostState.showSnackbar(message = event.msg, scope = scope)
 
+            is FeedEvent.EditGroupResultEvent.Failed ->
+                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+
             is FeedEvent.EditFeedResultEvent.Success -> LaunchedEffect(event) {
-                if (openEditDialog != null) openEditDialog = event.feed
+                if (openEditFeedDialog != null) openEditFeedDialog = event.feed
             }
 
-            FeedEvent.AddFeedResultEvent.Success,
+            is FeedEvent.EditGroupResultEvent.Success -> LaunchedEffect(event) {
+                if (openEditGroupDialog != null) openEditGroupDialog = event.group
+            }
+
+            is FeedEvent.AddFeedResultEvent.Success -> LaunchedEffect(event) {
+                openEditFeedDialog = event.feed
+            }
+
             FeedEvent.RemoveFeedResultEvent.Success,
-            FeedEvent.RefreshFeedResultEvent.Success,
+            is FeedEvent.RefreshFeedResultEvent.Success,
             FeedEvent.CreateGroupResultEvent.Success,
             FeedEvent.MoveFeedsToGroupResultEvent.Success,
             FeedEvent.DeleteGroupResultEvent.Success,
             null -> Unit
         }
+
+        if (openAddDialog) {
+            AddFeedDialog(
+                url = addDialogUrl,
+                onUrlChange = { text -> addDialogUrl = text },
+                onConfirm = { newUrl ->
+                    if (newUrl.isNotBlank()) {
+                        dispatch(FeedIntent.AddFeed(url = newUrl))
+                    }
+                    addDialogUrl = ""
+                    openAddDialog = false
+                },
+                onDismissRequest = {
+                    addDialogUrl = ""
+                    openAddDialog = false
+                }
+            )
+        }
+
+        if (openEditFeedDialog != null) {
+            val groups = remember(uiState.groupListState) {
+                (uiState.groupListState as? GroupListState.Success)
+                    ?.dataList?.filterIsInstance<GroupBean>().orEmpty()
+            }
+            EditFeedSheet(
+                onDismissRequest = { openEditFeedDialog = null },
+                feed = openEditFeedDialog!!,
+                groups = groups,
+                onDelete = { dispatch(FeedIntent.RemoveFeed(it)) },
+                onRefresh = { dispatch(FeedIntent.RefreshFeed(it)) },
+                onUrlChange = {
+                    dispatch(FeedIntent.EditFeedUrl(oldUrl = openEditFeedDialog!!.url, newUrl = it))
+                },
+                onNicknameChange = {
+                    dispatch(
+                        FeedIntent.EditFeedNickname(
+                            url = openEditFeedDialog!!.url,
+                            nickname = it
+                        )
+                    )
+                },
+                onCustomDescriptionChange = {
+                    dispatch(
+                        FeedIntent.EditFeedCustomDescription(
+                            url = openEditFeedDialog!!.url, customDescription = it,
+                        )
+                    )
+                },
+                onCustomIconChange = {
+                    dispatch(
+                        FeedIntent.EditFeedCustomIcon(
+                            url = openEditFeedDialog!!.url,
+                            customIcon = it
+                        )
+                    )
+                },
+                onGroupChange = {
+                    dispatch(
+                        FeedIntent.EditFeedGroup(
+                            url = openEditFeedDialog!!.url,
+                            groupId = it.groupId
+                        )
+                    )
+                },
+                openCreateGroupDialog = {
+                    openCreateGroupDialog = true
+                    createGroupDialogGroup = ""
+                },
+            )
+        }
+
+        if (openEditGroupDialog != null) {
+            val groups = remember(uiState.groupListState) {
+                (uiState.groupListState as? GroupListState.Success)
+                    ?.dataList?.filterIsInstance<GroupBean>().orEmpty()
+            }
+            EditGroupSheet(
+                onDismissRequest = { openEditGroupDialog = null },
+                group = openEditGroupDialog!!,
+                groups = groups,
+                onDelete = { dispatch(FeedIntent.DeleteGroup(it)) },
+                onRefresh = { dispatch(FeedIntent.RefreshGroupFeed(it)) },
+                onNameChange = {
+                    dispatch(
+                        FeedIntent.RenameGroup(groupId = openEditGroupDialog!!.groupId, name = it)
+                    )
+                },
+                onMoveTo = {
+                    dispatch(
+                        FeedIntent.MoveFeedsToGroup(
+                            fromGroupId = openEditGroupDialog!!.groupId,
+                            toGroupId = it.groupId,
+                        )
+                    )
+                },
+                openCreateGroupDialog = {
+                    openCreateGroupDialog = true
+                    createGroupDialogGroup = ""
+                },
+            )
+        }
+
+        WaitingDialog(visible = uiState.loadingDialog)
+
+        CreateGroupDialog(
+            visible = openCreateGroupDialog,
+            value = createGroupDialogGroup,
+            onValueChange = { text -> createGroupDialogGroup = text },
+            onCreateGroup = {
+                dispatch(FeedIntent.CreateGroup(it))
+                openCreateGroupDialog = false
+            },
+            onDismissRequest = {
+                openCreateGroupDialog = false
+            }
+        )
     }
 }
 
 @Composable
-private fun EditFeedDialog(
-    title: String = stringResource(id = R.string.edit),
+private fun AddFeedDialog(
     url: String,
     onUrlChange: (String) -> Unit,
-    nickname: String,
-    onNicknameChange: (String) -> Unit,
-    group: GroupBean,
-    groups: List<GroupBean>,
-    onGroupChange: (GroupBean) -> Unit,
-    openCreateGroupDialog: () -> Unit,
-    onConfirm: (url: String, nickname: String, group: GroupBean) -> Unit,
+    onConfirm: (url: String) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    var expandMenu by rememberSaveable { mutableStateOf(false) }
-
     AniVuDialog(
         visible = true,
         icon = { Icon(imageVector = Icons.Outlined.RssFeed, contentDescription = null) },
-        title = { Text(text = title) },
+        title = { Text(text = stringResource(id = R.string.add)) },
         onDismissRequest = onDismissRequest,
         selectable = false,
         text = {
@@ -470,73 +460,6 @@ private fun EditFeedDialog(
                         focusManager.moveFocus(FocusDirection.Next)
                     }
                 )
-                Spacer(modifier = Modifier.height(10.dp))
-                ClipboardTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = nickname,
-                    onValueChange = onNicknameChange,
-                    autoRequestFocus = false,
-                    label = stringResource(id = R.string.feed_screen_rss_nickname),
-                    focusManager = focusManager,
-                    keyboardAction = { _, _ ->
-                        focusManager.clearFocus()
-                    }
-                )
-                Spacer(modifier = Modifier.height(10.dp))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    ExposedDropdownMenuBox(
-                        modifier = Modifier.weight(1f),
-                        expanded = expandMenu,
-                        onExpandedChange = { expandMenu = it },
-                    ) {
-                        AniVuTextField(
-                            // The `menuAnchor` modifier must be passed to the text field to handle
-                            // expanding/collapsing the menu on click. A read-only text field has
-                            // the anchor type `PrimaryNotEditable`.
-                            modifier = Modifier
-                                .menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                                .fillMaxWidth(),
-                            value = group.name,
-                            onValueChange = {},
-                            readOnly = true,
-                            maxLines = 1,
-                            label = stringResource(R.string.feed_group),
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandMenu) },
-                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        )
-                        ExposedDropdownMenu(
-                            expanded = expandMenu,
-                            onDismissRequest = { expandMenu = false },
-                        ) {
-                            groups.forEach { group ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Text(
-                                            text = group.name,
-                                            style = MaterialTheme.typography.bodyLarge,
-                                        )
-                                    },
-                                    onClick = {
-                                        onGroupChange(group)
-                                        expandMenu = false
-                                    },
-                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                                )
-                            }
-                        }
-                    }
-                    AniVuIconButton(
-                        // https://m3.material.io/components/text-fields/specs#605e24f1-1c1f-4c00-b385-4bf50733a5ef
-                        modifier = Modifier.run {
-                            if (LocalTextFieldStyle.current == AniVuTextFieldStyle.Outlined.value)
-                                padding(top = 8.dp)
-                            else this
-                        },
-                        onClick = openCreateGroupDialog,
-                        imageVector = Icons.Outlined.Add,
-                        contentDescription = stringResource(id = R.string.feed_screen_add_group),
-                    )
-                }
 
                 LaunchedEffect(focusRequester) {
                     focusRequester.requestFocus()
@@ -548,9 +471,7 @@ private fun EditFeedDialog(
         confirmButton = {
             TextButton(
                 enabled = url.isNotBlank(),
-                onClick = {
-                    onConfirm(url, nickname, group)
-                }
+                onClick = { onConfirm(url) }
             ) {
                 Text(
                     text = stringResource(R.string.ok),
@@ -601,9 +522,7 @@ private fun FeedList(
     selectedFeedUrls: List<String>? = null,
     onShowArticleList: (List<String>) -> Unit,
     onEditFeed: (FeedBean) -> Unit,
-    onDeleteGroup: (GroupBean) -> Unit,
-    onMoveToGroup: (from: GroupBean, to: GroupBean) -> Unit,
-    openCreateGroupDialog: () -> Unit,
+    onEditGroup: (GroupBean) -> Unit,
 ) {
     val context = LocalContext.current
     val hideEmptyDefault = LocalHideEmptyDefault.current
@@ -631,8 +550,6 @@ private fun FeedList(
             feedVisible[it.groupId] = feedVisible[it.groupId] ?: defaultExpand
         }
     }
-    var openSelectGroupDialog by rememberSaveable { mutableStateOf<GroupBean?>(null) }
-    var selectGroupDialogCurrentGroup by rememberSaveable { mutableStateOf<GroupBean?>(null) }
 
     val adapter = remember(result, hideEmptyDefault, selectedFeedUrls) {
         val group1Proxy = Group1Proxy(
@@ -646,11 +563,7 @@ private fun FeedList(
                     .map { it.feed.url }
                 onShowArticleList(feedUrls)
             },
-            onDelete = onDeleteGroup,
-            onMoveFeedsTo = {
-                openSelectGroupDialog = it
-                selectGroupDialogCurrentGroup = it
-            },
+            onEdit = onEditGroup,
         )
         LazyGridAdapter(
             mutableListOf(
@@ -682,67 +595,6 @@ private fun FeedList(
                 is GroupBean -> item.groupId
                 is FeedViewBean -> item.feed.url
                 else -> item
-            }
-        },
-    )
-
-    if (openSelectGroupDialog != null) {
-        SelectGroupDialog(
-            currentGroup = selectGroupDialogCurrentGroup!!,
-            groups = groups,
-            onGroupIdChange = { group -> selectGroupDialogCurrentGroup = group },
-            onConfirm = { group ->
-                onMoveToGroup(openSelectGroupDialog!!, group)
-                openSelectGroupDialog = null
-            },
-            openCreateGroupDialog = openCreateGroupDialog,
-            onDismissRequest = { openSelectGroupDialog = null }
-        )
-    }
-}
-
-@Composable
-private fun SelectGroupDialog(
-    currentGroup: GroupBean,
-    groups: List<GroupBean>,
-    onGroupIdChange: (GroupBean) -> Unit,
-    onConfirm: (groupId: GroupBean) -> Unit,
-    openCreateGroupDialog: () -> Unit,
-    onDismissRequest: () -> Unit,
-) {
-    AniVuDialog(
-        visible = true,
-        icon = { Icon(imageVector = Icons.Outlined.MoveUp, contentDescription = null) },
-        title = { Text(stringResource(id = R.string.feed_screen_group_feeds_move_to)) },
-        onDismissRequest = onDismissRequest,
-        selectable = false,
-        text = {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                overflow = FlowRowOverflow.Visible
-            ) {
-                groups.forEach { group ->
-                    FilterChip(
-                        selected = currentGroup.groupId == group.groupId,
-                        onClick = { onGroupIdChange(group) },
-                        label = { Text(text = group.name) }
-                    )
-                }
-                AniVuIconButton(
-                    onClick = { openCreateGroupDialog() },
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = stringResource(id = R.string.feed_screen_add_group),
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = { onConfirm(currentGroup) }) {
-                Text(text = stringResource(R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = stringResource(R.string.cancel))
             }
         },
     )
