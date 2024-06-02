@@ -1,5 +1,7 @@
 package com.skyd.anivu.ui.fragment.feed
 
+import com.skyd.anivu.model.bean.FeedBean
+
 
 internal sealed interface FeedPartialStateChange {
     fun reduce(oldState: FeedState): FeedState
@@ -44,7 +46,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data object Success : EditFeed
+        data class Success(val feed: FeedBean) : EditFeed
         data class Failed(val msg: String) : EditFeed
     }
 
@@ -63,6 +65,23 @@ internal sealed interface FeedPartialStateChange {
 
         data object Success : RemoveFeed
         data class Failed(val msg: String) : RemoveFeed
+    }
+
+    sealed interface RefreshFeed : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : RefreshFeed
+        data class Failed(val msg: String) : RefreshFeed
     }
 
     sealed interface CreateGroup : FeedPartialStateChange {

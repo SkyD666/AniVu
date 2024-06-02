@@ -5,7 +5,7 @@
     <string name="media_screen_name">媒体</string>
     <string name="more_screen_name">更多</string>
     <string name="add">添加</string>
-    <string name="feed_screen_add_rss_hint">RSS 订阅链接</string>
+    <string name="feed_screen_rss_url">RSS 订阅链接</string>
     <string name="paste">粘贴</string>
     <string name="warning">警告</string>
     <string name="cancel">取消</string>
@@ -175,7 +175,9 @@
     <string name="feed_screen_group_feeds_move_to">移动到组</string>
     <string name="feed_screen_delete_group_warning">删除“%s”分组及其所有订阅和文章</string>
     <string name="feed_screen_delete_group_warning_title">删除分组</string>
-    <string name="feed_screen_rss_nickname">名称（可选）</string>
+    <string name="feed_screen_delete_feed_warning">删除当前订阅及其所有文章</string>
+    <string name="feed_screen_rss_nickname">标题（可选）</string>
+    <string name="feed_screen_rss_title">标题</string>
     <string name="feed_style_screen_name">订阅页面</string>
     <string name="feed_style_screen_feed_group_expand">总是展开</string>
     <string name="feed_style_screen_group_list_category">分组列表</string>
@@ -231,6 +233,20 @@
     <string name="import_export_screen_description">通过 OPML 文件来导入与导出订阅数据</string>
     <string name="player_speed">速度</string>
     <string name="player_add_external_audio">添加音频文件</string>
+    <string name="feed_screen_rss_description_hint">点击设置描述</string>
+    <string name="feed_screen_rss_description">描述</string>
+    <string name="refresh">刷新</string>
+    <string name="feed_options">选项</string>
+    <string name="pick_image_method_pick_visual_media">照片选择器（%s）</string>
+    <string name="pick_image_method_open_document">来自文档（%s）</string>
+    <string name="pick_image_method_get_content">来自内容（%s）</string>
+    <string name="pick_image_method_pick_from_gallery">来自相册（%s）</string>
+    <string name="use_the_following_to_open">使用以下方式打开</string>
+    <string name="feed_screen_rss_icon_source_local">来自本地</string>
+    <string name="feed_screen_rss_edit_icon">编辑图标</string>
+    <string name="feed_screen_rss_icon_source_network">来自网络</string>
+    <string name="feed_screen_rss_icon_source_network_hint">以 http 或 https 开头的网址</string>
+    <string name="reset">重置</string>
     <plurals name="import_opml_result">
         <item quantity="other">导入了 %d 项，花费 %.2f 秒</item>
     </plurals>

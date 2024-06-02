@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoveDown
+import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -89,7 +89,7 @@ fun AutoDeleteScreen() {
             item {
                 BannerItem {
                     SwitchSettingsItem(
-                        imageVector = Icons.Default.MoveDown,
+                        imageVector = Icons.Outlined.AutoDelete,
                         text = stringResource(id = R.string.enable),
                         checked = useAutoDelete,
                         onCheckedChange = {

@@ -51,6 +51,10 @@ data class ArticleBean(
     var link: String? = null,
     @ColumnInfo(name = UPDATE_AT_COLUMN)
     var updateAt: Long? = null,
+    @ColumnInfo(name = IS_READ_COLUMN)
+    var isRead: Boolean = false,
+    @ColumnInfo(name = IS_FAVORITE_COLUMN)
+    var isFavorite: Boolean = false,
 ) : BaseBean, Parcelable {
     companion object {
         const val ARTICLE_ID_COLUMN = "articleId"
@@ -63,5 +67,7 @@ data class ArticleBean(
         const val IMAGE_COLUMN = "image"
         const val LINK_COLUMN = "link"
         const val UPDATE_AT_COLUMN = "updateAt"
+        const val IS_READ_COLUMN = "isRead"
+        const val IS_FAVORITE_COLUMN = "isFavorite"
     }
 }

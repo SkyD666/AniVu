@@ -14,25 +14,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Badge
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
@@ -50,7 +40,6 @@ class Feed1Proxy(
     private val isEnded: (index: Int) -> Boolean = { false },
     private val useCardLayout: () -> Boolean = { false },
     private val onClick: ((FeedBean) -> Unit)? = null,
-    private val onRemove: ((FeedBean) -> Unit)? = null,
     private val onEdit: ((FeedBean) -> Unit)? = null,
 ) : LazyGridAdapter.Proxy<FeedViewBean>() {
     @Composable
@@ -63,7 +52,6 @@ class Feed1Proxy(
             isEnded = isEnded,
             useCardLayout = useCardLayout,
             onClick = onClick,
-            onRemove = onRemove,
             onEdit = onEdit,
         )
     }
@@ -78,11 +66,9 @@ fun Feed1Item(
     useCardLayout: () -> Boolean,
     onClick: ((FeedBean) -> Unit)? = null,
     isEnded: (index: Int) -> Boolean,
-    onRemove: ((FeedBean) -> Unit)? = null,
     onEdit: ((FeedBean) -> Unit)? = null,
 ) {
     val navController = LocalNavController.current
-    var expandMenu by rememberSaveable { mutableStateOf(false) }
     val feed = data.feed
 
     AnimatedVisibility(
@@ -108,8 +94,8 @@ fun Feed1Item(
                     } else this
                 }
                 .combinedClickable(
-                    onLongClick = if (onRemove != null && onEdit != null) {
-                        { expandMenu = true }
+                    onLongClick = if (onEdit != null) {
+                        { onEdit(feed) }
                     } else null,
                     onClick = {
                         if (onClick == null) {
@@ -154,8 +140,13 @@ fun Feed1Item(
                         )
                     }
                 }
-                val description =
-                    rememberSaveable(feed.description) { feed.description?.readable().orEmpty() }
+                val description = rememberSaveable(feed.customDescription, feed.description) {
+                    if (feed.customDescription == null) {
+                        feed.description?.readable().orEmpty()
+                    } else {
+                        feed.customDescription.readable()
+                    }
+                }
                 if (description.isNotBlank()) {
                     Text(
                         text = description,
@@ -163,31 +154,6 @@ fun Feed1Item(
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                DropdownMenu(
-                    expanded = expandMenu,
-                    onDismissRequest = { expandMenu = false },
-                ) {
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(id = R.string.remove)) },
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Outlined.Delete, contentDescription = null)
-                        },
-                        onClick = {
-                            onRemove?.invoke(feed)
-                            expandMenu = false
-                        },
-                    )
-                    DropdownMenuItem(
-                        text = { Text(text = stringResource(id = R.string.edit)) },
-                        leadingIcon = {
-                            Icon(imageVector = Icons.Outlined.Edit, contentDescription = null)
-                        },
-                        onClick = {
-                            onEdit?.invoke(feed)
-                            expandMenu = false
-                        },
                     )
                 }
             }

@@ -490,7 +490,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     }
 
     fun zoom(value: Float) {
-        MPVLib.setOptionString("video-zoom", log(value, 2f).toString())
+        MPVLib.setOptionString("video-zoom", log(value.coerceAtMost(60f), 2f).toString())
     }
 
     fun rotate(value: Int) {

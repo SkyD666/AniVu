@@ -85,16 +85,6 @@ interface FeedDao {
     @Query(
         """
         UPDATE $FEED_TABLE_NAME
-        SET ${FeedBean.NICKNAME_COLUMN} = :nickname, ${FeedBean.GROUP_ID_COLUMN} = :groupId
-        WHERE ${FeedBean.URL_COLUMN} = :feedUrl
-        """
-    )
-    suspend fun updateFeedGroupId(feedUrl: String, nickname: String?, groupId: String?): Int
-
-    @Transaction
-    @Query(
-        """
-        UPDATE $FEED_TABLE_NAME
         SET ${FeedBean.GROUP_ID_COLUMN} = :toGroupId
         WHERE :fromGroupId IS NULL AND ${FeedBean.GROUP_ID_COLUMN} IS NULL OR
         ${FeedBean.GROUP_ID_COLUMN} = :fromGroupId OR
@@ -127,6 +117,15 @@ interface FeedDao {
     @Query(
         """
             SELECT * FROM $FEED_VIEW_NAME
+            WHERE ${FeedBean.GROUP_ID_COLUMN} IN (:groupIds)
+        """
+    )
+    suspend fun getFeedsIn(groupIds: List<String>): List<FeedViewBean>
+
+    @Transaction
+    @Query(
+        """
+            SELECT * FROM $FEED_VIEW_NAME
             WHERE ${FeedBean.GROUP_ID_COLUMN} IS NULL OR 
             ${FeedBean.GROUP_ID_COLUMN} NOT IN (:groupIds)
         """
@@ -148,4 +147,8 @@ interface FeedDao {
     @Transaction
     @Query("SELECT COUNT(*) FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} LIKE :url")
     fun containsByUrl(url: String): Int
+
+    @Transaction
+    @Query("SELECT COUNT(*) FROM $FEED_TABLE_NAME WHERE ${FeedBean.CUSTOM_ICON_COLUMN} LIKE :customIcon")
+    fun containsByCustomIcon(customIcon: String): Int
 }

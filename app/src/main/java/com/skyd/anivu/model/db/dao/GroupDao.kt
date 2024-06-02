@@ -10,6 +10,7 @@ import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.GROUP_TABLE_NAME
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.model.bean.GroupWithFeedBean
+import com.skyd.anivu.model.repository.tryDeleteFeedIconFile
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -40,6 +41,9 @@ interface GroupDao {
     suspend fun removeGroupWithFeed(groupId: String): Int {
         removeGroup(groupId)
         return EntryPointAccessors.fromApplication(appContext, GroupDaoEntryPoint::class.java).run {
+            feedDao.getFeedsIn(listOf(groupId)).forEach {
+                it.feed.customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
+            }
             feedDao.removeFeedByGroupId(groupId)
         }
     }
