@@ -19,10 +19,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.ImportContacts
+import androidx.compose.material.icons.outlined.MarkEmailRead
+import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SwipeToDismissBox
@@ -30,6 +36,7 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -73,16 +80,21 @@ import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalNavController
 
-class Article1Proxy : LazyGridAdapter.Proxy<ArticleWithFeed>() {
+class Article1Proxy(
+    private val onFavorite: (ArticleWithFeed, Boolean) -> Unit,
+    private val onRead: (ArticleWithFeed, Boolean) -> Unit,
+) : LazyGridAdapter.Proxy<ArticleWithFeed>() {
     @Composable
     override fun Draw(index: Int, data: ArticleWithFeed) {
-        Article1Item(data = data)
+        Article1Item(data = data, onFavorite = onFavorite, onRead = onRead)
     }
 }
 
 @Composable
 fun Article1Item(
     data: ArticleWithFeed,
+    onFavorite: (ArticleWithFeed, Boolean) -> Unit,
+    onRead: (ArticleWithFeed, Boolean) -> Unit,
 ) {
     val navController = LocalNavController.current
     val context = LocalContext.current
@@ -145,122 +157,197 @@ fun Article1Item(
                 )
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+            val colorAlpha = if (data.articleWithEnclosure.article.isRead) 0.5f else 1f
+            CompositionLocalProvider(
+                LocalContentColor provides LocalContentColor.current.copy(alpha = colorAlpha)
             ) {
-                FeedIcon(data = data.feed)
-                val feedName = data.feed.nickname.orEmpty().ifBlank { data.feed.title.orEmpty() }
-                if (feedName.isNotBlank()) {
-                    Text(
-                        modifier = Modifier
-                            .padding(horizontal = 10.dp)
-                            .weight(1f),
-                        text = feedName,
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-                val date = article.date?.toDateTimeString(context = context)
-                if (!date.isNullOrBlank()) {
-                    Text(
-                        text = date,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.outline,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(3.dp))
-            Row {
-                Column(modifier = Modifier.weight(1f)) {
-                    val title = article.title?.readable().orEmpty()
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleSmall,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                    val author = article.author
-                    if (!author.isNullOrBlank()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    FeedIcon(data = data.feed)
+                    val feedName =
+                        data.feed.nickname.orEmpty().ifBlank { data.feed.title.orEmpty() }
+                    if (feedName.isNotBlank()) {
                         Text(
-                            text = author,
-                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier
+                                .padding(horizontal = 10.dp)
+                                .weight(1f),
+                            text = feedName,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.tertiary.copy(alpha = colorAlpha),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
-                    val description = article.description?.readable()?.let { desc ->
-                        if (LocalDeduplicateTitleInDesc.current) desc.replace(title, "") else desc
-                    }
-                    if (!description.isNullOrBlank()) {
-                        Spacer(modifier = Modifier.height(3.dp))
+                    val date = article.date?.toDateTimeString(context = context)
+                    if (!date.isNullOrBlank()) {
                         Text(
-                            text = description,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 3,
+                            text = date,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.outline.copy(alpha = colorAlpha),
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
-
-                    DropdownMenu(
-                        expanded = expandMenu,
-                        onDismissRequest = { expandMenu = false },
-                    ) {
-                        DropdownMenuItem(
-                            text = { Text(text = stringResource(id = R.string.article_screen_read)) },
-                            leadingIcon = {
-                                Icon(
-                                    imageVector = Icons.Outlined.ImportContacts,
-                                    contentDescription = null,
-                                )
-                            },
-                            onClick = {
-                                navigateToReadScreen(
-                                    navController = navController,
-                                    data = articleWithEnclosure,
-                                )
-                                expandMenu = false
-                            },
-                        )
-                        DropdownMenuItem(
-                            text = { Text(text = stringResource(id = R.string.bottom_sheet_enclosure_title)) },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_home_storage_24),
-                                    contentDescription = null,
-                                )
-                            },
-                            onClick = {
-                                showEnclosureBottomSheet(
-                                    context = context,
-                                    data = articleWithEnclosure
-                                )
-                                expandMenu = false
-                            },
-                        )
-                    }
                 }
-                if (!article.image.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.width(15.dp))
-                    OutlinedCard(
-                        modifier = Modifier
-                            .width(90.dp)
-                            .fillMaxHeight(),
-                    ) {
-                        AniVuImage(
-                            modifier = Modifier.fillMaxSize(),
-                            model = article.image,
-                            contentScale = ContentScale.Crop,
+                Spacer(modifier = Modifier.height(3.dp))
+                Row {
+                    Column(modifier = Modifier.weight(1f)) {
+                        val title = article.title?.readable().orEmpty()
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.titleSmall,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
                         )
+                        val author = article.author
+                        if (!author.isNullOrBlank()) {
+                            Text(
+                                text = author,
+                                style = MaterialTheme.typography.labelSmall,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                        val description = article.description?.readable()?.let { desc ->
+                            if (LocalDeduplicateTitleInDesc.current) desc.replace(
+                                title,
+                                ""
+                            ) else desc
+                        }
+                        if (!description.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.height(3.dp))
+                            Text(
+                                text = description,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                maxLines = 3,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
+                    }
+                    if (!article.image.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.width(15.dp))
+                        OutlinedCard(
+                            modifier = Modifier
+                                .width(90.dp)
+                                .fillMaxHeight(),
+                        ) {
+                            AniVuImage(
+                                modifier = Modifier.fillMaxSize(),
+                                model = article.image,
+                                contentScale = ContentScale.Crop,
+                            )
+                        }
                     }
                 }
             }
+
+            ArticleMenu(
+                expanded = expandMenu,
+                onDismissRequest = { expandMenu = false },
+                data = data,
+                onFavorite = onFavorite,
+                onRead = onRead,
+            )
         }
+    }
+}
+
+@Composable
+private fun ArticleMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    data: ArticleWithFeed,
+    onFavorite: (ArticleWithFeed, Boolean) -> Unit,
+    onRead: (ArticleWithFeed, Boolean) -> Unit,
+) {
+    val navController = LocalNavController.current
+    val context = LocalContext.current
+    val articleWithEnclosure = data.articleWithEnclosure
+    val isFavorite = articleWithEnclosure.article.isFavorite
+    val isRead = articleWithEnclosure.article.isRead
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
+    ) {
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(
+                        if (isFavorite) R.string.article_screen_unfavorite
+                        else R.string.article_screen_favorite
+                    )
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = if (isFavorite) Icons.Outlined.FavoriteBorder
+                    else Icons.Outlined.Favorite,
+                    contentDescription = null,
+                )
+            },
+            onClick = {
+                onFavorite(data, !isFavorite)
+                onDismissRequest()
+            },
+        )
+        DropdownMenuItem(
+            text = {
+                Text(
+                    text = stringResource(
+                        if (isRead) R.string.article_screen_mark_as_unread
+                        else R.string.article_screen_mark_as_read
+                    )
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = if (isRead) Icons.Outlined.MarkEmailUnread
+                    else Icons.Outlined.MarkEmailRead,
+                    contentDescription = null,
+                )
+            },
+            onClick = {
+                onRead(data, !isRead)
+                onDismissRequest()
+            },
+        )
+        HorizontalDivider()
+        DropdownMenuItem(
+            text = { Text(text = stringResource(id = R.string.article_screen_read)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.ImportContacts,
+                    contentDescription = null,
+                )
+            },
+            onClick = {
+                navigateToReadScreen(
+                    navController = navController,
+                    data = articleWithEnclosure,
+                )
+                onDismissRequest()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(text = stringResource(id = R.string.bottom_sheet_enclosure_title)) },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_home_storage_24),
+                    contentDescription = null,
+                )
+            },
+            onClick = {
+                showEnclosureBottomSheet(
+                    context = context,
+                    data = articleWithEnclosure
+                )
+                onDismissRequest()
+            },
+        )
     }
 }
 

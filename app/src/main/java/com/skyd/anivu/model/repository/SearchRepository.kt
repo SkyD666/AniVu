@@ -4,8 +4,6 @@ import android.database.DatabaseUtils
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.skyd.anivu.appContext
 import com.skyd.anivu.base.BaseRepository
@@ -28,10 +26,9 @@ import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class SearchRepository @Inject constructor(
@@ -39,74 +36,32 @@ class SearchRepository @Inject constructor(
     private val articleDao: ArticleDao,
     private val pagingConfig: PagingConfig,
 ) : BaseRepository() {
-    fun requestSearchAll(query: String): Flow<PagingData<Any>> {
-        return Pager(pagingConfig) {
-            object : PagingSource<Int, Any>() {
-                override fun getRefreshKey(state: PagingState<Int, Any>): Int? = null
+    private val searchQuery = MutableStateFlow("")
 
-                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Any> {
-                    val resultList = mutableListOf<Any>()
-                    val key = params.key ?: 0
-                    withContext(Dispatchers.IO) {
-                        val feedSql = genSql(
-                            tableName = FEED_VIEW_NAME,
-                            k = query,
-                            limit = { key to params.loadSize },
-                        )
-                        resultList.addAll(feedDao.getFeedList(feedSql))
-                        val articleSql by lazy {
-                            genSql(
-                                tableName = ARTICLE_TABLE_NAME,
-                                k = query,
-                                leadingFilter = "1",
-                                limit = {
-                                    key to if (resultList.isEmpty()) {
-                                        params.loadSize
-                                    } else {
-                                        params.loadSize - resultList.size
-                                    }
-                                },
-                            )
-                        }
-                        if (resultList.size < params.loadSize) {
-                            resultList.addAll(articleDao.getArticleList(articleSql))
-                        }
-                    }
-                    return LoadResult.Page(
-                        data = resultList,
-                        prevKey = null,
-                        nextKey = key + resultList.size
-                    )
-                }
-            }
-        }.flow.flowOn(Dispatchers.IO)
+    fun updateQuery(query: String) {
+        searchQuery.value = query
     }
 
-    fun requestSearchFeed(
-        query: String,
-    ): Flow<PagingData<FeedViewBean>> {
-        return flow { emit(genSql(tableName = FEED_VIEW_NAME, k = query)) }.flatMapConcat { sql ->
-            Pager(pagingConfig) { feedDao.getFeedPagingSource(sql) }.flow
+    fun listenSearchFeed(): Flow<PagingData<FeedViewBean>> {
+        return searchQuery.flatMapLatest { query ->
+            Pager(pagingConfig) {
+                feedDao.getFeedPagingSource(genSql(tableName = FEED_VIEW_NAME, k = query))
+            }.flow
         }.flowOn(Dispatchers.IO)
     }
 
-    fun requestSearchArticle(
-        feedUrls: List<String>,
-        query: String,
-    ): Flow<PagingData<ArticleWithFeed>> {
-        return flow {
-            emit(
-                genSql(
+    fun listenSearchArticle(feedUrls: List<String>): Flow<PagingData<ArticleWithFeed>> {
+        return searchQuery.flatMapLatest { query ->
+            Pager(pagingConfig) {
+                articleDao.getArticlePagingSource(genSql(
                     tableName = ARTICLE_TABLE_NAME,
                     k = query,
                     leadingFilter = if (feedUrls.isEmpty()) "1"
                     else "${ArticleBean.FEED_URL_COLUMN} IN (${
                         feedUrls.joinToString(", ") { DatabaseUtils.sqlEscapeString(it) }
                     })",
-                )
-            )
-        }.flatMapConcat { sql ->
-            Pager(pagingConfig) { articleDao.getArticlePagingSource(sql) }.flow
+                ))
+            }.flow
         }.flowOn(Dispatchers.IO)
     }
 

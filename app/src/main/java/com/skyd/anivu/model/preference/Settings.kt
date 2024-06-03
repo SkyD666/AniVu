@@ -14,14 +14,15 @@ import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
-import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleBeforePreference
-import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleFrequencyPreference
-import com.skyd.anivu.model.preference.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
+import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequencyPreference
+import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
@@ -38,6 +39,7 @@ import com.skyd.anivu.ui.local.LocalHardwareDecode
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
+import com.skyd.anivu.ui.local.LocalOpmlExportDir
 import com.skyd.anivu.ui.local.LocalPickImageMethod
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
@@ -73,6 +75,7 @@ data class Settings(
     val useAutoDelete: Boolean = UseAutoDeletePreference.default,
     val autoDeleteArticleFrequency: Long = AutoDeleteArticleFrequencyPreference.default,
     val autoDeleteArticleBefore: Long = AutoDeleteArticleBeforePreference.default,
+    val opmlExportDir: String = OpmlExportDirPreference.default,
 )
 
 @Composable
@@ -108,6 +111,7 @@ fun SettingsProvider(
         LocalUseAutoDelete provides settings.useAutoDelete,
         LocalAutoDeleteArticleFrequency provides settings.autoDeleteArticleFrequency,
         LocalAutoDeleteArticleBefore provides settings.autoDeleteArticleBefore,
+        LocalOpmlExportDir provides settings.opmlExportDir,
     ) {
         content()
     }

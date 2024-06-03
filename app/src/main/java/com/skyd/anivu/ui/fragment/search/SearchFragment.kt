@@ -63,9 +63,13 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
+import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.model.bean.ArticleWithFeed
+import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.BackIcon
+import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Article1Proxy
@@ -79,10 +83,6 @@ import java.io.Serializable
 class SearchFragment : BaseComposeFragment() {
     @kotlinx.serialization.Serializable
     sealed interface SearchDomain : Serializable {
-        data object All : SearchDomain {
-            private fun readResolve(): Any = All
-        }
-
         data object Feed : SearchDomain {
             private fun readResolve(): Any = Feed
         }
@@ -96,7 +96,7 @@ class SearchFragment : BaseComposeFragment() {
 
     private val viewModel by viewModels<SearchViewModel>()
     private val searchDomain by lazy {
-        (arguments?.getSerializable(SEARCH_DOMAIN_KEY) as? SearchDomain) ?: SearchDomain.All
+        (arguments?.getSerializable(SEARCH_DOMAIN_KEY) as? SearchDomain) ?: SearchDomain.Feed
     }
 
     override fun onCreateView(
@@ -114,6 +114,7 @@ fun SearchScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
+    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val searchResultListState = rememberLazyStaggeredGridState()
@@ -124,7 +125,13 @@ fun SearchScreen(
         mutableStateOf(TextFieldValue(text = "", selection = TextRange(0)))
     }
 
-    val dispatch = viewModel.getDispatcher(startWith = SearchIntent.Init)
+    val dispatch = viewModel.getDispatcher(
+        startWith = when (searchDomain) {
+            SearchFragment.SearchDomain.Feed -> SearchIntent.ListenSearchFeed
+            is SearchFragment.SearchDomain.Article ->
+                SearchIntent.ListenSearchArticle(feedUrls = searchDomain.feedUrls)
+        }
+    )
 
     Scaffold(
         modifier = Modifier.imePadding(),
@@ -156,17 +163,12 @@ fun SearchScreen(
                     )
             ) {
                 SearchBarInputField(
-                    onQueryChange = { searchFieldValueState = it },
-                    query = searchFieldValueState,
-                    onSearch = { state ->
-                        keyboardController?.hide()
-                        searchFieldValueState = state
-                        doSearch(
-                            searchDomain = searchDomain,
-                            query = state.text,
-                            onSearch = { dispatch(it) },
-                        )
+                    onQueryChange = {
+                        searchFieldValueState = it
+                        dispatch(SearchIntent.UpdateQuery(it.text))
                     },
+                    query = searchFieldValueState,
+                    onSearch = { keyboardController?.hide() },
                     placeholder = { Text(text = stringResource(R.string.search_screen_hint)) },
                     leadingIcon = { BackIcon() },
                     trailingIcon = {
@@ -187,8 +189,36 @@ fun SearchScreen(
             SearchResultState.Loading -> CircularProgressIndicator()
             is SearchResultState.Success -> SearchResultList(
                 result = searchResultState.result.collectAsLazyPagingItems(),
+                onFavorite = { articleWithFeed, favorite ->
+                    dispatch(
+                        SearchIntent.Favorite(
+                            articleId = articleWithFeed.articleWithEnclosure.article.articleId,
+                            favorite = favorite,
+                        )
+                    )
+                },
+                onRead = { articleWithFeed, read ->
+                    dispatch(
+                        SearchIntent.Read(
+                            articleId = articleWithFeed.articleWithEnclosure.article.articleId,
+                            read = read,
+                        )
+                    )
+                },
                 contentPadding = innerPaddings + PaddingValues(bottom = fabHeight),
             )
+        }
+
+        WaitingDialog(visible = uiState.loadingDialog)
+
+        when (val event = uiEvent) {
+            is SearchEvent.FavoriteArticleResultEvent.Failed ->
+                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+
+            is SearchEvent.ReadArticleResultEvent.Failed ->
+                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+
+            null -> Unit
         }
     }
 }
@@ -197,10 +227,17 @@ fun SearchScreen(
 private fun SearchResultList(
     modifier: Modifier = Modifier,
     result: LazyPagingItems<Any>,
+    onFavorite: (ArticleWithFeed, Boolean) -> Unit,
+    onRead: (ArticleWithFeed, Boolean) -> Unit,
     contentPadding: PaddingValues,
 ) {
     val adapter = remember {
-        LazyGridAdapter(mutableListOf(Feed1Proxy(), Article1Proxy()))
+        LazyGridAdapter(
+            mutableListOf(
+                Feed1Proxy(),
+                Article1Proxy(onFavorite = onFavorite, onRead = onRead),
+            )
+        )
     }
     AniVuLazyVerticalGrid(
         modifier = modifier,
@@ -208,21 +245,14 @@ private fun SearchResultList(
         dataList = result,
         adapter = adapter,
         contentPadding = contentPadding,
+        key = { _, item ->
+            when (item) {
+                is ArticleWithFeed -> item.articleWithEnclosure.article.articleId
+                is FeedViewBean -> item.feed.url
+                else -> item.hashCode()
+            }
+        },
     )
-}
-
-private fun doSearch(
-    searchDomain: SearchFragment.SearchDomain,
-    query: String,
-    onSearch: (SearchIntent) -> Unit,
-) {
-    when (searchDomain) {
-        SearchFragment.SearchDomain.All -> onSearch(SearchIntent.SearchAll(query = query))
-        SearchFragment.SearchDomain.Feed -> onSearch(SearchIntent.SearchFeed(query = query))
-        is SearchFragment.SearchDomain.Article -> {
-            onSearch(SearchIntent.SearchArticle(feedUrls = searchDomain.feedUrls, query = query))
-        }
-    }
 }
 
 @Composable
@@ -243,7 +273,7 @@ fun TrailingIcon(
 private fun SearchBarInputField(
     query: TextFieldValue,
     onQueryChange: (TextFieldValue) -> Unit,
-    onSearch: (TextFieldValue) -> Unit,
+    onSearch: () -> Unit,
     modifier: Modifier = Modifier,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -271,7 +301,7 @@ private fun SearchBarInputField(
         trailingIcon = trailingIcon,
         placeholder = placeholder,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = { onSearch(query) }),
+        keyboardActions = KeyboardActions(onSearch = { onSearch() }),
         interactionSource = interactionSource,
         singleLine = true,
         shape = RectangleShape,

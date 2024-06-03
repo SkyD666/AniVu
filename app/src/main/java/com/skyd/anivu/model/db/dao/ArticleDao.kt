@@ -98,11 +98,17 @@ interface ArticleDao {
     @Query(
         """
         SELECT * FROM $ARTICLE_TABLE_NAME 
-        WHERE ${ArticleBean.FEED_URL_COLUMN} IN (:feedUrls)
+        WHERE ${ArticleBean.FEED_URL_COLUMN} IN (:feedUrls) AND
+        (:isFavorite IS NULL OR ${ArticleBean.IS_FAVORITE_COLUMN} = :isFavorite) AND
+        (:isRead IS NULL OR ${ArticleBean.IS_READ_COLUMN} = :isRead)
         ORDER BY ${ArticleBean.DATE_COLUMN} DESC
         """
     )
-    fun getArticlePagingSource(feedUrls: List<String>): PagingSource<Int, ArticleWithFeed>
+    fun getArticlePagingSource(
+        feedUrls: List<String>,
+        isFavorite: Boolean?,
+        isRead: Boolean?,
+    ): PagingSource<Int, ArticleWithFeed>
 
     @Transaction
     @RawQuery(observedEntities = [ArticleBean::class])
@@ -132,4 +138,22 @@ interface ArticleDao {
         """
     )
     suspend fun queryLatestByFeedUrl(feedUrl: String): ArticleBean?
+
+    @Transaction
+    @Query(
+        """
+        UPDATE $ARTICLE_TABLE_NAME SET ${ArticleBean.IS_FAVORITE_COLUMN} = :favorite
+        WHERE ${ArticleBean.ARTICLE_ID_COLUMN} LIKE :articleId
+        """
+    )
+    fun favoriteArticle(articleId: String, favorite: Boolean)
+
+    @Transaction
+    @Query(
+        """
+        UPDATE $ARTICLE_TABLE_NAME SET ${ArticleBean.IS_READ_COLUMN} = :read
+        WHERE ${ArticleBean.ARTICLE_ID_COLUMN} LIKE :articleId
+        """
+    )
+    fun readArticle(articleId: String, read: Boolean)
 }

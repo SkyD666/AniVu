@@ -295,7 +295,9 @@ private fun InfoArea(
             )
         }
 
-        var networkIcon by rememberSaveable { mutableStateOf("") }
+        var networkIcon by rememberSaveable(feed.customIcon) {
+            mutableStateOf(if (URLUtil.isNetworkUrl(feed.customIcon)) feed.customIcon!! else "")
+        }
         if (openNetworkIconDialog) {
             TextFieldDialog(
                 onDismissRequest = { openNetworkIconDialog = false },

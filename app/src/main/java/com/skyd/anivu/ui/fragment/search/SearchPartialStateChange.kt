@@ -7,6 +7,12 @@ import kotlinx.coroutines.flow.Flow
 internal sealed interface SearchPartialStateChange {
     fun reduce(oldState: SearchState): SearchState
 
+    sealed interface LoadingDialog : SearchPartialStateChange {
+        data object Show : LoadingDialog {
+            override fun reduce(oldState: SearchState) = oldState.copy(loadingDialog = true)
+        }
+    }
+
     sealed interface SearchResult : SearchPartialStateChange {
         override fun reduce(oldState: SearchState): SearchState {
             return when (this) {
@@ -27,5 +33,39 @@ internal sealed interface SearchPartialStateChange {
         data class Success(val result: Flow<PagingData<Any>>) : SearchResult
         data class Failed(val msg: String) : SearchResult
         data object Loading : SearchResult
+    }
+
+    sealed interface FavoriteArticle : SearchPartialStateChange {
+        override fun reduce(oldState: SearchState): SearchState {
+            return when (this) {
+                is Success,
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : FavoriteArticle
+        data class Failed(val msg: String) : FavoriteArticle
+    }
+
+    sealed interface ReadArticle : SearchPartialStateChange {
+        override fun reduce(oldState: SearchState): SearchState {
+            return when (this) {
+                is Success,
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : ReadArticle
+        data class Failed(val msg: String) : ReadArticle
+    }
+
+    sealed interface UpdateQuery : SearchPartialStateChange {
+        override fun reduce(oldState: SearchState): SearchState = oldState
+
+        data object Success : UpdateQuery
     }
 }

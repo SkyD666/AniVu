@@ -4,16 +4,28 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -23,11 +35,15 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.viewModels
@@ -117,7 +133,7 @@ fun ArticleScreen(
                 scrollBehavior = scrollBehavior,
             )
         }
-    ) {
+    ) { paddingValues ->
         if (feedUrls.isEmpty()) {
             AniVuDialog(
                 visible = true,
@@ -131,45 +147,96 @@ fun ArticleScreen(
         } else {
             val dispatch =
                 viewModel.getDispatcher(feedUrls, startWith = ArticleIntent.Init(feedUrls))
-            val state = rememberPullRefreshState(
-                refreshing = uiState.articleListState.loading,
+            Content(
+                uiState = uiState,
                 onRefresh = { dispatch(ArticleIntent.Refresh(feedUrls)) },
-            )
-            Box(modifier = Modifier.pullRefresh(state)) {
-                when (val articleListState = uiState.articleListState) {
-                    is ArticleListState.Failed -> {}
-                    is ArticleListState.Init -> {}
-                    is ArticleListState.Success -> {
-                        ArticleList(
-                            modifier = Modifier.fillMaxSize(),
-                            articles = articleListState.articlePagingDataFlow.collectAsLazyPagingItems(),
-                            contentPadding = it,
+                onFilterFavorite = { dispatch(ArticleIntent.FilterFavorite(it)) },
+                onFilterRead = { dispatch(ArticleIntent.FilterRead(it)) },
+                onFavorite = { articleWithFeed, favorite ->
+                    dispatch(
+                        ArticleIntent.Favorite(
+                            articleId = articleWithFeed.articleWithEnclosure.article.articleId,
+                            favorite = favorite,
                         )
-                    }
-                }
-                PullRefreshIndicator(
-                    refreshing = uiState.articleListState.loading,
-                    state = state,
-                    modifier = Modifier
-                        .padding(it)
-                        .align(Alignment.TopCenter),
-                )
-            }
+                    )
+                },
+                onRead = { articleWithFeed, read ->
+                    dispatch(
+                        ArticleIntent.Read(
+                            articleId = articleWithFeed.articleWithEnclosure.article.articleId,
+                            read = read,
+                        )
+                    )
+                },
+                contentPadding = paddingValues,
+            )
         }
     }
 
     WaitingDialog(visible = uiState.loadingDialog)
 
     when (val event = uiEvent) {
-        is ArticleEvent.InitArticleListResultEvent.Failed -> {
+        is ArticleEvent.InitArticleListResultEvent.Failed ->
             snackbarHostState.showSnackbar(message = event.msg, scope = scope)
-        }
 
-        is ArticleEvent.RefreshArticleListResultEvent.Failed -> {
+        is ArticleEvent.RefreshArticleListResultEvent.Failed ->
             snackbarHostState.showSnackbar(message = event.msg, scope = scope)
-        }
+
+        is ArticleEvent.FavoriteArticleResultEvent.Failed ->
+            snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+
+        is ArticleEvent.ReadArticleResultEvent.Failed ->
+            snackbarHostState.showSnackbar(message = event.msg, scope = scope)
 
         null -> Unit
+    }
+}
+
+@Composable
+private fun Content(
+    uiState: ArticleState,
+    onRefresh: () -> Unit,
+    onFilterFavorite: (Boolean) -> Unit,
+    onFilterRead: (Boolean) -> Unit,
+    onFavorite: (ArticleWithFeed, Boolean) -> Unit,
+    onRead: (ArticleWithFeed, Boolean) -> Unit,
+    contentPadding: PaddingValues,
+) {
+    val state = rememberPullRefreshState(
+        refreshing = uiState.articleListState.loading,
+        onRefresh = onRefresh,
+    )
+    Box(modifier = Modifier.pullRefresh(state)) {
+        when (val articleListState = uiState.articleListState) {
+            is ArticleListState.Failed -> {}
+            is ArticleListState.Init -> {}
+            is ArticleListState.Success -> {
+                Column {
+                    FilterRow(
+                        modifier = Modifier.padding(top = contentPadding.calculateTopPadding()),
+                        onFilterFavorite = onFilterFavorite,
+                        onFilterRead = onFilterRead,
+                    )
+                    ArticleList(
+                        articles = articleListState.articlePagingDataFlow.collectAsLazyPagingItems(),
+                        onFavorite = onFavorite,
+                        onRead = onRead,
+                        contentPadding = PaddingValues(
+                            start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
+                            end = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
+                            bottom = contentPadding.calculateBottomPadding(),
+                        ),
+                    )
+                }
+            }
+        }
+        PullRefreshIndicator(
+            refreshing = uiState.articleListState.loading,
+            state = state,
+            modifier = Modifier
+                .padding(contentPadding)
+                .align(Alignment.TopCenter),
+        )
     }
 }
 
@@ -177,10 +244,12 @@ fun ArticleScreen(
 private fun ArticleList(
     modifier: Modifier = Modifier,
     articles: LazyPagingItems<ArticleWithFeed>,
+    onFavorite: (ArticleWithFeed, Boolean) -> Unit,
+    onRead: (ArticleWithFeed, Boolean) -> Unit,
     contentPadding: PaddingValues,
 ) {
     val adapter = remember {
-        LazyGridAdapter(mutableListOf(Article1Proxy()))
+        LazyGridAdapter(mutableListOf(Article1Proxy(onFavorite = onFavorite, onRead = onRead)))
     }
     AniVuLazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
@@ -190,4 +259,61 @@ private fun ArticleList(
         contentPadding = contentPadding,
         key = { _, item -> (item as ArticleWithFeed).articleWithEnclosure.article.articleId },
     )
+}
+
+@Composable
+private fun FilterRow(
+    modifier: Modifier,
+    onFilterFavorite: (Boolean) -> Unit,
+    onFilterRead: (Boolean) -> Unit,
+) {
+    var favoriteSelected by rememberSaveable { mutableStateOf(false) }
+    var readSelected by rememberSaveable { mutableStateOf(false) }
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+    ) {
+//        FilterChip(
+//            onClick = {
+//                favoriteSelected = !favoriteSelected
+//                onFilterFavorite(favoriteSelected)
+//            },
+//            label = { Text(stringResource(id = R.string.article_screen_favorite_filter)) },
+//            selected = favoriteSelected,
+//            leadingIcon = if (favoriteSelected) {
+//                {
+//                    Icon(
+//                        imageVector = Icons.Filled.Done,
+//                        contentDescription = stringResource(id = R.string.item_selected),
+//                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+//                    )
+//                }
+//            } else {
+//                null
+//            },
+//        )
+//        FilterChip(
+//            onClick = {
+//                readSelected = !readSelected
+//                onFilterRead(readSelected)
+//            },
+//            label = { Text(stringResource(id = R.string.article_screen_read_filter)) },
+//            selected = readSelected,
+//            leadingIcon = if (readSelected) {
+//                {
+//                    Icon(
+//                        imageVector = Icons.Filled.Done,
+//                        contentDescription = stringResource(id = R.string.item_selected),
+//                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+//                    )
+//                }
+//            } else {
+//                null
+//            },
+//        )
+    }
 }

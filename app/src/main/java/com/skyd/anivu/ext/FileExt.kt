@@ -7,6 +7,8 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.content.FileProvider
+import com.skyd.anivu.R
+import com.skyd.anivu.ui.component.showToast
 import java.io.File
 
 fun File.toUri(context: Context): Uri = FileProvider.getUriForFile(
@@ -43,5 +45,6 @@ fun File.savePictureToMediaStore(context: Context, autoDelete: Boolean = true) {
         if (!dir.exists()) dir.mkdirs()
         this.copyTo(File(dir, name))
     }
+    context.getString(R.string.save_picture_to_media_store_saved).showToast()
     if (autoDelete) delete()
 }

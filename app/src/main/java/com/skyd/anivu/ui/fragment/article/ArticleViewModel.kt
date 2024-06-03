@@ -61,6 +61,14 @@ class ArticleViewModel @Inject constructor(
                     ArticleEvent.RefreshArticleListResultEvent.Failed(change.msg)
                 }
 
+                is ArticlePartialStateChange.FavoriteArticle.Failed -> {
+                    ArticleEvent.FavoriteArticleResultEvent.Failed(change.msg)
+                }
+
+                is ArticlePartialStateChange.ReadArticle.Failed -> {
+                    ArticleEvent.FavoriteArticleResultEvent.Failed(change.msg)
+                }
+
                 else -> return@onEach
             }
             sendEvent(event)
@@ -82,6 +90,34 @@ class ArticleViewModel @Inject constructor(
                 }.startWith(ArticlePartialStateChange.RefreshArticleList.Loading).catchMap {
                     it.printStackTrace()
                     ArticlePartialStateChange.RefreshArticleList.Failed(it.message.toString())
+                }
+            },
+            filterIsInstance<ArticleIntent.Favorite>().flatMapConcat { intent ->
+                articleRepo.favoriteArticle(intent.articleId, intent.favorite).map {
+                    ArticlePartialStateChange.FavoriteArticle.Success
+                }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
+                    ArticlePartialStateChange.FavoriteArticle.Failed(it.message.toString())
+                }
+            },
+            filterIsInstance<ArticleIntent.Read>().flatMapConcat { intent ->
+                articleRepo.readArticle(intent.articleId, intent.read).map {
+                    ArticlePartialStateChange.ReadArticle.Success
+                }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
+                    ArticlePartialStateChange.ReadArticle.Failed(it.message.toString())
+                }
+            },
+            filterIsInstance<ArticleIntent.FilterFavorite>().flatMapConcat { intent ->
+                flowOf(articleRepo.filterFavorite(intent.favorite)).map {
+                    ArticlePartialStateChange.FilterArticle.Success
+                }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
+                    ArticlePartialStateChange.FilterArticle.Failed(it.message.toString())
+                }
+            },
+            filterIsInstance<ArticleIntent.FilterRead>().flatMapConcat { intent ->
+                flowOf(articleRepo.filterRead(intent.read)).map {
+                    ArticlePartialStateChange.FilterArticle.Success
+                }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
+                    ArticlePartialStateChange.FilterArticle.Failed(it.message.toString())
                 }
             },
         )

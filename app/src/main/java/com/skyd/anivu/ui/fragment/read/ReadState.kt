@@ -5,10 +5,12 @@ import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 
 data class ReadState(
     val articleState: ArticleState,
+    val loadingDialog: Boolean,
 ) : MviViewState {
     companion object {
         fun initial() = ReadState(
             articleState = ArticleState.Init,
+            loadingDialog = true,
         )
     }
 }

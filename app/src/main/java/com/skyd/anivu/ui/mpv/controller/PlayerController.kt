@@ -123,25 +123,8 @@ internal fun PlayerController(
                     controllerHeight = it.size.height
                     controllerLayoutCoordinates = it
                 }
-                .detectPressGestures(
-                    controllerWidth = { controllerWidth },
-                    playState = playState,
-                    playStateCallback = playStateCallback,
-                    showController = { showController },
-                    onShowControllerChanged = { showController = it },
-                    isLongPressing = { isLongPressing },
-                    isLongPressingChanged = { isLongPressing = it },
-                    onShowForwardRipple = {
-                        forwardRippleStartControllerOffset = it
-                        showForwardRipple = true
-                    },
-                    onShowBackwardRipple = {
-                        backwardRippleStartControllerOffset = it
-                        showBackwardRipple = true
-                    },
-                    cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
-                    restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
-                )
+                // detectControllerGestures should be called before detectPressGestures
+                // to avoid responding to swipes when long pressing
                 .detectControllerGestures(
                     enabled = enabled,
                     controllerWidth = { controllerWidth },
@@ -158,6 +141,25 @@ internal fun PlayerController(
                     onTimePreviewChanged = { seekTimePreview = it },
                     transformState = transformState,
                     transformStateCallback = transformStateCallback,
+                    cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
+                    restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
+                )
+                .detectPressGestures(
+                    controllerWidth = { controllerWidth },
+                    playState = playState,
+                    playStateCallback = playStateCallback,
+                    showController = { showController },
+                    onShowControllerChanged = { showController = it },
+                    isLongPressing = { isLongPressing },
+                    isLongPressingChanged = { isLongPressing = it },
+                    onShowForwardRipple = {
+                        forwardRippleStartControllerOffset = it
+                        showForwardRipple = true
+                    },
+                    onShowBackwardRipple = {
+                        backwardRippleStartControllerOffset = it
+                        showBackwardRipple = true
+                    },
                     cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
                     restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
                 )

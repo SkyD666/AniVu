@@ -34,9 +34,9 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
-import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleBeforePreference
-import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleFrequencyPreference
-import com.skyd.anivu.model.preference.autodelete.UseAutoDeletePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequencyPreference
+import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BannerItem

@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.fragment.settings.data.importexport.exportopml
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
@@ -41,11 +41,13 @@ import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.safeLaunch
 import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
 import com.skyd.anivu.ui.component.AniVuExtendedFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
+import com.skyd.anivu.ui.local.LocalOpmlExportDir
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -69,12 +71,16 @@ fun ExportOpmlScreen(viewModel: ExportOpmlViewModel = hiltViewModel()) {
 
     val dispatch = viewModel.getDispatcher(startWith = ExportOpmlIntent.Init)
 
-    var exportDir by rememberSaveable { mutableStateOf(Uri.EMPTY) }
+    val exportDir = LocalOpmlExportDir.current
     val pickExportDirLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri ->
         if (uri != null) {
-            exportDir = uri
+            context.contentResolver.takePersistableUriPermission(
+                uri, Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                        Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+            OpmlExportDirPreference.put(context, scope, uri.toString())
         }
     }
     val lazyListState = rememberLazyListState()
@@ -94,13 +100,13 @@ fun ExportOpmlScreen(viewModel: ExportOpmlViewModel = hiltViewModel()) {
                 text = { Text(text = stringResource(R.string.export_opml_screen_export)) },
                 icon = { Icon(imageVector = Icons.Default.Done, contentDescription = null) },
                 onClick = {
-                    if (exportDir == Uri.EMPTY) {
+                    if (exportDir.isBlank()) {
                         snackbarHostState.showSnackbar(
                             scope = scope,
                             message = context.getString(R.string.export_opml_screen_dir_not_selected),
                         )
                     } else {
-                        dispatch(ExportOpmlIntent.ExportOpml(outputDir = exportDir))
+                        dispatch(ExportOpmlIntent.ExportOpml(outputDir = Uri.parse(exportDir)))
                     }
                 },
                 onSizeWithSinglePaddingChanged = { _, height -> fabHeight = height },
@@ -119,8 +125,8 @@ fun ExportOpmlScreen(viewModel: ExportOpmlViewModel = hiltViewModel()) {
                 BaseSettingsItem(
                     icon = rememberVectorPainter(image = Icons.Outlined.Folder),
                     text = stringResource(id = R.string.export_opml_screen_select_dir),
-                    descriptionText = exportDir.toString().ifBlank { null },
-                    onClick = { pickExportDirLauncher.safeLaunch(exportDir) }
+                    descriptionText = exportDir.ifBlank { null },
+                    onClick = { pickExportDirLauncher.safeLaunch(Uri.parse(exportDir)) }
                 )
             }
         }

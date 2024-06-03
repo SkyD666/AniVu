@@ -22,6 +22,7 @@ import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.popBackStackWithLifecycle
+import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toHtml
@@ -136,6 +137,13 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
         }
     }
 
+    private fun updateEvent(event: ReadEvent) {
+        when (event) {
+            is ReadEvent.FavoriteArticleResultEvent.Failed -> showSnackbar(text = event.msg)
+            is ReadEvent.ReadArticleResultEvent.Failed -> showSnackbar(text = event.msg)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -150,6 +158,7 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
                     .launchIn(lifecycleScope)
 
                 feedViewModel.viewState.collectIn(this) { updateState(it) }
+                feedViewModel.singleEvent.collectIn(this) { updateEvent(it) }
             }
         )
     }

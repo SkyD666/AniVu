@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -24,10 +26,29 @@ class ArticleRepository @Inject constructor(
     private val rssHelper: RssHelper,
     private val pagingConfig: PagingConfig,
 ) : BaseRepository() {
+    private val filterFavorite = MutableStateFlow<Boolean?>(null)
+    private val filterRead = MutableStateFlow<Boolean?>(null)
+
+    fun filterFavorite(favorite: Boolean?) {
+        filterFavorite.value = favorite
+    }
+
+    fun filterRead(read: Boolean?) {
+        filterRead.value = read
+    }
+
     fun requestArticleList(feedUrls: List<String>): Flow<PagingData<ArticleWithFeed>> {
-        return Pager(pagingConfig) {
-            articleDao.getArticlePagingSource(feedUrls)
-        }.flow.flowOn(Dispatchers.IO)
+        return combine(filterFavorite, filterRead) { favorite, read ->
+            favorite to read
+        }.flatMapConcat { (favorite, read) ->
+            Pager(pagingConfig) {
+                articleDao.getArticlePagingSource(
+                    feedUrls = feedUrls,
+                    isFavorite = favorite,
+                    isRead = read,
+                )
+            }.flow
+        }.flowOn(Dispatchers.IO)
     }
 
     fun refreshGroupArticles(groupId: String?): Flow<Unit> {
@@ -68,6 +89,18 @@ class ArticleRepository @Inject constructor(
                 }
                 requests.forEach { it.await() }
             })
+        }.flowOn(Dispatchers.IO)
+    }
+
+    fun favoriteArticle(articleId: String, favorite: Boolean): Flow<Unit> {
+        return flow {
+            emit(articleDao.favoriteArticle(articleId, favorite))
+        }.flowOn(Dispatchers.IO)
+    }
+
+    fun readArticle(articleId: String, read: Boolean): Flow<Unit> {
+        return flow {
+            emit(articleDao.readArticle(articleId, read))
         }.flowOn(Dispatchers.IO)
     }
 }

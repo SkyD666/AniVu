@@ -60,9 +60,9 @@ internal sealed interface ArticlePartialStateChange {
                         articleListState = when (articleListState) {
                             is ArticleListState.Init -> articleListState.copy(loading = false)
                             is ArticleListState.Failed -> articleListState.copy(loading = false)
-                            is ArticleListState.Success -> ArticleListState.Success(
+                            is ArticleListState.Success -> articleListState.copy(
                                 articlePagingDataFlow = articleListState.articlePagingDataFlow,
-                                loading = false
+                                loading = false,
                             )
                         },
                         loadingDialog = false,
@@ -85,5 +85,47 @@ internal sealed interface ArticlePartialStateChange {
         data object Success : RefreshArticleList
         data object Loading : RefreshArticleList
         data class Failed(val msg: String) : RefreshArticleList
+    }
+
+    sealed interface FavoriteArticle : ArticlePartialStateChange {
+        override fun reduce(oldState: ArticleState): ArticleState {
+            return when (this) {
+                is Success,
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : FavoriteArticle
+        data class Failed(val msg: String) : FavoriteArticle
+    }
+
+    sealed interface ReadArticle : ArticlePartialStateChange {
+        override fun reduce(oldState: ArticleState): ArticleState {
+            return when (this) {
+                is Success,
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : ReadArticle
+        data class Failed(val msg: String) : ReadArticle
+    }
+
+    sealed interface FilterArticle : ArticlePartialStateChange {
+        override fun reduce(oldState: ArticleState): ArticleState {
+            return when (this) {
+                is Success,
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : FilterArticle
+        data class Failed(val msg: String) : FilterArticle
     }
 }

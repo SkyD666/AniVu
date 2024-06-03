@@ -139,7 +139,7 @@ fun ImportOpmlScreen(viewModel: ImportOpmlViewModel = hiltViewModel()) {
                     icon = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.Segment),
                     text = stringResource(id = R.string.import_opml_screen_select_file),
                     descriptionText = opmlUri.toString().ifBlank { null },
-                    onClick = { pickFileLauncher.safeLaunch("text/x-opml") }
+                    onClick = { pickFileLauncher.safeLaunch("*/*") }
                 )
             }
             item {
