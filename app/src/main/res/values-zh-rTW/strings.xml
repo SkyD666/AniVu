@@ -246,6 +246,13 @@
     <string name="feed_screen_rss_icon_source_network">From network</string>
     <string name="feed_screen_rss_icon_source_network_hint">URLs starting with http or https</string>
     <string name="reset">Reset</string>
+    <string name="save_picture_to_media_store_saved">Picture saved!</string>
+    <string name="article_screen_favorite">Favorite</string>
+    <string name="article_screen_unfavorite">Unfavorite</string>
+    <string name="article_screen_mark_as_unread">Unread</string>
+    <string name="article_screen_mark_as_read">Mark as read</string>
+    <string name="article_screen_favorite_filter">Favorite</string>
+    <string name="article_screen_read_filter">Read</string>
     <plurals name="import_opml_result">
         <item quantity="other">Imported %d items, takes %.2f seconds</item>
     </plurals>
