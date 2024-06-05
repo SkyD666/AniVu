@@ -105,7 +105,6 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
     val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AniVuTopBar(
@@ -173,6 +172,7 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
                     is MediaListState.Init -> Unit
                     is MediaListState.Success -> {
                         MediaList(
+                            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                             data = mediaListState.list,
                             contentPadding = innerPadding,
                             onPlay = {

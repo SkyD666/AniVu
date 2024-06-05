@@ -5,8 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -19,7 +22,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -28,6 +32,7 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -35,8 +40,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,6 +81,8 @@ import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Article1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Feed1Proxy
+import com.skyd.anivu.ui.local.LocalSearchListTonalElevation
+import com.skyd.anivu.ui.local.LocalSearchTopBarTonalElevation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.Serializable
@@ -117,7 +126,7 @@ fun SearchScreen(
     val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val searchResultListState = rememberLazyStaggeredGridState()
+    val searchResultListState = rememberLazyGridState()
     var fabHeight by remember { mutableStateOf(0.dp) }
     var fabWidth by remember { mutableStateOf(0.dp) }
 
@@ -137,14 +146,20 @@ fun SearchScreen(
         modifier = Modifier.imePadding(),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            AnimatedVisibility(visible = searchResultListState.firstVisibleItemIndex > 2) {
+            AnimatedVisibility(
+                visible = remember {
+                    derivedStateOf { searchResultListState.firstVisibleItemIndex > 2 }
+                }.value,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
                 AniVuFloatingActionButton(
                     onClick = { scope.launch { searchResultListState.animateScrollToItem(0) } },
                     onSizeWithSinglePaddingChanged = { width, height ->
                         fabWidth = width
                         fabHeight = height
                     },
-                    contentDescription = stringResource(R.string.search_screen_list_to_top),
+                    contentDescription = stringResource(R.string.to_top),
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.ArrowUpward,
@@ -156,7 +171,11 @@ fun SearchScreen(
         topBar = {
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceColorAtElevation(
+                            LocalSearchTopBarTonalElevation.current.dp
+                        )
+                    )
                     .windowInsetsPadding(
                         WindowInsets.systemBars
                             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
@@ -181,7 +200,12 @@ fun SearchScreen(
                 )
                 HorizontalDivider()
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+            LocalAbsoluteTonalElevation.current +
+                    LocalSearchListTonalElevation.current.dp
+        ),
+        contentColor = MaterialTheme.colorScheme.onSurface,
     ) { innerPaddings ->
         when (val searchResultState = uiState.searchResultState) {
             is SearchResultState.Failed -> Unit
@@ -189,6 +213,7 @@ fun SearchScreen(
             SearchResultState.Loading -> CircularProgressIndicator()
             is SearchResultState.Success -> SearchResultList(
                 result = searchResultState.result.collectAsLazyPagingItems(),
+                listState = searchResultListState,
                 onFavorite = { articleWithFeed, favorite ->
                     dispatch(
                         SearchIntent.Favorite(
@@ -205,7 +230,10 @@ fun SearchScreen(
                         )
                     )
                 },
-                contentPadding = innerPaddings + PaddingValues(bottom = fabHeight),
+                contentPadding = innerPaddings + PaddingValues(
+                    top = 4.dp,
+                    bottom = 4.dp + fabHeight,
+                ),
             )
         }
 
@@ -227,6 +255,7 @@ fun SearchScreen(
 private fun SearchResultList(
     modifier: Modifier = Modifier,
     result: LazyPagingItems<Any>,
+    listState: LazyGridState,
     onFavorite: (ArticleWithFeed, Boolean) -> Unit,
     onRead: (ArticleWithFeed, Boolean) -> Unit,
     contentPadding: PaddingValues,
@@ -241,10 +270,13 @@ private fun SearchResultList(
     }
     AniVuLazyVerticalGrid(
         modifier = modifier,
-        columns = GridCells.Adaptive(250.dp),
+        columns = GridCells.Adaptive(360.dp),
         dataList = result,
+        listState = listState,
         adapter = adapter,
-        contentPadding = contentPadding,
+        contentPadding = contentPadding + PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         key = { _, item ->
             when (item) {
                 is ArticleWithFeed -> item.articleWithEnclosure.article.articleId
@@ -294,8 +326,8 @@ private fun SearchBarInputField(
             unfocusedIndicatorColor = Color.Transparent,
             errorIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
         ),
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,

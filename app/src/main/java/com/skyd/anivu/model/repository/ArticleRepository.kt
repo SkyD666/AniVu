@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
@@ -40,7 +41,7 @@ class ArticleRepository @Inject constructor(
     fun requestArticleList(feedUrls: List<String>): Flow<PagingData<ArticleWithFeed>> {
         return combine(filterFavorite, filterRead) { favorite, read ->
             favorite to read
-        }.flatMapConcat { (favorite, read) ->
+        }.flatMapLatest { (favorite, read) ->
             Pager(pagingConfig) {
                 articleDao.getArticlePagingSource(
                     feedUrls = feedUrls,

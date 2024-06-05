@@ -38,7 +38,7 @@ class Feed1Proxy(
     private val visible: (groupId: String) -> Boolean = { true },
     private val selected: (FeedBean) -> Boolean = { false },
     private val isEnded: (index: Int) -> Boolean = { false },
-    private val useCardLayout: () -> Boolean = { false },
+    private val inGroup: () -> Boolean = { false },
     private val onClick: ((FeedBean) -> Unit)? = null,
     private val onEdit: ((FeedBean) -> Unit)? = null,
 ) : LazyGridAdapter.Proxy<FeedViewBean>() {
@@ -50,7 +50,7 @@ class Feed1Proxy(
             visible = visible,
             selected = selected,
             isEnded = isEnded,
-            useCardLayout = useCardLayout,
+            inGroup = inGroup,
             onClick = onClick,
             onEdit = onEdit,
         )
@@ -63,7 +63,7 @@ fun Feed1Item(
     data: FeedViewBean,
     visible: (groupId: String) -> Boolean,
     selected: (FeedBean) -> Boolean,
-    useCardLayout: () -> Boolean,
+    inGroup: () -> Boolean,
     onClick: ((FeedBean) -> Unit)? = null,
     isEnded: (index: Int) -> Boolean,
     onEdit: ((FeedBean) -> Unit)? = null,
@@ -79,20 +79,19 @@ fun Feed1Item(
         val isEnd = isEnded(index)
         Row(
             modifier = Modifier
-                .padding(horizontal = if (useCardLayout()) 16.dp else 0.dp)
                 .clip(
-                    if (useCardLayout() && isEnd) {
-                        RoundedCornerShape(0.dp, 0.dp, SHAPE_CORNER_DP, SHAPE_CORNER_DP)
-                    } else RectangleShape
+                    if (inGroup()) {
+                        if (isEnd) RoundedCornerShape(0.dp, 0.dp, SHAPE_CORNER_DP, SHAPE_CORNER_DP)
+                        else RectangleShape
+                    } else {
+                        RoundedCornerShape(12.dp)
+                    }
                 )
-                .run {
-                    if (useCardLayout()) {
-                        background(
-                            if (selected(feed)) MaterialTheme.colorScheme.surfaceContainerHighest
-                            else MaterialTheme.colorScheme.surfaceContainer
-                        )
-                    } else this
-                }
+                .background(
+                    MaterialTheme.colorScheme.secondary.copy(
+                        alpha = if (selected(feed)) 0.15f else 0.1f
+                    )
+                )
                 .combinedClickable(
                     onLongClick = if (onEdit != null) {
                         { onEdit(feed) }
@@ -108,8 +107,8 @@ fun Feed1Item(
                         } else onClick(feed)
                     },
                 )
-                .padding(horizontal = if (useCardLayout()) 20.dp else 16.dp, vertical = 10.dp)
-                .padding(bottom = if (useCardLayout() && isEnd) 6.dp else 0.dp)
+                .padding(horizontal = 20.dp, vertical = 10.dp)
+                .padding(bottom = if (inGroup() && isEnd) 6.dp else 0.dp)
         ) {
             FeedIcon(modifier = Modifier.padding(vertical = 3.dp), data = feed, size = 36.dp)
             Spacer(modifier = Modifier.width(12.dp))

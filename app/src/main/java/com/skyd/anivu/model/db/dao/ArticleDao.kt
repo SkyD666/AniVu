@@ -31,11 +31,25 @@ interface ArticleDao {
         val enclosureDao: EnclosureDao
     }
 
+    // null always compares false in '='
     @Query(
         """
         SELECT * from $ARTICLE_TABLE_NAME 
-        WHERE ${ArticleBean.LINK_COLUMN} = :link
-        AND ${ArticleBean.FEED_URL_COLUMN} = :feedUrl
+        WHERE ${ArticleBean.GUID_COLUMN} = :guid AND 
+        ${ArticleBean.FEED_URL_COLUMN} = :feedUrl
+        """
+    )
+    suspend fun queryArticleByGuid(
+        guid: String?,
+        feedUrl: String,
+    ): ArticleBean?
+
+    // null always compares false in '='
+    @Query(
+        """
+        SELECT * from $ARTICLE_TABLE_NAME 
+        WHERE ${ArticleBean.LINK_COLUMN} = :link AND 
+        ${ArticleBean.FEED_URL_COLUMN} = :feedUrl
         """
     )
     suspend fun queryArticleByLink(
@@ -56,16 +70,26 @@ interface ArticleDao {
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(appContext, ArticleDaoEntryPoint::class.java)
         articleWithEnclosureList.forEach {
-            // 可能会出现link、feedUrl都一样，但是uuid不一样的情况
-            var newArticle = queryArticleByLink(
-                link = it.article.link,
-                feedUrl = it.article.feedUrl,
-            )
+            // Duplicate article by guid or link
+            val guid = it.article.guid
+            val link = it.article.link
+            var newArticle: ArticleBean? = null
+            if (guid != null) {
+                newArticle = queryArticleByGuid(
+                    guid = guid,
+                    feedUrl = it.article.feedUrl,
+                )
+            } else if (link != null) {
+                newArticle = queryArticleByLink(
+                    link = link,
+                    feedUrl = it.article.feedUrl,
+                )
+            }
             if (newArticle == null) {
                 innerUpdateArticle(it.article)
                 newArticle = it.article
             } else {
-                // 除了uuid，其他的字段都更新
+                // Update all fields except articleId
                 newArticle = it.article.copy(articleId = newArticle.articleId)
                 innerUpdateArticle(newArticle)
             }
@@ -143,7 +167,7 @@ interface ArticleDao {
     @Query(
         """
         UPDATE $ARTICLE_TABLE_NAME SET ${ArticleBean.IS_FAVORITE_COLUMN} = :favorite
-        WHERE ${ArticleBean.ARTICLE_ID_COLUMN} LIKE :articleId
+        WHERE ${ArticleBean.ARTICLE_ID_COLUMN} = :articleId
         """
     )
     fun favoriteArticle(articleId: String, favorite: Boolean)
@@ -152,7 +176,7 @@ interface ArticleDao {
     @Query(
         """
         UPDATE $ARTICLE_TABLE_NAME SET ${ArticleBean.IS_READ_COLUMN} = :read
-        WHERE ${ArticleBean.ARTICLE_ID_COLUMN} LIKE :articleId
+        WHERE ${ArticleBean.ARTICLE_ID_COLUMN} = :articleId
         """
     )
     fun readArticle(articleId: String, read: Boolean)

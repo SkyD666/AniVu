@@ -26,6 +26,7 @@ import com.skyd.anivu.model.db.migration.Migration2To3
 import com.skyd.anivu.model.db.migration.Migration3To4
 import com.skyd.anivu.model.db.migration.Migration4To5
 import com.skyd.anivu.model.db.migration.Migration5To6
+import com.skyd.anivu.model.db.migration.Migration6To7
 
 const val APP_DATA_BASE_FILE_NAME = "app.db"
 
@@ -41,7 +42,7 @@ const val APP_DATA_BASE_FILE_NAME = "app.db"
         GroupBean::class,
     ],
     views = [FeedViewBean::class],
-    version = 6,
+    version = 7,
 )
 @TypeConverters(
     value = []
@@ -61,7 +62,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         private val migrations = arrayOf(
             Migration1To2(), Migration2To3(), Migration3To4(), Migration4To5(),
-            Migration5To6()
+            Migration5To6(), Migration6To7()
         )
 
         fun getInstance(context: Context): AppDatabase {

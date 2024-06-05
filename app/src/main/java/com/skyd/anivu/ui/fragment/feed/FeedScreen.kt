@@ -19,6 +19,7 @@ import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -34,6 +35,7 @@ import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.layout.calculatePaneScaffoldDirective
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.material3.rememberTopAppBarState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -90,6 +92,8 @@ import com.skyd.anivu.ui.fragment.article.ArticleFragment
 import com.skyd.anivu.ui.fragment.article.ArticleScreen
 import com.skyd.anivu.ui.fragment.search.SearchFragment
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
+import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
+import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
@@ -190,7 +194,6 @@ private fun FeedList(
     val dispatch = viewModel.getDispatcher(startWith = FeedIntent.Init)
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AniVuTopBar(
@@ -232,6 +235,14 @@ private fun FeedList(
                         if (windowSizeClass.isCompact) plus(WindowInsetsSides.Left) else this
                     }
                 ),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors().copy(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                        LocalFeedTopBarTonalElevation.current.dp
+                    ),
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                        LocalFeedTopBarTonalElevation.current.dp + 4.dp
+                    ),
+                ),
                 scrollBehavior = scrollBehavior,
             )
         },
@@ -247,11 +258,17 @@ private fun FeedList(
                 Icon(imageVector = Icons.Outlined.Add, contentDescription = null)
             }
         },
+        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+            LocalAbsoluteTonalElevation.current +
+                    LocalFeedListTonalElevation.current.dp
+        ),
+        contentColor = MaterialTheme.colorScheme.onSurface,
     ) { innerPadding ->
         when (val groupListState = uiState.groupListState) {
             is GroupListState.Failed, GroupListState.Init, GroupListState.Loading -> {}
             is GroupListState.Success -> {
                 FeedList(
+                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     result = groupListState.dataList,
                     contentPadding = innerPadding + PaddingValues(bottom = fabHeight + 16.dp),
                     selectedFeedUrls = listPaneSelectedFeedUrls,
@@ -517,6 +534,7 @@ private fun CreateGroupDialog(
 
 @Composable
 private fun FeedList(
+    modifier: Modifier = Modifier,
     result: List<Any>,
     contentPadding: PaddingValues = PaddingValues(),
     selectedFeedUrls: List<String>? = null,
@@ -575,7 +593,7 @@ private fun FeedList(
                 Feed1Proxy(
                     visible = { feedVisible[it] ?: false },
                     selected = { selectedFeedUrls != null && it.url in selectedFeedUrls },
-                    useCardLayout = { true },
+                    inGroup = { true },
                     onClick = { onShowArticleList(listOf(it.url)) },
                     isEnded = { it == result.lastIndex || result[it + 1] is GroupBean },
                     onEdit = onEditFeed
@@ -584,11 +602,11 @@ private fun FeedList(
         )
     }
     AniVuLazyVerticalGrid(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         columns = GridCells.Fixed(1),
         dataList = result,
         adapter = adapter,
-        contentPadding = contentPadding,
+        contentPadding = contentPadding + PaddingValues(horizontal = 16.dp),
         key = { _, item ->
             when (item) {
                 is GroupBean.DefaultGroup -> item.groupId

@@ -107,7 +107,8 @@ class RssHelper @Inject constructor(
                 description = content ?: desc,
                 content = content,
                 image = findImg((content ?: desc) ?: ""),
-                link = syndEntry.link ?: "",
+                link = syndEntry.link,
+                guid = syndEntry.uri,
                 updateAt = Date().time,
             ),
             enclosures = syndEntry.enclosures.map {
@@ -123,7 +124,7 @@ class RssHelper @Inject constructor(
 
     fun getRssIcon(url: String): String? {
         return runCatching {
-            faviconExtractor.extractFavicon(url).apply { Log.e("TAG", "getRssIcon: $this", ) }
+            faviconExtractor.extractFavicon(url).apply { Log.e("TAG", "getRssIcon: $this") }
         }.onFailure { it.printStackTrace() }.getOrNull()
     }
 

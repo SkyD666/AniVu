@@ -34,7 +34,7 @@ fun AniVuTheme(
 @Composable
 fun AniVuTheme(
     darkTheme: Boolean,
-    wallpaperColors: Map<String, ColorScheme> = extractAllColors(darkTheme),
+    colors: Map<String, ColorScheme> = extractAllColors(darkTheme),
     content: @Composable () -> Unit
 ) {
     val view = LocalView.current
@@ -49,7 +49,7 @@ fun AniVuTheme(
 
     MaterialTheme(
         colorScheme = remember(themeName) {
-            wallpaperColors.getOrElse(themeName) {
+            colors.getOrElse(themeName) {
                 dynamicColorScheme(
                     seedColor = ThemePreference.toSeedColor(
                         context = context,

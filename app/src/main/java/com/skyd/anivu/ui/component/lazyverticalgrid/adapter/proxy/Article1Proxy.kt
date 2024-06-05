@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -14,11 +15,14 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Drafts
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.ImportContacts
@@ -28,6 +32,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
@@ -35,6 +40,7 @@ import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -75,6 +81,7 @@ import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
 import com.skyd.anivu.ui.fragment.read.EnclosureBottomSheet
 import com.skyd.anivu.ui.fragment.read.ReadFragment
+import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
@@ -98,10 +105,8 @@ fun Article1Item(
 ) {
     val navController = LocalNavController.current
     val context = LocalContext.current
-    val articleTapAction = LocalArticleTapAction.current
     val articleSwipeLeftAction = LocalArticleSwipeLeftAction.current
     val articleWithEnclosure = data.articleWithEnclosure
-    val article = articleWithEnclosure.article
     var expandMenu by rememberSaveable { mutableStateOf(false) }
 
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
@@ -127,25 +132,65 @@ fun Article1Item(
                 swipeToDismissBoxState.targetValue != SwipeToDismissBoxValue.Settled
     }
 
-    SwipeToDismissBox(
-        state = swipeToDismissBoxState,
-        backgroundContent = {
-            SwipeBackgroundContent(
-                direction = swipeToDismissBoxState.dismissDirection,
-                isActive = isSwipeToDismissActive,
-                articleSwipeLeftAction = articleSwipeLeftAction,
-                context = context,
+    Box(modifier = Modifier.clip(RoundedCornerShape(12.dp))) {
+        SwipeToDismissBox(
+            state = swipeToDismissBoxState,
+            backgroundContent = {
+                SwipeBackgroundContent(
+                    direction = swipeToDismissBoxState.dismissDirection,
+                    isActive = isSwipeToDismissActive,
+                    articleSwipeLeftAction = articleSwipeLeftAction,
+                    context = context,
+                )
+            },
+            enableDismissFromStartToEnd = false,
+        ) {
+            Article1ItemContent(
+                data = data,
+                onLongClick = { expandMenu = true },
+                onFavorite = onFavorite,
+                onRead = onRead,
             )
-        },
-        enableDismissFromStartToEnd = false,
+            ArticleMenu(
+                expanded = expandMenu,
+                onDismissRequest = { expandMenu = false },
+                data = data,
+                onFavorite = onFavorite,
+                onRead = onRead,
+            )
+        }
+    }
+}
+
+@Composable
+private fun Article1ItemContent(
+    data: ArticleWithFeed,
+    onLongClick: () -> Unit,
+    onFavorite: (ArticleWithFeed, Boolean) -> Unit,
+    onRead: (ArticleWithFeed, Boolean) -> Unit,
+) {
+    val context = LocalContext.current
+    val navController = LocalNavController.current
+    val articleTapAction = LocalArticleTapAction.current
+    val articleWithEnclosure = data.articleWithEnclosure
+    val article = articleWithEnclosure.article
+    val colorAlpha = if (data.articleWithEnclosure.article.isRead) 0.5f else 1f
+
+    CompositionLocalProvider(
+        LocalContentColor provides LocalContentColor.current.copy(alpha = colorAlpha)
     ) {
         Column(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.background)
+                .background(
+                    MaterialTheme.colorScheme.surfaceColorAtElevation(
+                        LocalAbsoluteTonalElevation.current +
+                                LocalArticleItemTonalElevation.current.dp
+                    )
+                )
                 .fillMaxWidth()
                 .run { if (article.image.isNullOrBlank()) this else height(IntrinsicSize.Max) }
                 .combinedClickable(
-                    onLongClick = { expandMenu = true },
+                    onLongClick = onLongClick,
                     onClick = {
                         tapAction(
                             articleTapAction,
@@ -154,53 +199,26 @@ fun Article1Item(
                             articleWithEnclosure,
                         )
                     },
-                )
-                .padding(horizontal = 16.dp, vertical = 12.dp),
+                ),
         ) {
-            val colorAlpha = if (data.articleWithEnclosure.article.isRead) 0.5f else 1f
-            CompositionLocalProvider(
-                LocalContentColor provides LocalContentColor.current.copy(alpha = colorAlpha)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
+            val title = article.title?.readable().orEmpty()
+
+            Row(modifier = Modifier.height(IntrinsicSize.Max)) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(top = 12.dp)
+                        .padding(horizontal = 15.dp),
                 ) {
-                    FeedIcon(data = data.feed)
-                    val feedName =
-                        data.feed.nickname.orEmpty().ifBlank { data.feed.title.orEmpty() }
-                    if (feedName.isNotBlank()) {
-                        Text(
-                            modifier = Modifier
-                                .padding(horizontal = 10.dp)
-                                .weight(1f),
-                            text = feedName,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.tertiary.copy(alpha = colorAlpha),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                    val date = article.date?.toDateTimeString(context = context)
-                    if (!date.isNullOrBlank()) {
-                        Text(
-                            text = date,
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.outline.copy(alpha = colorAlpha),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(3.dp))
-                Row {
-                    Column(modifier = Modifier.weight(1f)) {
-                        val title = article.title?.readable().orEmpty()
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.titleSmall,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+
+                    Row {
                         val author = article.author
                         if (!author.isNullOrBlank()) {
                             Text(
@@ -210,47 +228,123 @@ fun Article1Item(
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
-                        val description = article.description?.readable()?.let { desc ->
-                            if (LocalDeduplicateTitleInDesc.current) desc.replace(
-                                title,
-                                ""
-                            ) else desc
-                        }
-                        if (!description.isNullOrBlank()) {
-                            Spacer(modifier = Modifier.height(3.dp))
+                        val date = article.date?.toDateTimeString(context = context)
+                        if (!date.isNullOrBlank()) {
+                            if (!author.isNullOrBlank()) {
+                                Text(
+                                    modifier = Modifier.padding(horizontal = 3.dp),
+                                    text = "·",
+                                    style = MaterialTheme.typography.labelMedium,
+                                )
+                            }
                             Text(
-                                text = description,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
-                                maxLines = 3,
+                                text = date,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.outline.copy(alpha = colorAlpha),
+                                maxLines = 1,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
-                    if (!article.image.isNullOrBlank()) {
-                        Spacer(modifier = Modifier.width(15.dp))
-                        OutlinedCard(
+                    Spacer(modifier = Modifier.height(3.dp))
+
+                    val description = article.description?.readable()?.let { desc ->
+                        if (LocalDeduplicateTitleInDesc.current) desc.replace(title, "") else desc
+                    }?.trim()
+                    if (!description.isNullOrBlank()) {
+                        Text(
+                            text = description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+
+                if (!article.image.isNullOrBlank()) {
+                    OutlinedCard(
+                        modifier = Modifier
+                            .padding(top = 12.dp, end = 12.dp)
+                            .align(Alignment.CenterVertically),
+                    ) {
+                        AniVuImage(
                             modifier = Modifier
-                                .width(90.dp)
-                                .fillMaxHeight(),
-                        ) {
-                            AniVuImage(
-                                modifier = Modifier.fillMaxSize(),
-                                model = article.image,
-                                contentScale = ContentScale.Crop,
-                            )
-                        }
+                                .width(100.dp)
+                                .fillMaxHeight()
+                                .heightIn(min = 70.dp, max = 120.dp),
+                            model = article.image,
+                            contentScale = ContentScale.Crop,
+                        )
                     }
                 }
             }
 
-            ArticleMenu(
-                expanded = expandMenu,
-                onDismissRequest = { expandMenu = false },
-                data = data,
-                onFavorite = onFavorite,
-                onRead = onRead,
-            )
+            // Bottom row
+            Row(
+                modifier = Modifier.padding(start = 15.dp, end = 9.dp, top = 3.dp, bottom = 6.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                FeedIcon(
+                    data = data.feed,
+                    size = 22.dp
+                )
+
+                val feedName =
+                    data.feed.nickname.orEmpty().ifBlank { data.feed.title.orEmpty() }
+                if (feedName.isNotBlank()) {
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 6.dp)
+                            .weight(1f),
+                        text = feedName,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.tertiary.copy(alpha = colorAlpha),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                } else {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+
+                val isFavorite = articleWithEnclosure.article.isFavorite
+                val isRead = articleWithEnclosure.article.isRead
+                Icon(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .clickable { onFavorite(data, !isFavorite) }
+                        .padding(6.dp),
+                    imageVector = if (isFavorite) {
+                        Icons.Outlined.Favorite
+                    } else {
+                        Icons.Outlined.FavoriteBorder
+                    },
+                    contentDescription = if (isFavorite) {
+                        stringResource(id = R.string.article_screen_favorite)
+                    } else {
+                        stringResource(id = R.string.article_screen_unfavorite)
+                    },
+                )
+                Spacer(modifier = Modifier.width(3.dp))
+                Icon(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .clickable { onRead(data, !isRead) }
+                        .padding(6.dp),
+                    imageVector = if (isRead) {
+                        Icons.Outlined.Drafts
+                    } else {
+                        Icons.Outlined.MarkEmailUnread
+                    },
+                    contentDescription = if (isRead) {
+                        stringResource(id = R.string.article_screen_mark_as_unread)
+                    } else {
+                        stringResource(id = R.string.article_screen_mark_as_read)
+                    },
+                )
+            }
         }
     }
 }

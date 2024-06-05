@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
+import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
+import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
 
 open class Group1Proxy(
     val isExpand: (GroupBean) -> Boolean = { false },
@@ -67,7 +70,6 @@ fun Group1Item(
 
     Row(
         modifier = Modifier
-            .padding(horizontal = 16.dp)
             .padding(top = 16.dp)
             .clip(
                 RoundedCornerShape(
@@ -77,7 +79,7 @@ fun Group1Item(
                     backgroundShapeCorner,
                 )
             )
-            .background(color = MaterialTheme.colorScheme.surfaceContainer)
+            .background(color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f))
             .combinedClickable(
                 onLongClick = if (onEdit == null) null else {
                     { onEdit(data) }

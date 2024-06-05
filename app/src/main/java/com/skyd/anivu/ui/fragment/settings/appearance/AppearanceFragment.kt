@@ -156,6 +156,12 @@ class AppearanceFragment : BasePreferenceFragmentCompat() {
             styleCategory.addPreference(this)
         }
 
+        val screenStyleCategory = PreferenceCategory(this).apply {
+            key = "screenStyleCategory"
+            title = getString(R.string.appearance_fragment_screen_style_category)
+            screen.addPreference(this)
+        }
+
         Preference(this).apply {
             key = "feedScreenStyle"
             title = getString(R.string.feed_style_screen_name)
@@ -163,7 +169,27 @@ class AppearanceFragment : BasePreferenceFragmentCompat() {
                 findMainNavController().navigate(R.id.action_to_feed_style_fragment)
                 true
             }
-            styleCategory.addPreference(this)
+            screenStyleCategory.addPreference(this)
+        }
+
+        Preference(this).apply {
+            key = "articleScreenStyle"
+            title = getString(R.string.article_style_screen_name)
+            setOnPreferenceClickListener {
+                findMainNavController().navigate(R.id.action_to_article_style_fragment)
+                true
+            }
+            screenStyleCategory.addPreference(this)
+        }
+
+        Preference(this).apply {
+            key = "searchScreenStyle"
+            title = getString(R.string.search_style_screen_name)
+            setOnPreferenceClickListener {
+                findMainNavController().navigate(R.id.action_to_search_style_fragment)
+                true
+            }
+            screenStyleCategory.addPreference(this)
         }
     }
 

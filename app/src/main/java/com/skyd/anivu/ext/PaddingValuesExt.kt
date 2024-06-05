@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
 
 @Composable
 operator fun PaddingValues.plus(other: PaddingValues): PaddingValues = PaddingValues(
@@ -15,3 +16,6 @@ operator fun PaddingValues.plus(other: PaddingValues): PaddingValues = PaddingVa
     end = calculateEndPadding(LocalLayoutDirection.current) +
             other.calculateEndPadding(LocalLayoutDirection.current)
 )
+
+@Composable
+operator fun PaddingValues.plus(other: Dp): PaddingValues = this + PaddingValues(other)

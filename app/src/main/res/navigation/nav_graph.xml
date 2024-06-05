@@ -165,7 +165,7 @@
 
     <fragment
         android:id="@+id/feed_style_fragment"
-        android:name="com.skyd.anivu.ui.fragment.settings.appearance.feed.FeedAppearanceFragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.appearance.feed.FeedStyleFragment"
         android:label="@string/feed_style_screen_name" />
     <action
         android:id="@+id/action_to_feed_style_fragment"
@@ -202,4 +202,20 @@
     <action
         android:id="@+id/action_to_import_opml_fragment"
         app:destination="@id/import_opml_fragment" />
+
+    <fragment
+        android:id="@+id/article_style_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.appearance.article.ArticleStyleFragment"
+        android:label="@string/article_style_screen_name" />
+    <action
+        android:id="@+id/action_to_article_style_fragment"
+        app:destination="@id/article_style_fragment" />
+
+    <fragment
+        android:id="@+id/search_style_fragment"
+        android:name="com.skyd.anivu.ui.fragment.settings.appearance.search.SearchStyleFragment"
+        android:label="@string/search_style_screen_name" />
+    <action
+        android:id="@+id/action_to_search_style_fragment"
+        app:destination="@id/search_style_fragment" />
 </navigation>

@@ -167,14 +167,14 @@
     <string name="article_action_show_enclosures">附件</string>
     <string name="behavior_screen_article_tap_action">點選項</string>
     <string name="behavior_screen_article_swipe_left_action">左滑</string>
-    <string name="search_screen_list_to_top">到頂部</string>
+    <string name="to_top">到頂部</string>
     <string name="default_feed_group">預設</string>
     <string name="feed_group">分組</string>
     <string name="feed_screen_add_group">新增分組</string>
     <string name="feed_screen_group_feeds_move_to">移動到組</string>
     <string name="feed_screen_delete_group_warning">刪除“%s”分組及其所有訂閱和文章</string>
     <string name="feed_style_screen_name">訂閱頁面</string>
-    <string name="feed_style_screen_feed_group_expand">總是展開</string>
+    <string name="feed_style_screen_group_expand">總是展開</string>
     <string name="feed_style_screen_group_list_category">分組列表</string>
     <string name="appearance_fragment_style_category">樣式</string>
     <string name="pick_image_method_pick_visual_media">相片挑選工具（%s）</string>

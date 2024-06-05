@@ -13,7 +13,14 @@ import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
+import com.skyd.anivu.model.preference.appearance.article.ArticleItemTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
@@ -27,14 +34,19 @@ import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
+import com.skyd.anivu.ui.local.LocalArticleListTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
+import com.skyd.anivu.ui.local.LocalArticleTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleBefore
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleFrequency
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalDateStyle
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
+import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
+import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalHardwareDecode
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
@@ -44,6 +56,8 @@ import com.skyd.anivu.ui.local.LocalPickImageMethod
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
+import com.skyd.anivu.ui.local.LocalSearchListTonalElevation
+import com.skyd.anivu.ui.local.LocalSearchTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
 import com.skyd.anivu.ui.local.LocalUseAutoDelete
@@ -58,6 +72,13 @@ data class Settings(
     val textFieldStyle: String = TextFieldStylePreference.default,
     val dateStyle: String = DateStylePreference.default,
     val navigationBarLabel: String = NavigationBarLabelPreference.default,
+    val feedListTonalElevation: Float = FeedListTonalElevationPreference.default,
+    val feedTopBarTonalElevation: Float = FeedTopBarTonalElevationPreference.default,
+    val articleListTonalElevation: Float = ArticleListTonalElevationPreference.default,
+    val articleTopBarTonalElevation: Float = ArticleTopBarTonalElevationPreference.default,
+    val articleItemTonalElevation: Float = ArticleItemTonalElevationPreference.default,
+    val searchListTonalElevation: Float = SearchListTonalElevationPreference.default,
+    val searchTopBarTonalElevation: Float = SearchTopBarTonalElevationPreference.default,
     // Update
     val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
     // Behavior
@@ -94,6 +115,13 @@ fun SettingsProvider(
         LocalTextFieldStyle provides settings.textFieldStyle,
         LocalDateStyle provides settings.dateStyle,
         LocalNavigationBarLabel provides settings.navigationBarLabel,
+        LocalFeedListTonalElevation provides settings.feedListTonalElevation,
+        LocalFeedTopBarTonalElevation provides settings.feedTopBarTonalElevation,
+        LocalArticleListTonalElevation provides settings.articleListTonalElevation,
+        LocalArticleTopBarTonalElevation provides settings.articleTopBarTonalElevation,
+        LocalArticleItemTonalElevation provides settings.articleItemTonalElevation,
+        LocalSearchListTonalElevation provides settings.searchListTonalElevation,
+        LocalSearchTopBarTonalElevation provides settings.searchTopBarTonalElevation,
         // Update
         LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
         // Behavior

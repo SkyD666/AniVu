@@ -9,7 +9,14 @@ import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
+import com.skyd.anivu.model.preference.appearance.article.ArticleItemTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
@@ -39,6 +46,19 @@ val LocalFeedGroupExpand = compositionLocalOf { FeedGroupExpandPreference.defaul
 val LocalTextFieldStyle = compositionLocalOf { TextFieldStylePreference.default }
 val LocalDateStyle = compositionLocalOf { DateStylePreference.default }
 val LocalNavigationBarLabel = compositionLocalOf { NavigationBarLabelPreference.default }
+val LocalFeedListTonalElevation = compositionLocalOf { FeedListTonalElevationPreference.default }
+val LocalFeedTopBarTonalElevation =
+    compositionLocalOf { FeedTopBarTonalElevationPreference.default }
+val LocalArticleListTonalElevation =
+    compositionLocalOf { ArticleListTonalElevationPreference.default }
+val LocalArticleTopBarTonalElevation =
+    compositionLocalOf { ArticleTopBarTonalElevationPreference.default }
+val LocalArticleItemTonalElevation =
+    compositionLocalOf { ArticleItemTonalElevationPreference.default }
+val LocalSearchListTonalElevation =
+    compositionLocalOf { SearchListTonalElevationPreference.default }
+val LocalSearchTopBarTonalElevation =
+    compositionLocalOf { SearchTopBarTonalElevationPreference.default }
 
 // Update
 val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreference.default }
