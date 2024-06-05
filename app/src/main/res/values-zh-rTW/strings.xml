@@ -169,7 +169,7 @@
     <string name="article_action_show_enclosures">附件</string>
     <string name="behavior_screen_article_tap_action">點選項</string>
     <string name="behavior_screen_article_swipe_left_action">左滑</string>
-    <string name="search_screen_list_to_top">到頂部</string>
+    <string name="to_top">到頂部</string>
     <string name="default_feed_group">預設</string>
     <string name="feed_group">分組</string>
     <string name="feed_screen_add_group">新增分組</string>
@@ -178,9 +178,10 @@
     <string name="feed_screen_delete_feed_warning">Delete the feed and articles it contains</string>
     <string name="feed_screen_rss_title">Title</string>
     <string name="feed_style_screen_name">訂閱頁面</string>
-    <string name="feed_style_screen_feed_group_expand">總是展開</string>
+    <string name="feed_style_screen_group_expand">總是展開</string>
     <string name="feed_style_screen_group_list_category">分組列表</string>
     <string name="appearance_fragment_style_category">樣式</string>
+    <string name="appearance_fragment_screen_style_category">Screen style</string>
     <string name="normal_text_field_style">Normal</string>
     <string name="outlined_text_field_style">Outlined</string>
     <string name="appearance_fragment_text_field_style">Text field style</string>
@@ -251,8 +252,22 @@
     <string name="article_screen_unfavorite">Unfavorite</string>
     <string name="article_screen_mark_as_unread">Unread</string>
     <string name="article_screen_mark_as_read">Mark as read</string>
-    <string name="article_screen_favorite_filter">Favorite</string>
-    <string name="article_screen_read_filter">Read</string>
+    <string name="article_screen_filter_favorite">Favorite</string>
+    <string name="article_screen_filter_unfavorite">Favorite</string>
+    <string name="article_screen_filter_read">Read</string>
+    <string name="article_screen_filter_unread">Unread</string>
+    <string name="article_screen_filter_all">All</string>
+    <string name="article_screen_filter_setting">Settings</string>
+    <string name="article_screen_filter_clear_all_filter">Clear all filters</string>
+    <string name="tonal_elevation">Tonal elevation</string>
+    <string name="feed_style_screen_top_bar_category">Top bar</string>
+    <string name="article_style_screen_name">Article screen</string>
+    <string name="article_style_screen_top_bar_category">Top bar</string>
+    <string name="article_style_screen_article_list_category">Article list</string>
+    <string name="article_style_screen_article_item_category">Article item</string>
+    <string name="search_style_screen_name">Search screen</string>
+    <string name="search_style_screen_top_bar_category">Top bar</string>
+    <string name="search_style_screen_search_list_category">Search list</string>
     <plurals name="import_opml_result">
         <item quantity="other">Imported %d items, takes %.2f seconds</item>
     </plurals>
