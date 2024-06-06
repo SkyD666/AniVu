@@ -27,9 +27,9 @@ fun SnackbarHostState.showSnackbar(
 @Composable
 fun SnackbarHostState.showSnackbarWithLaunchedEffect(
     message: String,
-    key1: Any? = this,
+    key1: Any? = null,
     key2: Any? = null,
-    key3: Any? = null,
+    key3: Any? = this,
     actionLabel: String? = null,
     withDismissAction: Boolean = true,
     duration: SnackbarDuration = if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite

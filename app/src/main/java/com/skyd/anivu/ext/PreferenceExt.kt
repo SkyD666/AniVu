@@ -11,6 +11,8 @@ import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleItemTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefreshPreference
+import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
@@ -46,6 +48,8 @@ fun Preferences.toSettings(): Settings {
         articleItemTonalElevation = ArticleItemTonalElevationPreference.fromPreferences(this),
         searchListTonalElevation = SearchListTonalElevationPreference.fromPreferences(this),
         searchTopBarTonalElevation = SearchTopBarTonalElevationPreference.fromPreferences(this),
+        showArticleTopBarRefresh = ShowArticleTopBarRefreshPreference.fromPreferences(this),
+        showArticlePullRefresh = ShowArticlePullRefreshPreference.fromPreferences(this),
 
         // Update
         ignoreUpdateVersion = IgnoreUpdateVersionPreference.fromPreferences(this),

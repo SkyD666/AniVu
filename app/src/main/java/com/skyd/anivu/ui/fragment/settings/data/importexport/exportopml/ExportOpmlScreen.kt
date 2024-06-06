@@ -41,6 +41,7 @@ import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.safeLaunch
 import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
 import com.skyd.anivu.ui.component.AniVuExtendedFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -136,12 +137,12 @@ fun ExportOpmlScreen(viewModel: ExportOpmlViewModel = hiltViewModel()) {
 
     when (val event = uiEvent) {
         is ExportOpmlEvent.ExportOpmlResultEvent.Failed ->
-            snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+            snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
         is ExportOpmlEvent.ExportOpmlResultEvent.Success ->
-            snackbarHostState.showSnackbar(
+            snackbarHostState.showSnackbarWithLaunchedEffect(
                 message = stringResource(id = R.string.success_time_msg, event.time / 1000f),
-                scope = scope,
+                key1 = event,
             )
 
         null -> Unit

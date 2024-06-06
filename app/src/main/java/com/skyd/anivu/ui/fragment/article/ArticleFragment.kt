@@ -5,6 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -59,7 +65,7 @@ import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.popBackStackWithLifecycle
-import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
@@ -75,6 +81,8 @@ import com.skyd.anivu.ui.fragment.search.SearchFragment
 import com.skyd.anivu.ui.local.LocalArticleListTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.local.LocalShowArticlePullRefresh
+import com.skyd.anivu.ui.local.LocalShowArticleTopBarRefresh
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -157,6 +165,27 @@ private fun ArticleContentScreen(
                     ),
                 ),
                 actions = {
+                    if (LocalShowArticleTopBarRefresh.current) {
+                        val angle = if (uiState.articleListState.loading) {
+                            val infiniteTransition =
+                                rememberInfiniteTransition(label = "topBarRefreshTransition")
+                            infiniteTransition.animateFloat(
+                                initialValue = 0f,
+                                targetValue = 360f,
+                                animationSpec = infiniteRepeatable(
+                                    animation = tween(1000, easing = LinearEasing)
+                                ),
+                                label = "topBarRefreshAnimate",
+                            ).value
+                        } else 0f
+                        AniVuIconButton(
+                            onClick = { dispatch(ArticleIntent.Refresh(feedUrls)) },
+                            imageVector = Icons.Outlined.Refresh,
+                            contentDescription = stringResource(id = R.string.refresh),
+                            rotate = angle,
+                            enabled = !uiState.articleListState.loading,
+                        )
+                    }
                     AniVuIconButton(
                         onClick = {
                             navController.navigate(
@@ -230,16 +259,16 @@ private fun ArticleContentScreen(
 
         when (val event = uiEvent) {
             is ArticleEvent.InitArticleListResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is ArticleEvent.RefreshArticleListResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is ArticleEvent.FavoriteArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is ArticleEvent.ReadArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             null -> Unit
         }
@@ -264,7 +293,7 @@ private fun Content(
     )
     Box(
         modifier = Modifier
-            .pullRefresh(state)
+            .pullRefresh(state = state, enabled = LocalShowArticlePullRefresh.current)
             .padding(top = contentPadding.calculateTopPadding()),
     ) {
         Column {
@@ -291,11 +320,13 @@ private fun Content(
             )
         }
 
-        PullRefreshIndicator(
-            refreshing = uiState.articleListState.loading,
-            state = state,
-            modifier = Modifier.align(Alignment.TopCenter),
-        )
+        if (LocalShowArticlePullRefresh.current) {
+            PullRefreshIndicator(
+                refreshing = uiState.articleListState.loading,
+                state = state,
+                modifier = Modifier.align(Alignment.TopCenter),
+            )
+        }
     }
 }
 

@@ -53,73 +53,62 @@ class FeedViewModel @Inject constructor(
     private fun Flow<FeedPartialStateChange>.sendSingleEvent(): Flow<FeedPartialStateChange> {
         return onEach { change ->
             val event = when (change) {
-                is FeedPartialStateChange.AddFeed.Success -> {
+                is FeedPartialStateChange.AddFeed.Success ->
                     FeedEvent.AddFeedResultEvent.Success(change.feed)
-                }
 
-                is FeedPartialStateChange.AddFeed.Failed -> {
+                is FeedPartialStateChange.AddFeed.Failed ->
                     FeedEvent.AddFeedResultEvent.Failed(change.msg)
-                }
 
-                is FeedPartialStateChange.EditFeed.Success -> {
+                is FeedPartialStateChange.EditFeed.Success ->
                     FeedEvent.EditFeedResultEvent.Success(change.feed)
-                }
 
-                is FeedPartialStateChange.EditFeed.Failed -> {
+                is FeedPartialStateChange.EditFeed.Failed ->
                     FeedEvent.EditFeedResultEvent.Failed(change.msg)
-                }
 
-                is FeedPartialStateChange.RemoveFeed.Success -> {
+                is FeedPartialStateChange.RemoveFeed.Success ->
                     FeedEvent.RemoveFeedResultEvent.Success
-                }
 
-                is FeedPartialStateChange.RemoveFeed.Failed -> {
+                is FeedPartialStateChange.RemoveFeed.Failed ->
                     FeedEvent.RemoveFeedResultEvent.Failed(change.msg)
-                }
 
-                is FeedPartialStateChange.RefreshFeed.Success -> {
+                is FeedPartialStateChange.RefreshFeed.Success ->
                     FeedEvent.RefreshFeedResultEvent.Success
-                }
 
-                is FeedPartialStateChange.RefreshFeed.Failed -> {
+                is FeedPartialStateChange.RefreshFeed.Failed ->
                     FeedEvent.RefreshFeedResultEvent.Failed(change.msg)
-                }
 
-                is FeedPartialStateChange.FeedList.Failed -> {
+                is FeedPartialStateChange.FeedList.Failed ->
                     FeedEvent.InitFeetListResultEvent.Failed(change.msg)
-                }
 
-                is FeedPartialStateChange.CreateGroup.Success -> {
+                is FeedPartialStateChange.CreateGroup.Success ->
                     FeedEvent.CreateGroupResultEvent.Success
-                }
 
-                is FeedPartialStateChange.CreateGroup.Failed -> {
+                is FeedPartialStateChange.CreateGroup.Failed ->
                     FeedEvent.CreateGroupResultEvent.Failed(change.msg)
-                }
 
-                is FeedPartialStateChange.DeleteGroup.Success -> {
+                is FeedPartialStateChange.DeleteGroup.Success ->
                     FeedEvent.DeleteGroupResultEvent.Success
-                }
 
-                is FeedPartialStateChange.DeleteGroup.Failed -> {
+                is FeedPartialStateChange.DeleteGroup.Failed ->
                     FeedEvent.DeleteGroupResultEvent.Failed(change.msg)
-                }
 
-                is FeedPartialStateChange.MoveFeedsToGroup.Success -> {
+                is FeedPartialStateChange.MoveFeedsToGroup.Success ->
                     FeedEvent.MoveFeedsToGroupResultEvent.Success
-                }
 
-                is FeedPartialStateChange.MoveFeedsToGroup.Failed -> {
+                is FeedPartialStateChange.MoveFeedsToGroup.Failed ->
                     FeedEvent.MoveFeedsToGroupResultEvent.Failed(change.msg)
-                }
 
-                is FeedPartialStateChange.EditGroup.Success -> {
+                is FeedPartialStateChange.EditGroup.Success ->
                     FeedEvent.EditGroupResultEvent.Success(change.group)
-                }
 
-                is FeedPartialStateChange.EditGroup.Failed -> {
+                is FeedPartialStateChange.EditGroup.Failed ->
                     FeedEvent.EditGroupResultEvent.Failed(change.msg)
-                }
+
+                is FeedPartialStateChange.ReadAll.Success ->
+                    FeedEvent.ReadAllResultEvent.Success(change.count)
+
+                is FeedPartialStateChange.ReadAll.Failed ->
+                    FeedEvent.ReadAllResultEvent.Failed(change.msg)
 
                 else -> return@onEach
             }
@@ -144,37 +133,27 @@ class FeedViewModel @Inject constructor(
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.AddFeed.Failed(it.message.toString()) }
             },
-            filterIsInstance<FeedIntent.EditFeedUrl>().flatMapConcat { intent ->
-                feedRepo.editFeedUrl(oldUrl = intent.oldUrl, newUrl = intent.newUrl).map {
-                    FeedPartialStateChange.EditFeed.Success(it)
-                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
-                    .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
-            },
-            filterIsInstance<FeedIntent.EditFeedGroup>().flatMapConcat { intent ->
-                feedRepo.editFeedGroup(url = intent.url, groupId = intent.groupId).map {
-                    FeedPartialStateChange.EditFeed.Success(it)
-                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
-                    .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
-            },
-            filterIsInstance<FeedIntent.EditFeedCustomDescription>().flatMapConcat { intent ->
-                feedRepo.editFeedCustomDescription(
-                    url = intent.url,
-                    customDescription = intent.customDescription,
-                ).map {
-                    FeedPartialStateChange.EditFeed.Success(it)
-                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
-                    .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
-            },
-            filterIsInstance<FeedIntent.EditFeedCustomIcon>().flatMapConcat { intent ->
-                feedRepo.editFeedCustomIcon(url = intent.url, customIcon = intent.customIcon).map {
-                    FeedPartialStateChange.EditFeed.Success(it)
-                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
-                    .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
-            },
-            filterIsInstance<FeedIntent.EditFeedNickname>().flatMapConcat { intent ->
-                feedRepo.editFeedNickname(url = intent.url, nickname = intent.nickname).map {
-                    FeedPartialStateChange.EditFeed.Success(it)
-                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+            merge(
+                filterIsInstance<FeedIntent.EditFeedUrl>().map { intent ->
+                    feedRepo.editFeedUrl(oldUrl = intent.oldUrl, newUrl = intent.newUrl)
+                },
+                filterIsInstance<FeedIntent.EditFeedGroup>().map { intent ->
+                    feedRepo.editFeedGroup(url = intent.url, groupId = intent.groupId)
+                },
+                filterIsInstance<FeedIntent.EditFeedCustomDescription>().map { intent ->
+                    feedRepo.editFeedCustomDescription(
+                        url = intent.url, customDescription = intent.customDescription,
+                    )
+                },
+                filterIsInstance<FeedIntent.EditFeedCustomIcon>().map { intent ->
+                    feedRepo.editFeedCustomIcon(url = intent.url, customIcon = intent.customIcon)
+                },
+                filterIsInstance<FeedIntent.EditFeedNickname>().map { intent ->
+                    feedRepo.editFeedNickname(url = intent.url, nickname = intent.nickname)
+                },
+            ).flatMapConcat { flow ->
+                flow.map { FeedPartialStateChange.EditFeed.Success(it) }
+                    .startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.RemoveFeed>().flatMapConcat { intent ->
@@ -183,16 +162,24 @@ class FeedViewModel @Inject constructor(
                     else FeedPartialStateChange.RemoveFeed.Failed("Remove failed!")
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
             },
-            filterIsInstance<FeedIntent.RefreshFeed>().flatMapConcat { intent ->
-                articleRepo.refreshArticleList(listOf(intent.url)).map {
-                    FeedPartialStateChange.RefreshFeed.Success
-                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
-                    .catchMap { FeedPartialStateChange.RefreshFeed.Failed(it.message.toString()) }
+            merge(
+                filterIsInstance<FeedIntent.ReadAllInGroup>()
+                    .map { intent -> feedRepo.readAllInGroup(intent.groupId) },
+                filterIsInstance<FeedIntent.ReadAllInFeed>()
+                    .map { intent -> feedRepo.readAllInFeed(intent.feedUrl) },
+            ).flatMapConcat { flow ->
+                flow.map { FeedPartialStateChange.ReadAll.Success(it) }
+                    .startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.ReadAll.Failed(it.message.toString()) }
             },
-            filterIsInstance<FeedIntent.RefreshGroupFeed>().flatMapConcat { intent ->
-                articleRepo.refreshGroupArticles(intent.groupId).map {
-                    FeedPartialStateChange.RefreshFeed.Success
-                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+            merge(
+                filterIsInstance<FeedIntent.RefreshFeed>()
+                    .map { intent -> articleRepo.refreshArticleList(listOf(intent.url)) },
+                filterIsInstance<FeedIntent.RefreshGroupFeed>()
+                    .map { intent -> articleRepo.refreshGroupArticles(intent.groupId) },
+            ).flatMapConcat { flow ->
+                flow.map { FeedPartialStateChange.RefreshFeed.Success }
+                    .startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.RefreshFeed.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.CreateGroup>().flatMapConcat { intent ->

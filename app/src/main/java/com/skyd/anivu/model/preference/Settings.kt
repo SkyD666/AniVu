@@ -16,6 +16,8 @@ import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleItemTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefreshPreference
+import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
@@ -58,6 +60,8 @@ import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.local.LocalSearchListTonalElevation
 import com.skyd.anivu.ui.local.LocalSearchTopBarTonalElevation
+import com.skyd.anivu.ui.local.LocalShowArticlePullRefresh
+import com.skyd.anivu.ui.local.LocalShowArticleTopBarRefresh
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
 import com.skyd.anivu.ui.local.LocalUseAutoDelete
@@ -79,6 +83,8 @@ data class Settings(
     val articleItemTonalElevation: Float = ArticleItemTonalElevationPreference.default,
     val searchListTonalElevation: Float = SearchListTonalElevationPreference.default,
     val searchTopBarTonalElevation: Float = SearchTopBarTonalElevationPreference.default,
+    val showArticleTopBarRefresh: Boolean = ShowArticleTopBarRefreshPreference.default,
+    val showArticlePullRefresh: Boolean = ShowArticlePullRefreshPreference.default,
     // Update
     val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
     // Behavior
@@ -122,6 +128,8 @@ fun SettingsProvider(
         LocalArticleItemTonalElevation provides settings.articleItemTonalElevation,
         LocalSearchListTonalElevation provides settings.searchListTonalElevation,
         LocalSearchTopBarTonalElevation provides settings.searchTopBarTonalElevation,
+        LocalShowArticleTopBarRefresh provides settings.showArticleTopBarRefresh,
+        LocalShowArticlePullRefresh provides settings.showArticlePullRefresh,
         // Update
         LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
         // Behavior

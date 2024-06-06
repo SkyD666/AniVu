@@ -64,6 +64,23 @@ internal sealed interface FeedPartialStateChange {
         data class Failed(val msg: String) : RemoveFeed
     }
 
+    sealed interface ReadAll : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val count: Int) : ReadAll
+        data class Failed(val msg: String) : ReadAll
+    }
+
     sealed interface RefreshFeed : FeedPartialStateChange {
         override fun reduce(oldState: FeedState): FeedState {
             return when (this) {

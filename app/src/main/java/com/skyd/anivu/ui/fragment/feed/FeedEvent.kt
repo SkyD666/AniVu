@@ -48,4 +48,9 @@ sealed interface FeedEvent : MviSingleEvent {
         data class Success(val group: GroupBean) : EditGroupResultEvent
         data class Failed(val msg: String) : EditGroupResultEvent
     }
+
+    sealed interface ReadAllResultEvent : FeedEvent {
+        data class Success(val count: Int) : ReadAllResultEvent
+        data class Failed(val msg: String) : ReadAllResultEvent
+    }
 }

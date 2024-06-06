@@ -70,7 +70,7 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
@@ -241,10 +241,10 @@ fun SearchScreen(
 
         when (val event = uiEvent) {
             is SearchEvent.FavoriteArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is SearchEvent.ReadArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             null -> Unit
         }

@@ -180,4 +180,26 @@ interface ArticleDao {
         """
     )
     fun readArticle(articleId: String, read: Boolean)
+
+    @Transaction
+    @Query(
+        """
+        UPDATE $ARTICLE_TABLE_NAME SET ${ArticleBean.IS_READ_COLUMN} = 1
+        WHERE ${ArticleBean.IS_READ_COLUMN} = 0 AND ${ArticleBean.FEED_URL_COLUMN} = :feedUrl
+        """
+    )
+    fun readAllInFeed(feedUrl: String): Int
+
+    @Transaction
+    @Query(
+        """
+        UPDATE $ARTICLE_TABLE_NAME SET ${ArticleBean.IS_READ_COLUMN} = 1
+        WHERE ${ArticleBean.IS_READ_COLUMN} = 0 AND ${ArticleBean.FEED_URL_COLUMN} IN (
+            SELECT DISTINCT ${FeedBean.URL_COLUMN} FROM $FEED_TABLE_NAME
+            WHERE ${FeedBean.GROUP_ID_COLUMN} = :groupId OR
+            :groupId IS NULL AND ${FeedBean.GROUP_ID_COLUMN} IS NULL
+        )
+        """
+    )
+    fun readAllInGroup(groupId: String?): Int
 }

@@ -33,6 +33,7 @@ fun EditGroupSheet(
     onDismissRequest: () -> Unit,
     group: GroupBean,
     groups: List<GroupBean>,
+    onReadAll: (String) -> Unit,
     onRefresh: (String) -> Unit,
     onDelete: (String) -> Unit,
     onNameChange: (String) -> Unit,
@@ -67,6 +68,7 @@ fun EditGroupSheet(
                     id = R.string.feed_screen_delete_group_warning,
                     group.name,
                 ),
+                onReadAll = { onReadAll(group.groupId) },
                 onRefresh = { onRefresh(group.groupId) },
                 onDelete = {
                     onDelete(group.groupId)

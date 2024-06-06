@@ -3,8 +3,6 @@ package com.skyd.anivu.ui.fragment.article
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -65,15 +63,12 @@ internal fun FilterRow(
     ) {
         AnimatedVisibility(
             visible = favoriteFilterValue != null || readFilterValue != null,
-            enter = fadeIn() + expandHorizontally(),
-            exit = fadeOut() + shrinkHorizontally(),
+            enter = expandHorizontally(),
+            exit = shrinkHorizontally(),
         ) {
             FilterSetting(
                 filterCount = {
-                    listOf(
-                        favoriteFilterValue,
-                        readFilterValue
-                    ).map { if (it != null) 1 else 0 }.sum()
+                    listOfNotNull(favoriteFilterValue, readFilterValue).size
                 },
                 onClearAllFilters = {
                     onFilterFavorite(null)
@@ -252,5 +247,4 @@ private fun FavoriteReadFilter(
             }
         }
     }
-
 }

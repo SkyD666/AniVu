@@ -12,6 +12,8 @@ import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleItemTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefreshPreference
+import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
@@ -59,6 +61,9 @@ val LocalSearchListTonalElevation =
     compositionLocalOf { SearchListTonalElevationPreference.default }
 val LocalSearchTopBarTonalElevation =
     compositionLocalOf { SearchTopBarTonalElevationPreference.default }
+val LocalShowArticleTopBarRefresh =
+    compositionLocalOf { ShowArticleTopBarRefreshPreference.default }
+val LocalShowArticlePullRefresh = compositionLocalOf { ShowArticlePullRefreshPreference.default }
 
 // Update
 val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreference.default }

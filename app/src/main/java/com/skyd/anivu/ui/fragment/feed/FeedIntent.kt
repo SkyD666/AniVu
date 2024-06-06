@@ -21,6 +21,8 @@ sealed interface FeedIntent : MviIntent {
     data class EditFeedCustomIcon(val url: String, val customIcon: Uri?) : FeedIntent
 
     data class RemoveFeed(val url: String) : FeedIntent
+    data class ReadAllInFeed(val feedUrl: String) : FeedIntent
+    data class ReadAllInGroup(val groupId: String?) : FeedIntent
     data class RefreshFeed(val url: String) : FeedIntent
     data class RefreshGroupFeed(val groupId: String?) : FeedIntent
     data class CreateGroup(val group: GroupBean) : FeedIntent

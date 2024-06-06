@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Tonality
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -27,15 +28,20 @@ import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.model.preference.appearance.article.ArticleItemTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefreshPreference
+import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
 import com.skyd.anivu.model.preference.appearance.feed.TonalElevationPreferenceUtil
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
+import com.skyd.anivu.ui.component.SwitchSettingsItem
 import com.skyd.anivu.ui.fragment.settings.appearance.feed.TonalElevationDialog
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleListTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleTopBarTonalElevation
+import com.skyd.anivu.ui.local.LocalShowArticlePullRefresh
+import com.skyd.anivu.ui.local.LocalShowArticleTopBarRefresh
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -87,6 +93,21 @@ fun ArticleStyleScreen() {
                 )
             }
             item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.Refresh,
+                    text = stringResource(id = R.string.article_style_screen_top_bar_refresh),
+                    description = stringResource(id = R.string.article_style_screen_top_bar_refresh_description),
+                    checked = LocalShowArticleTopBarRefresh.current,
+                    onCheckedChange = {
+                        ShowArticleTopBarRefreshPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
+            }
+            item {
                 CategorySettingsItem(text = stringResource(id = R.string.article_style_screen_article_list_category))
             }
             item {
@@ -97,6 +118,21 @@ fun ArticleStyleScreen() {
                         LocalArticleListTonalElevation.current
                     ),
                     onClick = { openArticleListTonalElevationDialog = true }
+                )
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.Refresh,
+                    text = stringResource(id = R.string.article_style_screen_pull_refresh),
+                    description = stringResource(id = R.string.article_style_screen_pull_refresh_description),
+                    checked = LocalShowArticlePullRefresh.current,
+                    onCheckedChange = {
+                        ShowArticlePullRefreshPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
                 )
             }
             item {

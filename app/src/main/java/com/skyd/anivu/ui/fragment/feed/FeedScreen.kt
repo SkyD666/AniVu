@@ -43,7 +43,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -56,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -67,7 +67,7 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ext.snapshotStateMapSaver
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedBean.Companion.isDefaultGroup
@@ -177,7 +177,6 @@ private fun FeedList(
     val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val windowSizeClass = LocalWindowSizeClass.current
-    val scope = rememberCoroutineScope()
     var openAddDialog by rememberSaveable { mutableStateOf(false) }
     var addDialogUrl by rememberSaveable { mutableStateOf("") }
     var openEditFeedDialog by rememberSaveable { mutableStateOf<FeedBean?>(null) }
@@ -281,31 +280,34 @@ private fun FeedList(
 
         when (val event = uiEvent) {
             is FeedEvent.AddFeedResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is FeedEvent.EditFeedResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is FeedEvent.InitFeetListResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is FeedEvent.RemoveFeedResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is FeedEvent.RefreshFeedResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is FeedEvent.CreateGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is FeedEvent.MoveFeedsToGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is FeedEvent.DeleteGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is FeedEvent.EditGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbar(message = event.msg, scope = scope)
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+
+            is FeedEvent.ReadAllResultEvent.Failed ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is FeedEvent.EditFeedResultEvent.Success -> LaunchedEffect(event) {
                 if (openEditFeedDialog != null) openEditFeedDialog = event.feed
@@ -319,12 +321,23 @@ private fun FeedList(
                 openEditFeedDialog = event.feed
             }
 
+            is FeedEvent.ReadAllResultEvent.Success ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(
+                    message = pluralStringResource(
+                        id = R.plurals.feed_screen_read_all_result,
+                        count = event.count,
+                        event.count,
+                    ),
+                    key1 = event,
+                )
+
             FeedEvent.RemoveFeedResultEvent.Success,
             is FeedEvent.RefreshFeedResultEvent.Success,
             FeedEvent.CreateGroupResultEvent.Success,
             FeedEvent.MoveFeedsToGroupResultEvent.Success,
             FeedEvent.DeleteGroupResultEvent.Success,
             null -> Unit
+
         }
 
         if (openAddDialog) {
@@ -354,8 +367,9 @@ private fun FeedList(
                 onDismissRequest = { openEditFeedDialog = null },
                 feed = openEditFeedDialog!!,
                 groups = groups,
-                onDelete = { dispatch(FeedIntent.RemoveFeed(it)) },
+                onReadAll = { dispatch(FeedIntent.ReadAllInFeed(it)) },
                 onRefresh = { dispatch(FeedIntent.RefreshFeed(it)) },
+                onDelete = { dispatch(FeedIntent.RemoveFeed(it)) },
                 onUrlChange = {
                     dispatch(FeedIntent.EditFeedUrl(oldUrl = openEditFeedDialog!!.url, newUrl = it))
                 },
@@ -406,8 +420,9 @@ private fun FeedList(
                 onDismissRequest = { openEditGroupDialog = null },
                 group = openEditGroupDialog!!,
                 groups = groups,
-                onDelete = { dispatch(FeedIntent.DeleteGroup(it)) },
+                onReadAll = { dispatch(FeedIntent.ReadAllInGroup(it)) },
                 onRefresh = { dispatch(FeedIntent.RefreshGroupFeed(it)) },
+                onDelete = { dispatch(FeedIntent.DeleteGroup(it)) },
                 onNameChange = {
                     dispatch(
                         FeedIntent.RenameGroup(groupId = openEditGroupDialog!!.groupId, name = it)

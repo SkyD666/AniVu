@@ -32,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +50,7 @@ import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.popBackStackWithLifecycle
-import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.activity.PlayActivity
@@ -94,7 +93,6 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val navController = LocalNavController.current
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val windowSizeClass = LocalWindowSizeClass.current
 
@@ -206,9 +204,8 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
         WaitingDialog(visible = uiState.loadingDialog)
 
         when (val event = uiEvent) {
-            is MediaEvent.DeleteUriResultEvent.Failed -> snackbarHostState.showSnackbar(
-                scope = scope, message = event.msg,
-            )
+            is MediaEvent.DeleteUriResultEvent.Failed ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             null -> Unit
         }

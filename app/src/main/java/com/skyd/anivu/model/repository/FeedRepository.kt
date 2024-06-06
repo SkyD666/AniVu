@@ -9,6 +9,7 @@ import com.skyd.anivu.ext.isLocal
 import com.skyd.anivu.ext.isNetwork
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
 import kotlinx.coroutines.Dispatchers
@@ -23,8 +24,9 @@ import java.util.UUID
 import javax.inject.Inject
 
 class FeedRepository @Inject constructor(
-    private val feedDao: FeedDao,
     private val groupDao: GroupDao,
+    private val feedDao: FeedDao,
+    private val articleDao: ArticleDao,
     private val rssHelper: RssHelper,
 ) : BaseRepository() {
     suspend fun requestGroupAnyList(): Flow<List<Any>> {
@@ -180,6 +182,19 @@ class FeedRepository @Inject constructor(
             } else {
                 emit(Unit)
             }
+        }.flowOn(Dispatchers.IO)
+    }
+
+    suspend fun readAllInGroup(groupId: String?): Flow<Int> {
+        return flow {
+            val realGroupId = if (groupId == GroupBean.DEFAULT_GROUP_ID) null else groupId
+            emit(articleDao.readAllInGroup(realGroupId))
+        }.flowOn(Dispatchers.IO)
+    }
+
+    suspend fun readAllInFeed(feedUrl: String): Flow<Int> {
+        return flow {
+            emit(articleDao.readAllInFeed(feedUrl))
         }.flowOn(Dispatchers.IO)
     }
 }

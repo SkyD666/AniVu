@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Link
@@ -78,6 +79,7 @@ fun EditFeedSheet(
     onDismissRequest: () -> Unit,
     feed: FeedBean,
     groups: List<GroupBean>,
+    onReadAll: (String) -> Unit,
     onRefresh: (String) -> Unit,
     onDelete: (String) -> Unit,
     onUrlChange: (String) -> Unit,
@@ -118,6 +120,7 @@ fun EditFeedSheet(
 
             // Options
             OptionArea(
+                onReadAll = { onReadAll(feed.url) },
                 onRefresh = { onRefresh(feed.url) },
                 onDelete = {
                     onDelete(feed.url)
@@ -342,6 +345,7 @@ private fun LinkArea(link: String, onLinkClick: () -> Unit) {
 internal fun OptionArea(
     deleteEnabled: Boolean = true,
     deleteWarningText: String = stringResource(id = R.string.feed_screen_delete_feed_warning),
+    onReadAll: () -> Unit,
     onRefresh: () -> Unit,
     onDelete: () -> Unit,
 ) {
@@ -358,6 +362,11 @@ internal fun OptionArea(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         overflow = FlowRowOverflow.Visible
     ) {
+        SheetChip(
+            icon = Icons.Outlined.DoneAll,
+            text = stringResource(id = R.string.read_all),
+            onClick = onReadAll,
+        )
         SheetChip(
             icon = Icons.Outlined.Refresh,
             text = stringResource(id = R.string.refresh),
