@@ -268,6 +268,14 @@
     <string name="search_style_screen_name">搜索页面</string>
     <string name="search_style_screen_top_bar_category">标题栏</string>
     <string name="search_style_screen_search_list_category">搜索列表</string>
+    <string name="read_all">Read all</string>
+    <string name="article_style_screen_top_bar_refresh">Top bar refresh</string>
+    <string name="article_style_screen_pull_refresh">Pull refresh</string>
+    <string name="article_style_screen_pull_refresh_description">Enable pull to refresh</string>
+    <string name="article_style_screen_top_bar_refresh_description">Show Refresh button on top bar</string>
+    <plurals name="feed_screen_read_all_result">
+        <item quantity="other">Read %d items</item>
+    </plurals>
     <plurals name="import_opml_result">
         <item quantity="other">导入了 %d 项，花费 %.2f 秒</item>
     </plurals>
