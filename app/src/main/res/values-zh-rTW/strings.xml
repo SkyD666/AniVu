@@ -268,6 +268,14 @@
     <string name="search_style_screen_name">Search screen</string>
     <string name="search_style_screen_top_bar_category">Top bar</string>
     <string name="search_style_screen_search_list_category">Search list</string>
+    <string name="read_all">Read all</string>
+    <string name="article_style_screen_top_bar_refresh">Top bar refresh</string>
+    <string name="article_style_screen_pull_refresh">Pull refresh</string>
+    <string name="article_style_screen_pull_refresh_description">Enable pull to refresh</string>
+    <string name="article_style_screen_top_bar_refresh_description">Show Refresh button on top bar</string>
+    <plurals name="feed_screen_read_all_result">
+        <item quantity="other">Read %d items</item>
+    </plurals>
     <plurals name="import_opml_result">
         <item quantity="other">Imported %d items, takes %.2f seconds</item>
     </plurals>
