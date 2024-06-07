@@ -257,7 +257,6 @@
     <string name="article_screen_filter_read">已读</string>
     <string name="article_screen_filter_unread">未读</string>
     <string name="article_screen_filter_all">全部</string>
-    <string name="article_screen_filter_setting">设置</string>
     <string name="article_screen_filter_clear_all_filter">清除所有过滤</string>
     <string name="tonal_elevation">色调高程</string>
     <string name="feed_style_screen_top_bar_category">标题栏</string>
@@ -268,13 +267,20 @@
     <string name="search_style_screen_name">搜索页面</string>
     <string name="search_style_screen_top_bar_category">标题栏</string>
     <string name="search_style_screen_search_list_category">搜索列表</string>
-    <string name="read_all">Read all</string>
-    <string name="article_style_screen_top_bar_refresh">Top bar refresh</string>
-    <string name="article_style_screen_pull_refresh">Pull refresh</string>
-    <string name="article_style_screen_pull_refresh_description">Enable pull to refresh</string>
-    <string name="article_style_screen_top_bar_refresh_description">Show Refresh button on top bar</string>
+    <string name="read_all">阅读所有</string>
+    <string name="article_style_screen_top_bar_refresh">刷新按钮</string>
+    <string name="article_style_screen_pull_refresh">下拉刷新</string>
+    <string name="article_style_screen_pull_refresh_description">启用下拉刷新</string>
+    <string name="article_style_screen_top_bar_refresh_description">在标题栏上显示刷新按钮</string>
+    <string name="article_screen_sort">排序</string>
+    <string name="article_screen_sort_date_asc">日期 ↑</string>
+    <string name="article_screen_sort_date_desc">日期 ↓</string>
+    <string name="article_screen_sort_title_asc">标题 ↑</string>
+    <string name="article_screen_sort_title_desc">标题 ↓</string>
+    <string name="article_screen_show_filter_bar">显示过滤条</string>
+    <string name="article_screen_hide_filter_bar">隐藏过滤条</string>
     <plurals name="feed_screen_read_all_result">
-        <item quantity="other">Read %d items</item>
+        <item quantity="other">已读 %d 项</item>
     </plurals>
     <plurals name="import_opml_result">
         <item quantity="other">导入了 %d 项，花费 %.2f 秒</item>
