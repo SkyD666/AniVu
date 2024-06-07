@@ -84,6 +84,11 @@ class ArticleViewModel @Inject constructor(
                     ArticlePartialStateChange.ArticleList.Failed(it.message.toString())
                 }
             },
+            filterIsInstance<ArticleIntent.UpdateSort>().flatMapConcat { intent ->
+                flowOf(articleRepo.updateSort(intent.articleSort)).map {
+                    ArticlePartialStateChange.UpdateSort.Success(intent.articleSort)
+                }
+            },
             filterIsInstance<ArticleIntent.Refresh>().flatMapConcat { intent ->
                 articleRepo.refreshArticleList(intent.urls).map {
                     ArticlePartialStateChange.RefreshArticleList.Success
@@ -108,16 +113,16 @@ class ArticleViewModel @Inject constructor(
             },
             filterIsInstance<ArticleIntent.FilterFavorite>().flatMapConcat { intent ->
                 flowOf(articleRepo.filterFavorite(intent.favorite)).map {
-                    ArticlePartialStateChange.FilterArticle.Success
+                    ArticlePartialStateChange.FavoriteFilterArticle.Success(intent.favorite)
                 }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
-                    ArticlePartialStateChange.FilterArticle.Failed(it.message.toString())
+                    ArticlePartialStateChange.FavoriteFilterArticle.Failed(it.message.toString())
                 }
             },
             filterIsInstance<ArticleIntent.FilterRead>().flatMapConcat { intent ->
                 flowOf(articleRepo.filterRead(intent.read)).map {
-                    ArticlePartialStateChange.FilterArticle.Success
+                    ArticlePartialStateChange.ReadFilterArticle.Success(intent.read)
                 }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
-                    ArticlePartialStateChange.FilterArticle.Failed(it.message.toString())
+                    ArticlePartialStateChange.ReadFilterArticle.Failed(it.message.toString())
                 }
             },
         )

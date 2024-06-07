@@ -15,6 +15,7 @@ import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.ArticleWithFeed
+import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
 import dagger.hilt.EntryPoint
@@ -119,24 +120,9 @@ interface ArticleDao {
     suspend fun deleteArticleBefore(timestamp: Long): Int
 
     @Transaction
-    @Query(
-        """
-        SELECT * FROM $ARTICLE_TABLE_NAME 
-        WHERE ${ArticleBean.FEED_URL_COLUMN} IN (:feedUrls) AND
-        (:isFavorite IS NULL OR ${ArticleBean.IS_FAVORITE_COLUMN} = :isFavorite) AND
-        (:isRead IS NULL OR ${ArticleBean.IS_READ_COLUMN} = :isRead)
-        ORDER BY ${ArticleBean.DATE_COLUMN} DESC
-        """
-    )
-    fun getArticlePagingSource(
-        feedUrls: List<String>,
-        isFavorite: Boolean?,
-        isRead: Boolean?,
-    ): PagingSource<Int, ArticleWithFeed>
-
-    @Transaction
-    @RawQuery(observedEntities = [ArticleBean::class])
+    @RawQuery(observedEntities = [FeedBean::class, ArticleBean::class, EnclosureBean::class])
     fun getArticlePagingSource(sql: SupportSQLiteQuery): PagingSource<Int, ArticleWithFeed>
+
 
     @Transaction
     @RawQuery(observedEntities = [ArticleBean::class])

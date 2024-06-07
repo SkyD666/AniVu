@@ -96,6 +96,11 @@ class SearchViewModel @Inject constructor(
                     SearchPartialStateChange.UpdateQuery.Success
                 }
             },
+            filterIsInstance<SearchIntent.UpdateSort>().flatMapConcat { intent ->
+                flowOf(searchRepo.updateSort(intent.dateDesc)).map {
+                    SearchPartialStateChange.UpdateSort.Success
+                }
+            },
             filterIsInstance<SearchIntent.Favorite>().flatMapConcat { intent ->
                 articleRepo.favoriteArticle(intent.articleId, intent.favorite).map {
                     SearchPartialStateChange.FavoriteArticle.Success

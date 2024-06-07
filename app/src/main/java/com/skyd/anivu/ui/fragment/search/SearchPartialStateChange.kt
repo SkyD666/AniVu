@@ -68,4 +68,10 @@ internal sealed interface SearchPartialStateChange {
 
         data object Success : UpdateQuery
     }
+
+    sealed interface UpdateSort : SearchPartialStateChange {
+        override fun reduce(oldState: SearchState): SearchState = oldState
+
+        data object Success : UpdateSort
+    }
 }

@@ -37,15 +37,24 @@ class SearchRepository @Inject constructor(
     private val pagingConfig: PagingConfig,
 ) : BaseRepository() {
     private val searchQuery = MutableStateFlow("")
+    private val searchSortDateDesc = MutableStateFlow(true)
 
     fun updateQuery(query: String) {
         searchQuery.value = query
     }
 
+    fun updateSort(dateDesc: Boolean) {
+        searchSortDateDesc.value = dateDesc
+    }
+
     fun listenSearchFeed(): Flow<PagingData<FeedViewBean>> {
         return searchQuery.flatMapLatest { query ->
             Pager(pagingConfig) {
-                feedDao.getFeedPagingSource(genSql(tableName = FEED_VIEW_NAME, k = query))
+                feedDao.getFeedPagingSource(
+                    genSql(
+                        tableName = FEED_VIEW_NAME, k = query
+                    )
+                )
             }.flow
         }.flowOn(Dispatchers.IO)
     }
@@ -60,6 +69,9 @@ class SearchRepository @Inject constructor(
                     else "${ArticleBean.FEED_URL_COLUMN} IN (${
                         feedUrls.joinToString(", ") { DatabaseUtils.sqlEscapeString(it) }
                     })",
+                    orderBy = {
+                        ArticleBean.DATE_COLUMN to if (searchSortDateDesc.value) "DESC" else "ASC"
+                    }
                 ))
             }.flow
         }.flowOn(Dispatchers.IO)
@@ -89,6 +101,7 @@ class SearchRepository @Inject constructor(
             leadingFilter: String = "1",
             leadingFilterLogicalConnective: String = "AND",
             limit: (() -> Pair<Int, Int>)? = null,
+            orderBy: (() -> Pair<String, String>)? = null,
         ): SimpleSQLiteQuery {
             if (useRegexSearch) {
                 // Check Regex format
@@ -97,10 +110,11 @@ class SearchRepository @Inject constructor(
                 }
             }
 
-            return if (intersectSearchBySpace) {
-                // 以多个连续的空格/制表符/换行符分割
-                val keywords = k.trim().split("\\s+".toRegex()).toSet()
-                val sql = buildString {
+            val sql = buildString {
+                if (intersectSearchBySpace) {
+                    // 以多个连续的空格/制表符/换行符分割
+                    val keywords = k.trim().split("\\s+".toRegex()).toSet()
+
                     keywords.forEachIndexed { i, s ->
                         if (i > 0) append("INTERSECT \n")
                         append(
@@ -116,14 +130,7 @@ class SearchRepository @Inject constructor(
                             } \n"
                         )
                     }
-                    if (limit != null) {
-                        val (offset, count) = limit()
-                        append("\nLIMIT $offset, $count")
-                    }
-                }
-                SimpleSQLiteQuery(sql)
-            } else {
-                val sql = buildString {
+                } else {
                     append(
                         "SELECT * FROM $tableName WHERE ${
                             getFilter(
@@ -136,14 +143,17 @@ class SearchRepository @Inject constructor(
                             )
                         } \n"
                     )
-                    if (limit != null) {
-                        val (offset, count) = limit()
-                        append("\nLIMIT $offset, $count")
-                    }
                 }
-
-                SimpleSQLiteQuery(sql)
+                if (limit != null) {
+                    val (offset, count) = limit()
+                    append("\nLIMIT $offset, $count")
+                }
+                if (orderBy != null) {
+                    val (field, desc) = orderBy()
+                    append("\nORDER BY $field $desc")
+                }
             }
+            return SimpleSQLiteQuery(sql)
         }
 
         private fun getFilter(

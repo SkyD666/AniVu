@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.component.dialog
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -95,7 +96,7 @@ fun TextFieldDialog(
         title = title,
         text = {
             ClipboardTextField(
-                modifier = modifier,
+                modifier = modifier.fillMaxWidth(),
                 readOnly = readOnly,
                 value = value,
                 maxLines = maxLines,

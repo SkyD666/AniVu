@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -47,6 +48,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,10 +69,10 @@ import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.bean.ArticleWithFeed
+import com.skyd.anivu.model.repository.ArticleSort
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BackIcon
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
@@ -141,6 +143,7 @@ private fun ArticleContentScreen(
 
     val listState: LazyGridState = rememberLazyGridState()
     var fabHeight by remember { mutableStateOf(0.dp) }
+    var showFilterBar by rememberSaveable { mutableStateOf(false) }
 
     val dispatch = viewModel.getDispatcher(feedUrls, startWith = ArticleIntent.Init(feedUrls))
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
@@ -150,13 +153,12 @@ private fun ArticleContentScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AniVuTopBar(
-                style = AniVuTopBarStyle.CenterAligned,
                 title = { Text(text = stringResource(R.string.article_screen_name)) },
                 navigationIcon = {
                     if (onBackClick == DefaultBackClick) BackIcon()
                     else BackIcon(onClick = onBackClick)
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors().copy(
+                colors = TopAppBarDefaults.topAppBarColors().copy(
                     containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                         LocalArticleTopBarTonalElevation.current.dp
                     ),
@@ -186,6 +188,14 @@ private fun ArticleContentScreen(
                             enabled = !uiState.articleListState.loading,
                         )
                     }
+                    FilterIcon(
+                        filterCount = uiState.articleFilterState.filterCount,
+                        showFilterBar = showFilterBar,
+                        onFilterBarVisibilityChanged = { showFilterBar = it },
+                        onFilterFavorite = { dispatch(ArticleIntent.FilterFavorite(it)) },
+                        onFilterRead = { dispatch(ArticleIntent.FilterRead(it)) },
+                        onSort = { dispatch(ArticleIntent.UpdateSort(it)) },
+                    )
                     AniVuIconButton(
                         onClick = {
                             navController.navigate(
@@ -233,9 +243,11 @@ private fun ArticleContentScreen(
             uiState = uiState,
             listState = listState,
             nestedScrollConnection = scrollBehavior.nestedScrollConnection,
+            showFilterBar = showFilterBar,
             onRefresh = { dispatch(ArticleIntent.Refresh(feedUrls)) },
             onFilterFavorite = { dispatch(ArticleIntent.FilterFavorite(it)) },
             onFilterRead = { dispatch(ArticleIntent.FilterRead(it)) },
+            onSort = { dispatch(ArticleIntent.UpdateSort(it)) },
             onFavorite = { articleWithFeed, favorite ->
                 dispatch(
                     ArticleIntent.Favorite(
@@ -280,9 +292,11 @@ private fun Content(
     uiState: ArticleState,
     listState: LazyGridState,
     nestedScrollConnection: NestedScrollConnection,
+    showFilterBar: Boolean,
     onRefresh: () -> Unit,
     onFilterFavorite: (Boolean?) -> Unit,
     onFilterRead: (Boolean?) -> Unit,
+    onSort: (ArticleSort) -> Unit,
     onFavorite: (ArticleWithFeed, Boolean) -> Unit,
     onRead: (ArticleWithFeed, Boolean) -> Unit,
     contentPadding: PaddingValues,
@@ -297,12 +311,22 @@ private fun Content(
             .padding(top = contentPadding.calculateTopPadding()),
     ) {
         Column {
-            FilterRow(
-                onFilterFavorite = onFilterFavorite,
-                onFilterRead = onFilterRead,
-            )
-            HorizontalDivider()
-
+            AnimatedVisibility(visible = showFilterBar) {
+                Column(
+                    modifier = Modifier.padding(
+                        start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
+                        end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
+                    ),
+                ) {
+                    FilterRow(
+                        articleFilterState = uiState.articleFilterState,
+                        onFilterFavorite = onFilterFavorite,
+                        onFilterRead = onFilterRead,
+                        onSort = onSort,
+                    )
+                    HorizontalDivider()
+                }
+            }
             val articleListState = uiState.articleListState
             ArticleList(
                 modifier = Modifier.nestedScroll(nestedScrollConnection),
@@ -314,7 +338,7 @@ private fun Content(
                 onRead = onRead,
                 contentPadding = PaddingValues(
                     start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
-                    end = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
+                    end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
                     bottom = contentPadding.calculateBottomPadding(),
                 ) + PaddingValues(vertical = 4.dp),
             )

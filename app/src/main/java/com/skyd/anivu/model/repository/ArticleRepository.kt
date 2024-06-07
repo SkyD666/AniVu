@@ -1,9 +1,14 @@
 package com.skyd.anivu.model.repository
 
+import android.database.DatabaseUtils
+import android.os.Parcelable
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.skyd.anivu.base.BaseRepository
+import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
+import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.model.db.dao.ArticleDao
@@ -19,7 +24,18 @@ import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
+
+@Parcelize
+sealed class ArticleSort(open val asc: Boolean) : Parcelable {
+    data class Date(override val asc: Boolean) : ArticleSort(asc)
+    data class Title(override val asc: Boolean) : ArticleSort(asc)
+
+    companion object {
+        val default = Date(false)
+    }
+}
 
 class ArticleRepository @Inject constructor(
     private val feedDao: FeedDao,
@@ -29,6 +45,7 @@ class ArticleRepository @Inject constructor(
 ) : BaseRepository() {
     private val filterFavorite = MutableStateFlow<Boolean?>(null)
     private val filterRead = MutableStateFlow<Boolean?>(null)
+    private val articleSortDateDesc = MutableStateFlow<ArticleSort>(ArticleSort.default)
 
     fun filterFavorite(favorite: Boolean?) {
         filterFavorite.value = favorite
@@ -38,15 +55,26 @@ class ArticleRepository @Inject constructor(
         filterRead.value = read
     }
 
+    fun updateSort(articleSort: ArticleSort) {
+        articleSortDateDesc.value = articleSort
+    }
+
     fun requestArticleList(feedUrls: List<String>): Flow<PagingData<ArticleWithFeed>> {
-        return combine(filterFavorite, filterRead) { favorite, read ->
-            favorite to read
-        }.flatMapLatest { (favorite, read) ->
+        return combine(
+            filterFavorite,
+            filterRead,
+            articleSortDateDesc,
+        ) { favorite, read, sortDateDesc ->
+            arrayOf(favorite, read, sortDateDesc)
+        }.flatMapLatest { (favorite, read, sortDateDesc) ->
             Pager(pagingConfig) {
                 articleDao.getArticlePagingSource(
-                    feedUrls = feedUrls,
-                    isFavorite = favorite,
-                    isRead = read,
+                    genSql(
+                        feedUrls = feedUrls,
+                        isFavorite = favorite as Boolean?,
+                        isRead = read as Boolean?,
+                        orderBy = sortDateDesc as ArticleSort,
+                    )
                 )
             }.flow
         }.flowOn(Dispatchers.IO)
@@ -103,5 +131,35 @@ class ArticleRepository @Inject constructor(
         return flow {
             emit(articleDao.readArticle(articleId, read))
         }.flowOn(Dispatchers.IO)
+    }
+
+    companion object {
+        fun genSql(
+            feedUrls: List<String>,
+            isFavorite: Boolean?,
+            isRead: Boolean?,
+            orderBy: ArticleSort,
+        ): SimpleSQLiteQuery {
+            val sql = buildString {
+                val feedUrlsStr = feedUrls.joinToString(", ") { DatabaseUtils.sqlEscapeString(it) }
+                append(
+                    "SELECT * FROM `$ARTICLE_TABLE_NAME` WHERE " +
+                            "`${ArticleBean.FEED_URL_COLUMN}` IN ($feedUrlsStr) "
+                )
+                if (isFavorite != null) {
+                    append("AND `${ArticleBean.IS_FAVORITE_COLUMN}` = ${if (isFavorite) 1 else 0} ")
+                }
+                if (isRead != null) {
+                    append("AND `${ArticleBean.IS_READ_COLUMN}` = ${if (isRead) 1 else 0} ")
+                }
+                val ascOrDesc = if (orderBy.asc) "ASC" else "DESC"
+                val orderField = when (orderBy) {
+                    is ArticleSort.Date -> ArticleBean.DATE_COLUMN
+                    is ArticleSort.Title -> ArticleBean.TITLE_COLUMN
+                }
+                append("\nORDER BY `$orderField` $ascOrDesc")
+            }
+            return SimpleSQLiteQuery(sql)
+        }
     }
 }
