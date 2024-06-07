@@ -257,7 +257,6 @@
     <string name="article_screen_filter_read">Read</string>
     <string name="article_screen_filter_unread">Unread</string>
     <string name="article_screen_filter_all">All</string>
-    <string name="article_screen_filter_setting">Settings</string>
     <string name="article_screen_filter_clear_all_filter">Clear all filters</string>
     <string name="tonal_elevation">Tonal elevation</string>
     <string name="feed_style_screen_top_bar_category">Top bar</string>
@@ -273,6 +272,13 @@
     <string name="article_style_screen_pull_refresh">Pull refresh</string>
     <string name="article_style_screen_pull_refresh_description">Enable pull to refresh</string>
     <string name="article_style_screen_top_bar_refresh_description">Show Refresh button on top bar</string>
+    <string name="article_screen_sort">Sort</string>
+    <string name="article_screen_sort_date_asc">Date ↑</string>
+    <string name="article_screen_sort_date_desc">Date ↓</string>
+    <string name="article_screen_sort_title_asc">Title ↑</string>
+    <string name="article_screen_sort_title_desc">Title ↓</string>
+    <string name="article_screen_show_filter_bar">Show filter bar</string>
+    <string name="article_screen_hide_filter_bar">Hide filter bar</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">Read %d items</item>
     </plurals>
