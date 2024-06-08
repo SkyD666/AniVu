@@ -39,7 +39,6 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -71,18 +70,23 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.ext.toDateTimeString
+import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
+import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeRightActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.ui.component.AniVuImage
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
+import com.skyd.anivu.ui.component.rememberSwipeToDismissBoxState
 import com.skyd.anivu.ui.fragment.read.EnclosureBottomSheet
 import com.skyd.anivu.ui.fragment.read.ReadFragment
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
+import com.skyd.anivu.ui.local.LocalArticleSwipeRightAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalNavController
@@ -105,21 +109,34 @@ fun Article1Item(
 ) {
     val navController = LocalNavController.current
     val context = LocalContext.current
-    val articleSwipeLeftAction = LocalArticleSwipeLeftAction.current
     val articleWithEnclosure = data.articleWithEnclosure
     var expandMenu by rememberSaveable { mutableStateOf(false) }
 
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
+        inputs = arrayOf(data),
         confirmValueChange = { dismissValue ->
-            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                swipeLeftAction(
-                    // rememberSwipeToDismissBoxState does not update the variable
-                    // when the outer recompose, so don't use the outer articleSwipeLeftAction
-                    context.dataStore.getOrDefault(ArticleSwipeLeftActionPreference),
-                    context,
-                    navController,
-                    articleWithEnclosure,
-                )
+            val articleSwipeAction = context.dataStore.getOrDefault(
+                if (dismissValue == SwipeToDismissBoxValue.StartToEnd) {
+                    ArticleSwipeRightActionPreference
+                } else {
+                    ArticleSwipeLeftActionPreference
+                }
+            )
+            when (dismissValue) {
+                SwipeToDismissBoxValue.EndToStart, SwipeToDismissBoxValue.StartToEnd -> {
+                    swipeAction(
+                        articleSwipeAction = articleSwipeAction,
+                        context = context,
+                        navController = navController,
+                        data = articleWithEnclosure,
+                        onMarkAsRead = { onRead(data, !data.articleWithEnclosure.article.isRead) },
+                        onMarkAsFavorite = {
+                            onFavorite(data, !data.articleWithEnclosure.article.isFavorite)
+                        },
+                    )
+                }
+
+                SwipeToDismissBoxValue.Settled -> Unit
             }
             false
         },
@@ -133,17 +150,22 @@ fun Article1Item(
     }
 
     Box(modifier = Modifier.clip(RoundedCornerShape(12.dp))) {
+        val enableDismissFromStartToEnd =
+            LocalArticleSwipeRightAction.current != ArticleSwipeActionPreference.NONE
+        val enableDismissFromEndToStart =
+            LocalArticleSwipeLeftAction.current != ArticleSwipeActionPreference.NONE
         SwipeToDismissBox(
             state = swipeToDismissBoxState,
             backgroundContent = {
                 SwipeBackgroundContent(
+                    article = data.articleWithEnclosure.article,
                     direction = swipeToDismissBoxState.dismissDirection,
                     isActive = isSwipeToDismissActive,
-                    articleSwipeLeftAction = articleSwipeLeftAction,
-                    context = context,
                 )
             },
-            enableDismissFromStartToEnd = false,
+            enableDismissFromStartToEnd = enableDismissFromStartToEnd,
+            enableDismissFromEndToStart = enableDismissFromEndToStart,
+            gesturesEnabled = enableDismissFromStartToEnd || enableDismissFromEndToStart,
         ) {
             Article1ItemContent(
                 data = data,
@@ -492,14 +514,19 @@ fun FeedIcon(modifier: Modifier = Modifier, data: FeedBean, size: Dp = 22.dp) {
 
 @Composable
 private fun SwipeBackgroundContent(
+    article: ArticleBean,
     direction: SwipeToDismissBoxValue,
     isActive: Boolean,
-    articleSwipeLeftAction: String,
-    context: Context,
 ) {
+    val context = LocalContext.current
     val containerColor = MaterialTheme.colorScheme.background
     val containerColorElevated = MaterialTheme.colorScheme.tertiaryContainer
     val backgroundColor = remember(isActive) { Animatable(containerColor) }
+    val articleSwipeAction = if (direction == SwipeToDismissBoxValue.StartToEnd) {
+        LocalArticleSwipeRightAction.current
+    } else {
+        LocalArticleSwipeLeftAction.current
+    }
 
     LaunchedEffect(isActive) {
         backgroundColor.animateTo(if (isActive) containerColorElevated else containerColor)
@@ -510,29 +537,49 @@ private fun SwipeBackgroundContent(
             .fillMaxSize()
             .background(backgroundColor.value)
             .padding(horizontal = 20.dp),
-        contentAlignment = Alignment.CenterEnd
+        contentAlignment = if (direction == SwipeToDismissBoxValue.StartToEnd) {
+            Alignment.CenterStart
+        } else {
+            Alignment.CenterEnd
+        },
     ) {
         val painter = when (direction) {
-            SwipeToDismissBoxValue.EndToStart -> when (articleSwipeLeftAction) {
-                ArticleSwipeLeftActionPreference.READ -> {
+            SwipeToDismissBoxValue.StartToEnd,
+            SwipeToDismissBoxValue.EndToStart -> when (articleSwipeAction) {
+                ArticleSwipeActionPreference.READ -> {
                     rememberVectorPainter(image = Icons.Outlined.ImportContacts)
                 }
 
-                ArticleSwipeLeftActionPreference.SHOW_ENCLOSURES -> {
+                ArticleSwipeActionPreference.SHOW_ENCLOSURES -> {
                     painterResource(id = R.drawable.ic_home_storage_24)
+                }
+
+                ArticleSwipeActionPreference.SWITCH_READ_STATE -> {
+                    if (article.isRead) {
+                        rememberVectorPainter(image = Icons.Outlined.MarkEmailUnread)
+                    } else {
+                        rememberVectorPainter(image = Icons.Outlined.Drafts)
+                    }
+                }
+
+                ArticleSwipeActionPreference.SWITCH_FAVORITE_STATE -> {
+                    if (article.isFavorite) {
+                        rememberVectorPainter(image = Icons.Outlined.FavoriteBorder)
+                    } else {
+                        rememberVectorPainter(image = Icons.Outlined.Favorite)
+                    }
                 }
 
                 else -> rememberVectorPainter(image = Icons.Outlined.ImportContacts)
             }
 
-            SwipeToDismissBoxValue.StartToEnd -> null
             SwipeToDismissBoxValue.Settled -> null
         }
         val contentDescription = when (direction) {
-            SwipeToDismissBoxValue.EndToStart -> ArticleSwipeLeftActionPreference
-                .toDisplayName(context, articleSwipeLeftAction)
+            SwipeToDismissBoxValue.StartToEnd,
+            SwipeToDismissBoxValue.EndToStart -> ArticleSwipeActionPreference
+                .toDisplayName(context, articleSwipeAction)
 
-            SwipeToDismissBoxValue.StartToEnd -> null
             SwipeToDismissBoxValue.Settled -> null
         }
 
@@ -546,20 +593,25 @@ private fun SwipeBackgroundContent(
     }
 }
 
-private fun swipeLeftAction(
-    articleSwipeLeftAction: String,
+private fun swipeAction(
+    articleSwipeAction: String,
     context: Context,
     navController: NavController,
     data: ArticleWithEnclosureBean,
+    onMarkAsRead: () -> Unit,
+    onMarkAsFavorite: () -> Unit,
 ) {
-    when (articleSwipeLeftAction) {
-        ArticleSwipeLeftActionPreference.READ -> {
+    when (articleSwipeAction) {
+        ArticleSwipeActionPreference.READ -> {
             navigateToReadScreen(navController = navController, data = data)
         }
 
-        ArticleSwipeLeftActionPreference.SHOW_ENCLOSURES -> {
+        ArticleSwipeActionPreference.SHOW_ENCLOSURES -> {
             showEnclosureBottomSheet(context = context, data = data)
         }
+
+        ArticleSwipeActionPreference.SWITCH_READ_STATE -> onMarkAsRead()
+        ArticleSwipeActionPreference.SWITCH_FAVORITE_STATE -> onMarkAsFavorite()
     }
 }
 

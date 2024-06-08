@@ -168,6 +168,7 @@
     <string name="article_action_show_enclosures">附件</string>
     <string name="behavior_screen_article_tap_action">点击项</string>
     <string name="behavior_screen_article_swipe_left_action">左滑</string>
+    <string name="behavior_screen_article_swipe_right_action">右滑</string>
     <string name="to_top">到顶部</string>
     <string name="default_feed_group">默认</string>
     <string name="feed_group">分组</string>
@@ -272,12 +273,15 @@
     <string name="article_style_screen_pull_refresh_description">启用下拉刷新</string>
     <string name="article_style_screen_top_bar_refresh_description">在标题栏上显示刷新按钮</string>
     <string name="article_screen_sort">排序</string>
-    <string name="article_screen_sort_date_asc">日期 ↑</string>
-    <string name="article_screen_sort_date_desc">日期 ↓</string>
-    <string name="article_screen_sort_title_asc">标题 ↑</string>
-    <string name="article_screen_sort_title_desc">标题 ↓</string>
+    <string name="article_screen_sort_date_asc">最旧</string>
+    <string name="article_screen_sort_date_desc">最新</string>
+    <string name="article_screen_sort_title_asc">A 到 Z</string>
+    <string name="article_screen_sort_title_desc">Z 到 A</string>
     <string name="article_screen_show_filter_bar">显示过滤条</string>
     <string name="article_screen_hide_filter_bar">隐藏过滤条</string>
+    <string name="article_action_switch_read_state">切换已读状态</string>
+    <string name="article_action_switch_favorite_state">切换收藏状态</string>
+    <string name="none">无</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>

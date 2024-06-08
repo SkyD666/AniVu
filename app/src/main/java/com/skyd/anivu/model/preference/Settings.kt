@@ -25,6 +25,7 @@ import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevatio
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
+import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeRightActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
@@ -39,6 +40,7 @@ import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreferen
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleListTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
+import com.skyd.anivu.ui.local.LocalArticleSwipeRightAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalArticleTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleBefore
@@ -91,6 +93,7 @@ data class Settings(
     val deduplicateTitleInDesc: Boolean = DeduplicateTitleInDescPreference.default,
     val articleTapAction: String = ArticleTapActionPreference.default,
     val articleSwipeLeftAction: String = ArticleSwipeLeftActionPreference.default,
+    val articleSwipeRightAction: String = ArticleSwipeRightActionPreference.default,
     val hideEmptyDefault: Boolean = HideEmptyDefaultPreference.default,
     val pickImageMethod: String = PickImageMethodPreference.default,
     // Player
@@ -136,6 +139,7 @@ fun SettingsProvider(
         LocalDeduplicateTitleInDesc provides settings.deduplicateTitleInDesc,
         LocalArticleTapAction provides settings.articleTapAction,
         LocalArticleSwipeLeftAction provides settings.articleSwipeLeftAction,
+        LocalArticleSwipeRightAction provides settings.articleSwipeRightAction,
         LocalHideEmptyDefault provides settings.hideEmptyDefault,
         LocalPickImageMethod provides settings.pickImageMethod,
         // Player

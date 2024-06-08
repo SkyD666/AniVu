@@ -21,6 +21,7 @@ import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevatio
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
+import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeRightActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
@@ -72,6 +73,7 @@ val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreferenc
 val LocalDeduplicateTitleInDesc = compositionLocalOf { DeduplicateTitleInDescPreference.default }
 val LocalArticleTapAction = compositionLocalOf { ArticleTapActionPreference.default }
 val LocalArticleSwipeLeftAction = compositionLocalOf { ArticleSwipeLeftActionPreference.default }
+val LocalArticleSwipeRightAction = compositionLocalOf { ArticleSwipeRightActionPreference.default }
 val LocalHideEmptyDefault = compositionLocalOf { HideEmptyDefaultPreference.default }
 val LocalPickImageMethod = compositionLocalOf { PickImageMethodPreference.default }
 

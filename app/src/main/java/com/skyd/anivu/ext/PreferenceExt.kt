@@ -20,6 +20,7 @@ import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevatio
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
+import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeRightActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
 import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
@@ -58,6 +59,7 @@ fun Preferences.toSettings(): Settings {
         deduplicateTitleInDesc = DeduplicateTitleInDescPreference.fromPreferences(this),
         articleTapAction = ArticleTapActionPreference.fromPreferences(this),
         articleSwipeLeftAction = ArticleSwipeLeftActionPreference.fromPreferences(this),
+        articleSwipeRightAction = ArticleSwipeRightActionPreference.fromPreferences(this),
         hideEmptyDefault = HideEmptyDefaultPreference.fromPreferences(this),
         pickImageMethod = PickImageMethodPreference.fromPreferences(this),
 

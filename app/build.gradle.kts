@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.plugin.compose")
     id("kotlinx-serialization")
     id("kotlin-parcelize")
     id("com.google.devtools.ksp")
@@ -21,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 18
-        versionName = "1.1-beta47"
+        versionName = "1.1-beta48"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -104,9 +105,6 @@ android {
         viewBinding = true
         buildConfig = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
     packaging {
         resources.excludes += mutableSetOf(
             "DebugProbesKt.bin",
@@ -128,6 +126,13 @@ android {
         }
     }
 //    ndkVersion = "26.3.11579264"
+}
+
+composeCompiler {
+    enableStrongSkippingMode = true
+
+    reportsDestination = layout.buildDirectory.dir("compose_compiler")
+//    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
 }
 
 tasks.withType(KotlinCompile::class.java).configureEach {
@@ -167,7 +172,7 @@ dependencies {
     implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta01")
     implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta01")
     implementation("androidx.compose.material:material-icons-extended:1.6.7")
-    implementation("com.materialkolor:material-kolor:1.6.1")
+    implementation("com.materialkolor:material-kolor:1.6.2")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-paging:2.6.1")
@@ -191,7 +196,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.1")
 
     implementation("com.github.aniyomiorg:aniyomi-mpv-lib:1.15.n")

@@ -5,12 +5,12 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 
-object ArticleSwipeLeftActionPreference : ArticleSwipeActionPreference() {
-    private const val ARTICLE_SWIPE_LEFT_ACTION = "articleSwipeLeftAction"
+object ArticleSwipeRightActionPreference : ArticleSwipeActionPreference() {
+    private const val ARTICLE_SWIPE_RIGHT_ACTION = "articleSwipeRightAction"
 
-    override val default = SHOW_ENCLOSURES
+    override val default = SWITCH_FAVORITE_STATE
 
-    override val key = stringPreferencesKey(ARTICLE_SWIPE_LEFT_ACTION)
+    override val key = stringPreferencesKey(ARTICLE_SWIPE_RIGHT_ACTION)
 
     fun toDisplayName(
         context: Context,

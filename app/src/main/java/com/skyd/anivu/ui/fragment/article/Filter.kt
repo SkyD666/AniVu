@@ -100,9 +100,20 @@ fun FilterIcon(
             },
         )
         DropdownMenuItem(
-            text = { Text(text = stringResource(id = R.string.article_screen_hide_filter_bar)) },
+            text = {
+                Text(
+                    text = stringResource(
+                        if (showFilterBar) R.string.article_screen_hide_filter_bar
+                        else R.string.article_screen_show_filter_bar
+                    )
+                )
+            },
             leadingIcon = {
-                Icon(imageVector = Icons.Outlined.FilterAltOff, contentDescription = null)
+                Icon(
+                    imageVector = if (showFilterBar) Icons.Outlined.FilterAltOff
+                    else Icons.Outlined.FilterAlt,
+                    contentDescription = null,
+                )
             },
             onClick = {
                 onFilterBarVisibilityChanged(!showFilterBar)
@@ -162,12 +173,12 @@ internal fun SortSetting(
                 context.getString(R.string.article_screen_sort_date_asc),
                 Icons.Outlined.CalendarMonth,
             ),
-            ArticleSort.Title(false) to Pair(
-                context.getString(R.string.article_screen_sort_title_desc),
-                Icons.Outlined.Title,
-            ),
             ArticleSort.Title(true) to Pair(
                 context.getString(R.string.article_screen_sort_title_asc),
+                Icons.Outlined.Title,
+            ),
+            ArticleSort.Title(false) to Pair(
+                context.getString(R.string.article_screen_sort_title_desc),
                 Icons.Outlined.Title,
             ),
         )
