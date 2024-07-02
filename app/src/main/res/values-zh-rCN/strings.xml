@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AniVu</string>
     <string name="main_fragment_name">主页</string>
@@ -216,7 +217,7 @@
     <string name="player_config_advanced_screen_hardware_decode">硬件解码</string>
     <string name="player_config_advanced_screen_hardware_decode_description">优先使用硬件解码，失败时改用软件解码。</string>
     <string name="player_audio_track">音轨</string>
-    <string name="import_export_screen_name">导入与导出</string>
+    <string name="import_export_screen_name"><![CDATA[导入与导出]]></string>
     <string name="import_opml_screen_name">导入 OPML</string>
     <string name="export_opml_screen_name">导出 OPML</string>
     <string name="export_opml_screen_export">导出</string>
