@@ -4,4 +4,7 @@ import com.skyd.anivu.base.BaseBean
 
 data class LinkEnclosureBean(
     val link: String,
-) : BaseBean
+) : BaseBean {
+    val isMedia: Boolean
+        get() = EnclosureBean.mediaExtensions.any { link.endsWith(it) }
+}

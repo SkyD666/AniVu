@@ -18,11 +18,15 @@ import com.skyd.anivu.ext.addInsetsByPadding
 import com.skyd.anivu.ext.collectIn
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
+import com.skyd.anivu.ext.gone
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.popBackStackWithLifecycle
+import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.ext.startWith
+import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toHtml
+import com.skyd.anivu.ext.visible
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
@@ -86,29 +90,57 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
             }
 
             is ArticleState.Success -> {
-                binding.topAppBar.menu?.apply {
-                    findItem(R.id.action_read_fragment_open_in_browser)?.isEnabled = true
-                    findItem(R.id.action_read_fragment_share)?.isEnabled = true
-                }
                 val article = articleState.article
-                binding.tvReadFragmentContent.post {
-                    binding.tvReadFragmentContent.text = article.article.content
-                        .ifNullOfBlank { article.article.description.orEmpty() }
-                        .toHtml(
-                            imageGetter = ImageGetter(
-                                context = requireContext(),
-                                maxWidth = { binding.tvReadFragmentContent.width },
-                                onSuccess = { _, _ ->
-                                    binding.tvReadFragmentContent.text =
-                                        binding.tvReadFragmentContent.text
-                                }
-                            ),
-                            tagHandler = null,
-                        )
+
+                with(binding) {
+                    topAppBar.menu?.apply {
+                        findItem(R.id.action_read_fragment_open_in_browser)?.isEnabled = true
+                        findItem(R.id.action_read_fragment_share)?.isEnabled = true
+                    }
+
+                    tvReadFragmentTitle.text = article.article.title
+
+                    val date = article.article.date
+                    if (date == null) {
+                        tvReadFragmentDate.gone()
+                    } else {
+                        tvReadFragmentDate.visible()
+                        tvReadFragmentDate.text = date.toDateTimeString(context = requireContext())
+                    }
+
+                    val author = article.article.author
+                    if (author.isNullOrBlank()) {
+                        tvReadFragmentAuthor.gone()
+                    } else {
+                        tvReadFragmentAuthor.text = author
+                        tvReadFragmentAuthor.visible()
+                    }
+
+                    tvReadFragmentContent.post {
+                        tvReadFragmentContent.text = article.article.content
+                            .ifNullOfBlank { article.article.description.orEmpty() }
+                            .toHtml(
+                                imageGetter = ImageGetter(
+                                    context = requireContext(),
+                                    maxWidth = { tvReadFragmentContent.width },
+                                    onSuccess = { _, _ ->
+                                        tvReadFragmentContent.text = tvReadFragmentContent.text
+                                    }
+                                ),
+                                tagHandler = null,
+                            )
+                    }
                 }
 
                 enclosureBottomSheet?.updateData(getEnclosuresList(requireContext(), article))
             }
+        }
+    }
+
+    private fun updateEvent(event: ReadEvent) {
+        when (event) {
+            is ReadEvent.FavoriteArticleResultEvent.Failed -> showSnackbar(text = event.msg)
+            is ReadEvent.ReadArticleResultEvent.Failed -> showSnackbar(text = event.msg)
         }
     }
 
@@ -126,6 +158,7 @@ class ReadFragment : BaseFragment<FragmentReadBinding>() {
                     .launchIn(lifecycleScope)
 
                 feedViewModel.viewState.collectIn(this) { updateState(it) }
+                feedViewModel.singleEvent.collectIn(this) { updateEvent(it) }
             }
         )
     }

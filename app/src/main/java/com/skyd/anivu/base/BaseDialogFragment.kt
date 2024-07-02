@@ -32,7 +32,7 @@ abstract class BaseDialogFragment<T : ViewBinding> : DialogFragment() {
         binding.initView()
     }
 
-    protected open fun T.initView() {}
+    protected open fun T.initView() = Unit
 
     override fun onDestroyView() {
         super.onDestroyView()

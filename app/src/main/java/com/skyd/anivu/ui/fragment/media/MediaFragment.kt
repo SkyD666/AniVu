@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.fragment.media
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +16,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -33,7 +32,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,11 +50,10 @@ import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.popBackStackWithLifecycle
-import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.activity.PlayActivity
-import com.skyd.anivu.ui.activity.PlayActivity.Companion.VIDEO_URI_KEY
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
@@ -96,7 +93,6 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val navController = LocalNavController.current
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val windowSizeClass = LocalWindowSizeClass.current
 
@@ -107,7 +103,6 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
     val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AniVuTopBar(
@@ -136,14 +131,15 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
                 },
                 contentDescription = stringResource(R.string.download_fragment_name),
             ) {
-                Icon(imageVector = Icons.Default.Download, contentDescription = null)
+                Icon(imageVector = Icons.Outlined.Download, contentDescription = null)
             }
         },
         contentWindowInsets = WindowInsets.safeDrawing.run {
             val leftPadding = hasParentDir || windowSizeClass.isCompact
+            val bottomPadding = hasParentDir || !windowSizeClass.isCompact
             var sides = WindowInsetsSides.Top + WindowInsetsSides.Right
             if (leftPadding) sides += WindowInsetsSides.Left
-            if (hasParentDir) sides += WindowInsetsSides.Bottom
+            if (bottomPadding) sides += WindowInsetsSides.Bottom
             only(sides)
         },
     ) { innerPadding ->
@@ -174,14 +170,11 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
                     is MediaListState.Init -> Unit
                     is MediaListState.Success -> {
                         MediaList(
+                            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                             data = mediaListState.list,
                             contentPadding = innerPadding,
                             onPlay = {
-                                (context.activity).startActivity(
-                                    Intent(context, PlayActivity::class.java).apply {
-                                        putExtra(VIDEO_URI_KEY, it.file.toUri(context))
-                                    }
-                                )
+                                PlayActivity.play(context.activity, it.file.toUri(context))
                             },
                             onOpenDir = {
                                 navController.navigate(
@@ -211,9 +204,8 @@ fun MediaScreen(path: String, hasParentDir: Boolean, viewModel: MediaViewModel =
         WaitingDialog(visible = uiState.loadingDialog)
 
         when (val event = uiEvent) {
-            is MediaEvent.DeleteUriResultEvent.Failed -> snackbarHostState.showSnackbar(
-                scope = scope, message = event.msg,
-            )
+            is MediaEvent.DeleteUriResultEvent.Failed ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             null -> Unit
         }
@@ -232,7 +224,7 @@ private fun MediaList(
     LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
         contentPadding = contentPadding,
-        columns = GridCells.Adaptive(300.dp),
+        columns = GridCells.Adaptive(360.dp),
     ) {
         items(data) { item ->
             if (item is VideoBean) {

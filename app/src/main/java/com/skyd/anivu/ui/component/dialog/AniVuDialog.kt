@@ -1,10 +1,11 @@
 package com.skyd.anivu.ui.component.dialog
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -14,18 +15,19 @@ import androidx.compose.ui.window.DialogProperties
 @Composable
 fun AniVuDialog(
     modifier: Modifier = Modifier,
-    visible: Boolean,
+    visible: Boolean = true,
     properties: DialogProperties = DialogProperties(),
     onDismissRequest: () -> Unit = {},
     icon: @Composable (() -> Unit)? = {
         Icon(
-            imageVector = Icons.Default.Info,
+            imageVector = Icons.Outlined.Info,
             contentDescription = null,
         )
     },
     title: @Composable (() -> Unit)? = null,
     text: @Composable (() -> Unit)? = null,
     selectable: Boolean = true,
+    scrollable: Boolean = true,
     confirmButton: @Composable () -> Unit,
     dismissButton: @Composable (() -> Unit)? = null,
 ) {
@@ -38,11 +40,21 @@ fun AniVuDialog(
             title = title,
             text = {
                 if (selectable) {
-                    SelectionContainer(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                    SelectionContainer(
+                        modifier = Modifier.run {
+                            if (scrollable) verticalScroll(rememberScrollState()) else this
+                        },
+                    ) {
                         text?.invoke()
                     }
                 } else {
-                    text?.invoke()
+                    if (scrollable) {
+                        Box(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                            text?.invoke()
+                        }
+                    } else {
+                        text?.invoke()
+                    }
                 }
             },
             confirmButton = confirmButton,

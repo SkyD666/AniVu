@@ -128,7 +128,7 @@ class DataFragment : BasePreferenceFragmentCompat() {
         }
         Preference(this).apply {
             key = "autoDeleteArticle"
-            title = getString(R.string.auto_delete_article_fragment_name)
+            title = getString(R.string.auto_delete_screen_name)
             summary = getString(R.string.auto_delete_article_fragment_description)
             setIcon(R.drawable.ic_auto_delete_24)
             setOnPreferenceClickListener {
@@ -136,6 +136,22 @@ class DataFragment : BasePreferenceFragmentCompat() {
                 true
             }
             clearUpCategory.addPreference(this)
+        }
+        val syncCategory = PreferenceCategory(this).apply {
+            key = "syncCategory"
+            title = getString(R.string.data_fragment_sync_category)
+            screen.addPreference(this)
+        }
+        Preference(this).apply {
+            key = "importExportOpml"
+            title = getString(R.string.import_export_screen_name)
+            summary = getString(R.string.import_export_screen_description)
+            setIcon(R.drawable.ic_swap_vert_24)
+            setOnPreferenceClickListener {
+                findMainNavController().navigate(R.id.action_to_import_export_fragment)
+                true
+            }
+            syncCategory.addPreference(this)
         }
     }
 }

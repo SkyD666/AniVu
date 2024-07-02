@@ -14,7 +14,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Update
+import androidx.compose.material.icons.outlined.Update
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
@@ -129,7 +129,7 @@ private fun NewerDialog(
     AniVuDialog(
         onDismissRequest = onDismissRequest,
         visible = visible,
-        icon = { Icon(imageVector = Icons.Default.Update, contentDescription = null) },
+        icon = { Icon(imageVector = Icons.Outlined.Update, contentDescription = null) },
         title = { Text(text = stringResource(R.string.update_newer)) },
         selectable = false,
         text = {
@@ -226,7 +226,7 @@ private fun NoUpdateDialog(
     AniVuDialog(
         onDismissRequest = onDismissRequest,
         visible = visible,
-        icon = { Icon(imageVector = Icons.Default.Update, contentDescription = null) },
+        icon = { Icon(imageVector = Icons.Outlined.Update, contentDescription = null) },
         title = { Text(text = stringResource(R.string.update_check)) },
         text = { Text(text = stringResource(R.string.update_no_update)) },
         confirmButton = {

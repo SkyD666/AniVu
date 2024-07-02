@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.OpenableColumns
+import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.skyd.anivu.R
@@ -89,6 +90,10 @@ private fun Uri.openChooser(context: Context, action: String, chooserTitle: Char
     }
 }
 
+fun Uri.isLocal(): Boolean = URLUtil.isFileUrl(toString()) || URLUtil.isContentUrl(toString())
+
+fun Uri.isNetwork(): Boolean = URLUtil.isNetworkUrl(toString())
+
 fun InputStream.saveTo(target: File): File {
     val parentFile = target.parentFile
     if (parentFile?.exists() == false) {
@@ -103,7 +108,7 @@ fun InputStream.saveTo(target: File): File {
 
 fun File.md5(): String? {
     var bi: BigInteger? = null
-    try {
+    runCatching {
         val buffer = ByteArray(4096)
         var len: Int
         val md = MessageDigest.getInstance("MD5")
@@ -114,10 +119,12 @@ fun File.md5(): String? {
         }
         val b = md.digest()
         bi = BigInteger(1, b)
-    } catch (e: NoSuchAlgorithmException) {
-        e.printStackTrace()
-    } catch (e: IOException) {
-        e.printStackTrace()
+    }.onFailure {
+        when (it) {
+            is NoSuchAlgorithmException -> it.printStackTrace()
+            is IOException -> it.printStackTrace()
+            else -> throw it
+        }
     }
     return bi?.toString(16)
 }

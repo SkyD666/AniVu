@@ -27,15 +27,16 @@
         </a>
     </p>
     <p>
-        <b>AniVu</b>, an <b>all-in-one tool</b> for <b>RSS anime subscription and updates</b>, <b>bit torrent downloads</b>, and <b>video playback</b>.
+        <b>AniVu</b>, an <b>all-in-one tool</b> for <b>RSS subscription and updates</b>, <b>bit torrent downloads</b>, and <b>video playback</b>.
     </p>
     <p>
         AniVu utilizes the <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> architecture and fully adopts the <b><a href="https://m3.material.io/">Material You</a></b> design style. All pages are developed using <b>Android View</b> and <b>Jetpack Compose</b>.
     </p>
     <p>
-        <b><a href="doc/readme/README-zh-rCN.md">中文</a></b> | <b><a href="doc/readme/README-zh-rTW.md">正體中文</a></b>
+        <b><a href="doc/readme/README-zh-rCN.md">中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="doc/readme/README-zh-rTW.md">正體中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">Help us translate</a></b>
     </p>
 </div>
+
 
 
 ## 💡 Features
@@ -44,29 +45,31 @@
 2. **Automatically update RSS** subscriptions
 3. **Download enclosures** (enclosure tags) of **torrent or magnet** links in RSS articles
 4. **Seeding** downloaded files
-5. **Play downloaded videos**
-6. Support variable playback **speed**, **long press** to speed up playback
-7. **Double-finger** gesture to **rotate and zoom** video
+5. **Play media enclosures or downloaded videos**
+6. Support variable playback **speed**, setup **audio track**, **subtitle track**, etc
+7. **Double-finger** gesture to **rotate and zoom** video, **long press** to speed up playback
 8. **Swipe** on the video to **control volume**, **brightness**, and **playback position**
 9. **Searching** existing **RSS subscription content**
 10. **Play other videos on the phone**
-11. Support **dark mode**
-12. ......
-
-## 🚧 Todo
-
-1. Automatically **download new videos**
-2. **Customize player settings**, such as default screen scale, surface type used by the player, and more
-3. **Float** video playback **window**
-4. **Automatically** play the **next video**
+11. Support **custom MPV player**
+12. Support **import and export** subscriptions via **OPML**
+13. Support **dark mode**
+14. ......
 
 ## 🤩 Screenshots
 
 <img src="doc/image/en/ic_rss_fragment.jpg" alt="ic_rss_fragment" style="zoom:80%;" /> <img src="doc/image/en/ic_media_fragment.jpg" alt="ic_media_fragment" style="zoom:80%;" />
 <img src="doc/image/en/ic_article_fragment.jpg" alt="ic_article_fragment" style="zoom:80%;" /> <img src="doc/image/en/ic_read_fragment.jpg" alt="ic_read_fragment" style="zoom:80%;" />
 <img src="doc/image/en/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="doc/image/en/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
+<img src="doc/image/en/ic_setting_fragment.jpg" alt="ic_setting_fragment" style="zoom:80%;" /> <img src="doc/image/en/ic_appearance_fragment.jpg" alt="ic_appearance_fragment" style="zoom:80%;" />
 <img src="doc/image/en/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="doc/image/en/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
-<img src="doc/image/en/ic_player_activity.png" alt="ic_player_activity" style="zoom:80%;" />
+<img src="doc/image/en/ic_player_activity.jpg" alt="ic_player_activity" style="zoom:80%;" />
+
+## 🌏 Translation
+
+If you are interested, please help us **translate**, thank you.
+
+<a title="Crowdin" target="_blank" href="https://crowdin.com/project/anivu"><img src="https://badges.crowdin.net/anivu/localized.svg"></a>
 
 ## 🛠 Primary technology stack
 
@@ -78,14 +81,18 @@
 - **Room**
 - **Paging 3**
 - **Hilt**
-- Media3 **ExoPlayer**
+- **MPV**
 - **WorkManager**
 - **DataStore**
 - Splash Screen
 - Navigation
 - Coil
 
-## ✨ Other works
+## ✨ Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=SkyD666/AniVu)](https://star-history.com/?repos=SkyD666/AniVu#SkyD666/AniVu&Date)
+
+## 🎈 Other works
 
 <table>
 <thead>

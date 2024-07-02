@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.component.dialog
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -19,12 +20,12 @@ import com.skyd.anivu.ui.local.LocalTextFieldStyle
 @Composable
 fun TextFieldDialog(
     modifier: Modifier = Modifier,
-    visible: Boolean = false,
+    visible: Boolean = true,
     readOnly: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     icon: @Composable (() -> Unit)? = null,
-    title: String = "",
+    titleText: String? = null,
     value: String = "",
     placeholder: String = "",
     trailingIcon: @Composable (() -> Unit)? = DefaultTrailingIcon,
@@ -32,6 +33,54 @@ fun TextFieldDialog(
     errorText: String = "",
     dismissText: String = stringResource(R.string.cancel),
     confirmText: String = stringResource(R.string.ok),
+    enableConfirm: (String) -> Boolean = { it.isNotBlank() },
+    onValueChange: (String) -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+    onConfirm: (String) -> Unit = {},
+    imeAction: ImeAction = if (maxLines == 1) ImeAction.Done else ImeAction.Default,
+) {
+    TextFieldDialog(
+        modifier = modifier,
+        visible = visible,
+        readOnly = readOnly,
+        maxLines = maxLines,
+        style = style,
+        icon = icon,
+        title = if (titleText == null) null else {
+            { Text(text = titleText, maxLines = 2, overflow = TextOverflow.Ellipsis) }
+        },
+        value = value,
+        placeholder = placeholder,
+        trailingIcon = trailingIcon,
+        isPassword = isPassword,
+        errorText = errorText,
+        dismissText = dismissText,
+        confirmText = confirmText,
+        enableConfirm = enableConfirm,
+        onValueChange = onValueChange,
+        onDismissRequest = onDismissRequest,
+        onConfirm = onConfirm,
+        imeAction = imeAction,
+    )
+}
+
+@Composable
+fun TextFieldDialog(
+    modifier: Modifier = Modifier,
+    visible: Boolean = true,
+    readOnly: Boolean = false,
+    maxLines: Int = Int.MAX_VALUE,
+    style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
+    icon: @Composable (() -> Unit)? = null,
+    title: @Composable (() -> Unit)? = null,
+    value: String = "",
+    placeholder: String = "",
+    trailingIcon: @Composable (() -> Unit)? = DefaultTrailingIcon,
+    isPassword: Boolean = false,
+    errorText: String = "",
+    dismissText: String = stringResource(R.string.cancel),
+    confirmText: String = stringResource(R.string.ok),
+    enableConfirm: (String) -> Boolean = { it.isNotBlank() },
     onValueChange: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {},
     onConfirm: (String) -> Unit = {},
@@ -44,10 +93,10 @@ fun TextFieldDialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
         icon = icon,
-        title = { Text(text = title, maxLines = 2, overflow = TextOverflow.Ellipsis) },
+        title = title,
         text = {
             ClipboardTextField(
-                modifier = modifier,
+                modifier = modifier.fillMaxWidth(),
                 readOnly = readOnly,
                 value = value,
                 maxLines = maxLines,
@@ -64,7 +113,7 @@ fun TextFieldDialog(
         },
         confirmButton = {
             TextButton(
-                enabled = value.isNotBlank(),
+                enabled = enableConfirm(value),
                 onClick = {
                     focusManager.clearFocus()
                     onConfirm(value)
@@ -72,7 +121,7 @@ fun TextFieldDialog(
             ) {
                 Text(
                     text = confirmText,
-                    color = if (value.isNotBlank()) {
+                    color = if (enableConfirm(value)) {
                         Color.Unspecified
                     } else {
                         MaterialTheme.colorScheme.outline.copy(alpha = 0.7f)

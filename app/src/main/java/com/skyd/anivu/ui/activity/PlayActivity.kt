@@ -1,125 +1,104 @@
 package com.skyd.anivu.ui.activity
 
-import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.view.KeyEvent
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.core.content.IntentCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.media3.common.MediaItem
-import androidx.media3.exoplayer.ExoPlayer
-import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
-import com.skyd.anivu.base.BaseActivity
-import com.skyd.anivu.databinding.ActivityPlayBinding
-import com.skyd.anivu.ext.dataStore
-import com.skyd.anivu.ext.getOrDefault
-import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
-import com.skyd.anivu.ui.player.TorrentDataSource
+import androidx.core.util.Consumer
+import com.skyd.anivu.base.BaseComposeActivity
+import com.skyd.anivu.ext.savePictureToMediaStore
+import com.skyd.anivu.ui.component.showToast
+import com.skyd.anivu.ui.mpv.MPVView
+import com.skyd.anivu.ui.mpv.PlayerView
+import com.skyd.anivu.ui.mpv.copyAssetsForMpv
+import java.io.File
 
 
-@SuppressLint("UnsafeOptInUsageError")
-class PlayActivity : BaseActivity<ActivityPlayBinding>() {
+class PlayActivity : BaseComposeActivity() {
     companion object {
         const val VIDEO_URI_KEY = "videoUri"
+
+        fun play(activity: Activity, uri: Uri) {
+            activity.startActivity(
+                Intent(activity, PlayActivity::class.java).apply {
+                    putExtra(VIDEO_URI_KEY, uri)
+                }
+            )
+        }
     }
 
-    private val player: ExoPlayer by lazy { ExoPlayer.Builder(this@PlayActivity).build() }
-    private var videoUri: Uri? = null
-    private var beforePauseIsPlaying = false
+    private var player: MPVView? = null
+    private lateinit var picture: File
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            picture.savePictureToMediaStore(this)
+        } else {
+            getString(com.skyd.anivu.R.string.player_no_permission_cannot_save_screenshot).showToast()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        copyAssetsForMpv(this)
+
         super.onCreate(savedInstanceState)
 
-        val windowInsetsController =
-            WindowCompat.getInsetsController(window, window.decorView)
-        // Configure the behavior of the hidden system bars.
-        windowInsetsController.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-
-        window.decorView.setOnApplyWindowInsetsListener { view, windowInsets ->
-            windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
-            view.onApplyWindowInsets(windowInsets)
-        }
         // Keep screen on
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-    }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
+        setContentBase {
+            var videoUri by remember { mutableStateOf(handleIntent(intent)) }
 
-        if (intent != null) {
-            val data = IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
-                ?: intent.data
-            if (data != null) {
-                videoUri = data
-                play()
+            DisposableEffect(Unit) {
+                val listener = Consumer<Intent> { newIntent ->
+                    videoUri = handleIntent(newIntent)
+                }
+                addOnNewIntentListener(listener)
+                onDispose { removeOnNewIntentListener(listener) }
+            }
+            videoUri?.let { uri ->
+                PlayerView(
+                    uri = uri,
+                    onBack = { finish() },
+                    onSaveScreenshot = {
+                        picture = it
+                        saveScreenshot()
+                    },
+                    onPlayerChanged = { player = it }
+                )
             }
         }
     }
 
-    override fun ActivityPlayBinding.initView() {
-        playerView.setForward85sButton(dataStore.getOrDefault(PlayerShow85sButtonPreference))
-//        playerView.setOnScreenshotListener {
-//            val retriever = MediaMetadataRetriever()
-//            retriever.setDataSource(player.curren)
-//            val bitmap = retriever.getFrameAtTime(simpleExoPlayer.getCurrentPosition())
-//        }
-        videoUri = IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
+    private fun handleIntent(intent: Intent?): Uri? {
+        intent ?: return null
+        return IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
             ?: intent.data
-
-        if (videoUri != null) {
-            playerView.setOnBackButtonClickListener { finish() }
-            // Attach player to the view.
-            playerView.player = player
-            play()
-        }
     }
 
-    private fun play(): Boolean {
-        if (videoUri == null) {
-            return false
-        }
-        if (videoUri.toString().startsWith("magnet:")) {
-            player.setMediaSource(DefaultMediaSourceFactory { TorrentDataSource() }
-                .createMediaSource(MediaItem.fromUri(videoUri!!)))
+    private fun saveScreenshot() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            picture.savePictureToMediaStore(this)
         } else {
-            // Set the media item to be played.
-            player.setMediaItem(MediaItem.fromUri(videoUri!!))
-        }
-//        player.setMediaItem(MediaItem.fromUri(Uri.parse("magnet:?xt=urn:btih:344a65fde5ab561370ad5f144319a9f4951ac125&dn=%5BLPSub%5D%20Kaii%20to%20Otome%20to%20Kamikakushi%20%5B01%5D%5BAVC%20AAC%5D%5B1080p%5D%5BJPTC%5D.mp4&tr=udp%3A%2F%2F104.143.10.186%3A8000%2Fannounce&tr=http%3A%2F%2F104.143.10.186%3A8000%2Fannounce&tr=http%3A%2F%2Ftracker.openbittorrent.com%3A80%2Fannounce&tr=udp%3A%2F%2Ftracker3.itzmx.com%3A6961%2Fannounce&tr=udp%3A%2F%2Ftracker4.itzmx.com%3A2710%2Fannounce&tr=http%3A%2F%2Ftracker.publicbt.com%3A80%2Fannounce&tr=http%3A%2F%2Ftracker.prq.to%2Fannounce&tr=http%3A%2F%2Fopen.acgtracker.com%3A1096%2Fannounce&tr=https%3A%2F%2Ft-115.rhcloud.com%2Fonly_for_ylbud&tr=udp%3A%2F%2Ftracker1.itzmx.com%3A8080%2Fannounce&tr=udp%3A%2F%2Ftracker2.itzmx.com%3A6961%2Fannounce&tr=http%3A%2F%2Ftracker1.itzmx.com%3A8080%2Fannounce&tr=http%3A%2F%2Ftracker2.itzmx.com%3A6961%2Fannounce&tr=http%3A%2F%2Ftracker3.itzmx.com%3A6961%2Fannounce&tr=http%3A%2F%2Ftracker4.itzmx.com%3A2710%2Fannounce")))
-        // Prepare the player.
-        player.prepare()
-        player.play()
-        return true
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        player.stop()
-        player.release()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        if (beforePauseIsPlaying) {
-            beforePauseIsPlaying = false
-            player.play()
+            requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-
-        if (player.isPlaying) {
-            beforePauseIsPlaying = true
-            player.pause()
+    override fun dispatchKeyEvent(event: KeyEvent): Boolean {
+        if (player?.onKey(event) == true) {
+            return true
         }
+        return super.dispatchKeyEvent(event)
     }
-
-    override fun getViewBinding() = ActivityPlayBinding.inflate(layoutInflater)
 }

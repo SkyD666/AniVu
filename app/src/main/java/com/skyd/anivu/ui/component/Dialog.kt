@@ -12,11 +12,8 @@ import android.widget.Button
 import android.widget.ProgressBar
 import androidx.annotation.DrawableRes
 import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.Fragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.skyd.anivu.R
 
 
@@ -118,112 +115,6 @@ fun Activity.showListDialog(
                     positionButton?.isEnabled = itemIndex != -1
                 }
             } else null
-        }
-}
-
-fun Fragment.showInputDialog(
-    title: CharSequence? = null,
-    hint: String? = null,
-    prefill: CharSequence? = null,
-    icon: Drawable? = null,
-    cancelable: Boolean = true,
-    empty: Boolean = false,     // 是否可以什么都不输入
-    multipleLine: Boolean = false,     // 是否可以换行
-    validator: ((CharSequence?) -> Boolean)? = null,
-    validatorErrorMessage: String = getString(R.string.input_dialog_error_message),
-    negativeText: String = getString(R.string.cancel),
-    neutralText: String? = null,
-    positiveText: String = getString(R.string.ok),
-    onNegative: ((dialog: DialogInterface, which: Int) -> Unit)? = null,
-    onNeutral: ((dialog: DialogInterface, which: Int) -> Unit)? = null,
-    onPositive: ((dialog: DialogInterface, which: Int, text: CharSequence) -> Unit)? = null,
-): AlertDialog? {
-    return requireActivity().showInputDialog(
-        title = title,
-        hint = hint,
-        prefill = prefill,
-        icon = icon,
-        cancelable = cancelable,
-        empty = empty,
-        multipleLine = multipleLine,
-        validator = validator,
-        validatorErrorMessage = validatorErrorMessage,
-        negativeText = negativeText,
-        neutralText = neutralText,
-        positiveText = positiveText,
-        onNegative = onNegative,
-        onNeutral = onNeutral,
-        onPositive = onPositive
-    )
-}
-
-fun Activity.showInputDialog(
-    title: CharSequence? = null,
-    hint: String? = null,
-    prefill: CharSequence? = null,
-    icon: Drawable? = null,
-    cancelable: Boolean = true,
-    empty: Boolean = false,     // 是否可以什么都不输入
-    multipleLine: Boolean = false,     // 是否可以换行
-    validator: ((CharSequence?) -> Boolean)? = null,
-    validatorErrorMessage: String = getString(R.string.input_dialog_error_message),
-    negativeText: String = getString(R.string.cancel),
-    neutralText: String? = null,
-    positiveText: String = getString(R.string.ok),
-    onNegative: ((dialog: DialogInterface, which: Int) -> Unit)? = null,
-    onNeutral: ((dialog: DialogInterface, which: Int) -> Unit)? = null,
-    onPositive: ((dialog: DialogInterface, which: Int, text: CharSequence) -> Unit)? = null,
-): AlertDialog? {
-    var text: CharSequence = ""
-    var positionButton: Button? = null
-    return MaterialAlertDialogBuilder(
-        this,
-        com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog_Centered
-    )
-        .setTitle(title)
-        .apply {
-            onPositive?.let {
-                setPositiveButton(positiveText) { dialog, which ->
-                    onPositive.invoke(dialog, which, text)
-                }
-            }
-        }
-        .apply { onNegative?.let { setNegativeButton(negativeText, it) } }
-        .apply {
-            if (onNeutral != null && neutralText != null) {
-                setNeutralButton(neutralText, onNeutral)
-            }
-        }
-        .setCancelable(cancelable)
-        .setIcon(icon)
-        .setView(R.layout.layout_input_dialog)
-        .run { if (!isFinishing) show() else null }
-        ?.apply {
-            positionButton = getButton(AlertDialog.BUTTON_POSITIVE)
-            if (!empty) positionButton?.isEnabled = false
-            findViewById<TextInputLayout>(R.id.til_input_dialog)?.hint = hint
-            findViewById<TextInputEditText>(R.id.et_input_dialog)?.also {
-                if (!multipleLine) it.setSingleLine()
-                it.doOnTextChanged { t, _, _, _ ->
-                    if (!t.isNullOrEmpty() || empty) {
-                        text = t ?: ""
-                        positionButton?.isEnabled = true
-                    } else {
-                        positionButton?.isEnabled = false
-                    }
-
-                    if (validator?.invoke(t) == false) {
-                        it.error = validatorErrorMessage
-                        positionButton?.isEnabled = false
-                    } else {
-                        positionButton?.isEnabled = true
-                    }
-                }
-                autoShowKeyboard(this@showInputDialog, it)
-                window?.fixWindowTranslucentStatus()
-                if (prefill != null) it.setText(prefill)
-                it.selectAll()
-            }
         }
 }
 

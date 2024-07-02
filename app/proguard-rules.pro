@@ -108,3 +108,9 @@ public static final ** CREATOR;
 
 # Retrofit
 -keep, allowobfuscation, allowshrinking interface retrofit2.Call
+
+# FFmpeg
+-dontwarn com.arthenica.smartexception.java.Exceptions
+
+# MPV
+-keep,allowoptimization class is.xyz.mpv.MPVLib { public protected *; }

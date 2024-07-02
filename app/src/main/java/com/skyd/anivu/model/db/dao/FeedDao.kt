@@ -8,10 +8,14 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.Transaction
+import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
+import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
+import com.skyd.anivu.model.bean.FEED_VIEW_NAME
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.FeedWithArticleBean
 import com.skyd.anivu.model.bean.GROUP_TABLE_NAME
 import com.skyd.anivu.model.bean.GroupBean
@@ -33,8 +37,16 @@ interface FeedDao {
     suspend fun setFeed(feedBean: FeedBean)
 
     @Transaction
+    @Update
+    suspend fun updateFeed(feedBean: FeedBean)
+
+    @Transaction
     suspend fun setFeedWithArticle(feedWithArticleBean: FeedWithArticleBean) {
-        setFeed(feedWithArticleBean.feed)
+        if (containsByUrl(feedWithArticleBean.feed.url) == 0) {
+            setFeed(feedWithArticleBean.feed)
+        } else {
+            updateFeed(feedWithArticleBean.feed)
+        }
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(appContext, FeedDaoEntryPoint::class.java)
         val feedUrl = feedWithArticleBean.feed.url
@@ -73,16 +85,6 @@ interface FeedDao {
     @Query(
         """
         UPDATE $FEED_TABLE_NAME
-        SET ${FeedBean.NICKNAME_COLUMN} = :nickname, ${FeedBean.GROUP_ID_COLUMN} = :groupId
-        WHERE ${FeedBean.URL_COLUMN} = :feedUrl
-        """
-    )
-    suspend fun updateFeedGroupId(feedUrl: String, nickname: String?, groupId: String?): Int
-
-    @Transaction
-    @Query(
-        """
-        UPDATE $FEED_TABLE_NAME
         SET ${FeedBean.GROUP_ID_COLUMN} = :toGroupId
         WHERE :fromGroupId IS NULL AND ${FeedBean.GROUP_ID_COLUMN} IS NULL OR
         ${FeedBean.GROUP_ID_COLUMN} = :fromGroupId OR
@@ -92,6 +94,16 @@ interface FeedDao {
         """
     )
     suspend fun moveFeedToGroup(fromGroupId: String?, toGroupId: String?): Int
+
+    @Transaction
+    @Query(
+        """
+        UPDATE $FEED_TABLE_NAME
+        SET ${FeedBean.ICON_COLUMN} = :icon
+        WHERE ${FeedBean.URL_COLUMN} = :feedUrl
+        """
+    )
+    suspend fun updateFeedIcon(feedUrl: String, icon: String?): Int
 
     @Transaction
     @Query("SELECT * FROM $FEED_TABLE_NAME")
@@ -104,22 +116,49 @@ interface FeedDao {
     @Transaction
     @Query(
         """
-            SELECT * FROM $FEED_TABLE_NAME
+            SELECT * FROM $FEED_VIEW_NAME
+            WHERE ${FeedBean.GROUP_ID_COLUMN} IN (:groupIds)
+        """
+    )
+    suspend fun getFeedsIn(groupIds: List<String>): List<FeedViewBean>
+
+    @Transaction
+    @Query(
+        """
+            SELECT * FROM $FEED_VIEW_NAME
             WHERE ${FeedBean.GROUP_ID_COLUMN} IS NULL OR 
             ${FeedBean.GROUP_ID_COLUMN} NOT IN (:groupIds)
         """
     )
-    suspend fun getFeedsNotIn(groupIds: List<String>): List<FeedBean>
+    suspend fun getFeedsNotIn(groupIds: List<String>): List<FeedViewBean>
 
     @Transaction
-    @RawQuery(observedEntities = [FeedBean::class])
-    fun getFeedPagingSource(sql: SupportSQLiteQuery): PagingSource<Int, FeedBean>
+    @Query(
+        """
+            SELECT * FROM $FEED_VIEW_NAME
+            WHERE :groupId IS NULL AND ${FeedBean.GROUP_ID_COLUMN} IS NULL OR
+            ${FeedBean.GROUP_ID_COLUMN} = :groupId
+        """
+    )
+    suspend fun getFeedsByGroupId(groupId: String?): List<FeedViewBean>
 
     @Transaction
-    @RawQuery(observedEntities = [FeedBean::class])
-    fun getFeedList(sql: SupportSQLiteQuery): List<FeedBean>
+    @RawQuery(observedEntities = [FeedBean::class, ArticleBean::class])
+    fun getFeedPagingSource(sql: SupportSQLiteQuery): PagingSource<Int, FeedViewBean>
+
+    @Transaction
+    @RawQuery(observedEntities = [FeedBean::class, ArticleBean::class])
+    fun getFeedList(sql: SupportSQLiteQuery): List<FeedViewBean>
 
     @Transaction
     @Query("SELECT ${FeedBean.URL_COLUMN} FROM $FEED_TABLE_NAME")
     fun getAllFeedUrl(): List<String>
+
+    @Transaction
+    @Query("SELECT COUNT(*) FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} LIKE :url")
+    fun containsByUrl(url: String): Int
+
+    @Transaction
+    @Query("SELECT COUNT(*) FROM $FEED_TABLE_NAME WHERE ${FeedBean.CUSTOM_ICON_COLUMN} LIKE :customIcon")
+    fun containsByCustomIcon(customIcon: String): Int
 }

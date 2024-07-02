@@ -46,12 +46,14 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.isCompact
+import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.ui.fragment.feed.FEED_SCREEN_ROUTE
 import com.skyd.anivu.ui.fragment.feed.FeedScreen
 import com.skyd.anivu.ui.fragment.media.MEDIA_SCREEN_ROUTE
 import com.skyd.anivu.ui.fragment.media.MediaScreen
 import com.skyd.anivu.ui.fragment.more.MORE_SCREEN_ROUTE
 import com.skyd.anivu.ui.fragment.more.MoreScreen
+import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -149,13 +151,17 @@ private fun NavigationBarOrRail(navController: NavController) {
         }
     }
 
+    val navigationBarLabel = LocalNavigationBarLabel.current
     if (LocalWindowSizeClass.current.isCompact) {
         NavigationBar {
             items.forEachIndexed { index, item ->
                 val selected = currentDest?.hierarchy?.any { it.route == item.second } == true
                 NavigationBarItem(
                     icon = { Icon(icons[selected]!![index], contentDescription = item.first) },
-                    label = { Text(item.first) },
+                    label = if (navigationBarLabel == NavigationBarLabelPreference.NONE) null else {
+                        { Text(item.first) }
+                    },
+                    alwaysShowLabel = navigationBarLabel == NavigationBarLabelPreference.SHOW,
                     selected = selected,
                     onClick = { onClick(index) }
                 )
@@ -167,7 +173,10 @@ private fun NavigationBarOrRail(navController: NavController) {
                 val selected = currentDest?.hierarchy?.any { it.route == item.second } == true
                 NavigationRailItem(
                     icon = { Icon(icons[selected]!![index], contentDescription = item.first) },
-                    label = { Text(item.first) },
+                    label = if (navigationBarLabel == NavigationBarLabelPreference.NONE) null else {
+                        { Text(item.first) }
+                    },
+                    alwaysShowLabel = navigationBarLabel == NavigationBarLabelPreference.SHOW,
                     selected = selected,
                     onClick = { onClick(index) }
                 )

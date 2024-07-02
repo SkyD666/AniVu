@@ -3,9 +3,10 @@ package com.skyd.anivu.config
 import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
+import com.skyd.anivu.model.bean.FEED_VIEW_NAME
 import com.skyd.anivu.model.bean.FeedBean
 
-val allSearchDomain: HashMap<String, List<String>> = hashMapOf(
+val allSearchDomain: Map<String, List<String>> = mutableMapOf(
     FEED_TABLE_NAME to listOf(
         FeedBean.URL_COLUMN,
         FeedBean.TITLE_COLUMN,
@@ -20,4 +21,6 @@ val allSearchDomain: HashMap<String, List<String>> = hashMapOf(
         ArticleBean.CONTENT_COLUMN,
         ArticleBean.LINK_COLUMN,
     ),
-)
+).apply {
+    put(FEED_VIEW_NAME, getValue(FEED_TABLE_NAME))
+}

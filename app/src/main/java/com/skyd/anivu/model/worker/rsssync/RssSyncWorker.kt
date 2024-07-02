@@ -9,8 +9,6 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
@@ -32,14 +30,8 @@ class RssSyncWorker(context: Context, parameters: WorkerParameters) :
     override suspend fun doWork(): Result {
         coroutineScope {
             runCatching {
-                val requests = mutableListOf<Deferred<Unit>>()
-                hiltEntryPoint.feedDao.getAllFeedUrl().forEach {
-                    requests += async {
-                        hiltEntryPoint.articleRepo.refreshArticleList(it)
-                            .catch { it.printStackTrace() }.collect()
-                    }
-                }
-                requests.forEach { it.await() }
+                hiltEntryPoint.articleRepo.refreshArticleList(hiltEntryPoint.feedDao.getAllFeedUrl())
+                    .catch { it.printStackTrace() }.collect()
             }
         }
         return Result.success()

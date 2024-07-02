@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="PrivateResource">
-    <drawable name="exo_styled_controls_play">@drawable/ic_play_arrow_fill_24</drawable>
-    <drawable name="exo_styled_controls_pause">@drawable/ic_pause_fill_24</drawable>
-    <drawable name="exo_styled_controls_next">@drawable/ic_skip_next_fill_24</drawable>
-    <drawable name="exo_styled_controls_settings">@drawable/ic_settings_fill_24</drawable>
-</resources>

@@ -1,6 +1,5 @@
 package com.skyd.anivu.model.repository
 
-import android.content.Context
 import android.util.Log
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
@@ -11,9 +10,9 @@ import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedWithArticleBean
-import com.skyd.anivu.model.db.dao.FeedDao
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.skyd.anivu.util.favicon.FaviconExtractor
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -26,20 +25,21 @@ import javax.inject.Inject
  * Some operations on RSS.
  */
 class RssHelper @Inject constructor(
-    @ApplicationContext
-    private val context: Context,
     private val okHttpClient: OkHttpClient,
+    private val faviconExtractor: FaviconExtractor,
 ) {
 
     @Throws(Exception::class)
     suspend fun searchFeed(url: String): FeedWithArticleBean {
         return withContext(Dispatchers.IO) {
+            val iconAsync = async { getRssIcon(url) }
             val syndFeed = SyndFeedInput().build(XmlReader(inputStream(okHttpClient, url)))
             val feed = FeedBean(
                 url = url,
                 title = syndFeed.title,
                 description = syndFeed.description,
                 link = syndFeed.link,
+                icon = syndFeed.icon?.link ?: iconAsync.await(),
             )
             val list = syndFeed.entries.map { article(feed, it) }
             FeedWithArticleBean(feed, list)
@@ -49,22 +49,34 @@ class RssHelper @Inject constructor(
     suspend fun queryRssXml(
         feed: FeedBean,
         latestLink: String?,        // 日期最新的文章链接，更新时不会take比这个文章更旧的文章
-    ): List<ArticleWithEnclosureBean> =
-        try {
+    ): FeedWithArticleBean? = withContext(Dispatchers.IO) {
+        runCatching {
+            val iconAsync = async { getRssIcon(feed.url) }
             inputStream(okHttpClient, feed.url).use { inputStream ->
                 SyndFeedInput().apply { isPreserveWireFeed = true }
                     .build(XmlReader(inputStream))
-                    .entries
-                    .asSequence()
-                    .takeWhile { latestLink == null || latestLink != it.link }
-                    .map { article(feed, it) }
-                    .toList()
+                    .let { syndFeed ->
+                        FeedWithArticleBean(
+                            feed = feed.copy(
+                                title = syndFeed.title,
+                                description = syndFeed.description,
+                                link = syndFeed.link,
+                                icon = syndFeed.icon?.link ?: iconAsync.await(),
+                            ),
+                            articles = syndFeed.entries
+                                .asSequence()
+                                .takeWhile { latestLink == null || latestLink != it.link }
+                                .map { article(feed, it) }
+                                .toList(),
+                        )
+                    }
             }
-        } catch (e: Exception) {
+        }.onFailure { e ->
             e.printStackTrace()
             Log.e("RLog", "queryRssXml[${feed.title}]: ${e.message}")
             throw e
-        }
+        }.getOrNull()
+    }
 
     private fun article(
         feed: FeedBean,
@@ -95,7 +107,8 @@ class RssHelper @Inject constructor(
                 description = content ?: desc,
                 content = content,
                 image = findImg((content ?: desc) ?: ""),
-                link = syndEntry.link ?: "",
+                link = syndEntry.link,
+                guid = syndEntry.uri,
                 updateAt = Date().time,
             ),
             enclosures = syndEntry.enclosures.map {
@@ -109,6 +122,12 @@ class RssHelper @Inject constructor(
         )
     }
 
+    fun getRssIcon(url: String): String? {
+        return runCatching {
+            faviconExtractor.extractFavicon(url).apply { Log.e("TAG", "getRssIcon: $this") }
+        }.onFailure { it.printStackTrace() }.getOrNull()
+    }
+
     fun findImg(rawDescription: String): String? {
         // From: https://gitlab.com/spacecowboy/Feeder
         // Using negative lookahead to skip data: urls, being inline base64
@@ -116,45 +135,6 @@ class RssHelper @Inject constructor(
         val regex = """img.*?src=(["'])((?!data).*?)\1""".toRegex(RegexOption.DOT_MATCHES_ALL)
         // Base64 encoded images can be quite large - and crash database cursors
         return regex.find(rawDescription)?.groupValues?.get(2)?.takeIf { !it.startsWith("data:") }
-    }
-
-    @Throws(Exception::class)
-    suspend fun queryRssIcon(
-        feedDao: FeedDao,
-        feed: FeedBean,
-        articleLink: String,
-    ) {
-        withContext(Dispatchers.IO) {
-            val domainRegex = Regex("(http|https)://(www.)?(\\w+(\\.)?)+")
-            val request = response(okHttpClient, articleLink)
-            val content = request.body.string()
-            val regex = Regex("""<link(.+?)rel="shortcut icon"(.+?)href="(.+?)"""")
-            var iconLink = regex
-                .find(content)
-                ?.groups?.get(3)
-                ?.value
-            Log.i("rlog", "queryRssIcon: $iconLink")
-            if (iconLink != null) {
-                if (iconLink.startsWith("//")) {
-                    iconLink = "http:$iconLink"
-                }
-                if (iconLink.startsWith("/")) {
-                    iconLink = "${domainRegex.find(articleLink)?.value}$iconLink"
-                }
-                saveRssIcon(feedDao, feed, iconLink)
-            } else {
-                domainRegex.find(articleLink)?.value?.let {
-                    Log.i("RLog", "favicon: $it")
-                    if (response(okHttpClient, "$it/favicon.ico").isSuccessful) {
-                        saveRssIcon(feedDao, feed, it)
-                    }
-                }
-            }
-        }
-    }
-
-    private suspend fun saveRssIcon(feedDao: FeedDao, feed: FeedBean, iconLink: String) {
-        feedDao.setFeed(feed.copy(icon = iconLink))
     }
 
     private suspend fun inputStream(

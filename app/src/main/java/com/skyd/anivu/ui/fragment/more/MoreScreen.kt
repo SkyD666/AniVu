@@ -48,6 +48,7 @@ import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.shape.CloverShape
 import com.skyd.anivu.ui.component.shape.CurlyCornerShape
+import com.skyd.anivu.ui.component.shape.SquircleShape
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 
@@ -108,10 +109,7 @@ fun More1Item(
     data: MoreBean,
     onClickListener: ((data: MoreBean) -> Unit)? = null
 ) {
-    OutlinedCard(
-        modifier = Modifier.padding(vertical = 6.dp),
-        shape = RoundedCornerShape(16)
-    ) {
+    OutlinedCard(shape = RoundedCornerShape(16)) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -161,19 +159,27 @@ private fun getMoreBeanList(
 ): MutableList<MoreBean> {
     return mutableListOf(
         MoreBean(
+            title = context.getString(R.string.import_export_screen_name),
+            icon = R.drawable.ic_swap_vert_24,
+            iconTint = colorScheme.onPrimary,
+            shape = SquircleShape,
+            shapeColor = colorScheme.primary,
+            action = { navController.navigate(R.id.action_to_import_export_fragment) },
+        ),
+        MoreBean(
             title = context.getString(R.string.settings_screen_name),
             icon = R.drawable.ic_settings_24,
-            iconTint = colorScheme.onPrimary,
+            iconTint = colorScheme.onSecondary,
             shape = CloverShape,
-            shapeColor = colorScheme.primary,
+            shapeColor = colorScheme.secondary,
             action = { navController.navigate(R.id.action_to_settings_fragment) },
         ),
         MoreBean(
             title = context.getString(R.string.about_screen_name),
             icon = R.drawable.ic_info_24,
-            iconTint = colorScheme.onSecondary,
+            iconTint = colorScheme.onTertiary,
             shape = CurlyCornerShape(amp = with(density) { 1.6.dp.toPx() }, count = 10),
-            shapeColor = colorScheme.secondary,
+            shapeColor = colorScheme.tertiary,
             action = { navController.navigate(R.id.action_to_about_fragment) }
         ),
     )

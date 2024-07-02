@@ -16,7 +16,7 @@ fun AniVuLazyVerticalGrid(
     modifier: Modifier = Modifier,
     columns: GridCells,
     contentPadding: PaddingValues = PaddingValues(),
-    count: Int,
+    count: () -> Int,
     data: (index: Int) -> Any,
     listState: LazyGridState = rememberLazyGridState(),
     adapter: LazyGridAdapter,
@@ -36,7 +36,7 @@ fun AniVuLazyVerticalGrid(
         horizontalArrangement = horizontalArrangement,
     ) {
         items(
-            count = count,
+            count = count(),
             key = if (key == null) null else { index -> key.invoke(index, data(index)) },
         ) { index ->
             adapter.Draw(
@@ -66,7 +66,7 @@ fun AniVuLazyVerticalGrid(
         columns = columns,
         listState = listState,
         contentPadding = contentPadding,
-        count = dataList.itemCount,
+        count = { dataList.itemCount },
         data = { dataList[it]!! },
         adapter = adapter,
         reverseLayout = reverseLayout,
@@ -95,7 +95,7 @@ fun AniVuLazyVerticalGrid(
         columns = columns,
         listState = listState,
         contentPadding = contentPadding,
-        count = dataList.size,
+        count = { dataList.size },
         data = { dataList.elementAt(it) },
         adapter = adapter,
         reverseLayout = reverseLayout,

@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Article
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.SwipeLeft
+import androidx.compose.material.icons.automirrored.outlined.Article
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.SwipeLeft
+import androidx.compose.material.icons.outlined.SwipeRight
+import androidx.compose.material.icons.outlined.Visibility
+import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -31,16 +34,20 @@ import androidx.compose.ui.res.stringResource
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
+import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeRightActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.model.preference.behavior.article.DeduplicateTitleInDescPreference
+import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.SwitchSettingsItem
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
+import com.skyd.anivu.ui.local.LocalArticleSwipeRightAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
+import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -60,6 +67,7 @@ fun BehaviorScreen() {
     val scope = rememberCoroutineScope()
     var expandArticleTapActionMenu by rememberSaveable { mutableStateOf(false) }
     var expandArticleSwipeLeftActionMenu by rememberSaveable { mutableStateOf(false) }
+    var expandArticleSwipeRightActionMenu by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -76,6 +84,28 @@ fun BehaviorScreen() {
                 .nestedScroll(scrollBehavior.nestedScrollConnection),
             contentPadding = paddingValues,
         ) {
+            item {
+                CategorySettingsItem(text = stringResource(id = R.string.behavior_screen_feed_screen_category))
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = if (LocalHideEmptyDefault.current) {
+                        Icons.Outlined.VisibilityOff
+                    } else {
+                        Icons.Outlined.Visibility
+                    },
+                    text = stringResource(id = R.string.behavior_screen_feed_screen_hide_empty_default),
+                    description = stringResource(id = R.string.behavior_screen_feed_screen_hide_empty_default_description),
+                    checked = LocalHideEmptyDefault.current,
+                    onCheckedChange = {
+                        HideEmptyDefaultPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
+            }
             item {
                 CategorySettingsItem(text = stringResource(id = R.string.behavior_screen_article_screen_category))
             }
@@ -96,7 +126,7 @@ fun BehaviorScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.AutoMirrored.Default.Article),
+                    icon = rememberVectorPainter(image = Icons.AutoMirrored.Outlined.Article),
                     text = stringResource(id = R.string.behavior_screen_article_tap_action),
                     descriptionText = ArticleTapActionPreference.toDisplayName(
                         context = context,
@@ -113,19 +143,48 @@ fun BehaviorScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(image = Icons.Default.SwipeLeft),
+                    icon = rememberVectorPainter(image = Icons.Outlined.SwipeLeft),
                     text = stringResource(id = R.string.behavior_screen_article_swipe_left_action),
                     descriptionText = ArticleSwipeLeftActionPreference.toDisplayName(
                         context = context,
                         value = LocalArticleSwipeLeftAction.current,
                     ),
                     dropdownMenu = {
-                        ArticleSwipeLeftActionMenu(
+                        ArticleSwipeActionMenu(
                             expanded = expandArticleSwipeLeftActionMenu,
-                            onDismissRequest = { expandArticleSwipeLeftActionMenu = false }
+                            onDismissRequest = { expandArticleSwipeLeftActionMenu = false },
+                            articleSwipeAction = LocalArticleSwipeLeftAction.current,
+                            values = ArticleSwipeLeftActionPreference.values,
+                            toDisplayName = {
+                                ArticleSwipeLeftActionPreference.toDisplayName(context, it)
+                            },
+                            onClick = { ArticleSwipeLeftActionPreference.put(context, scope, it) },
                         )
                     },
                     onClick = { expandArticleSwipeLeftActionMenu = true },
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Outlined.SwipeRight),
+                    text = stringResource(id = R.string.behavior_screen_article_swipe_right_action),
+                    descriptionText = ArticleSwipeRightActionPreference.toDisplayName(
+                        context = context,
+                        value = LocalArticleSwipeRightAction.current,
+                    ),
+                    dropdownMenu = {
+                        ArticleSwipeActionMenu(
+                            expanded = expandArticleSwipeRightActionMenu,
+                            onDismissRequest = { expandArticleSwipeRightActionMenu = false },
+                            articleSwipeAction = LocalArticleSwipeRightAction.current,
+                            values = ArticleSwipeRightActionPreference.values,
+                            toDisplayName = {
+                                ArticleSwipeRightActionPreference.toDisplayName(context, it)
+                            },
+                            onClick = { ArticleSwipeRightActionPreference.put(context, scope, it) },
+                        )
+                    },
+                    onClick = { expandArticleSwipeRightActionMenu = true },
                 )
             }
         }
@@ -147,7 +206,7 @@ private fun ArticleTapActionMenu(expanded: Boolean, onDismissRequest: () -> Unit
                 text = { Text(text = ArticleTapActionPreference.toDisplayName(context, action)) },
                 leadingIcon = {
                     if (articleTapAction == action) {
-                        Icon(imageVector = Icons.Default.Done, contentDescription = null)
+                        Icon(imageVector = Icons.Outlined.Done, contentDescription = null)
                     }
                 },
                 onClick = {
@@ -164,31 +223,30 @@ private fun ArticleTapActionMenu(expanded: Boolean, onDismissRequest: () -> Unit
 }
 
 @Composable
-private fun ArticleSwipeLeftActionMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val articleSwipeLeftAction = LocalArticleSwipeLeftAction.current
-
+private fun ArticleSwipeActionMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    articleSwipeAction: String,
+    values: Array<String>,
+    toDisplayName: (String) -> String,
+    onClick: (String) -> Unit,
+) {
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = onDismissRequest,
     ) {
-        ArticleSwipeLeftActionPreference.values.forEach { action ->
+        values.forEach { action ->
             DropdownMenuItem(
                 text = {
-                    Text(text = ArticleSwipeLeftActionPreference.toDisplayName(context, action))
+                    Text(text = toDisplayName(action))
                 },
                 leadingIcon = {
-                    if (articleSwipeLeftAction == action) {
-                        Icon(imageVector = Icons.Default.Done, contentDescription = null)
+                    if (articleSwipeAction == action) {
+                        Icon(imageVector = Icons.Outlined.Done, contentDescription = null)
                     }
                 },
                 onClick = {
-                    ArticleSwipeLeftActionPreference.put(
-                        context = context,
-                        scope = scope,
-                        value = action,
-                    )
+                    onClick(action)
                     onDismissRequest()
                 },
             )

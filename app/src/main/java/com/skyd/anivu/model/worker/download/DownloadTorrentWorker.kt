@@ -5,6 +5,7 @@ import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.navigation.NavDeepLinkBuilder
@@ -340,7 +341,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             }
 
             is TorrentErrorAlert -> {
-                // 下载错误
+                // Download error
                 pauseWorker(
                     handle = alert.handle(),
                     state = DownloadInfoBean.DownloadState.ErrorPaused,
@@ -360,7 +361,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
             is StorageMovedAlert -> {
                 alert.handle().saveResumeData()
-                updateNotificationAsync()     // 更新Notification
+                updateNotificationAsync()     // update Notification
                 updateDownloadStateAndSessionParams(
                     link = torrentLink,
                     sessionStateData = sessionManager.saveState() ?: byteArrayOf(),
@@ -369,6 +370,13 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             }
 
             is StorageMovedFailedAlert -> {
+                Log.e(
+                    TAG,
+                    "StorageMovedFailedAlert: " +
+                            "Message: ${alert.message()}\n" +
+                            "${alert.error()}\n" +
+                            "Path: ${alert.filePath()}"
+                )
                 // 文件移动，例如存储空间已满
                 alert.handle().saveResumeData()
                 pauseWorker(
@@ -378,12 +386,12 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             }
 
             is TorrentFinishedAlert -> {
-                // 下载完成更新
+                // Torrent download finished
                 val handle = alert.handle()
                 progress = 1f
                 name = handle.name
                 handle.saveResumeData()
-                updateNotificationAsync()     // 更新Notification
+                updateNotificationAsync()     // update Notification
                 moveFromDownloadingDirToVideoDir(handle = handle)
                 updateDownloadStateAndSessionParams(
                     link = torrentLink,
@@ -409,7 +417,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 val handle = alert.handle()
                 updateTorrentFilesToDb(link = torrentLink, files = handle.torrentFile().files())
                 name = handle.name
-                updateNotificationAsync()     // 更新Notification
+                updateNotificationAsync()     // update Notification
                 updateNameInfoToDb(link = torrentLink, name = name)
             }
 
@@ -420,7 +428,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             }
 
             is StateChangedAlert -> {
-                // 下载状态更新
+                // Download state update
                 if (alert.state == TorrentStatus.State.SEEDING) {
                     updateDownloadStateAndSessionParams(
                         link = torrentLink,
@@ -433,7 +441,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 val handle = alert.handle()
                 if (handle.isValid) {
                     progress = handle.status().progress()
-                    updateNotificationAsync()     // 更新Notification
+                    updateNotificationAsync()     // update Notification
                     updateProgressInfoToDb(link = torrentLink, progress = progress)
                 }
             }
@@ -451,13 +459,13 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
             is TorrentAlert<*> -> {
 //                Log.e("TAG", "onAlert: ${alert}")
-                // 下载进度更新
+                // Download progress update
                 val handle = alert.handle()
                 if (handle.isValid) {
                     updateTorrentStatusMapFlow(id.toString(), handle.status())
                     if (progress != handle.status().progress()) {
                         progress = handle.status().progress()
-                        updateNotificationAsync()     // 更新Notification
+                        updateNotificationAsync()     // update Notification
                         updateProgressInfoToDb(link = torrentLink, progress = progress)
                         updateSizeInfoToDb(
                             link = torrentLink,
@@ -497,8 +505,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     }
 
     private fun moveFromDownloadingDirToVideoDir(handle: TorrentHandle) {
-        if (handle.savePath() != Const.VIDEO_DIR.path && File(handle.savePath()).exists()) {
+        if (handle.savePath() != Const.VIDEO_DIR.path) {
             handle.moveStorage(Const.VIDEO_DIR.path, MoveFlags.ALWAYS_REPLACE_FILES)
+        } else {
+            Log.w(TAG, "handle.savePath() != Const.VIDEO_DIR.path: ${handle.savePath()}")
         }
     }
 

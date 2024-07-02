@@ -7,7 +7,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.outlined.HourglassEmpty
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -43,10 +44,14 @@ fun WaitingDialog(
                         textAlign = TextAlign.Center,
                     )
                 }
-            }
+            },
         )
     } else {
-        WaitingDialog(visible = visible, title = title) {
+        WaitingDialog(
+            visible = visible,
+            title = title,
+            icon = { Icon(imageVector = Icons.Outlined.HourglassEmpty, contentDescription = null) },
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,12 +89,13 @@ fun WaitingDialog(
 fun WaitingDialog(
     visible: Boolean,
     title: String = stringResource(R.string.waiting),
+    icon: @Composable (() -> Unit)? = { CircularProgressIndicator() },
     text: @Composable (() -> Unit)? = null,
 ) {
     AniVuDialog(
         visible = visible,
         onDismissRequest = { },
-        icon = { Icon(imageVector = Icons.Default.HourglassEmpty, contentDescription = null) },
+        icon = icon,
         title = { Text(text = title) },
         text = text,
         confirmButton = {}

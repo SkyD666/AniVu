@@ -39,5 +39,16 @@ data class EnclosureBean(
         const val URL_COLUMN = "url"
         const val LENGTH_COLUMN = "length"
         const val TYPE_COLUMN = "type"
+
+        val mediaExtensions = listOf(
+            ".m3u8", ".ogg", ".mp3", ".flac", ".m4v", ".mov", ".avi", ".webm",
+            ".mp4", ".mkv", ".m4a",
+        )
     }
+
+    val isMedia: Boolean
+        get() = type?.startsWith("audio/") == true ||
+                type?.startsWith("video/") == true ||
+                type == "application/vnd.apple.mpegurl" ||
+                mediaExtensions.any { url.endsWith(it) }
 }

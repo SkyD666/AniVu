@@ -4,38 +4,81 @@ import android.annotation.SuppressLint
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.DialogInterface
-import android.view.LayoutInflater
+import android.text.Editable
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.widget.addTextChangedListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.skyd.anivu.R
+import com.skyd.anivu.ext.dataStore
+import com.skyd.anivu.ext.dp
+import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.showSoftKeyboard
+import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
+import com.skyd.anivu.ui.component.AniVuTextFieldStyle
 
 @SuppressLint("InflateParams")
 open class InputDialogBuilder(
     context: Context,
 ) : MaterialAlertDialogBuilder(context) {
 
-    private val textField = LayoutInflater.from(context).inflate(
-        R.layout.layout_input_dialog, null, false
-    ) as TextInputLayout
+    private val textField = TextInputLayout(
+        context, null,
+        if (context.dataStore.getOrDefault(TextFieldStylePreference) == AniVuTextFieldStyle.Normal.value) {
+            com.google.android.material.R.attr.textInputFilledStyle
+        } else {
+            com.google.android.material.R.attr.textInputOutlinedStyle
+        }
+    ).apply {
+        addView(TextInputEditText(this.context))
+    }
 
     init {
-        textField.setEndIconOnClickListener {
-            val clipboard = getSystemService(context, ClipboardManager::class.java)
-            val text = clipboard?.primaryClip?.let { primaryClip ->
-                if (primaryClip.itemCount > 0) {
-                    // note: text may be null, ensure this is null-safe
-                    primaryClip.getItemAt(0)?.coerceToText(context)
-                } else {
-                    null
+        with(textField) {
+            setPadding(20.dp, 20.dp, 20.dp, 0.dp)
+            endIconMode = TextInputLayout.END_ICON_CUSTOM
+            setEndIconDrawable(R.drawable.ic_content_paste_24)
+            setEndIconContentDescription(R.string.paste)
+            setEndIconOnClickListener {
+                val clipboard = getSystemService(context, ClipboardManager::class.java)
+                val text = clipboard?.primaryClip?.let { primaryClip ->
+                    if (primaryClip.itemCount > 0) {
+                        // note: text may be null, ensure this is null-safe
+                        primaryClip.getItemAt(0)?.coerceToText(context)
+                    } else {
+                        null
+                    }
+                }
+                if (!text.isNullOrBlank()) {
+                    editText?.setText(text)
                 }
             }
-            if (!text.isNullOrBlank()) {
-                textField.editText?.setText(text)
-            }
         }
+    }
+
+    fun addTextChangedListener(
+        beforeTextChanged: (
+            text: CharSequence?,
+            start: Int,
+            count: Int,
+            after: Int
+        ) -> Unit = { _, _, _, _ -> },
+        onTextChanged: (
+            text: CharSequence?,
+            start: Int,
+            before: Int,
+            count: Int
+        ) -> Unit = { _, _, _, _ -> },
+        afterTextChanged: (text: Editable?) -> Unit = {}
+    ): InputDialogBuilder {
+        textField.editText?.addTextChangedListener(
+            beforeTextChanged,
+            onTextChanged,
+            afterTextChanged,
+        )
+        return this
     }
 
     fun setPositiveButton(

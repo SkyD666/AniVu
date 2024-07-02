@@ -19,6 +19,7 @@ import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -36,6 +37,7 @@ fun AniVuIconButton(
     tint: Color? = null,
     style: AniVuIconButtonStyle = AniVuIconButtonStyle.Normal,
     contentDescription: String? = null,
+    rotate: Float = 0f,
     enabled: Boolean = true,
     colors: IconButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -43,6 +45,7 @@ fun AniVuIconButton(
     val iconButton: @Composable (modifier: Modifier) -> Unit = {
         val icon: @Composable () -> Unit = {
             Icon(
+                modifier = Modifier.rotate(rotate),
                 painter = painter,
                 tint = tint ?: LocalContentColor.current,
                 contentDescription = contentDescription,
@@ -113,6 +116,7 @@ fun AniVuIconButton(
     tint: Color? = null,
     style: AniVuIconButtonStyle = AniVuIconButtonStyle.Normal,
     contentDescription: String? = null,
+    rotate: Float = 0f,
     enabled: Boolean = true,
     colors: IconButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
@@ -123,6 +127,7 @@ fun AniVuIconButton(
         painter = rememberVectorPainter(image = imageVector),
         style = style,
         contentDescription = contentDescription,
+        rotate = rotate,
         tint = tint,
         enabled = enabled,
         colors = colors,

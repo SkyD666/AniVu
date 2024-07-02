@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
@@ -20,7 +21,6 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,7 +34,7 @@ class ArticleViewModel @Inject constructor(
         val initialVS = ArticleState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<ArticleIntent.Init>().take(1),
+            intentSharedFlow.filterIsInstance<ArticleIntent.Init>().distinctUntilChanged(),
             intentSharedFlow.filterNot { it is ArticleIntent.Init }
         )
             .shareWhileSubscribed()
@@ -61,6 +61,14 @@ class ArticleViewModel @Inject constructor(
                     ArticleEvent.RefreshArticleListResultEvent.Failed(change.msg)
                 }
 
+                is ArticlePartialStateChange.FavoriteArticle.Failed -> {
+                    ArticleEvent.FavoriteArticleResultEvent.Failed(change.msg)
+                }
+
+                is ArticlePartialStateChange.ReadArticle.Failed -> {
+                    ArticleEvent.FavoriteArticleResultEvent.Failed(change.msg)
+                }
+
                 else -> return@onEach
             }
             sendEvent(event)
@@ -70,18 +78,51 @@ class ArticleViewModel @Inject constructor(
     private fun SharedFlow<ArticleIntent>.toArticlePartialStateChangeFlow(): Flow<ArticlePartialStateChange> {
         return merge(
             filterIsInstance<ArticleIntent.Init>().flatMapConcat { intent ->
-                flowOf(articleRepo.requestArticleList(intent.url).cachedIn(viewModelScope)).map {
+                flowOf(articleRepo.requestArticleList(intent.urls).cachedIn(viewModelScope)).map {
                     ArticlePartialStateChange.ArticleList.Success(articlePagingDataFlow = it)
                 }.startWith(ArticlePartialStateChange.ArticleList.Loading).catchMap {
                     ArticlePartialStateChange.ArticleList.Failed(it.message.toString())
                 }
             },
+            filterIsInstance<ArticleIntent.UpdateSort>().flatMapConcat { intent ->
+                flowOf(articleRepo.updateSort(intent.articleSort)).map {
+                    ArticlePartialStateChange.UpdateSort.Success(intent.articleSort)
+                }
+            },
             filterIsInstance<ArticleIntent.Refresh>().flatMapConcat { intent ->
-                articleRepo.refreshArticleList(intent.url).map {
+                articleRepo.refreshArticleList(intent.urls).map {
                     ArticlePartialStateChange.RefreshArticleList.Success
                 }.startWith(ArticlePartialStateChange.RefreshArticleList.Loading).catchMap {
                     it.printStackTrace()
                     ArticlePartialStateChange.RefreshArticleList.Failed(it.message.toString())
+                }
+            },
+            filterIsInstance<ArticleIntent.Favorite>().flatMapConcat { intent ->
+                articleRepo.favoriteArticle(intent.articleId, intent.favorite).map {
+                    ArticlePartialStateChange.FavoriteArticle.Success
+                }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
+                    ArticlePartialStateChange.FavoriteArticle.Failed(it.message.toString())
+                }
+            },
+            filterIsInstance<ArticleIntent.Read>().flatMapConcat { intent ->
+                articleRepo.readArticle(intent.articleId, intent.read).map {
+                    ArticlePartialStateChange.ReadArticle.Success
+                }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
+                    ArticlePartialStateChange.ReadArticle.Failed(it.message.toString())
+                }
+            },
+            filterIsInstance<ArticleIntent.FilterFavorite>().flatMapConcat { intent ->
+                flowOf(articleRepo.filterFavorite(intent.favorite)).map {
+                    ArticlePartialStateChange.FavoriteFilterArticle.Success(intent.favorite)
+                }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
+                    ArticlePartialStateChange.FavoriteFilterArticle.Failed(it.message.toString())
+                }
+            },
+            filterIsInstance<ArticleIntent.FilterRead>().flatMapConcat { intent ->
+                flowOf(articleRepo.filterRead(intent.read)).map {
+                    ArticlePartialStateChange.ReadFilterArticle.Success(intent.read)
+                }.startWith(ArticlePartialStateChange.LoadingDialog.Show).catchMap {
+                    ArticlePartialStateChange.ReadFilterArticle.Failed(it.message.toString())
                 }
             },
         )

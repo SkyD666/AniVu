@@ -22,11 +22,7 @@ import com.skyd.anivu.ext.visible
 
 
 class ColorPaletteView : MaterialCardView {
-    private val iconImage = ImageView(context).apply {
-        setBackgroundResource(R.drawable.shape_fill_circle)
-        setPadding(7.dp)
-        backgroundTintList = ColorStateList.valueOf(iconBackgroundColor)
-    }
+    private val iconImage = ImageView(context)
     var icon: Drawable?
         get() = iconImage.drawable
         set(value) {
@@ -72,6 +68,11 @@ class ColorPaletteView : MaterialCardView {
         attrs,
         defStyleAttr
     ) {
+        with(iconImage) {
+            setBackgroundResource(R.drawable.shape_fill_circle)
+            setPadding(7.dp)
+            backgroundTintList = ColorStateList.valueOf(iconBackgroundColor)
+        }
         val a = context.obtainStyledAttributes(
             attrs, R.styleable.ColorPaletteView, defStyleAttr, 0
         )

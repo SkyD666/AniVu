@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.RssFeed
-import androidx.compose.material.icons.filled.SmartDisplay
-import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material.icons.filled.TouchApp
+import androidx.compose.material.icons.outlined.Palette
+import androidx.compose.material.icons.outlined.RssFeed
+import androidx.compose.material.icons.outlined.SmartDisplay
+import androidx.compose.material.icons.outlined.SwapVert
+import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -60,7 +60,7 @@ fun SettingsScreen() {
         ) {
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(Icons.Default.Palette),
+                    icon = rememberVectorPainter(Icons.Outlined.Palette),
                     text = stringResource(id = R.string.appearance_fragment_name),
                     descriptionText = stringResource(id = R.string.appearance_fragment_description),
                     onClick = { navController.navigate(R.id.action_to_appearance_fragment) }
@@ -68,7 +68,7 @@ fun SettingsScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(Icons.Default.TouchApp),
+                    icon = rememberVectorPainter(Icons.Outlined.TouchApp),
                     text = stringResource(id = R.string.behavior_screen_name),
                     descriptionText = stringResource(id = R.string.behavior_screen_description),
                     onClick = { navController.navigate(R.id.action_to_behavior_fragment) }
@@ -76,7 +76,7 @@ fun SettingsScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(Icons.Default.RssFeed),
+                    icon = rememberVectorPainter(Icons.Outlined.RssFeed),
                     text = stringResource(id = R.string.rss_config_fragment_name),
                     descriptionText = stringResource(id = R.string.rss_config_fragment_description),
                     onClick = { navController.navigate(R.id.action_to_rss_config_fragment) }
@@ -84,7 +84,7 @@ fun SettingsScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(Icons.Default.SmartDisplay),
+                    icon = rememberVectorPainter(Icons.Outlined.SmartDisplay),
                     text = stringResource(id = R.string.player_config_fragment_name),
                     descriptionText = stringResource(id = R.string.player_config_fragment_description),
                     onClick = { navController.navigate(R.id.action_to_player_config_fragment) }
@@ -100,7 +100,7 @@ fun SettingsScreen() {
             }
             item {
                 BaseSettingsItem(
-                    icon = rememberVectorPainter(Icons.Default.SwapVert),
+                    icon = rememberVectorPainter(Icons.Outlined.SwapVert),
                     text = stringResource(id = R.string.transmission_fragment_name),
                     descriptionText = stringResource(id = R.string.transmission_fragment_description),
                     onClick = { navController.navigate(R.id.action_to_transmission_fragment) }

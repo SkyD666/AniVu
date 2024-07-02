@@ -5,8 +5,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -19,15 +22,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.outlined.ArrowUpward
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -35,8 +40,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -63,13 +70,19 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
+import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
+import com.skyd.anivu.model.bean.ArticleWithFeed
+import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.BackIcon
+import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Article1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Feed1Proxy
+import com.skyd.anivu.ui.local.LocalSearchListTonalElevation
+import com.skyd.anivu.ui.local.LocalSearchTopBarTonalElevation
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import java.io.Serializable
@@ -79,15 +92,11 @@ import java.io.Serializable
 class SearchFragment : BaseComposeFragment() {
     @kotlinx.serialization.Serializable
     sealed interface SearchDomain : Serializable {
-        data object All : SearchDomain {
-            private fun readResolve(): Any = All
-        }
-
         data object Feed : SearchDomain {
             private fun readResolve(): Any = Feed
         }
 
-        data class Article(val feedUrl: String?) : SearchDomain
+        data class Article(val feedUrls: List<String>) : SearchDomain
     }
 
     companion object {
@@ -96,7 +105,7 @@ class SearchFragment : BaseComposeFragment() {
 
     private val viewModel by viewModels<SearchViewModel>()
     private val searchDomain by lazy {
-        (arguments?.getSerializable(SEARCH_DOMAIN_KEY) as? SearchDomain) ?: SearchDomain.All
+        (arguments?.getSerializable(SEARCH_DOMAIN_KEY) as? SearchDomain) ?: SearchDomain.Feed
     }
 
     override fun onCreateView(
@@ -114,9 +123,10 @@ fun SearchScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
+    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    val searchResultListState = rememberLazyStaggeredGridState()
+    val searchResultListState = rememberLazyGridState()
     var fabHeight by remember { mutableStateOf(0.dp) }
     var fabWidth by remember { mutableStateOf(0.dp) }
 
@@ -124,23 +134,35 @@ fun SearchScreen(
         mutableStateOf(TextFieldValue(text = "", selection = TextRange(0)))
     }
 
-    val dispatch = viewModel.getDispatcher(startWith = SearchIntent.Init)
+    val dispatch = viewModel.getDispatcher(
+        startWith = when (searchDomain) {
+            SearchFragment.SearchDomain.Feed -> SearchIntent.ListenSearchFeed
+            is SearchFragment.SearchDomain.Article ->
+                SearchIntent.ListenSearchArticle(feedUrls = searchDomain.feedUrls)
+        }
+    )
 
     Scaffold(
         modifier = Modifier.imePadding(),
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            AnimatedVisibility(visible = searchResultListState.firstVisibleItemIndex > 2) {
+            AnimatedVisibility(
+                visible = remember {
+                    derivedStateOf { searchResultListState.firstVisibleItemIndex > 2 }
+                }.value,
+                enter = fadeIn(),
+                exit = fadeOut(),
+            ) {
                 AniVuFloatingActionButton(
                     onClick = { scope.launch { searchResultListState.animateScrollToItem(0) } },
                     onSizeWithSinglePaddingChanged = { width, height ->
                         fabWidth = width
                         fabHeight = height
                     },
-                    contentDescription = stringResource(R.string.search_screen_list_to_top),
+                    contentDescription = stringResource(R.string.to_top),
                 ) {
                     Icon(
-                        imageVector = Icons.Default.ArrowUpward,
+                        imageVector = Icons.Outlined.ArrowUpward,
                         contentDescription = null,
                     )
                 }
@@ -149,24 +171,23 @@ fun SearchScreen(
         topBar = {
             Column(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.background)
+                    .background(
+                        MaterialTheme.colorScheme.surfaceColorAtElevation(
+                            LocalSearchTopBarTonalElevation.current.dp
+                        )
+                    )
                     .windowInsetsPadding(
                         WindowInsets.systemBars
                             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
                     )
             ) {
                 SearchBarInputField(
-                    onQueryChange = { searchFieldValueState = it },
-                    query = searchFieldValueState,
-                    onSearch = { state ->
-                        keyboardController?.hide()
-                        searchFieldValueState = state
-                        doSearch(
-                            searchDomain = searchDomain,
-                            query = state.text,
-                            onSearch = { dispatch(it) },
-                        )
+                    onQueryChange = {
+                        searchFieldValueState = it
+                        dispatch(SearchIntent.UpdateQuery(it.text))
                     },
+                    query = searchFieldValueState,
+                    onSearch = { keyboardController?.hide() },
                     placeholder = { Text(text = stringResource(R.string.search_screen_hint)) },
                     leadingIcon = { BackIcon() },
                     trailingIcon = {
@@ -179,7 +200,12 @@ fun SearchScreen(
                 )
                 HorizontalDivider()
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+            LocalAbsoluteTonalElevation.current +
+                    LocalSearchListTonalElevation.current.dp
+        ),
+        contentColor = MaterialTheme.colorScheme.onSurface,
     ) { innerPaddings ->
         when (val searchResultState = uiState.searchResultState) {
             is SearchResultState.Failed -> Unit
@@ -187,8 +213,40 @@ fun SearchScreen(
             SearchResultState.Loading -> CircularProgressIndicator()
             is SearchResultState.Success -> SearchResultList(
                 result = searchResultState.result.collectAsLazyPagingItems(),
-                contentPadding = innerPaddings + PaddingValues(bottom = fabHeight),
+                listState = searchResultListState,
+                onFavorite = { articleWithFeed, favorite ->
+                    dispatch(
+                        SearchIntent.Favorite(
+                            articleId = articleWithFeed.articleWithEnclosure.article.articleId,
+                            favorite = favorite,
+                        )
+                    )
+                },
+                onRead = { articleWithFeed, read ->
+                    dispatch(
+                        SearchIntent.Read(
+                            articleId = articleWithFeed.articleWithEnclosure.article.articleId,
+                            read = read,
+                        )
+                    )
+                },
+                contentPadding = innerPaddings + PaddingValues(
+                    top = 4.dp,
+                    bottom = 4.dp + fabHeight,
+                ),
             )
+        }
+
+        WaitingDialog(visible = uiState.loadingDialog)
+
+        when (val event = uiEvent) {
+            is SearchEvent.FavoriteArticleResultEvent.Failed ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+
+            is SearchEvent.ReadArticleResultEvent.Failed ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+
+            null -> Unit
         }
     }
 }
@@ -197,32 +255,36 @@ fun SearchScreen(
 private fun SearchResultList(
     modifier: Modifier = Modifier,
     result: LazyPagingItems<Any>,
+    listState: LazyGridState,
+    onFavorite: (ArticleWithFeed, Boolean) -> Unit,
+    onRead: (ArticleWithFeed, Boolean) -> Unit,
     contentPadding: PaddingValues,
 ) {
     val adapter = remember {
-        LazyGridAdapter(mutableListOf(Feed1Proxy(), Article1Proxy()))
+        LazyGridAdapter(
+            mutableListOf(
+                Feed1Proxy(),
+                Article1Proxy(onFavorite = onFavorite, onRead = onRead),
+            )
+        )
     }
     AniVuLazyVerticalGrid(
         modifier = modifier,
-        columns = GridCells.Adaptive(250.dp),
+        columns = GridCells.Adaptive(360.dp),
         dataList = result,
+        listState = listState,
         adapter = adapter,
-        contentPadding = contentPadding,
+        contentPadding = contentPadding + PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        key = { _, item ->
+            when (item) {
+                is ArticleWithFeed -> item.articleWithEnclosure.article.articleId
+                is FeedViewBean -> item.feed.url
+                else -> item.hashCode()
+            }
+        },
     )
-}
-
-private fun doSearch(
-    searchDomain: SearchFragment.SearchDomain,
-    query: String,
-    onSearch: (SearchIntent) -> Unit,
-) {
-    when (searchDomain) {
-        SearchFragment.SearchDomain.All -> onSearch(SearchIntent.SearchAll(query = query))
-        SearchFragment.SearchDomain.Feed -> onSearch(SearchIntent.SearchFeed(query = query))
-        is SearchFragment.SearchDomain.Article -> {
-            onSearch(SearchIntent.SearchArticle(feedUrl = searchDomain.feedUrl, query = query))
-        }
-    }
 }
 
 @Composable
@@ -232,7 +294,7 @@ fun TrailingIcon(
 ) {
     if (showClearButton) {
         AniVuIconButton(
-            imageVector = Icons.Default.Clear,
+            imageVector = Icons.Outlined.Clear,
             contentDescription = stringResource(R.string.clear_input_text),
             onClick = { onClick?.invoke() }
         )
@@ -243,7 +305,7 @@ fun TrailingIcon(
 private fun SearchBarInputField(
     query: TextFieldValue,
     onQueryChange: (TextFieldValue) -> Unit,
-    onSearch: (TextFieldValue) -> Unit,
+    onSearch: () -> Unit,
     modifier: Modifier = Modifier,
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
@@ -264,14 +326,14 @@ private fun SearchBarInputField(
             unfocusedIndicatorColor = Color.Transparent,
             errorIndicatorColor = Color.Transparent,
             disabledIndicatorColor = Color.Transparent,
-            focusedContainerColor = MaterialTheme.colorScheme.surface,
-            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
         ),
         leadingIcon = leadingIcon,
         trailingIcon = trailingIcon,
         placeholder = placeholder,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = { onSearch(query) }),
+        keyboardActions = KeyboardActions(onSearch = { onSearch() }),
         interactionSource = interactionSource,
         singleLine = true,
         shape = RectangleShape,

@@ -6,7 +6,7 @@ import androidx.work.WorkerParameters
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.db.dao.ArticleDao
-import com.skyd.anivu.model.preference.autodelete.AutoDeleteArticleBeforePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors

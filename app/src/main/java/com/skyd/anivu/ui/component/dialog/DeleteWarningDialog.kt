@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.component.dialog
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -23,7 +23,7 @@ fun DeleteWarningDialog(
     AniVuDialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
-        icon = { Icon(imageVector = Icons.Default.Warning, contentDescription = null) },
+        icon = { Icon(imageVector = Icons.Outlined.Warning, contentDescription = null) },
         title = { Text(text = title) },
         text = if (text == null) null else {
             { Text(text = text) }

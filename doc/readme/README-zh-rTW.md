@@ -24,13 +24,13 @@
         </a>
     </p>
     <p>
-        <b>AniVu</b>，一個集<b> RSS 番劇訂閱與更新、BitTorrent下載、影片播放</b>為一體的工具。
+        <b>AniVu</b>，一個集<b> RSS 訂閱與更新、BitTorrent下載、影片播放</b>為一體的工具。
     </p>
     <p>
         使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架構，完全採用 <b><a href="https://m3.material.io/">Material You</a></b> 設計風格。使用 <b>Android View</b> 和 <b>Jetpack Compose</b> 混合開發。
     </p>
     <p>
-        <b><a href="../../README.md">English</a></b> | <b><a href="README-zh-rCN.md">中文</a></b> | <b>正體中文</b>
+        <b><a href="../../README.md">English</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="README-zh-rCN.md">中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b>正體中文</b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">幫助我們翻譯</a></b>
     </p>
 </div>
 
@@ -42,28 +42,30 @@
 3. **下載** RSS 文章中的 **BT 種子或磁力連結**附件（enclosure 標籤）
 4. 已下載**檔案做種**
 5. **播放**已下載的**影片檔案**
-6. **更改播放速度**、**長按**影片**倍速播放**
-7. **雙指旋轉縮放影片畫面**
+6. **更改播放速度**，設定**音軌**、**字幕軌**等
+7. **雙指旋轉縮放影片畫面**、**長按**影片**倍速播放**
 8. **滑動**調整**音量**、**螢幕亮度和播放位置**
 9. 支援**搜尋已獲取的 RSS 訂閱或文章**
 10. **播放**手機中的**其他影片**
-11. 支援**深色模式**
-12. ......
-
-## 🚧待實現
-
-1. **自動下載訂閱中的新影片**
-2. **自定義播放器配置**，例如：預設的畫面比例、播放器使用的 Surface type 等等
-3. **懸浮窗播放影片**
-4. **自動播放**下一個影片
+11. 支援**自訂 MPV** 播放器
+12. 支援透過 **OPML 匯入和匯出**訂閱
+13. 支援**深色模式**
+14. ......
 
 ## 🤩應用截圖
 
 <img src="../image/zh-rTW/ic_rss_fragment.jpg" alt="ic_rss_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_media_fragment.jpg" alt="ic_media_fragment" style="zoom:80%;" />
 <img src="../image/zh-rTW/ic_article_fragment.jpg" alt="ic_article_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_read_fragment.jpg" alt="ic_read_fragment" style="zoom:80%;" />
 <img src="../image/zh-rTW/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_setting_fragment.jpg" alt="ic_setting_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_appearance_fragment.jpg" alt="ic_appearance_fragment" style="zoom:80%;" />
 <img src="../image/zh-rTW/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
-<img src="../image/zh-rTW/ic_player_activity.png" alt="ic_player_activity" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_player_activity.jpg" alt="ic_player_activity" style="zoom:80%;" />
+
+## 🌏翻譯
+
+如果你有興趣，**請幫我們翻譯**，謝謝。
+
+<a title="Crowdin" target="_blank" href="https://crowdin.com/project/anivu"><img src="https://badges.crowdin.net/anivu/localized.svg"></a>
 
 ## 🛠主要技術棧
 
@@ -75,14 +77,18 @@
 - **Room**
 - **Paging 3**
 - **Hilt**
-- Media3 **ExoPlayer**
+- **MPV**
 - **WorkManager**
 - **DataStore**
 - Splash Screen
 - Navigation
 - Coil
 
-## ✨其他應用
+## ✨Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=SkyD666/AniVu)](https://star-history.com/?repos=SkyD666/AniVu#SkyD666/AniVu&Date)
+
+## 🎈其他應用
 
 <table>
 <thead>
