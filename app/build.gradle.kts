@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 18
-        versionName = "1.1-beta48"
+        versionName = "1.1-beta49"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -163,16 +163,16 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
-    implementation("androidx.compose.ui:ui:1.7.0-beta01")
-    implementation("androidx.compose.material:material:1.7.0-beta01")
-    implementation("androidx.compose.material3:material3:1.3.0-beta01")
-    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-beta01")
-    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta01")
-    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta01")
-    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta01")
-    implementation("androidx.compose.material:material-icons-extended:1.6.7")
-    implementation("com.materialkolor:material-kolor:1.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
+    implementation("androidx.compose.ui:ui:1.7.0-beta04")
+    implementation("androidx.compose.material:material:1.7.0-beta04")
+    implementation("androidx.compose.material3:material3:1.3.0-beta04")
+    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-beta04")
+    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta04")
+    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta04")
+    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta04")
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation("com.materialkolor:material-kolor:1.7.0")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-paging:2.6.1")
@@ -196,7 +196,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.1")
 
     implementation("com.github.aniyomiorg:aniyomi-mpv-lib:1.15.n")
@@ -219,6 +219,6 @@ dependencies {
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 }

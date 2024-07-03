@@ -1,5 +1,9 @@
 package com.skyd.anivu.ui.mpv.controller
 
+import android.content.Context
+import android.os.Build
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -28,10 +32,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.view.WindowInsetsControllerCompat
+import com.skyd.anivu.ext.tickVibrate
 import com.skyd.anivu.ui.component.rememberSystemUiController
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
@@ -80,6 +86,7 @@ internal fun PlayerController(
     var controllerHeight by remember { mutableIntStateOf(0) }
     var controllerLayoutCoordinates by remember { mutableStateOf<LayoutCoordinates?>(null) }
 
+    val context = LocalContext.current
     val view = LocalView.current
     val autoHideControllerRunnable = remember { Runnable { showController = false } }
     val cancelAutoHideControllerRunnable = { view.removeCallbacks(autoHideControllerRunnable) }
@@ -229,6 +236,18 @@ internal fun PlayerController(
             }
             // Long press speed preview
             if (isLongPressing) {
+                LaunchedEffect(Unit) {
+                    if (isLongPressing) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                            val vibratorManager =
+                                context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                            vibratorManager.defaultVibrator
+                        } else {
+                            @Suppress("DEPRECATION")
+                            context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                        }.tickVibrate()
+                    }
+                }
                 LongPressSpeedPreview(speed = { playState().speed })
             }
 
