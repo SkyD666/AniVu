@@ -68,12 +68,12 @@
     <string name="success_time_msg">操作成功：耗時 %.2f 秒</string>
     <string name="open_with">開啟方式</string>
     <string name="settings_screen_name">設定</string>
-    <string name="data_fragment_name">資料</string>
+    <string name="data_screen_name">資料</string>
     <string name="data_fragment_description">管理資料、檔案、快取等</string>
-    <string name="data_fragment_clear_cache">清空快取</string>
-    <string name="data_fragment_clear_cache_description">刪除遊離的下載臨時檔案、快取的 Torrent 檔案等資料</string>
+    <string name="data_screen_clear_cache">清空快取</string>
+    <string name="data_screen_clear_cache_description">刪除遊離的下載臨時檔案、快取的 Torrent 檔案等資料</string>
     <string name="data_fragment_data_cleared_size">%s 資料被刪除</string>
-    <string name="data_fragment_clear_cache_warning">確定要刪除這些快取嗎？</string>
+    <string name="data_screen_clear_cache_warning">確定要刪除這些快取嗎？</string>
     <string name="clear">清除</string>
     <string name="rss_config_fragment_name">RSS</string>
     <string name="rss_config_fragment_description">配置 RSS 等</string>
@@ -100,10 +100,10 @@
     <string name="proxy_fragment_type">型別</string>
     <string name="not_configure">未設定</string>
     <string name="configured">已設定</string>
-    <string name="data_fragment_delete_article_before">刪除之前的文章</string>
-    <string name="data_fragment_delete_article_before_description">刪除更新日期在指定日期之前的所有文章資料</string>
+    <string name="data_screen_delete_article_before">刪除之前的文章</string>
+    <string name="data_screen_delete_article_before_description">刪除更新日期在指定日期之前的所有文章資料</string>
     <string name="select_date">選擇日期</string>
-    <string name="data_fragment_clear_up_category">清理</string>
+    <string name="data_screen_clear_up_category">清理</string>
     <plurals name="data_fragment_deleted_count">
         <item quantity="other">刪除了 %d 項</item>
     </plurals>
@@ -230,7 +230,6 @@
     <string name="import_opml_conflict_strategy_replace">替換</string>
     <string name="import_opml_conflict_strategy_skip">跳過</string>
     <string name="import_opml_screen_opml_not_selected">請選擇一個 OPML 文件</string>
-    <string name="data_fragment_sync_category">同步</string>
     <string name="import_export_screen_description">透過 OPML 檔案匯入和匯出 RSS 資料</string>
     <string name="player_speed">速度</string>
     <string name="player_add_external_audio">添加音頻文件</string>

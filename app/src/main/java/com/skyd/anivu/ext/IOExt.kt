@@ -1,13 +1,17 @@
 package com.skyd.anivu.ext
 
 import android.content.ActivityNotFoundException
+import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.net.Uri
+import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.webkit.URLUtil
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.documentfile.provider.DocumentFile
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
 import com.skyd.anivu.ui.component.showToast
@@ -19,6 +23,7 @@ import java.io.InputStream
 import java.math.BigInteger
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
+import java.util.LinkedList
 
 
 fun Uri.copyTo(target: File): File {
@@ -88,6 +93,99 @@ private fun Uri.openChooser(context: Context, action: String, chooserTitle: Char
         e.printStackTrace()
         context.getString(R.string.failed_msg, e.message).showToast(Toast.LENGTH_LONG)
     }
+}
+
+fun Uri.toDocumentFile(context: Context, isTree: Boolean = false): DocumentFile? {
+    val uriString = toString()
+    return if (URLUtil.isFileUrl(uriString) || uriString.startsWith("/")) {
+        DocumentFile.fromFile(File(uriString))
+    } else {
+        if (isTree) DocumentFile.fromTreeUri(context, this)
+        else DocumentFile.fromSingleUri(context, this)
+    }
+}
+
+fun Uri.traverseDirectoryEntries(
+    contentResolver: ContentResolver,
+    projection: Array<String>,
+    onEach: (Uri, Cursor) -> Unit
+) {
+    var childrenUri = DocumentsContract.buildChildDocumentsUriUsingTree(
+        this,
+        DocumentsContract.getTreeDocumentId(this)
+    )
+
+    // Keep track of our directory hierarchy
+    val dirNodes: MutableList<Uri> = LinkedList()
+    dirNodes.add(childrenUri)
+
+    while (dirNodes.isNotEmpty()) {
+        childrenUri = dirNodes.removeAt(0) // get the item from top
+        contentResolver.query(
+            childrenUri,
+            (arrayOf(
+                DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+                DocumentsContract.Document.COLUMN_MIME_TYPE
+            ) + projection).distinct().toTypedArray(),
+            null,
+            null,
+            null
+        )?.use { c ->
+            while (c.moveToNext()) {
+                val docId = c.getString(0)
+                val mime = c.getString(1)
+                if (DocumentsContract.Document.MIME_TYPE_DIR == mime) {
+                    val newNode = DocumentsContract.buildChildDocumentsUriUsingTree(this, docId)
+                    dirNodes.add(newNode)
+                }
+                onEach(childrenUri, c)
+            }
+        }
+    }
+}
+
+fun Uri.listFiles(
+    contentResolver: ContentResolver,
+): List<Uri> {
+    val result = mutableListOf<Uri>()
+
+    contentResolver.query(
+        this,
+        arrayOf(DocumentsContract.Document.COLUMN_DOCUMENT_ID),
+        null,
+        null,
+        null
+    )?.use { c ->
+        while (c.moveToNext()) {
+            val docId = c.getString(0)
+            result.add(DocumentsContract.buildDocumentUriUsingTree(this, docId))
+        }
+    }
+
+    return result
+}
+
+/**
+ * Needs tree uri
+ */
+fun Uri.findFile(contentResolver: ContentResolver, name: String): Uri? {
+    contentResolver.query(
+        this,
+        arrayOf(
+            DocumentsContract.Document.COLUMN_DOCUMENT_ID,
+            DocumentsContract.Document.COLUMN_DISPLAY_NAME,
+        ),
+        null,
+        null,
+        null
+    )?.use { c ->
+        while (c.moveToNext()) {
+            val docId = c.getString(0)
+            if (name != c.getString(1)) continue
+            return DocumentsContract.buildDocumentUriUsingTree(this, docId)
+        }
+    }
+    return null
 }
 
 fun Uri.isLocal(): Boolean = URLUtil.isFileUrl(toString()) || URLUtil.isContentUrl(toString())

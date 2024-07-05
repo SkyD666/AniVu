@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 18
-        versionName = "1.1-beta49"
+        versionName = "1.1-beta50"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -136,8 +136,8 @@ composeCompiler {
 }
 
 tasks.withType(KotlinCompile::class.java).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += listOf(
+    compilerOptions {
+        freeCompilerArgs.addAll(
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
             "-opt-in=androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi",
             "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
@@ -150,6 +150,7 @@ tasks.withType(KotlinCompile::class.java).configureEach {
             "-opt-in=kotlinx.coroutines.FlowPreview",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
         )
     }
 }
@@ -186,10 +187,12 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.1")
 
     implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
     implementation("com.google.dagger:hilt-android:2.51.1")
     ksp("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:okhttp-coroutines-jvm:5.0.0-alpha.12")

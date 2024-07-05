@@ -14,12 +14,14 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,7 +34,11 @@ class DataViewModel @Inject constructor(
     init {
         val initialVS = DataState.initial()
 
-        viewState = intentSharedFlow
+        viewState = merge(
+            intentSharedFlow.filterIsInstance<DataIntent.Init>().take(1),
+            intentSharedFlow.filterNot { it is DataIntent.Init }
+        )
+            .shareWhileSubscribed()
             .toDataPartialStateChangeFlow()
             .debugLog("DataPartialStateChange")
             .sendSingleEvent()
@@ -83,6 +89,8 @@ class DataViewModel @Inject constructor(
 
     private fun SharedFlow<DataIntent>.toDataPartialStateChangeFlow(): Flow<DataPartialStateChange> {
         return merge(
+            filterIsInstance<DataIntent.Init>().map { DataPartialStateChange.Init },
+
             filterIsInstance<DataIntent.ClearCache>().flatMapConcat {
                 dataRepo.requestClearCache().map {
                     DataPartialStateChange.ClearCacheResult.Success(deletedSize = it)

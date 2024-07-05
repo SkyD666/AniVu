@@ -10,6 +10,10 @@ internal sealed interface DataPartialStateChange {
         }
     }
 
+    data object Init : DataPartialStateChange {
+        override fun reduce(oldState: DataState) = oldState
+    }
+
     sealed interface ClearCacheResult : DataPartialStateChange {
         override fun reduce(oldState: DataState): DataState {
             return when (this) {

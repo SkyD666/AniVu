@@ -1,29 +1,18 @@
 package com.skyd.anivu.model.bean
 
-import android.content.Context
-import android.os.Parcelable
 import com.skyd.anivu.base.BaseBean
-import com.skyd.anivu.ext.toUri
-import kotlinx.parcelize.IgnoredOnParcel
-import kotlinx.parcelize.Parcelize
+import com.skyd.anivu.ext.getMimeType
 import java.io.File
 
-@Parcelize
 data class VideoBean(
+    val displayName: String? = null,
     val file: File,
-) : BaseBean, Parcelable {
-    fun isMedia(context: Context): Boolean = context.contentResolver
-        .getType(file.toUri(context))?.startsWith("video/") == true
-
-    @IgnoredOnParcel
-    val name: String = file.name.orEmpty()
-
-    @IgnoredOnParcel
-    val size: Long = file.length()
-
-    @IgnoredOnParcel
-    val date: Long = file.lastModified()
-
-    @IgnoredOnParcel
+) : BaseBean {
+    var name: String = file.name
+    var mimetype: String = file.getMimeType() ?: "*/*"
+    var size: Long = file.length()
+    var date: Long = file.lastModified()
+    val isMedia: Boolean = mimetype.startsWith("video/") || mimetype.startsWith("audio/")
     val isDir: Boolean = file.isDirectory
+    val isFile: Boolean = file.isFile
 }

@@ -93,7 +93,7 @@ fun SettingsScreen() {
             item {
                 BaseSettingsItem(
                     icon = painterResource(id = R.drawable.ic_database_24),
-                    text = stringResource(id = R.string.data_fragment_name),
+                    text = stringResource(id = R.string.data_screen_name),
                     descriptionText = stringResource(id = R.string.data_fragment_description),
                     onClick = { navController.navigate(R.id.action_to_data_fragment) }
                 )

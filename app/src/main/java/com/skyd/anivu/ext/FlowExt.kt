@@ -22,7 +22,10 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
 fun <T> Flow<T>.catchMap(transform: FlowCollector<T>.(Throwable) -> T): Flow<T> =
-    catch { emit(transform(it)) }
+    catch {
+        it.printStackTrace()
+        emit(transform(it))
+    }
 
 fun <T> concat(flow1: Flow<T>, flow2: Flow<T>): Flow<T> = flow {
     emitAll(flow1)

@@ -51,9 +51,41 @@ class MediaViewModel @Inject constructor(
     private fun Flow<MediaPartialStateChange>.sendSingleEvent(): Flow<MediaPartialStateChange> {
         return onEach { change ->
             val event = when (change) {
-                is MediaPartialStateChange.DeleteUriResult.Failed -> {
-                    MediaEvent.DeleteUriResultEvent.Failed(change.msg)
-                }
+                is MediaPartialStateChange.MediaListResult.Failed ->
+                    MediaEvent.MediaListResultEvent.Failed(change.msg)
+
+                is MediaPartialStateChange.DeleteFileResult.Failed ->
+                    MediaEvent.DeleteFileResultEvent.Failed(change.msg)
+
+                is MediaPartialStateChange.DeleteGroup.Failed ->
+                    MediaEvent.DeleteGroupResultEvent.Failed(change.msg)
+
+                is MediaPartialStateChange.DeleteGroup.Success ->
+                    MediaEvent.DeleteGroupResultEvent.Success(System.currentTimeMillis())
+
+                is MediaPartialStateChange.MoveFilesToGroup.Failed ->
+                    MediaEvent.MoveFilesToGroupResultEvent.Failed(change.msg)
+
+                is MediaPartialStateChange.MoveFilesToGroup.Success ->
+                    MediaEvent.MoveFilesToGroupResultEvent.Success(System.currentTimeMillis())
+
+                is MediaPartialStateChange.ChangeMediaGroup.Failed ->
+                    MediaEvent.ChangeFileGroupResultEvent.Failed(change.msg)
+
+                is MediaPartialStateChange.ChangeMediaGroup.Success ->
+                    MediaEvent.ChangeFileGroupResultEvent.Success(System.currentTimeMillis())
+
+                is MediaPartialStateChange.CreateGroup.Failed ->
+                    MediaEvent.CreateGroupResultEvent.Failed(change.msg)
+
+                is MediaPartialStateChange.CreateGroup.Success ->
+                    MediaEvent.CreateGroupResultEvent.Success(System.currentTimeMillis())
+
+                is MediaPartialStateChange.EditGroup.Failed ->
+                    MediaEvent.EditGroupResultEvent.Failed(change.msg)
+
+                is MediaPartialStateChange.EditGroup.Success ->
+                    MediaEvent.EditGroupResultEvent.Success(change.group)
 
                 else -> return@onEach
             }
@@ -69,15 +101,59 @@ class MediaViewModel @Inject constructor(
             ).flatMapConcat { intent ->
                 val path = if (intent is MediaIntent.Init) intent.path
                 else (intent as MediaIntent.Refresh).path
-                mediaRepo.requestMedias(path = path!!).map {
+                val isMediaLibRoot = if (intent is MediaIntent.Init) intent.isMediaLibRoot
+                else (intent as MediaIntent.Refresh).isMediaLibRoot
+                mediaRepo.requestMedias(uriPath = path!!, isMediaLibRoot = isMediaLibRoot).map {
                     MediaPartialStateChange.MediaListResult.Success(list = it)
                 }.startWith(MediaPartialStateChange.MediaListResult.Loading)
+                    .catchMap { MediaPartialStateChange.MediaListResult.Failed(it.message.toString()) }
             },
             filterIsInstance<MediaIntent.Delete>().flatMapConcat { intent ->
                 mediaRepo.requestDelete(intent.file).map {
-                    MediaPartialStateChange.DeleteUriResult.Success(file = intent.file)
+                    MediaPartialStateChange.DeleteFileResult.Success(file = intent.file)
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
-                    .catchMap { MediaPartialStateChange.DeleteUriResult.Failed(it.message.toString()) }
+                    .catchMap { MediaPartialStateChange.DeleteFileResult.Failed(it.message.toString()) }
+            },
+            filterIsInstance<MediaIntent.DeleteGroup>().filterNot {
+                it.path.isNullOrBlank()
+            }.flatMapConcat { intent ->
+                mediaRepo.requestDeleteGroup(intent.path!!, intent.group).map {
+                    MediaPartialStateChange.DeleteGroup.Success
+                }.startWith(MediaPartialStateChange.LoadingDialog.Show)
+                    .catchMap { MediaPartialStateChange.DeleteGroup.Failed(it.message.toString()) }
+            },
+            filterIsInstance<MediaIntent.ChangeMediaGroup>().filterNot {
+                it.path.isNullOrBlank()
+            }.flatMapConcat { intent ->
+                mediaRepo.requestChangeMediaGroup(intent.path!!, intent.videoBean, intent.group)
+                    .map {
+                        MediaPartialStateChange.ChangeMediaGroup.Success
+                    }.startWith(MediaPartialStateChange.LoadingDialog.Show)
+                    .catchMap { MediaPartialStateChange.ChangeMediaGroup.Failed(it.message.toString()) }
+            },
+            filterIsInstance<MediaIntent.CreateGroup>().filterNot {
+                it.path.isNullOrBlank()
+            }.flatMapConcat { intent ->
+                mediaRepo.requestCreateGroup(intent.path!!, intent.group).map {
+                    MediaPartialStateChange.CreateGroup.Success
+                }.startWith(MediaPartialStateChange.LoadingDialog.Show)
+                    .catchMap { MediaPartialStateChange.CreateGroup.Failed(it.message.toString()) }
+            },
+            filterIsInstance<MediaIntent.MoveFilesToGroup>().filterNot {
+                it.path.isNullOrBlank()
+            }.flatMapConcat { intent ->
+                mediaRepo.requestMoveFilesToGroup(intent.path!!, intent.from, intent.to).map {
+                    MediaPartialStateChange.MoveFilesToGroup.Success
+                }.startWith(MediaPartialStateChange.LoadingDialog.Show)
+                    .catchMap { MediaPartialStateChange.MoveFilesToGroup.Failed(it.message.toString()) }
+            },
+            filterIsInstance<MediaIntent.RenameGroup>().filterNot {
+                it.path.isNullOrBlank()
+            }.flatMapConcat { intent ->
+                mediaRepo.requestRenameGroup(intent.path!!, intent.group, intent.newName).map {
+                    MediaPartialStateChange.EditGroup.Success(it)
+                }.startWith(MediaPartialStateChange.LoadingDialog.Show)
+                    .catchMap { MediaPartialStateChange.EditGroup.Failed(it.message.toString()) }
             },
         )
     }

@@ -16,7 +16,7 @@ data class MediaState(
 }
 
 sealed class MediaListState(open val loading: Boolean) {
-    data class Success(val list: List<VideoBean>, override val loading: Boolean = false) :
+    data class Success(val list: List<Any>, override val loading: Boolean = false) :
         MediaListState(loading)
 
     data class Init(override val loading: Boolean = false) : MediaListState(loading)

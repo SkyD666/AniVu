@@ -29,6 +29,7 @@ import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequencyPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
+import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
@@ -90,3 +91,4 @@ val LocalAutoDeleteArticleFrequency =
     compositionLocalOf { AutoDeleteArticleFrequencyPreference.default }
 val LocalAutoDeleteArticleBefore = compositionLocalOf { AutoDeleteArticleBeforePreference.default }
 val LocalOpmlExportDir = compositionLocalOf { OpmlExportDirPreference.default }
+val LocalMediaLibLocation = compositionLocalOf { MediaLibLocationPreference.default }

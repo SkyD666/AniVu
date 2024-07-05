@@ -33,6 +33,7 @@ import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequencyPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
+import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
@@ -54,6 +55,7 @@ import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalHardwareDecode
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
+import com.skyd.anivu.ui.local.LocalMediaLibLocation
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalOpmlExportDir
 import com.skyd.anivu.ui.local.LocalPickImageMethod
@@ -106,6 +108,7 @@ data class Settings(
     val autoDeleteArticleFrequency: Long = AutoDeleteArticleFrequencyPreference.default,
     val autoDeleteArticleBefore: Long = AutoDeleteArticleBeforePreference.default,
     val opmlExportDir: String = OpmlExportDirPreference.default,
+    val mediaLibLocation: String = MediaLibLocationPreference.default,
 )
 
 @Composable
@@ -152,6 +155,7 @@ fun SettingsProvider(
         LocalAutoDeleteArticleFrequency provides settings.autoDeleteArticleFrequency,
         LocalAutoDeleteArticleBefore provides settings.autoDeleteArticleBefore,
         LocalOpmlExportDir provides settings.opmlExportDir,
+        LocalMediaLibLocation provides settings.mediaLibLocation,
     ) {
         content()
     }

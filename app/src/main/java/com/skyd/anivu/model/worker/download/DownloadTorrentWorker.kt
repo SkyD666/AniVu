@@ -36,6 +36,7 @@ import com.skyd.anivu.model.bean.download.PeerInfoBean
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
 import com.skyd.anivu.model.db.dao.TorrentFileDao
+import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 import com.skyd.anivu.model.repository.DownloadRepository
 import com.skyd.anivu.model.service.HttpService
@@ -147,8 +148,13 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private var sessionIsStopping: Boolean = false
     private suspend fun workerDownload(
-        saveDir: File = if (tempDownloadingDirName.isNullOrBlank()) Const.DOWNLOADING_VIDEO_DIR
-        else File(Const.DOWNLOADING_VIDEO_DIR, tempDownloadingDirName!!)
+        saveDir: File = applicationContext.dataStore.getOrDefault(MediaLibLocationPreference).let {
+            if (tempDownloadingDirName.isNullOrBlank()) {
+                File(it)
+            } else {
+                File(it, tempDownloadingDirName!!)
+            }
+        }
     ) = suspendCancellableCoroutine { continuation ->
 
         if (!saveDir.exists() && !saveDir.mkdirs()) {
@@ -505,11 +511,11 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     }
 
     private fun moveFromDownloadingDirToVideoDir(handle: TorrentHandle) {
-        if (handle.savePath() != Const.VIDEO_DIR.path) {
-            handle.moveStorage(Const.VIDEO_DIR.path, MoveFlags.ALWAYS_REPLACE_FILES)
-        } else {
-            Log.w(TAG, "handle.savePath() != Const.VIDEO_DIR.path: ${handle.savePath()}")
-        }
+//        if (handle.savePath() != Const.VIDEO_DIR.path) {
+//            handle.moveStorage(Const.VIDEO_DIR.path, MoveFlags.ALWAYS_REPLACE_FILES)
+//        } else {
+//            Log.w(TAG, "handle.savePath() != Const.VIDEO_DIR.path: ${handle.savePath()}")
+//        }
     }
 
     companion object {
