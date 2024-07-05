@@ -68,12 +68,12 @@
     <string name="success_time_msg">操作成功：耗时 %.2f 秒</string>
     <string name="open_with">打开方式</string>
     <string name="settings_screen_name">设置</string>
-    <string name="data_fragment_name">数据</string>
+    <string name="data_screen_name">数据</string>
     <string name="data_fragment_description">管理数据、文件、缓存等</string>
-    <string name="data_fragment_clear_cache">清空缓存</string>
-    <string name="data_fragment_clear_cache_description">删除游离的下载临时文件、缓存的 Torrent 文件等数据</string>
+    <string name="data_screen_clear_cache">清空缓存</string>
+    <string name="data_screen_clear_cache_description">删除游离的下载临时文件、缓存的 Torrent 文件等数据</string>
     <string name="data_fragment_data_cleared_size">%s 数据被删除</string>
-    <string name="data_fragment_clear_cache_warning">确定要删除这些缓存吗？</string>
+    <string name="data_screen_clear_cache_warning">确定要删除这些缓存吗？</string>
     <string name="clear">清除</string>
     <string name="rss_config_fragment_name">RSS</string>
     <string name="rss_config_fragment_description">配置 RSS 同步、解析规则等</string>
@@ -100,10 +100,10 @@
     <string name="proxy_fragment_type">类型</string>
     <string name="not_configure">未设置</string>
     <string name="configured">已设置</string>
-    <string name="data_fragment_delete_article_before">删除之前的文章</string>
-    <string name="data_fragment_delete_article_before_description">删除更新日期在指定日期之前的所有文章数据</string>
+    <string name="data_screen_delete_article_before">删除之前的文章</string>
+    <string name="data_screen_delete_article_before_description">删除更新日期在指定日期之前的所有文章数据</string>
     <string name="select_date">选择日期</string>
-    <string name="data_fragment_clear_up_category">清理</string>
+    <string name="data_screen_clear_up_category">清理</string>
     <plurals name="data_fragment_deleted_count">
         <item quantity="other">删除了 %d 项</item>
     </plurals>
@@ -172,6 +172,7 @@
     <string name="behavior_screen_article_swipe_right_action">右滑</string>
     <string name="to_top">到顶部</string>
     <string name="default_feed_group">默认</string>
+    <string name="default_media_group">默认</string>
     <string name="feed_group">分组</string>
     <string name="feed_screen_add_group">添加分组</string>
     <string name="feed_screen_group_feeds_move_to">移动到组</string>
@@ -230,7 +231,7 @@
     <string name="import_opml_conflict_strategy_replace">覆盖</string>
     <string name="import_opml_conflict_strategy_skip">跳过</string>
     <string name="import_opml_screen_opml_not_selected">请选择一个 OPML 文件</string>
-    <string name="data_fragment_sync_category">同步</string>
+    <string name="data_screen_sync_category">同步</string>
     <string name="import_export_screen_description">通过 OPML 文件来导入与导出订阅数据</string>
     <string name="player_speed">速度</string>
     <string name="player_add_external_audio">添加音频文件</string>
@@ -283,6 +284,21 @@
     <string name="article_action_switch_read_state">切换已读状态</string>
     <string name="article_action_switch_favorite_state">切换收藏状态</string>
     <string name="none">无</string>
+    <string name="data_screen_media_lib_category">媒体库</string>
+    <string name="data_screen_media_lib_location">存储位置</string>
+    <string name="storage_permission_request_screen_first_tip">资源下载与媒体浏览需要存储权限，请授予权限。</string>
+    <string name="storage_permission_request_screen_rationale">没有存储权限无法运行应用程序，请授予权限。</string>
+    <string name="storage_permission_request_screen_title">AniVu 需要存储访问</string>
+    <string name="storage_permission_request_screen_request_permission">授予权限</string>
+    <string name="file_picker_screen_name">文件选择器</string>
+    <string name="file_picker_screen_pick">选择此文件夹</string>
+    <string name="file_picker_screen_internal_storage">内部存储</string>
+    <string name="media_screen_delete_file_warning">删除此文件？</string>
+    <string name="media_options">选项</string>
+    <string name="media_group">分组</string>
+    <string name="media_screen_add_group">添加分组</string>
+    <string name="media_screen_group_media_move_to">移动到</string>
+    <string name="media_screen_delete_group_warning">删除“%s”分组及其包含的所有文件和文件夹</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>
