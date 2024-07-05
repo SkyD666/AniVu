@@ -68,12 +68,12 @@
     <string name="success_time_msg">操作成功：耗時 %.2f 秒</string>
     <string name="open_with">開啟方式</string>
     <string name="settings_screen_name">設定</string>
-    <string name="data_fragment_name">資料</string>
+    <string name="data_screen_name">資料</string>
     <string name="data_fragment_description">管理資料、檔案、快取等</string>
-    <string name="data_fragment_clear_cache">清空快取</string>
-    <string name="data_fragment_clear_cache_description">刪除遊離的下載臨時檔案、快取的 Torrent 檔案等資料</string>
+    <string name="data_screen_clear_cache">清空快取</string>
+    <string name="data_screen_clear_cache_description">刪除遊離的下載臨時檔案、快取的 Torrent 檔案等資料</string>
     <string name="data_fragment_data_cleared_size">%s 資料被刪除</string>
-    <string name="data_fragment_clear_cache_warning">確定要刪除這些快取嗎？</string>
+    <string name="data_screen_clear_cache_warning">確定要刪除這些快取嗎？</string>
     <string name="clear">清除</string>
     <string name="rss_config_fragment_name">RSS</string>
     <string name="rss_config_fragment_description">配置 RSS 等</string>
@@ -100,10 +100,10 @@
     <string name="proxy_fragment_type">型別</string>
     <string name="not_configure">未設定</string>
     <string name="configured">已設定</string>
-    <string name="data_fragment_delete_article_before">刪除之前的文章</string>
-    <string name="data_fragment_delete_article_before_description">刪除更新日期在指定日期之前的所有文章資料</string>
+    <string name="data_screen_delete_article_before">刪除之前的文章</string>
+    <string name="data_screen_delete_article_before_description">刪除更新日期在指定日期之前的所有文章資料</string>
     <string name="select_date">選擇日期</string>
-    <string name="data_fragment_clear_up_category">清理</string>
+    <string name="data_screen_clear_up_category">清理</string>
     <plurals name="data_fragment_deleted_count">
         <item quantity="other">刪除了 %d 項</item>
     </plurals>
@@ -172,6 +172,7 @@
     <string name="behavior_screen_article_swipe_right_action">右滑</string>
     <string name="to_top">到頂部</string>
     <string name="default_feed_group">預設</string>
+    <string name="default_media_group">Default</string>
     <string name="feed_group">分組</string>
     <string name="feed_screen_add_group">新增分組</string>
     <string name="feed_screen_group_feeds_move_to">移動到組</string>
@@ -230,7 +231,7 @@
     <string name="import_opml_conflict_strategy_replace">替換</string>
     <string name="import_opml_conflict_strategy_skip">跳過</string>
     <string name="import_opml_screen_opml_not_selected">請選擇一個 OPML 文件</string>
-    <string name="data_fragment_sync_category">同步</string>
+    <string name="data_screen_sync_category">Sync</string>
     <string name="import_export_screen_description">透過 OPML 檔案匯入和匯出 RSS 資料</string>
     <string name="player_speed">速度</string>
     <string name="player_add_external_audio">添加音頻文件</string>
@@ -283,6 +284,21 @@
     <string name="article_action_switch_read_state">切換已讀狀態</string>
     <string name="article_action_switch_favorite_state">切換收藏狀態</string>
     <string name="none">無</string>
+    <string name="data_screen_media_lib_category">Media library</string>
+    <string name="data_screen_media_lib_location">Storage location</string>
+    <string name="storage_permission_request_screen_first_tip">Resource download and media browsing require storage permission, please grant the permission.</string>
+    <string name="storage_permission_request_screen_rationale">Application can\'t be launched without storage permission, please grant the permission</string>
+    <string name="storage_permission_request_screen_title">AniVu requires storage access</string>
+    <string name="storage_permission_request_screen_request_permission">Request permission</string>
+    <string name="file_picker_screen_name">File picker</string>
+    <string name="file_picker_screen_pick">Pick this folder</string>
+    <string name="file_picker_screen_internal_storage">Internal storage</string>
+    <string name="media_screen_delete_file_warning">Delete this file?</string>
+    <string name="media_options">Options</string>
+    <string name="media_group">Group</string>
+    <string name="media_screen_add_group">Add group</string>
+    <string name="media_screen_group_media_move_to">Move to</string>
+    <string name="media_screen_delete_group_warning">Delete the \"%s\" group and all the files it contains</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已讀 %d 項</item>
     </plurals>
