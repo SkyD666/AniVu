@@ -299,6 +299,8 @@
     <string name="media_screen_add_group">新增分組</string>
     <string name="media_screen_group_media_move_to">移動</string>
     <string name="media_screen_delete_group_warning">刪除“%s”分組及其所有檔案</string>
+    <string name="min_width_dp">Min width (dp)</string>
+    <string name="search_style_screen_search_item_category">Search item</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已讀 %d 項</item>
     </plurals>
