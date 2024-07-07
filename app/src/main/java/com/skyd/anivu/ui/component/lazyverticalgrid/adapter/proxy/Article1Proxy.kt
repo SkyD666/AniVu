@@ -2,6 +2,7 @@ package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Parcelable
 import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -90,7 +91,7 @@ import com.skyd.anivu.ui.local.LocalArticleSwipeRightAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalNavController
-import java.io.Serializable
+import kotlinx.parcelize.Parcelize
 
 class Article1Proxy(
     private val onFavorite: (ArticleWithFeed, Boolean) -> Unit,
@@ -102,6 +103,17 @@ class Article1Proxy(
     }
 }
 
+/**
+ * SwipeToDismissBoxState doesn't recompose,
+ * so we need to pass in a "variable" that points to an object that doesn't change,
+ * hence the need to wrap the data (DataWrapper).
+ * When the data changes, we only change the fields inside the DataWrapper object,
+ * which ensures that SwipeToDismissBoxState gets the latest data from the DataWrapper object.
+ */
+@Parcelize
+private class DataWrapper(
+    var data: ArticleWithFeed
+) : Parcelable
 
 @Composable
 fun Article1Item(
@@ -112,17 +124,6 @@ fun Article1Item(
     val navController = LocalNavController.current
     val context = LocalContext.current
     var expandMenu by rememberSaveable { mutableStateOf(false) }
-
-    /**
-     * SwipeToDismissBoxState doesn't recompose,
-     * so we need to pass in a "variable" that points to an object that doesn't change,
-     * hence the need to wrap the data (DataWrapper).
-     * When the data changes, we only change the fields inside the DataWrapper object,
-     * which ensures that SwipeToDismissBoxState gets the latest data from the DataWrapper object.
-     */
-    class DataWrapper(
-        var data: ArticleWithFeed
-    ) : Serializable
 
     val dataWrapper = rememberSaveable { DataWrapper(data) }
     LaunchedEffect(data) { dataWrapper.data = data }
