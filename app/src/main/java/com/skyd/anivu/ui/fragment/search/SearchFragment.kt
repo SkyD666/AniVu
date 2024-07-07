@@ -81,6 +81,7 @@ import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Article1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Feed1Proxy
+import com.skyd.anivu.ui.local.LocalSearchItemMinWidth
 import com.skyd.anivu.ui.local.LocalSearchListTonalElevation
 import com.skyd.anivu.ui.local.LocalSearchTopBarTonalElevation
 import dagger.hilt.android.AndroidEntryPoint
@@ -270,7 +271,7 @@ private fun SearchResultList(
     }
     AniVuLazyVerticalGrid(
         modifier = modifier,
-        columns = GridCells.Adaptive(360.dp),
+        columns = GridCells.Adaptive(LocalSearchItemMinWidth.current.dp),
         dataList = result,
         listState = listState,
         adapter = adapter,

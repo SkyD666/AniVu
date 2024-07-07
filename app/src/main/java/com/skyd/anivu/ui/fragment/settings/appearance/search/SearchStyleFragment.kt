@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Tonality
+import androidx.compose.material.icons.outlined.WidthNormal
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -25,13 +26,16 @@ import androidx.compose.ui.res.stringResource
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.model.preference.appearance.feed.TonalElevationPreferenceUtil
+import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
+import com.skyd.anivu.ui.fragment.settings.appearance.article.ItemMinWidthDialog
 import com.skyd.anivu.ui.fragment.settings.appearance.feed.TonalElevationDialog
+import com.skyd.anivu.ui.local.LocalSearchItemMinWidth
 import com.skyd.anivu.ui.local.LocalSearchListTonalElevation
 import com.skyd.anivu.ui.local.LocalSearchTopBarTonalElevation
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,6 +67,7 @@ fun SearchStyleScreen() {
     ) { paddingValues ->
         var openTopBarTonalElevationDialog by rememberSaveable { mutableStateOf(false) }
         var openSearchListTonalElevationDialog by rememberSaveable { mutableStateOf(false) }
+        var openSearchItemMinWidthDialog by rememberSaveable { mutableStateOf(false) }
 
         LazyColumn(
             modifier = Modifier
@@ -96,6 +101,17 @@ fun SearchStyleScreen() {
                     onClick = { openSearchListTonalElevationDialog = true }
                 )
             }
+            item {
+                CategorySettingsItem(text = stringResource(id = R.string.search_style_screen_search_item_category))
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(Icons.Outlined.WidthNormal),
+                    text = stringResource(id = R.string.min_width_dp),
+                    descriptionText = "${LocalSearchItemMinWidth.current} dp",
+                    onClick = { openSearchItemMinWidthDialog = true }
+                )
+            }
         }
 
         if (openTopBarTonalElevationDialog) {
@@ -125,6 +141,21 @@ fun SearchStyleScreen() {
                         value = it,
                     )
                     openSearchListTonalElevationDialog = false
+                }
+            )
+        }
+        if (openSearchItemMinWidthDialog) {
+            ItemMinWidthDialog(
+                onDismissRequest = { openSearchItemMinWidthDialog = false },
+                initValue = LocalSearchItemMinWidth.current,
+                defaultValue = { SearchItemMinWidthPreference.default },
+                onConfirm = {
+                    SearchItemMinWidthPreference.put(
+                        context = context,
+                        scope = scope,
+                        value = it,
+                    )
+                    openSearchItemMinWidthDialog = false
                 }
             )
         }

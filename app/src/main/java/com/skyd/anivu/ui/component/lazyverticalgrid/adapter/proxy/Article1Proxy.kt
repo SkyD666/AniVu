@@ -39,6 +39,7 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -81,7 +82,6 @@ import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreferen
 import com.skyd.anivu.ui.component.AniVuImage
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
-import com.skyd.anivu.ui.component.rememberSwipeToDismissBoxState
 import com.skyd.anivu.ui.fragment.read.EnclosureBottomSheet
 import com.skyd.anivu.ui.fragment.read.ReadFragment
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
@@ -90,6 +90,7 @@ import com.skyd.anivu.ui.local.LocalArticleSwipeRightAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalNavController
+import java.io.Serializable
 
 class Article1Proxy(
     private val onFavorite: (ArticleWithFeed, Boolean) -> Unit,
@@ -101,6 +102,7 @@ class Article1Proxy(
     }
 }
 
+
 @Composable
 fun Article1Item(
     data: ArticleWithFeed,
@@ -109,11 +111,23 @@ fun Article1Item(
 ) {
     val navController = LocalNavController.current
     val context = LocalContext.current
-    val articleWithEnclosure = data.articleWithEnclosure
     var expandMenu by rememberSaveable { mutableStateOf(false) }
 
+    /**
+     * SwipeToDismissBoxState doesn't recompose,
+     * so we need to pass in a "variable" that points to an object that doesn't change,
+     * hence the need to wrap the data (DataWrapper).
+     * When the data changes, we only change the fields inside the DataWrapper object,
+     * which ensures that SwipeToDismissBoxState gets the latest data from the DataWrapper object.
+     */
+    class DataWrapper(
+        var data: ArticleWithFeed
+    ) : Serializable
+
+    val dataWrapper = rememberSaveable { DataWrapper(data) }
+    LaunchedEffect(data) { dataWrapper.data = data }
+
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
-        inputs = arrayOf(data),
         confirmValueChange = { dismissValue ->
             val articleSwipeAction = context.dataStore.getOrDefault(
                 if (dismissValue == SwipeToDismissBoxValue.StartToEnd) {
@@ -124,14 +138,17 @@ fun Article1Item(
             )
             when (dismissValue) {
                 SwipeToDismissBoxValue.EndToStart, SwipeToDismissBoxValue.StartToEnd -> {
+                    val articleWithEnclosure = dataWrapper.data.articleWithEnclosure
                     swipeAction(
                         articleSwipeAction = articleSwipeAction,
                         context = context,
                         navController = navController,
                         data = articleWithEnclosure,
-                        onMarkAsRead = { onRead(data, !data.articleWithEnclosure.article.isRead) },
+                        onMarkAsRead = {
+                            onRead(dataWrapper.data, !articleWithEnclosure.article.isRead)
+                        },
                         onMarkAsFavorite = {
-                            onFavorite(data, !data.articleWithEnclosure.article.isFavorite)
+                            onFavorite(dataWrapper.data, !articleWithEnclosure.article.isFavorite)
                         },
                     )
                 }

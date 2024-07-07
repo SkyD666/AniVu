@@ -80,6 +80,7 @@ import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Article1Proxy
 import com.skyd.anivu.ui.fragment.search.SearchFragment
+import com.skyd.anivu.ui.local.LocalArticleItemMinWidth
 import com.skyd.anivu.ui.local.LocalArticleListTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalNavController
@@ -368,7 +369,7 @@ private fun ArticleList(
     }
     AniVuLazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
-        columns = GridCells.Adaptive(360.dp),
+        columns = GridCells.Adaptive(LocalArticleItemMinWidth.current.dp),
         dataList = articles,
         listState = listState,
         adapter = adapter,

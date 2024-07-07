@@ -54,6 +54,7 @@ class Enclosure1Proxy(
             }
             doIfMagnetOrTorrentLink(
                 link = data.url,
+                mimetype = data.type,
                 onSupported = {
                     btnEnclosure1Download.visible()
                     btnEnclosure1Download.setOnClickListener {

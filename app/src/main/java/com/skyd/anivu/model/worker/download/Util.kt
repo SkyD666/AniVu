@@ -36,22 +36,45 @@ import java.io.FileOutputStream
 import java.io.IOException
 
 
+fun isTorrentMimetype(mimetype: String?): Boolean {
+    return Regex("^application(s)?/x-bittorrent$").matches(mimetype.orEmpty())
+}
+
 fun doIfMagnetOrTorrentLink(
     link: String,
+    mimetype: String? = null,
     onMagnet: ((String) -> Unit)? = null,
     onTorrent: ((String) -> Unit)? = null,
     onSupported: ((String) -> Unit)? = null,
     onUnsupported: ((String) -> Unit)? = null,
 ) {
+    ifMagnetLink(
+        link = link,
+        onMagnet = {
+            onMagnet?.invoke(link)
+            onSupported?.invoke(link)
+        },
+        onUnsupported = {
+            if (
+                isTorrentMimetype(mimetype) ||
+                Regex("^(http|https)://.*\\.torrent$").matches(link)
+            ) {
+                onTorrent?.invoke(link)
+                onSupported?.invoke(link)
+            } else {
+                onUnsupported?.invoke(link)
+            }
+        },
+    )
+}
+
+fun ifMagnetLink(
+    link: String,
+    onMagnet: ((String) -> Unit)? = null,
+    onUnsupported: ((String) -> Unit)? = null,
+) {
     if (link.startsWith("magnet:")) {
         onMagnet?.invoke(link)
-        onSupported?.invoke(link)
-    } else if (
-        (link.startsWith("http:") || link.startsWith("https:")) &&
-        link.endsWith(".torrent")
-    ) {
-        onTorrent?.invoke(link)
-        onSupported?.invoke(link)
     } else {
         onUnsupported?.invoke(link)
     }

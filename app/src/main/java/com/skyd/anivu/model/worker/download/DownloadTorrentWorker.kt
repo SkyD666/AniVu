@@ -60,7 +60,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.libtorrent4j.AlertListener
-import org.libtorrent4j.MoveFlags
 import org.libtorrent4j.SessionManager
 import org.libtorrent4j.SessionParams
 import org.libtorrent4j.TorrentHandle
@@ -249,12 +248,12 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         saveDir: File,
         flags: torrent_flags_t = torrent_flags_t(),
     ) {
-        doIfMagnetOrTorrentLink(
+        ifMagnetLink(
             link = link,
             onMagnet = {
                 sessionManager.download(link, saveDir, flags)
             },
-            onTorrent = {
+            onUnsupported = {
                 val tempTorrentFile = File(
                     Const.TEMP_TORRENT_DIR,
                     link.substringAfterLast('/').toDecodedUrl().validateFileName()
@@ -268,9 +267,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     null, null, null,
                     flags
                 )
-            },
-            onUnsupported = {
-                error("Unsupported link: $link")
             },
         )
     }
