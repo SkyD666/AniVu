@@ -35,6 +35,7 @@ import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 
 fun Preferences.toSettings(): Settings {
     return Settings(
@@ -80,5 +81,8 @@ fun Preferences.toSettings(): Settings {
         autoDeleteArticleBefore = AutoDeleteArticleBeforePreference.fromPreferences(this),
         opmlExportDir = OpmlExportDirPreference.fromPreferences(this),
         mediaLibLocation = MediaLibLocationPreference.fromPreferences(this),
+
+        // Transmission
+        seedingWhenComplete = SeedingWhenCompletePreference.fromPreferences(this),
     )
 }

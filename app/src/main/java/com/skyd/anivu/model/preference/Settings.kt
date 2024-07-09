@@ -40,6 +40,7 @@ import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 import com.skyd.anivu.ui.local.LocalArticleItemMinWidth
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleListTonalElevation
@@ -68,6 +69,7 @@ import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.local.LocalSearchItemMinWidth
 import com.skyd.anivu.ui.local.LocalSearchListTonalElevation
 import com.skyd.anivu.ui.local.LocalSearchTopBarTonalElevation
+import com.skyd.anivu.ui.local.LocalSeedingWhenComplete
 import com.skyd.anivu.ui.local.LocalShowArticlePullRefresh
 import com.skyd.anivu.ui.local.LocalShowArticleTopBarRefresh
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
@@ -115,6 +117,8 @@ data class Settings(
     val autoDeleteArticleBefore: Long = AutoDeleteArticleBeforePreference.default,
     val opmlExportDir: String = OpmlExportDirPreference.default,
     val mediaLibLocation: String = MediaLibLocationPreference.default,
+    // Transmission
+    val seedingWhenComplete: Boolean = SeedingWhenCompletePreference.default,
 )
 
 @Composable
@@ -164,6 +168,8 @@ fun SettingsProvider(
         LocalAutoDeleteArticleBefore provides settings.autoDeleteArticleBefore,
         LocalOpmlExportDir provides settings.opmlExportDir,
         LocalMediaLibLocation provides settings.mediaLibLocation,
+        // Transmission
+        LocalSeedingWhenComplete provides settings.seedingWhenComplete,
     ) {
         content()
     }

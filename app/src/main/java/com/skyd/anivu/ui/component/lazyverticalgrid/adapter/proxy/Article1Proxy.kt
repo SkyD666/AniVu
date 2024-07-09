@@ -2,7 +2,6 @@ package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +47,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -91,7 +91,6 @@ import com.skyd.anivu.ui.local.LocalArticleSwipeRightAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalNavController
-import kotlinx.parcelize.Parcelize
 
 class Article1Proxy(
     private val onFavorite: (ArticleWithFeed, Boolean) -> Unit,
@@ -103,18 +102,6 @@ class Article1Proxy(
     }
 }
 
-/**
- * SwipeToDismissBoxState doesn't recompose,
- * so we need to pass in a "variable" that points to an object that doesn't change,
- * hence the need to wrap the data (DataWrapper).
- * When the data changes, we only change the fields inside the DataWrapper object,
- * which ensures that SwipeToDismissBoxState gets the latest data from the DataWrapper object.
- */
-@Parcelize
-private class DataWrapper(
-    var data: ArticleWithFeed
-) : Parcelable
-
 @Composable
 fun Article1Item(
     data: ArticleWithFeed,
@@ -124,9 +111,7 @@ fun Article1Item(
     val navController = LocalNavController.current
     val context = LocalContext.current
     var expandMenu by rememberSaveable { mutableStateOf(false) }
-
-    val dataWrapper = rememberSaveable { DataWrapper(data) }
-    LaunchedEffect(data) { dataWrapper.data = data }
+    val dataWrapper by rememberUpdatedState(newValue = data)
 
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
@@ -139,17 +124,17 @@ fun Article1Item(
             )
             when (dismissValue) {
                 SwipeToDismissBoxValue.EndToStart, SwipeToDismissBoxValue.StartToEnd -> {
-                    val articleWithEnclosure = dataWrapper.data.articleWithEnclosure
+                    val articleWithEnclosure = dataWrapper.articleWithEnclosure
                     swipeAction(
                         articleSwipeAction = articleSwipeAction,
                         context = context,
                         navController = navController,
                         data = articleWithEnclosure,
                         onMarkAsRead = {
-                            onRead(dataWrapper.data, !articleWithEnclosure.article.isRead)
+                            onRead(dataWrapper, !articleWithEnclosure.article.isRead)
                         },
                         onMarkAsFavorite = {
-                            onFavorite(dataWrapper.data, !articleWithEnclosure.article.isFavorite)
+                            onFavorite(dataWrapper, !articleWithEnclosure.article.isFavorite)
                         },
                     )
                 }
@@ -160,6 +145,7 @@ fun Article1Item(
         },
         positionalThreshold = { it * 0.15f },
     )
+    LaunchedEffect(data) { swipeToDismissBoxState.reset() }
     var isSwipeToDismissActive by remember(data) { mutableStateOf(false) }
 
     LaunchedEffect(swipeToDismissBoxState.progress > 0.15f) {

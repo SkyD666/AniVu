@@ -118,7 +118,7 @@
     <fragment
         android:id="@+id/transmission_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.transmission.TransmissionFragment"
-        android:label="@string/transmission_fragment_name" />
+        android:label="@string/transmission_screen_name" />
     <action
         android:id="@+id/action_to_transmission_fragment"
         app:destination="@id/transmission_fragment" />
@@ -126,7 +126,7 @@
     <fragment
         android:id="@+id/proxy_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.transmission.proxy.ProxyFragment"
-        android:label="@string/proxy_fragment_name" />
+        android:label="@string/proxy_screen_name" />
     <action
         android:id="@+id/action_to_proxy_fragment"
         app:destination="@id/proxy_fragment" />
@@ -142,7 +142,7 @@
     <fragment
         android:id="@+id/player_config_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.playerconfig.PlayerConfigFragment"
-        android:label="@string/player_config_fragment_name" />
+        android:label="@string/player_config_screen_name" />
     <action
         android:id="@+id/action_to_player_config_fragment"
         app:destination="@id/player_config_fragment" />

@@ -84,14 +84,14 @@
     <string name="rss_config_fragment_parse_link_tag_as_enclosure">Parse link as enclosure</string>
     <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">Parses and displays the link tag as an enclosure if it\'s a magnet or torrent link</string>
     <string name="rss_config_fragment_parse_category">Parse</string>
-    <string name="transmission_fragment_name">Transmission</string>
+    <string name="transmission_screen_name">Transmission</string>
     <string name="transmission_fragment_description">Data transfer setup, behavior</string>
-    <string name="transmission_fragment_transmission_behavior_category">Behavior</string>
-    <string name="transmission_fragment_seeding_when_complete">Auto seeding</string>
-    <string name="transmission_fragment_seeding_when_complete_description">Auto seeding when download is complete</string>
-    <string name="transmission_fragment_proxy_category">Proxy</string>
-    <string name="proxy_fragment_name">Proxy</string>
-    <string name="proxy_fragment_description">Configure proxy server address, port, account, etc</string>
+    <string name="transmission_screen_transmission_behavior_category">Behavior</string>
+    <string name="transmission_screen_seeding_when_complete">Auto seeding</string>
+    <string name="transmission_screen_seeding_when_complete_description">Auto seeding when download is complete</string>
+    <string name="transmission_screen_proxy_category">Proxy</string>
+    <string name="proxy_screen_name">Proxy</string>
+    <string name="proxy_screen_description">Configure proxy server address, port, account, etc</string>
     <string name="proxy_mode_auto">Auto</string>
     <string name="proxy_mode_manual">Manual</string>
     <string name="unknown">Unknown</string>
@@ -131,11 +131,10 @@
     <string name="player_pause">Pause/Play</string>
     <string name="player_backward_forward">Back/Forward</string>
     <string name="player_backward_pause_forward">Back/Forward &amp; Pause/Play</string>
-    <string name="player_config_fragment_name">Player</string>
-    <string name="player_config_fragment_behavior_category">Behavior</string>
-    <string name="player_config_fragment_double_tap">Double tap</string>
+    <string name="player_config_screen_name">Player</string>
+    <string name="player_config_screen_behavior_category">Behavior</string>
+    <string name="player_config_screen_double_tap">Double tap</string>
     <string name="player_config_fragment_description">Configure player behavior, appearance</string>
-    <string name="player_config_fragment_double_tap_description">Configure double tap behavior</string>
     <string name="appearance_fragment_name">Appearance &amp; Style</string>
     <string name="appearance_fragment_theme_category">Theme</string>
     <string name="appearance_fragment_description">Configure theme, appearance</string>
@@ -146,9 +145,9 @@
     <string name="theme_yellow">Yellow</string>
     <string name="theme_purple">Purple</string>
     <string name="player_forward_85s" translatable="false">+85s</string>
-    <string name="player_config_fragment_appearance_category">Appearance</string>
-    <string name="player_config_fragment_show_85s_button">+85s button</string>
-    <string name="player_config_fragment_show_85s_button_description">Show +85s button above the progress bar</string>
+    <string name="player_config_screen_appearance_category">Appearance</string>
+    <string name="player_config_screen_show_85s_button">+85s button</string>
+    <string name="player_config_screen_show_85s_button_description">Show +85s button above the progress bar</string>
     <string name="dark_mode_light">Light</string>
     <string name="dark_mode_dark">Dark</string>
     <string name="dark_mode_follow_system">System</string>
@@ -212,7 +211,7 @@
     <string name="appearance_fragment_navigation_bar_label">Navi bar label</string>
     <string name="pause">Pause</string>
     <string name="play">Play</string>
-    <string name="player_config_fragment_advanced_category">Advanced</string>
+    <string name="player_config_screen_advanced_category">Advanced</string>
     <string name="player_config_advanced_screen_name">Advanced config</string>
     <string name="player_config_advanced_screen_mpv_config">Edit mpv.conf</string>
     <string name="player_config_advanced_screen_mpv_input_config">Edit input.conf</string>
@@ -220,7 +219,7 @@
     <string name="item_selected">Selected</string>
     <string name="player_screenshot">Screenshot</string>
     <string name="player_no_permission_cannot_save_screenshot">No permission. Can\'t save screenshot.</string>
-    <string name="player_config_fragment_show_screenshot_button">Screenshot button</string>
+    <string name="player_config_screen_show_screenshot_button">Screenshot button</string>
     <string name="player_add_external_subtitle">Add subtitle file</string>
     <string name="player_config_advanced_screen_hardware_decode">Hardware decoding</string>
     <string name="player_config_advanced_screen_hardware_decode_description">Try hardware decoding first; fallback to software if it fails</string>

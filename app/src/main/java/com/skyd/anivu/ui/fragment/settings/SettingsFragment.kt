@@ -85,7 +85,7 @@ fun SettingsScreen() {
             item {
                 BaseSettingsItem(
                     icon = rememberVectorPainter(Icons.Outlined.SmartDisplay),
-                    text = stringResource(id = R.string.player_config_fragment_name),
+                    text = stringResource(id = R.string.player_config_screen_name),
                     descriptionText = stringResource(id = R.string.player_config_fragment_description),
                     onClick = { navController.navigate(R.id.action_to_player_config_fragment) }
                 )
@@ -101,7 +101,7 @@ fun SettingsScreen() {
             item {
                 BaseSettingsItem(
                     icon = rememberVectorPainter(Icons.Outlined.SwapVert),
-                    text = stringResource(id = R.string.transmission_fragment_name),
+                    text = stringResource(id = R.string.transmission_screen_name),
                     descriptionText = stringResource(id = R.string.transmission_fragment_description),
                     onClick = { navController.navigate(R.id.action_to_transmission_fragment) }
                 )

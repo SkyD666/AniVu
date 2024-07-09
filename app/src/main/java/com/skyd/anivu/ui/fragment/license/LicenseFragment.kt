@@ -77,7 +77,7 @@ private fun LicenseItem(data: LicenseBean) {
     val context = LocalContext.current
     Card(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 7.dp),
-        shape = RoundedCornerShape(20)
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(
             modifier = Modifier

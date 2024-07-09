@@ -36,6 +36,7 @@ import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 
 val LocalNavController = compositionLocalOf<NavHostController> {
     error("LocalNavController not initialized!")
@@ -96,3 +97,6 @@ val LocalAutoDeleteArticleFrequency =
 val LocalAutoDeleteArticleBefore = compositionLocalOf { AutoDeleteArticleBeforePreference.default }
 val LocalOpmlExportDir = compositionLocalOf { OpmlExportDirPreference.default }
 val LocalMediaLibLocation = compositionLocalOf { MediaLibLocationPreference.default }
+
+// Transmission
+val LocalSeedingWhenComplete = compositionLocalOf { SeedingWhenCompletePreference.default }
