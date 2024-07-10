@@ -248,7 +248,7 @@
     <string name="feed_screen_rss_icon_source_network">来自网络</string>
     <string name="feed_screen_rss_icon_source_network_hint">以 http 或 https 开头的网址</string>
     <string name="reset">重置</string>
-    <string name="save_picture_to_media_store_saved">图片以保存！</string>
+    <string name="save_picture_to_media_store_saved">图片已保存！</string>
     <string name="article_screen_favorite">收藏</string>
     <string name="article_screen_unfavorite">取消收藏</string>
     <string name="article_screen_mark_as_unread">标为未读</string>

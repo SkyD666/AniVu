@@ -250,7 +250,7 @@ internal fun ItemMinWidthDialog(
         onDismissRequest = onDismissRequest,
         value = value,
         onValueChange = { value = it },
-        valueRange = 200f..600f,
+        valueRange = 200f..1000f,
         valueLabel = {
             Box(modifier = Modifier.fillMaxWidth()) {
                 Text(
