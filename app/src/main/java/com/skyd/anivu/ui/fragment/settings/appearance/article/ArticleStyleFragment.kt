@@ -257,7 +257,7 @@ internal fun ItemMinWidthDialog(
                     modifier = Modifier
                         .align(Alignment.Center)
                         .animateContentSize(),
-                    text = "$value dp",
+                    text = "%.2f".format(value) + " dp",
                     style = MaterialTheme.typography.titleMedium,
                 )
                 AniVuIconButton(
