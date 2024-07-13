@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.fragment.filepicker
 
 import com.skyd.anivu.base.mvi.MviViewState
+import com.skyd.anivu.config.Const
 import java.io.File
 
 data class FilePickerState(
@@ -10,7 +11,7 @@ data class FilePickerState(
 ) : MviViewState {
     companion object {
         fun initial() = FilePickerState(
-            path = "",
+            path = Const.INTERNAL_STORAGE,
             fileListState = FileListState.Init(),
             loadingDialog = false,
         )

@@ -1,25 +1,31 @@
 package com.skyd.anivu.ui.fragment.filepicker
 
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.NavigateNext
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -27,9 +33,12 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
@@ -40,6 +49,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.base.mvi.getDispatcher
+import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.getMimeType
 import com.skyd.anivu.ext.popBackStackWithLifecycle
@@ -51,7 +61,6 @@ import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.util.fileicon.getFileIcon
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
-import java.io.Serializable
 
 
 @AndroidEntryPoint
@@ -61,39 +70,31 @@ class FilePickerFragment : BaseComposeFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View = setContentBase {
-        val callback = arguments?.getSerializable(CALLBACK_KEY) as? FilePickerCallback
         val path = arguments?.getString(PATH_KEY)
         val pickFolder = arguments?.getBoolean(PICK_FOLDER_KEY)
         val extensionName = arguments?.getString(EXTENSION_NAME_KEY)
-        if (callback == null || path == null || pickFolder == null || extensionName == null) {
+        if (path == null || pickFolder == null || extensionName == null) {
             findMainNavController().popBackStackWithLifecycle()
         } else {
             FilePickerScreen(
                 path = path,
                 pickFolder = pickFolder,
                 extensionName = extensionName,
-                onFilePicked = { callback.onFilePicked(it) }
             )
         }
     }
 }
 
 const val PATH_KEY = "path"
-const val CALLBACK_KEY = "callback"
 const val PICK_FOLDER_KEY = "pickFolder"
 const val EXTENSION_NAME_KEY = "extensionName"
-
-
-fun interface FilePickerCallback : Serializable {
-    fun onFilePicked(file: File)
-}
+const val FILE_PICKER_NEW_PATH_KEY = "newPath"
 
 @Composable
 fun FilePickerScreen(
     path: String,
     pickFolder: Boolean = false,
     extensionName: String? = null,
-    onFilePicked: (File) -> Unit,
     viewModel: FilePickerViewModel = hiltViewModel(),
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -112,8 +113,8 @@ fun FilePickerScreen(
         val current = File(uiState.path)
         val parent = current.parent
         if (!parent.isNullOrBlank() &&
-            uiState.path != Environment.getExternalStorageDirectory().absolutePath &&
-            uiState.path.startsWith(Environment.getExternalStorageDirectory().absolutePath)
+            uiState.path != Const.INTERNAL_STORAGE &&
+            uiState.path.startsWith(Const.INTERNAL_STORAGE)
         ) {
             dispatch(FilePickerIntent.NewLocation(parent))
         } else {
@@ -137,7 +138,7 @@ fun FilePickerScreen(
                 },
                 actions = {
                     AniVuIconButton(
-                        onClick = { dispatch(FilePickerIntent.NewLocation(Environment.getExternalStorageDirectory().absolutePath)) },
+                        onClick = { dispatch(FilePickerIntent.NewLocation(Const.INTERNAL_STORAGE)) },
                         imageVector = Icons.Outlined.PhoneAndroid,
                         contentDescription = stringResource(id = R.string.file_picker_screen_internal_storage),
                     )
@@ -145,7 +146,11 @@ fun FilePickerScreen(
             )
         }
     ) { paddingValues ->
-        Column {
+        Column(modifier = Modifier.padding(top = paddingValues.calculateTopPadding())) {
+            PathLevelIndication(
+                path = uiState.path,
+                onRouteTo = { dispatch(FilePickerIntent.NewLocation(it)) },
+            )
             LazyColumn(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,7 +159,6 @@ fun FilePickerScreen(
                 contentPadding = PaddingValues(
                     start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
                     end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
-                    top = paddingValues.calculateTopPadding(),
                 ),
             ) {
                 (uiState.fileListState as? FileListState.Success)?.list?.forEach { file ->
@@ -165,7 +169,9 @@ fun FilePickerScreen(
                                     dispatch(FilePickerIntent.NewLocation(file.path))
                                 } else {
                                     if (!pickFolder) {
-                                        onFilePicked(file)
+                                        navController.previousBackStackEntry
+                                            ?.savedStateHandle
+                                            ?.set(FILE_PICKER_NEW_PATH_KEY, file.absolutePath)
                                     }
                                 }
                             },
@@ -195,7 +201,9 @@ fun FilePickerScreen(
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth(),
                     onClick = {
-                        onFilePicked(File(uiState.path))
+                        navController.previousBackStackEntry
+                            ?.savedStateHandle
+                            ?.set(FILE_PICKER_NEW_PATH_KEY, uiState.path)
                         navController.popBackStackWithLifecycle()
                     },
                 ) {
@@ -209,6 +217,60 @@ fun FilePickerScreen(
                 snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             null -> Unit
+        }
+    }
+}
+
+@Composable
+private fun PathLevelIndication(path: String, onRouteTo: (String) -> Unit) {
+    val scrollState = rememberScrollState()
+    LaunchedEffect(scrollState.maxValue) {
+        if (scrollState.canScrollForward) {
+            scrollState.animateScrollTo(scrollState.maxValue)
+        }
+    }
+    Row(
+        modifier = Modifier
+            .horizontalScroll(scrollState)
+            .padding(horizontal = 12.dp)
+            .animateContentSize(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val items = remember(path) {
+            mutableListOf<String>().apply {
+                var newPath = path
+                if (newPath.startsWith(Const.INTERNAL_STORAGE)) {
+                    add(Const.INTERNAL_STORAGE)
+                    newPath = newPath.removePrefix(Const.INTERNAL_STORAGE)
+                }
+                newPath.removeSurrounding(File.separator)
+                newPath.split(File.separator).forEach {
+                    if (it.isNotBlank()) add(it)
+                }
+            }
+        }
+
+        items.forEachIndexed { index, item ->
+            Text(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(3.dp))
+                    .clickable {
+                        onRouteTo(
+                            items
+                                .subList(0, index + 1)
+                                .joinToString(File.separator)
+                        )
+                    }
+                    .padding(horizontal = 6.dp, vertical = 8.dp),
+                text = item,
+                style = MaterialTheme.typography.labelLarge,
+            )
+            if (index != items.size - 1) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.NavigateNext,
+                    contentDescription = null,
+                )
+            }
         }
     }
 }

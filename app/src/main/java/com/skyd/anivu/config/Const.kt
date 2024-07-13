@@ -50,4 +50,6 @@ object Const {
         .apply { if (!exists()) mkdirs() }
 
     val PICTURES_DIR = appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+
+    val INTERNAL_STORAGE = Environment.getExternalStorageDirectory().absolutePath
 }

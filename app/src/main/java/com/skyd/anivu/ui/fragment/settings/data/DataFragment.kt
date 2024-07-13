@@ -24,6 +24,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,17 +51,16 @@ import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
-import com.skyd.anivu.ui.fragment.filepicker.CALLBACK_KEY
 import com.skyd.anivu.ui.fragment.filepicker.EXTENSION_NAME_KEY
-import com.skyd.anivu.ui.fragment.filepicker.FilePickerCallback
+import com.skyd.anivu.ui.fragment.filepicker.FILE_PICKER_NEW_PATH_KEY
 import com.skyd.anivu.ui.fragment.filepicker.PATH_KEY
 import com.skyd.anivu.ui.fragment.filepicker.PICK_FOLDER_KEY
 import com.skyd.anivu.ui.local.LocalMediaLibLocation
 import com.skyd.anivu.ui.local.LocalNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import java.io.File
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.onEach
 
 
 @AndroidEntryPoint
@@ -83,6 +83,19 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
     val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val dispatch = viewModel.getDispatcher(startWith = DataIntent.Init)
+
+    LaunchedEffect(Unit) {
+        navController.currentBackStackEntry?.savedStateHandle
+            ?.getStateFlow<String?>(FILE_PICKER_NEW_PATH_KEY, null)
+            ?.filterNotNull()
+            ?.onEach { newPath ->
+                MediaLibLocationPreference.put(
+                    context,
+                    this,
+                    newPath,
+                )
+            }?.collect()
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -126,15 +139,6 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
                                     } else localMediaLibLocation
                                 )
                                 putString(EXTENSION_NAME_KEY, "")
-                                putSerializable(CALLBACK_KEY, object : FilePickerCallback {
-                                    override fun onFilePicked(file: File) {
-                                        MediaLibLocationPreference.put(
-                                            context,
-                                            CoroutineScope(Dispatchers.IO), // Do not use `val scope = rememberCoroutineScope()`
-                                            file.absolutePath,
-                                        )
-                                    }
-                                })
                             }
                         )
                     }

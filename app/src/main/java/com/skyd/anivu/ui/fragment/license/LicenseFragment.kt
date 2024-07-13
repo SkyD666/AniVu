@@ -185,5 +185,10 @@ private fun getLicenseList(): List<LicenseBean> {
             license = "MIT",
             link = "https://github.com/mpv-android/mpv-android",
         ),
+        LicenseBean(
+            name = "Lottie",
+            license = "MIT",
+            link = "https://github.com/airbnb/lottie",
+        ),
     ).sortedBy { it.name }
 }

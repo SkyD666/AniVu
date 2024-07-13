@@ -11,8 +11,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -159,8 +157,7 @@ private fun EmptyPlaceholder() {
     AnimatedPlaceholder(
         modifier = Modifier
             .width(220.dp)
-            .padding(vertical = 20.dp)
-            .verticalScroll(rememberScrollState()),
+            .padding(vertical = 20.dp),
         resId = R.raw.lottie_empty_1,
         tip = stringResource(id = R.string.empty_tip_1),
     )
