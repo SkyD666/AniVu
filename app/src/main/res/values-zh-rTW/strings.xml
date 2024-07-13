@@ -300,6 +300,8 @@
     <string name="media_screen_delete_group_warning">刪除“%s”分組及其所有檔案</string>
     <string name="min_width_dp">最小寬度 (dp)</string>
     <string name="search_style_screen_search_item_category">搜尋項</string>
+    <string name="empty_tip_1">Nothing</string>
+    <string name="sub_media_screen_path_illegal">Illegal path: %s</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已讀 %d 項</item>
     </plurals>
