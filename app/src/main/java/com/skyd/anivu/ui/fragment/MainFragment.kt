@@ -170,9 +170,7 @@ fun MainScreen() {
                 popExitTransition = { fadeOut(animationSpec = tween(170)) },
             ) {
                 composable(FEED_SCREEN_ROUTE) { FeedScreen() }
-                composable(MEDIA_SCREEN_ROUTE) {
-                    MediaScreen(path = LocalMediaLibLocation.current, hasParentDir = false)
-                }
+                composable(MEDIA_SCREEN_ROUTE) { MediaScreen(path = LocalMediaLibLocation.current) }
                 composable(MORE_SCREEN_ROUTE) { MoreScreen() }
             }
         }

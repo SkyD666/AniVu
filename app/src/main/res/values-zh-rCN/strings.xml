@@ -300,6 +300,8 @@
     <string name="media_screen_delete_group_warning">删除“%s”分组及其包含的所有文件和文件夹</string>
     <string name="min_width_dp">最小宽度（dp）</string>
     <string name="search_style_screen_search_item_category">搜索项</string>
+    <string name="empty_tip_1">空空如也~</string>
+    <string name="sub_media_screen_path_illegal">非法路径：%s</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>

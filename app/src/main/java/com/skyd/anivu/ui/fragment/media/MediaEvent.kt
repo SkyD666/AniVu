@@ -4,14 +4,6 @@ import com.skyd.anivu.base.mvi.MviSingleEvent
 import com.skyd.anivu.model.bean.MediaGroupBean
 
 sealed interface MediaEvent : MviSingleEvent {
-    sealed interface MediaListResultEvent : MediaEvent {
-        data class Failed(val msg: String) : MediaListResultEvent
-    }
-
-    sealed interface DeleteFileResultEvent : MediaEvent {
-        data class Failed(val msg: String) : DeleteFileResultEvent
-    }
-
     sealed interface DeleteGroupResultEvent : MediaEvent {
         data class Success(val timestamp: Long) : DeleteGroupResultEvent
         data class Failed(val msg: String) : DeleteGroupResultEvent

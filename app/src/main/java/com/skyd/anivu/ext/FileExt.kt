@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
@@ -28,6 +29,7 @@ fun File.deleteRecursivelyExclude(hook: (File) -> Boolean = { true }): Boolean =
     }
 
 fun File.getMimeType(): String? {
+    if (isDirectory) return DocumentsContract.Document.MIME_TYPE_DIR
     var type: String? = null
     val extension = path.substringAfterLast(".", "")
     if (extension.isNotBlank()) {

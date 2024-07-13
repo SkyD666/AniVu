@@ -27,6 +27,8 @@ import com.skyd.anivu.R
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.MediaGroupBean.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
+import com.skyd.anivu.ui.fragment.media.list.GroupArea
+import com.skyd.anivu.ui.fragment.media.list.OptionArea
 
 @Composable
 fun EditMediaGroupSheet(

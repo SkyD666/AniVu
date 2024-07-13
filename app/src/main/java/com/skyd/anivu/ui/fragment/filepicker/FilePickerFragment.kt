@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
@@ -34,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -42,12 +41,14 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.findMainNavController
+import com.skyd.anivu.ext.getMimeType
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.util.fileicon.getFileIcon
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.Serializable
@@ -170,8 +171,11 @@ fun FilePickerScreen(
                             },
                             leadingContent = {
                                 Icon(
-                                    imageVector = if (file.isDirectory) Icons.Outlined.Folder
-                                    else Icons.AutoMirrored.Outlined.InsertDriveFile,
+                                    painter = painterResource(
+                                        id = remember(file) {
+                                            getFileIcon(file.getMimeType() ?: "*/*").resourceId
+                                        }
+                                    ),
                                     contentDescription = null,
                                 )
                             },

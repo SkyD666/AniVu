@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
@@ -32,7 +33,7 @@ class MediaViewModel @Inject constructor(
         val initialVS = MediaState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<MediaIntent.Init>().take(1),
+            intentSharedFlow.filterIsInstance<MediaIntent.Init>().distinctUntilChanged(),
             intentSharedFlow.filterNot { it is MediaIntent.Init }
         )
             .shareWhileSubscribed()
@@ -51,12 +52,6 @@ class MediaViewModel @Inject constructor(
     private fun Flow<MediaPartialStateChange>.sendSingleEvent(): Flow<MediaPartialStateChange> {
         return onEach { change ->
             val event = when (change) {
-                is MediaPartialStateChange.MediaListResult.Failed ->
-                    MediaEvent.MediaListResultEvent.Failed(change.msg)
-
-                is MediaPartialStateChange.DeleteFileResult.Failed ->
-                    MediaEvent.DeleteFileResultEvent.Failed(change.msg)
-
                 is MediaPartialStateChange.DeleteGroup.Failed ->
                     MediaEvent.DeleteGroupResultEvent.Failed(change.msg)
 
@@ -101,26 +96,10 @@ class MediaViewModel @Inject constructor(
             ).flatMapConcat { intent ->
                 val path = if (intent is MediaIntent.Init) intent.path
                 else (intent as MediaIntent.Refresh).path
-                val isMediaLibRoot = if (intent is MediaIntent.Init) intent.isMediaLibRoot
-                else (intent as MediaIntent.Refresh).isMediaLibRoot
-                mediaRepo.requestMedias(uriPath = path!!, isMediaLibRoot = isMediaLibRoot).map {
-                    MediaPartialStateChange.MediaListResult.Success(list = it)
-                }.startWith(MediaPartialStateChange.MediaListResult.Loading)
-                    .catchMap { MediaPartialStateChange.MediaListResult.Failed(it.message.toString()) }
-            },
-            filterIsInstance<MediaIntent.Delete>().flatMapConcat { intent ->
-                mediaRepo.requestDelete(intent.file).map {
-                    MediaPartialStateChange.DeleteFileResult.Success(file = intent.file)
+                mediaRepo.requestGroups(uriPath = path!!).map {
+                    MediaPartialStateChange.GroupsResult.Success(groups = it)
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
-                    .catchMap { MediaPartialStateChange.DeleteFileResult.Failed(it.message.toString()) }
-            },
-            filterIsInstance<MediaIntent.DeleteGroup>().filterNot {
-                it.path.isNullOrBlank()
-            }.flatMapConcat { intent ->
-                mediaRepo.requestDeleteGroup(intent.path!!, intent.group).map {
-                    MediaPartialStateChange.DeleteGroup.Success
-                }.startWith(MediaPartialStateChange.LoadingDialog.Show)
-                    .catchMap { MediaPartialStateChange.DeleteGroup.Failed(it.message.toString()) }
+                    .catchMap { MediaPartialStateChange.GroupsResult.Failed(it.message.toString()) }
             },
             filterIsInstance<MediaIntent.ChangeMediaGroup>().filterNot {
                 it.path.isNullOrBlank()
@@ -130,6 +109,14 @@ class MediaViewModel @Inject constructor(
                         MediaPartialStateChange.ChangeMediaGroup.Success
                     }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.ChangeMediaGroup.Failed(it.message.toString()) }
+            },
+            filterIsInstance<MediaIntent.DeleteGroup>().filterNot {
+                it.path.isNullOrBlank()
+            }.flatMapConcat { intent ->
+                mediaRepo.requestDeleteGroup(intent.path!!, intent.group).map {
+                    MediaPartialStateChange.DeleteGroup.Success(intent.group)
+                }.startWith(MediaPartialStateChange.LoadingDialog.Show)
+                    .catchMap { MediaPartialStateChange.DeleteGroup.Failed(it.message.toString()) }
             },
             filterIsInstance<MediaIntent.CreateGroup>().filterNot {
                 it.path.isNullOrBlank()

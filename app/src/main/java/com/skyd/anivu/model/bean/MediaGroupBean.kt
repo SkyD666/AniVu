@@ -20,6 +20,11 @@ open class MediaGroupBean(
         return result
     }
 
+    override fun toString(): String {
+        return if (isDefaultGroup()) "default"
+        else name
+    }
+
     object DefaultMediaGroup :
         MediaGroupBean(appContext.getString(R.string.default_media_group)) {
         private fun readResolve(): Any = DefaultMediaGroup

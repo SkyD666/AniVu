@@ -1,5 +1,6 @@
 package com.skyd.anivu.model.repository
 
+import androidx.compose.ui.util.fastFirstOrNull
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.MediaGroupBean.Companion.isDefaultGroup
@@ -26,66 +27,57 @@ class MediaRepository @Inject constructor(
         const val GROUP_JSON_NAME = "group.json"
     }
 
-    fun requestMedias(uriPath: String, isMediaLibRoot: Boolean): Flow<List<Any>> {
+    fun requestGroups(uriPath: String): Flow<List<MediaGroupBean>> {
         return flow {
-            val file = File(uriPath)
+            val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
+            val mediaGroupJson = parseGroupJson(groupJsonFile)
+            val allGroups = mediaGroupJson?.allGroups.orEmpty()
+            emit(listOf(MediaGroupBean.DefaultMediaGroup) +
+                    allGroups.map { MediaGroupBean(name = it) }.sortedBy { it.name })
+        }.flowOn(Dispatchers.IO)
+    }
 
-            val fileList = file.listFiles()
-                .orEmpty()
-                .map {
+    fun requestFiles(uriPath: String, group: MediaGroupBean?): Flow<List<VideoBean>> {
+        return flow {
+            val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
+            val mediaGroupJson = parseGroupJson(groupJsonFile)
+            val filesInGroup = mediaGroupJson?.files.orEmpty()
+            val allFiles =
+                File(uriPath).listFiles().orEmpty().toMutableList().filter { it.exists() }
+            val videoList = if (group == null) {
+                allFiles.map {
                     VideoBean(
-                        displayName = if (it.isDirectory) {
-                            parseFolderInfoJson(File(it, FOLDER_INFO_JSON_NAME))?.displayName
-                        } else {
-                            null
-                        },
+                        displayName = null,     // TODO
                         file = it,
                     )
                 }
-
-            if (isMediaLibRoot) {
-                val groupToFiles = parseGroupJsonToMap(
-                    groupJsonFile = File(file, GROUP_JSON_NAME),
-                )
-
-                // Map group name to group object
-                val groupNameToObject = groupToFiles.keys
-                    .map { MediaGroupBean(name = it) }
-                    .associateBy { it.name }
-
-                // Map group object to video list
-                val result = mapOf(MediaGroupBean.DefaultMediaGroup to mutableListOf<VideoBean>()) +
-                        groupNameToObject.values.map { it to mutableListOf() }
-
-                // Map (fileName, isFile) to group object
-                val fileNameMap = groupToFiles.values
-                    .flatten()
-                    .associateBy { it.fileName }
-                    .mapKeys { it.key to it.value.isFile }
-
-                fileList.forEach { videoBean ->
-                    // Skip config files
-                    if (GROUP_JSON_NAME == videoBean.name) return@forEach
-                    val fileToGroup = fileNameMap[videoBean.name to videoBean.isFile]
-                    if (fileToGroup == null) {
-                        result[MediaGroupBean.DefaultMediaGroup]!! += videoBean
-                    } else {
-                        result[groupNameToObject[fileToGroup.groupName]]!! += videoBean
+            } else {
+                if (group.isDefaultGroup()) {
+                    allFiles.filter { file ->
+                        filesInGroup.fastFirstOrNull { it.fileName == file.name } == null
+                    }.map { file ->
+                        VideoBean(
+                            displayName = null,     // TODO
+                            file = file,
+                        )
+                    }
+                } else {
+                    filesInGroup.filter { it.groupName == group.name }.mapNotNull {
+                        val file = File(uriPath, it.fileName)
+                        if (file.exists()) {
+                            VideoBean(
+                                displayName = null,     // TODO
+                                file = file,
+                            )
+                        } else null
                     }
                 }
 
-                emit(result.flatMap { (group, list) -> listOf(group) + list })
-            } else {
-                // Skip config files
-                emit(fileList.toMutableList().apply {
-                    forEach {
-                        if (it.name == GROUP_JSON_NAME) {
-                            remove(it)
-                            return@apply
-                        }
-                    }
-                })
             }
+            emit(videoList.toMutableList().apply {
+                fastFirstOrNull { it.name.equals(FOLDER_INFO_JSON_NAME, true) }?.let { remove(it) }
+                fastFirstOrNull { it.name.equals(GROUP_JSON_NAME, true) }?.let { remove(it) }
+            })
         }.flowOn(Dispatchers.IO)
     }
 
@@ -101,7 +93,7 @@ class MediaRepository @Inject constructor(
             return@flow
         }
         val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
-        val mediaGroupJson = parseGroupJson(groupJsonFile)!!
+        val mediaGroupJson = parseGroupJson(groupJsonFile) ?: MediaGroupJson(files = emptyList())
 
         writeGroupToJson(
             groupJsonFile,
@@ -291,13 +283,6 @@ class MediaRepository @Inject constructor(
     private fun writeGroupToJson(groupJsonFile: File, data: MediaGroupJson) {
         groupJsonFile.outputStream().use { outputStream ->
             json.encodeToStream(formatMediaGroupJson(data), outputStream)
-        }
-    }
-
-    private fun parseFolderInfoJson(folderJsonFile: File): FolderInfo? {
-        if (!folderJsonFile.exists()) return null
-        return folderJsonFile.inputStream().use { inputStream ->
-            json.decodeFromStream(inputStream)
         }
     }
 }

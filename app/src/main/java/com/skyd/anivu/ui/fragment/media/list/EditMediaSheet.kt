@@ -1,4 +1,4 @@
-package com.skyd.anivu.ui.fragment.media
+package com.skyd.anivu.ui.fragment.media.list
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
@@ -143,7 +143,7 @@ internal fun OptionArea(
             if (onOpenWith != null) {
                 SheetChip(
                     icon = Icons.AutoMirrored.Outlined.OpenInNew,
-                    text = stringResource(id = R.string.refresh),
+                    text = stringResource(id = R.string.open_with),
                     onClick = onOpenWith,
                 )
             }

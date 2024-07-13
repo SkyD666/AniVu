@@ -49,24 +49,6 @@
         app:destination="@id/download_fragment" />
 
     <fragment
-        android:id="@+id/video_fragment"
-        android:name="com.skyd.anivu.ui.fragment.media.MediaFragment"
-        android:label="@string/media_screen_name">
-
-        <argument
-            android:name="path"
-            app:argType="string"
-            app:nullable="false" />
-        <argument
-            android:name="hasParentDir"
-            app:argType="boolean"
-            app:nullable="false" />
-    </fragment>
-    <action
-        android:id="@+id/action_to_video_fragment"
-        app:destination="@id/video_fragment" />
-
-    <fragment
         android:id="@+id/about_fragment"
         android:name="com.skyd.anivu.ui.fragment.about.AboutFragment"
         android:label="@string/about_screen_name" />
@@ -226,4 +208,11 @@
     <action
         android:id="@+id/action_to_file_picker_fragment"
         app:destination="@id/file_picker_fragment" />
+
+    <fragment
+        android:id="@+id/sub_media_fragment"
+        android:name="com.skyd.anivu.ui.fragment.media.sub.SubMediaFragment" />
+    <action
+        android:id="@+id/action_to_sub_media_fragment"
+        app:destination="@id/sub_media_fragment" />
 </navigation>

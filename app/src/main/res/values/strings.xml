@@ -307,6 +307,8 @@
     <string name="media_screen_delete_group_warning">Delete the \"%s\" group and all the files it contains</string>
     <string name="min_width_dp">Min width (dp)</string>
     <string name="search_style_screen_search_item_category">Search item</string>
+    <string name="empty_tip_1">Nothing</string>
+    <string name="sub_media_screen_path_illegal">Illegal path: %s</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>
