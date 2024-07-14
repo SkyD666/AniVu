@@ -230,6 +230,7 @@
     <string name="import_opml_conflict_strategy_replace">替換</string>
     <string name="import_opml_conflict_strategy_skip">跳過</string>
     <string name="import_opml_screen_opml_not_selected">請選擇一個 OPML 文件</string>
+    <string name="data_screen_sync_category">同步</string>
     <string name="import_export_screen_description">透過 OPML 檔案匯入和匯出 RSS 資料</string>
     <string name="player_speed">速度</string>
     <string name="player_add_external_audio">添加音頻文件</string>
@@ -301,6 +302,9 @@
     <string name="search_style_screen_search_item_category">搜尋項</string>
     <string name="empty_tip_1">Nothing</string>
     <string name="sub_media_screen_path_illegal">Illegal path: %s</string>
+    <string name="player_config_screen_auto_pip">Auto PIP</string>
+    <string name="player_config_screen_auto_pip_description">Switch to PiP mode if the Home or Recents button is pressed</string>
+    <string name="player_picture_in_picture">Picture in picture</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已讀 %d 項</item>
     </plurals>
