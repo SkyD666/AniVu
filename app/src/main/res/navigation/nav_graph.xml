@@ -49,24 +49,6 @@
         app:destination="@id/download_fragment" />
 
     <fragment
-        android:id="@+id/video_fragment"
-        android:name="com.skyd.anivu.ui.fragment.media.MediaFragment"
-        android:label="@string/media_screen_name">
-
-        <argument
-            android:name="path"
-            app:argType="string"
-            app:nullable="false" />
-        <argument
-            android:name="hasParentDir"
-            app:argType="boolean"
-            app:nullable="false" />
-    </fragment>
-    <action
-        android:id="@+id/action_to_video_fragment"
-        app:destination="@id/video_fragment" />
-
-    <fragment
         android:id="@+id/about_fragment"
         android:name="com.skyd.anivu.ui.fragment.about.AboutFragment"
         android:label="@string/about_screen_name" />
@@ -102,7 +84,7 @@
     <fragment
         android:id="@+id/data_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.data.DataFragment"
-        android:label="@string/data_fragment_name" />
+        android:label="@string/data_screen_name" />
     <action
         android:id="@+id/action_to_data_fragment"
         app:destination="@id/data_fragment" />
@@ -118,7 +100,7 @@
     <fragment
         android:id="@+id/transmission_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.transmission.TransmissionFragment"
-        android:label="@string/transmission_fragment_name" />
+        android:label="@string/transmission_screen_name" />
     <action
         android:id="@+id/action_to_transmission_fragment"
         app:destination="@id/transmission_fragment" />
@@ -126,7 +108,7 @@
     <fragment
         android:id="@+id/proxy_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.transmission.proxy.ProxyFragment"
-        android:label="@string/proxy_fragment_name" />
+        android:label="@string/proxy_screen_name" />
     <action
         android:id="@+id/action_to_proxy_fragment"
         app:destination="@id/proxy_fragment" />
@@ -142,7 +124,7 @@
     <fragment
         android:id="@+id/player_config_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.playerconfig.PlayerConfigFragment"
-        android:label="@string/player_config_fragment_name" />
+        android:label="@string/player_config_screen_name" />
     <action
         android:id="@+id/action_to_player_config_fragment"
         app:destination="@id/player_config_fragment" />
@@ -218,4 +200,19 @@
     <action
         android:id="@+id/action_to_search_style_fragment"
         app:destination="@id/search_style_fragment" />
+
+    <fragment
+        android:id="@+id/file_picker_fragment"
+        android:name="com.skyd.anivu.ui.fragment.filepicker.FilePickerFragment"
+        android:label="@string/file_picker_screen_name" />
+    <action
+        android:id="@+id/action_to_file_picker_fragment"
+        app:destination="@id/file_picker_fragment" />
+
+    <fragment
+        android:id="@+id/sub_media_fragment"
+        android:name="com.skyd.anivu.ui.fragment.media.sub.SubMediaFragment" />
+    <action
+        android:id="@+id/action_to_sub_media_fragment"
+        app:destination="@id/sub_media_fragment" />
 </navigation>

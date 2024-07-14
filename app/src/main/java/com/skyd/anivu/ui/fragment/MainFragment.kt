@@ -1,21 +1,33 @@
 package com.skyd.anivu.ui.fragment
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.RssFeed
@@ -23,7 +35,10 @@ import androidx.compose.material.icons.filled.Widgets
 import androidx.compose.material.icons.outlined.Movie
 import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Widgets
+import androidx.compose.material.icons.rounded.Storage
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationRail
@@ -32,9 +47,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -42,9 +62,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
-import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.ui.fragment.feed.FEED_SCREEN_ROUTE
@@ -53,6 +73,7 @@ import com.skyd.anivu.ui.fragment.media.MEDIA_SCREEN_ROUTE
 import com.skyd.anivu.ui.fragment.media.MediaScreen
 import com.skyd.anivu.ui.fragment.more.MORE_SCREEN_ROUTE
 import com.skyd.anivu.ui.fragment.more.MoreScreen
+import com.skyd.anivu.ui.local.LocalMediaLibLocation
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import dagger.hilt.android.AndroidEntryPoint
@@ -63,7 +84,49 @@ class MainFragment : BaseComposeFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View = setContentBase { MainScreen() }
+    ): View = setContentBase {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            var permissionGranted by remember {
+                mutableStateOf(Environment.isExternalStorageManager())
+            }
+            val permissionRequester = rememberLauncherForActivityResult(
+                ActivityResultContracts.StartActivityForResult()
+            ) { permissionGranted = Environment.isExternalStorageManager() }
+
+            if (permissionGranted) {
+                MainScreen()
+            } else {
+                RequestStoragePermissionScreen(
+                    shouldShowRationale = false,
+                    onPermissionRequest = {
+                        permissionGranted = Environment.isExternalStorageManager()
+                        if (!permissionGranted) {
+                            permissionRequester.launch(
+                                Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                            )
+                        }
+                    },
+                )
+            }
+        } else {
+            val storagePermissionState = rememberMultiplePermissionsState(
+                mutableListOf<String>().apply {
+                    add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
+            )
+            if (storagePermissionState.allPermissionsGranted) {
+                MainScreen()
+            } else {
+                RequestStoragePermissionScreen(
+                    shouldShowRationale = storagePermissionState.shouldShowRationale,
+                    onPermissionRequest = {
+                        storagePermissionState.launchMultiplePermissionRequest()
+                    },
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -107,9 +170,7 @@ fun MainScreen() {
                 popExitTransition = { fadeOut(animationSpec = tween(170)) },
             ) {
                 composable(FEED_SCREEN_ROUTE) { FeedScreen() }
-                composable(MEDIA_SCREEN_ROUTE) {
-                    MediaScreen(path = Const.VIDEO_DIR.path, hasParentDir = false)
-                }
+                composable(MEDIA_SCREEN_ROUTE) { MediaScreen(path = LocalMediaLibLocation.current) }
                 composable(MORE_SCREEN_ROUTE) { MoreScreen() }
             }
         }
@@ -180,6 +241,65 @@ private fun NavigationBarOrRail(navController: NavController) {
                     selected = selected,
                     onClick = { onClick(index) }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun RequestStoragePermissionScreen(shouldShowRationale: Boolean, onPermissionRequest: () -> Unit) {
+    Scaffold { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(50.dp))
+
+            Text(
+                text = stringResource(R.string.storage_permission_request_screen_title),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+            )
+
+            Icon(
+                modifier = Modifier
+                    .padding(30.dp)
+                    .size(110.dp),
+                imageVector = Icons.Rounded.Storage,
+                contentDescription = null,
+            )
+
+            val textToShow = if (shouldShowRationale) {
+                // If the user has denied the permission but the rationale can be shown,
+                // then gently explain why the app requires this permission
+                stringResource(R.string.storage_permission_request_screen_rationale)
+            } else {
+                // If it's the first time the user lands on this feature, or the user
+                // doesn't want to be asked again for this permission, explain that the
+                // permission is required
+                stringResource(R.string.storage_permission_request_screen_first_tip)
+            }
+            Text(
+                text = textToShow,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 20.dp)
+            )
+
+            Button(
+                modifier = Modifier.padding(vertical = 30.dp),
+                onClick = onPermissionRequest,
+            ) {
+                Text(stringResource(R.string.storage_permission_request_screen_request_permission))
             }
         }
     }

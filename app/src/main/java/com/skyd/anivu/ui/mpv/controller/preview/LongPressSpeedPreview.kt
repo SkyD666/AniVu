@@ -49,5 +49,6 @@ internal fun BoxScope.LongPressSpeedPreview(speed: () -> Float) {
             fontSize = TextUnit(18f, TextUnitType.Sp),
             color = Color.White,
         )
+        Spacer(modifier = Modifier.width(6.dp))
     }
 }

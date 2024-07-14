@@ -56,6 +56,7 @@ fun AniVuTheme(
                         value = ThemePreference.values[0],
                     ),
                     isDark = darkTheme,
+                    isAmoled = false,
                 )
             }
         },

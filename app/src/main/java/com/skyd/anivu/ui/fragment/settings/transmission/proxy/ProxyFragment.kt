@@ -25,7 +25,7 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ProxyFragment : BasePreferenceFragmentCompat() {
-    override val title by lazy { resources.getString(R.string.proxy_fragment_name) }
+    override val title by lazy { resources.getString(R.string.proxy_screen_name) }
     private lateinit var bannerSwitchPreference: BannerSwitchPreference
     private lateinit var proxyModePreference: DropDownPreference
     private lateinit var proxyTypePreference: DropDownPreference

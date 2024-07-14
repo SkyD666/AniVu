@@ -1,9 +1,7 @@
 package com.skyd.anivu.ui.fragment.read
 
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.divider.MaterialDividerItemDecoration
@@ -23,50 +21,16 @@ class EnclosureBottomSheet : BaseBottomSheetDialogFragment<BottomSheetEnclosureB
         const val TAG = "ModalBottomSheet"
     }
 
-    private val registerPostNotificationPermission = registerForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { resultMap ->
-        if (!resultMap.containsValue(false)) {
-            waitingDownloadList.removeIf {
-                val url = when (it) {
-                    is EnclosureBean -> it.url
-                    is LinkEnclosureBean -> it.link
-                    else -> return@removeIf true
-                }
-
-                DownloadTorrentWorker.startWorker(
-                    context = requireContext(),
-                    torrentLink = url
-                )
-                true
-            }
-        }
-    }
-
-    private val waitingDownloadList = mutableListOf<Any>()
-
     private val onDownload: (Any) -> Unit = {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            waitingDownloadList += it
-            registerPostNotificationPermission.launch(
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                    arrayOf(
-                        android.Manifest.permission.POST_NOTIFICATIONS,
-                        android.Manifest.permission.FOREGROUND_SERVICE_SPECIAL_USE,
-                    )
-                } else arrayOf(android.Manifest.permission.POST_NOTIFICATIONS)
+        val url = when (it) {
+            is EnclosureBean -> it.url
+            is LinkEnclosureBean -> it.link
+            else -> null
+        }
+        if (!url.isNullOrBlank()) {
+            DownloadTorrentWorker.startWorker(
+                context = requireContext(), torrentLink = url
             )
-        } else {
-            val url = when (it) {
-                is EnclosureBean -> it.url
-                is LinkEnclosureBean -> it.link
-                else -> null
-            }
-            if (!url.isNullOrBlank()) {
-                DownloadTorrentWorker.startWorker(
-                    context = requireContext(), torrentLink = url
-                )
-            }
         }
     }
 

@@ -3,7 +3,6 @@ package com.skyd.anivu.ui.mpv
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,10 +17,9 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnDetach
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.startWith
+import com.skyd.anivu.ui.component.OnLifecycleEvent
 import com.skyd.anivu.ui.component.rememberSystemUiController
 import com.skyd.anivu.ui.mpv.controller.PlayerController
 import com.skyd.anivu.ui.mpv.controller.bar.BottomBarCallback
@@ -356,34 +354,29 @@ fun PlayerView(
 
     var needPlayWhenResume by rememberSaveable { mutableStateOf(false) }
 
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_RESUME -> {
-                    if (needPlayWhenResume) {
-                        commandQueue.trySend(PlayerCommand.Paused(false))
-                    }
-                    systemUiController.isSystemBarsVisible = false
-                    systemUiController.systemBarsBehavior =
-                        WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    OnLifecycleEvent { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_RESUME -> {
+                if (needPlayWhenResume) {
+                    commandQueue.trySend(PlayerCommand.Paused(false))
                 }
-
-                Lifecycle.Event.ON_PAUSE -> {
-                    needPlayWhenResume = playState.isPlaying
-                    if (playState.isPlaying) {
-                        commandQueue.trySend(PlayerCommand.Paused(true))
-                    }
-                }
-
-                Lifecycle.Event.ON_DESTROY -> {
-                    commandQueue.trySend(PlayerCommand.Destroy)
-                }
-
-                else -> Unit
+                systemUiController.isSystemBarsVisible = false
+                systemUiController.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
+
+            Lifecycle.Event.ON_PAUSE -> {
+                needPlayWhenResume = playState.isPlaying
+                if (playState.isPlaying) {
+                    commandQueue.trySend(PlayerCommand.Paused(true))
+                }
+            }
+
+            Lifecycle.Event.ON_DESTROY -> {
+                commandQueue.trySend(PlayerCommand.Destroy)
+            }
+
+            else -> Unit
         }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
 }

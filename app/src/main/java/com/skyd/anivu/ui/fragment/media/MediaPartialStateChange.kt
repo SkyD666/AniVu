@@ -1,7 +1,6 @@
 package com.skyd.anivu.ui.fragment.media
 
-import com.skyd.anivu.model.bean.VideoBean
-import java.io.File
+import com.skyd.anivu.model.bean.MediaGroupBean
 
 
 internal sealed interface MediaPartialStateChange {
@@ -13,53 +12,15 @@ internal sealed interface MediaPartialStateChange {
         }
     }
 
-    sealed interface MediaListResult : MediaPartialStateChange {
+    sealed interface GroupsResult : MediaPartialStateChange {
         override fun reduce(oldState: MediaState): MediaState {
             return when (this) {
                 is Success -> oldState.copy(
-                    mediaListState = MediaListState.Success(list = list),
-                    loadingDialog = false,
-                )
-
-                is Failed -> oldState.copy(
-                    mediaListState = MediaListState.Failed(msg = msg),
-                    loadingDialog = false,
-                )
-
-                Loading -> oldState.copy(
-                    mediaListState = oldState.mediaListState.let {
-                        when (it) {
-                            is MediaListState.Failed -> it.copy(loading = false)
-                            is MediaListState.Init -> it.copy(loading = false)
-                            is MediaListState.Success -> it.copy(loading = false)
-                        }
+                    groups = groups.map {
+                        it to System.currentTimeMillis()
                     },
                     loadingDialog = false,
                 )
-            }
-        }
-
-        data class Success(val list: List<VideoBean>) : MediaListResult
-        data class Failed(val msg: String) : MediaListResult
-        data object Loading : MediaListResult
-    }
-
-    sealed interface DeleteUriResult : MediaPartialStateChange {
-        override fun reduce(oldState: MediaState): MediaState {
-            return when (this) {
-                is Success -> {
-                    val mediaListState = oldState.mediaListState
-                    oldState.copy(
-                        mediaListState = if (mediaListState is MediaListState.Success) {
-                            val list = mediaListState.list.toMutableList()
-                            list.removeIf { it.file == file }
-                            MediaListState.Success(list)
-                        } else {
-                            mediaListState
-                        },
-                        loadingDialog = false,
-                    )
-                }
 
                 is Failed -> oldState.copy(
                     loadingDialog = false,
@@ -67,7 +28,92 @@ internal sealed interface MediaPartialStateChange {
             }
         }
 
-        data class Success(val file: File) : DeleteUriResult
-        data class Failed(val msg: String) : DeleteUriResult
+        data class Success(val groups: List<MediaGroupBean>) : GroupsResult
+        data class Failed(val msg: String) : GroupsResult
+    }
+
+    sealed interface DeleteGroup : MediaPartialStateChange {
+        override fun reduce(oldState: MediaState): MediaState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val group: MediaGroupBean) : DeleteGroup
+        data class Failed(val msg: String) : DeleteGroup
+    }
+
+    sealed interface ChangeMediaGroup : MediaPartialStateChange {
+        override fun reduce(oldState: MediaState): MediaState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : ChangeMediaGroup
+        data class Failed(val msg: String) : ChangeMediaGroup
+    }
+
+    sealed interface CreateGroup : MediaPartialStateChange {
+        override fun reduce(oldState: MediaState): MediaState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : CreateGroup
+        data class Failed(val msg: String) : CreateGroup
+    }
+
+    sealed interface MoveFilesToGroup : MediaPartialStateChange {
+        override fun reduce(oldState: MediaState): MediaState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : MoveFilesToGroup
+        data class Failed(val msg: String) : MoveFilesToGroup
+    }
+
+    sealed interface EditGroup : MediaPartialStateChange {
+        override fun reduce(oldState: MediaState): MediaState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val group: MediaGroupBean) : EditGroup
+        data class Failed(val msg: String) : EditGroup
     }
 }

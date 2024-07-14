@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 18
-        versionName = "1.1-beta48"
+        versionName = "1.1-beta55"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -136,8 +136,8 @@ composeCompiler {
 }
 
 tasks.withType(KotlinCompile::class.java).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += listOf(
+    compilerOptions {
+        freeCompilerArgs.addAll(
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
             "-opt-in=androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi",
             "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
@@ -150,6 +150,7 @@ tasks.withType(KotlinCompile::class.java).configureEach {
             "-opt-in=kotlinx.coroutines.FlowPreview",
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
         )
     }
 }
@@ -163,16 +164,16 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.1")
-    implementation("androidx.compose.ui:ui:1.7.0-beta01")
-    implementation("androidx.compose.material:material:1.7.0-beta01")
-    implementation("androidx.compose.material3:material3:1.3.0-beta01")
-    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-beta01")
-    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta01")
-    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta01")
-    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta01")
-    implementation("androidx.compose.material:material-icons-extended:1.6.7")
-    implementation("com.materialkolor:material-kolor:1.6.2")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
+    implementation("androidx.compose.ui:ui:1.7.0-beta05")
+    implementation("androidx.compose.material:material:1.7.0-beta05")
+    implementation("androidx.compose.material3:material3:1.3.0-beta04")
+    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-beta04")
+    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta04")
+    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta04")
+    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta04")
+    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation("com.materialkolor:material-kolor:1.7.0")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-paging:2.6.1")
@@ -186,17 +187,19 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.1")
 
     implementation("com.google.android.material:material:1.12.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
     implementation("com.google.dagger:hilt-android:2.51.1")
     ksp("com.google.dagger:hilt-android-compiler:2.51.1")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation("androidx.profileinstaller:profileinstaller:1.3.1")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:okhttp-coroutines-jvm:5.0.0-alpha.12")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.1")
 
     implementation("com.github.aniyomiorg:aniyomi-mpv-lib:1.15.n")
@@ -206,6 +209,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("io.coil-kt:coil-gif:2.6.0")
     implementation("io.coil-kt:coil-svg:2.6.0")
+    implementation("com.airbnb.android:lottie-compose:6.4.1")
     implementation("com.rometools:rome:2.1.0")
     implementation("be.ceau:opml-parser:3.1.0") {
         exclude(group = "net.sf.kxml", module = "kxml2")
@@ -219,6 +223,6 @@ dependencies {
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test.ext:junit:1.2.1")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 }

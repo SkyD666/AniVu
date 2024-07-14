@@ -8,6 +8,7 @@ import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
+import com.skyd.anivu.model.preference.appearance.article.ArticleItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleItemTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
@@ -16,6 +17,7 @@ import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefre
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.behavior.PickImageMethodPreference
@@ -28,10 +30,12 @@ import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequencyPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
+import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 
 fun Preferences.toSettings(): Settings {
     return Settings(
@@ -51,6 +55,8 @@ fun Preferences.toSettings(): Settings {
         searchTopBarTonalElevation = SearchTopBarTonalElevationPreference.fromPreferences(this),
         showArticleTopBarRefresh = ShowArticleTopBarRefreshPreference.fromPreferences(this),
         showArticlePullRefresh = ShowArticlePullRefreshPreference.fromPreferences(this),
+        articleItemMinWidth = ArticleItemMinWidthPreference.fromPreferences(this),
+        searchItemMinWidth = SearchItemMinWidthPreference.fromPreferences(this),
 
         // Update
         ignoreUpdateVersion = IgnoreUpdateVersionPreference.fromPreferences(this),
@@ -74,5 +80,9 @@ fun Preferences.toSettings(): Settings {
         autoDeleteArticleFrequency = AutoDeleteArticleFrequencyPreference.fromPreferences(this),
         autoDeleteArticleBefore = AutoDeleteArticleBeforePreference.fromPreferences(this),
         opmlExportDir = OpmlExportDirPreference.fromPreferences(this),
+        mediaLibLocation = MediaLibLocationPreference.fromPreferences(this),
+
+        // Transmission
+        seedingWhenComplete = SeedingWhenCompletePreference.fromPreferences(this),
     )
 }

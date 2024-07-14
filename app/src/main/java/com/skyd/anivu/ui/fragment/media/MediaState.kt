@@ -1,25 +1,16 @@
 package com.skyd.anivu.ui.fragment.media
 
 import com.skyd.anivu.base.mvi.MviViewState
-import com.skyd.anivu.model.bean.VideoBean
+import com.skyd.anivu.model.bean.MediaGroupBean
 
 data class MediaState(
-    val mediaListState: MediaListState,
+    val groups: List<Pair<MediaGroupBean, Long>>,
     val loadingDialog: Boolean,
 ) : MviViewState {
     companion object {
         fun initial() = MediaState(
-            mediaListState = MediaListState.Init(),
+            groups = listOf(MediaGroupBean.DefaultMediaGroup to System.currentTimeMillis()),
             loadingDialog = false,
         )
     }
-}
-
-sealed class MediaListState(open val loading: Boolean) {
-    data class Success(val list: List<VideoBean>, override val loading: Boolean = false) :
-        MediaListState(loading)
-
-    data class Init(override val loading: Boolean = false) : MediaListState(loading)
-    data class Failed(val msg: String, override val loading: Boolean = false) :
-        MediaListState(loading)
 }

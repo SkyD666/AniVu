@@ -36,6 +36,7 @@ import com.skyd.anivu.model.bean.download.PeerInfoBean
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
 import com.skyd.anivu.model.db.dao.TorrentFileDao
+import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 import com.skyd.anivu.model.repository.DownloadRepository
 import com.skyd.anivu.model.service.HttpService
@@ -59,7 +60,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.libtorrent4j.AlertListener
-import org.libtorrent4j.MoveFlags
 import org.libtorrent4j.SessionManager
 import org.libtorrent4j.SessionParams
 import org.libtorrent4j.TorrentHandle
@@ -147,8 +147,13 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private var sessionIsStopping: Boolean = false
     private suspend fun workerDownload(
-        saveDir: File = if (tempDownloadingDirName.isNullOrBlank()) Const.DOWNLOADING_VIDEO_DIR
-        else File(Const.DOWNLOADING_VIDEO_DIR, tempDownloadingDirName!!)
+        saveDir: File = applicationContext.dataStore.getOrDefault(MediaLibLocationPreference).let {
+            if (tempDownloadingDirName.isNullOrBlank()) {
+                File(it)
+            } else {
+                File(it, tempDownloadingDirName!!)
+            }
+        }
     ) = suspendCancellableCoroutine { continuation ->
 
         if (!saveDir.exists() && !saveDir.mkdirs()) {
@@ -243,12 +248,12 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         saveDir: File,
         flags: torrent_flags_t = torrent_flags_t(),
     ) {
-        doIfMagnetOrTorrentLink(
+        ifMagnetLink(
             link = link,
             onMagnet = {
                 sessionManager.download(link, saveDir, flags)
             },
-            onTorrent = {
+            onUnsupported = {
                 val tempTorrentFile = File(
                     Const.TEMP_TORRENT_DIR,
                     link.substringAfterLast('/').toDecodedUrl().validateFileName()
@@ -262,9 +267,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     null, null, null,
                     flags
                 )
-            },
-            onUnsupported = {
-                error("Unsupported link: $link")
             },
         )
     }
@@ -505,11 +507,11 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     }
 
     private fun moveFromDownloadingDirToVideoDir(handle: TorrentHandle) {
-        if (handle.savePath() != Const.VIDEO_DIR.path) {
-            handle.moveStorage(Const.VIDEO_DIR.path, MoveFlags.ALWAYS_REPLACE_FILES)
-        } else {
-            Log.w(TAG, "handle.savePath() != Const.VIDEO_DIR.path: ${handle.savePath()}")
-        }
+//        if (handle.savePath() != Const.VIDEO_DIR.path) {
+//            handle.moveStorage(Const.VIDEO_DIR.path, MoveFlags.ALWAYS_REPLACE_FILES)
+//        } else {
+//            Log.w(TAG, "handle.savePath() != Const.VIDEO_DIR.path: ${handle.savePath()}")
+//        }
     }
 
     companion object {

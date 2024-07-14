@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
-    <files-path name="files" path="Video" />
+    <external-path
+        name="external"
+        path="." />
+    <files-path
+        name="files"
+        path="Video" />
 </paths>
