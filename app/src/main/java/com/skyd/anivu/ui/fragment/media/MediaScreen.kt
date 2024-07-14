@@ -16,6 +16,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.material3.HorizontalDivider
@@ -38,6 +39,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,12 +49,15 @@ import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.bean.MediaGroupBean
+import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
+import com.skyd.anivu.ui.fragment.filepicker.ListenToFilePicker
+import com.skyd.anivu.ui.fragment.filepicker.navigateToFilePicker
 import com.skyd.anivu.ui.fragment.media.list.GroupInfo
 import com.skyd.anivu.ui.fragment.media.list.MediaList
 import com.skyd.anivu.ui.local.LocalNavController
@@ -67,6 +72,7 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val snackbarHostState = remember { SnackbarHostState() }
     val navController = LocalNavController.current
+    val context = LocalContext.current
     val windowSizeClass = LocalWindowSizeClass.current
     val scope = rememberCoroutineScope()
 
@@ -80,13 +86,28 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
     val pagerState = rememberPagerState(pageCount = { uiState.groups.size })
     var openEditGroupDialog by rememberSaveable { mutableStateOf<MediaGroupBean?>(value = null) }
 
+    ListenToFilePicker { newPath ->
+        MediaLibLocationPreference.put(context, this, newPath)
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AniVuTopBar(
                 style = AniVuTopBarStyle.CenterAligned,
                 title = { Text(text = stringResource(R.string.media_screen_name)) },
-                navigationIcon = { },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    navigationIconContentColor = TopAppBarDefaults.centerAlignedTopAppBarColors().actionIconContentColor
+                ),
+                navigationIcon = {
+                    AniVuIconButton(
+                        onClick = {
+                            navigateToFilePicker(navController = navController, path = path)
+                        },
+                        imageVector = Icons.Outlined.MyLocation,
+                        contentDescription = stringResource(id = R.string.data_screen_media_lib_location),
+                    )
+                },
                 scrollBehavior = scrollBehavior,
                 windowInsets = WindowInsets.safeDrawing.run {
                     var sides = WindowInsetsSides.Top + WindowInsetsSides.Right
@@ -97,6 +118,7 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                     AniVuIconButton(
                         onClick = { dispatch(MediaIntent.Refresh(path)) },
                         imageVector = Icons.Outlined.Refresh,
+                        contentDescription = stringResource(id = R.string.refresh),
                     )
                     AniVuIconButton(
                         onClick = { navController.navigate(R.id.action_to_download_fragment) },

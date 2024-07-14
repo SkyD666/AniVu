@@ -46,6 +46,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.base.mvi.getDispatcher
@@ -54,12 +55,17 @@ import com.skyd.anivu.ext.findMainNavController
 import com.skyd.anivu.ext.getMimeType
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
+import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.util.fileicon.getFileIcon
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.onEach
 import java.io.File
 
 
@@ -89,6 +95,40 @@ const val PATH_KEY = "path"
 const val PICK_FOLDER_KEY = "pickFolder"
 const val EXTENSION_NAME_KEY = "extensionName"
 const val FILE_PICKER_NEW_PATH_KEY = "newPath"
+
+@Composable
+fun ListenToFilePicker(onNewPath: CoroutineScope.(String) -> Unit) {
+    val navController = LocalNavController.current
+    LaunchedEffect(Unit) {
+        navController.currentBackStackEntry?.savedStateHandle
+            ?.getStateFlow<String?>(FILE_PICKER_NEW_PATH_KEY, null)
+            ?.filterNotNull()
+            ?.onEach { this.onNewPath(it) }
+            ?.collect()
+    }
+}
+
+fun navigateToFilePicker(
+    navController: NavController,
+    path: String,
+    pickFolder: Boolean = true,
+    extensionName: String = "",
+) {
+    navController.navigate(
+        R.id.action_to_file_picker_fragment,
+        Bundle().apply {
+            putBoolean(PICK_FOLDER_KEY, pickFolder)
+            putString(
+                PATH_KEY,
+                if (path == MediaLibLocationPreference.default) {
+                    Const.INTERNAL_STORAGE
+                } else path
+            )
+            putString(EXTENSION_NAME_KEY, extensionName)
+        }
+    )
+}
+
 
 @Composable
 fun FilePickerScreen(

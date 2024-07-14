@@ -1,7 +1,6 @@
 package com.skyd.anivu.ui.fragment.settings.data
 
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,7 +23,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,16 +49,11 @@ import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
-import com.skyd.anivu.ui.fragment.filepicker.EXTENSION_NAME_KEY
-import com.skyd.anivu.ui.fragment.filepicker.FILE_PICKER_NEW_PATH_KEY
-import com.skyd.anivu.ui.fragment.filepicker.PATH_KEY
-import com.skyd.anivu.ui.fragment.filepicker.PICK_FOLDER_KEY
+import com.skyd.anivu.ui.fragment.filepicker.ListenToFilePicker
+import com.skyd.anivu.ui.fragment.filepicker.navigateToFilePicker
 import com.skyd.anivu.ui.local.LocalMediaLibLocation
 import com.skyd.anivu.ui.local.LocalNavController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.onEach
 
 
 @AndroidEntryPoint
@@ -84,17 +77,8 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
     val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val dispatch = viewModel.getDispatcher(startWith = DataIntent.Init)
 
-    LaunchedEffect(Unit) {
-        navController.currentBackStackEntry?.savedStateHandle
-            ?.getStateFlow<String?>(FILE_PICKER_NEW_PATH_KEY, null)
-            ?.filterNotNull()
-            ?.onEach { newPath ->
-                MediaLibLocationPreference.put(
-                    context,
-                    this,
-                    newPath,
-                )
-            }?.collect()
+    ListenToFilePicker { newPath ->
+        MediaLibLocationPreference.put(context, this, newPath)
     }
 
     Scaffold(
@@ -128,18 +112,9 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
                     text = stringResource(id = R.string.data_screen_media_lib_location),
                     descriptionText = localMediaLibLocation,
                     onClick = {
-                        navController.navigate(
-                            R.id.action_to_file_picker_fragment,
-                            Bundle().apply {
-                                putBoolean(PICK_FOLDER_KEY, true)
-                                putString(
-                                    PATH_KEY,
-                                    if (localMediaLibLocation == MediaLibLocationPreference.default) {
-                                        Environment.getExternalStorageDirectory().absolutePath
-                                    } else localMediaLibLocation
-                                )
-                                putString(EXTENSION_NAME_KEY, "")
-                            }
+                        navigateToFilePicker(
+                            navController = navController,
+                            path = localMediaLibLocation,
                         )
                     }
                 ) {

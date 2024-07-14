@@ -33,6 +33,7 @@ import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequenc
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
+import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
@@ -89,6 +90,7 @@ val LocalPlayerShow85sButton = compositionLocalOf { PlayerShow85sButtonPreferenc
 val LocalPlayerShowScreenshotButton =
     compositionLocalOf { PlayerShowScreenshotButtonPreference.default }
 val LocalHardwareDecode = compositionLocalOf { HardwareDecodePreference.default }
+val LocalPlayerAutoPip = compositionLocalOf { PlayerAutoPipPreference.default }
 
 // Data
 val LocalUseAutoDelete = compositionLocalOf { UseAutoDeletePreference.default }

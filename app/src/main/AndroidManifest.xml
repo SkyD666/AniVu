@@ -67,11 +67,13 @@
 
         <activity
             android:name=".ui.activity.PlayActivity"
+            android:autoRemoveFromRecents="true"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
             android:exported="true"
             android:label="@string/play_activity_label"
             android:launchMode="singleTask"
             android:screenOrientation="userLandscape"
+            android:supportsPictureInPicture="true"
             android:theme="@style/Theme.AniVu.Player">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />

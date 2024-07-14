@@ -309,6 +309,9 @@
     <string name="search_style_screen_search_item_category">Search item</string>
     <string name="empty_tip_1">Nothing</string>
     <string name="sub_media_screen_path_illegal">Illegal path: %s</string>
+    <string name="player_config_screen_auto_pip">Auto PIP</string>
+    <string name="player_config_screen_auto_pip_description">Switch to PiP mode if the Home or Recents button is pressed</string>
+    <string name="player_picture_in_picture">Picture in picture</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>

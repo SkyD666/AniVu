@@ -37,6 +37,7 @@ import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequenc
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
+import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
@@ -63,6 +64,7 @@ import com.skyd.anivu.ui.local.LocalMediaLibLocation
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalOpmlExportDir
 import com.skyd.anivu.ui.local.LocalPickImageMethod
+import com.skyd.anivu.ui.local.LocalPlayerAutoPip
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
@@ -111,6 +113,7 @@ data class Settings(
     val playerShow85sButton: Boolean = PlayerShow85sButtonPreference.default,
     val playerShowScreenshotButton: Boolean = PlayerShowScreenshotButtonPreference.default,
     val hardwareDecode: Boolean = HardwareDecodePreference.default,
+    val playerAutoPip: Boolean = PlayerAutoPipPreference.default,
     // Data
     val useAutoDelete: Boolean = UseAutoDeletePreference.default,
     val autoDeleteArticleFrequency: Long = AutoDeleteArticleFrequencyPreference.default,
@@ -162,6 +165,7 @@ fun SettingsProvider(
         LocalPlayerShow85sButton provides settings.playerShow85sButton,
         LocalPlayerShowScreenshotButton provides settings.playerShowScreenshotButton,
         LocalHardwareDecode provides settings.hardwareDecode,
+        LocalPlayerAutoPip provides settings.playerAutoPip,
         // Data
         LocalUseAutoDelete provides settings.useAutoDelete,
         LocalAutoDeleteArticleFrequency provides settings.autoDeleteArticleFrequency,

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.outlined.PictureInPictureAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -31,11 +32,16 @@ import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.ui.mpv.controller.ControllerBarGray
 
+data class TopBarCallback(
+    val onBack: () -> Unit,
+    val onPictureInPicture: () -> Unit,
+)
+
 @Composable
 internal fun TopBar(
     modifier: Modifier = Modifier,
     title: String,
-    onBack: () -> Unit
+    topBarCallback: TopBarCallback,
 ) {
     Row(
         modifier = modifier
@@ -58,7 +64,7 @@ internal fun TopBar(
             modifier = Modifier
                 .clip(CircleShape)
                 .size(56.dp)
-                .clickable(onClick = onBack)
+                .clickable(onClick = topBarCallback.onBack)
                 .padding(15.dp),
             imageVector = Icons.Outlined.ArrowBackIosNew,
             contentDescription = stringResource(id = R.string.back),
@@ -74,5 +80,12 @@ internal fun TopBar(
             maxLines = 1,
         )
         Spacer(modifier = Modifier.width(3.dp))
+        Spacer(modifier = Modifier.weight(1f))
+        BarIconButton(
+            modifier = Modifier.padding(2.dp),
+            onClick = topBarCallback.onPictureInPicture,
+            imageVector = Icons.Outlined.PictureInPictureAlt,
+            contentDescription = stringResource(id = R.string.player_picture_in_picture),
+        )
     }
 }

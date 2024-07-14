@@ -1,10 +1,10 @@
 package com.skyd.anivu.model.preference.data
 
 import android.content.Context
-import android.os.Environment
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.skyd.anivu.base.BasePreference
+import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.put
 import kotlinx.coroutines.CoroutineScope
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 object FilePickerLocationPreference : BasePreference<String> {
     private const val FILE_PICKER_LOCATION = "filePickerLocation"
 
-    override val default: String = Environment.getExternalStorageDirectory().absolutePath
+    override val default: String = Const.INTERNAL_STORAGE
 
     val key = stringPreferencesKey(FILE_PICKER_LOCATION)
 

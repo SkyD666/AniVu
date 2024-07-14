@@ -11,7 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.content.IntentCompat
 import androidx.core.util.Consumer
@@ -58,7 +58,7 @@ class PlayActivity : BaseComposeActivity() {
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setContentBase {
-            var videoUri by remember { mutableStateOf(handleIntent(intent)) }
+            var videoUri by rememberSaveable { mutableStateOf(handleIntent(intent)) }
 
             DisposableEffect(Unit) {
                 val listener = Consumer<Intent> { newIntent ->

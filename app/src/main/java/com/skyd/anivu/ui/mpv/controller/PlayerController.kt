@@ -44,6 +44,7 @@ import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.mpv.controller.bar.BottomBar
 import com.skyd.anivu.ui.mpv.controller.bar.BottomBarCallback
 import com.skyd.anivu.ui.mpv.controller.bar.TopBar
+import com.skyd.anivu.ui.mpv.controller.bar.TopBarCallback
 import com.skyd.anivu.ui.mpv.controller.button.Forward85s
 import com.skyd.anivu.ui.mpv.controller.button.ResetTransform
 import com.skyd.anivu.ui.mpv.controller.button.Screenshot
@@ -70,9 +71,9 @@ internal val ControllerLabelGray = Color(0x70000000)
 @Composable
 internal fun PlayerController(
     enabled: () -> Boolean,
-    onBack: () -> Unit,
     playState: () -> PlayState,
     playStateCallback: PlayStateCallback,
+    topBarCallback: TopBarCallback,
     bottomBarCallback: BottomBarCallback,
     dialogState: DialogState,
     dialogCallback: DialogCallback,
@@ -209,9 +210,9 @@ internal fun PlayerController(
             AutoHiddenBox(
                 enabled = enabled,
                 show = { showController },
-                onBack = onBack,
                 playState = playState,
                 playStateCallback = playStateCallback,
+                topBarCallback = topBarCallback,
                 bottomBarCallback = bottomBarCallback,
                 transformState = transformState,
                 transformStateCallback = transformStateCallback,
@@ -285,9 +286,9 @@ internal fun PlayerController(
 private fun AutoHiddenBox(
     enabled: () -> Boolean,
     show: () -> Boolean,
-    onBack: () -> Unit,
     playState: () -> PlayState,
     playStateCallback: PlayStateCallback,
+    topBarCallback: TopBarCallback,
     bottomBarCallback: BottomBarCallback,
     transformState: () -> TransformState,
     transformStateCallback: TransformStateCallback,
@@ -306,7 +307,7 @@ private fun AutoHiddenBox(
                 TopBar(
                     modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
                     title = playState().title,
-                    onBack = onBack,
+                    topBarCallback = topBarCallback,
                 )
                 BottomBar(
                     modifier = Modifier.constrainAs(bottomBar) { bottom.linkTo(parent.bottom) },

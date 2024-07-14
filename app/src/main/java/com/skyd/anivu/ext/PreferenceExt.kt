@@ -32,6 +32,7 @@ import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequenc
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
+import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
@@ -74,6 +75,7 @@ fun Preferences.toSettings(): Settings {
         playerShow85sButton = PlayerShow85sButtonPreference.fromPreferences(this),
         playerShowScreenshotButton = PlayerShowScreenshotButtonPreference.fromPreferences(this),
         hardwareDecode = HardwareDecodePreference.fromPreferences(this),
+        playerAutoPip = PlayerAutoPipPreference.fromPreferences(this),
 
         // Data
         useAutoDelete = UseAutoDeletePreference.fromPreferences(this),
