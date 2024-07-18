@@ -206,10 +206,10 @@ dependencies {
     implementation("com.github.aniyomiorg:aniyomi-mpv-lib:1.15.n")
     implementation("com.github.jmir1:ffmpeg-kit:1.15")
 
-    implementation("io.coil-kt:coil:2.6.0")
-    implementation("io.coil-kt:coil-compose:2.6.0")
-    implementation("io.coil-kt:coil-gif:2.6.0")
-    implementation("io.coil-kt:coil-svg:2.6.0")
+    implementation("io.coil-kt:coil:2.7.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation("io.coil-kt:coil-gif:2.7.0")
+    implementation("io.coil-kt:coil-svg:2.7.0")
     implementation("com.airbnb.android:lottie-compose:6.4.1")
     implementation("com.rometools:rome:2.1.0")
     implementation("be.ceau:opml-parser:3.1.0") {
