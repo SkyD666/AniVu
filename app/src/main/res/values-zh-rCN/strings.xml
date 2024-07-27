@@ -289,7 +289,8 @@
     <string name="storage_permission_request_screen_rationale">没有存储权限无法运行应用程序，请授予权限。</string>
     <string name="storage_permission_request_screen_title">AniVu 需要存储访问</string>
     <string name="storage_permission_request_screen_request_permission">授予权限</string>
-    <string name="file_picker_screen_name">文件选择器</string>
+    <string name="file_picker_screen_open_file">打开文件</string>
+    <string name="file_picker_screen_open_folder">打开文件夹</string>
     <string name="file_picker_screen_pick">选择此文件夹</string>
     <string name="file_picker_screen_internal_storage">内部存储</string>
     <string name="media_screen_delete_file_warning">删除此文件？</string>
@@ -305,6 +306,7 @@
     <string name="player_config_screen_auto_pip">自动画中画</string>
     <string name="player_config_screen_auto_pip_description">如果按下主页或最近任务按钮，则切换到画中画模式</string>
     <string name="player_picture_in_picture">画中画</string>
+    <string name="open_file">打开文件</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>
