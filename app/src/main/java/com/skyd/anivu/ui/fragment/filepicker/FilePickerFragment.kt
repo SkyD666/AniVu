@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.fragment.filepicker
 
 import android.os.Bundle
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,6 +67,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.parcelize.Parcelize
 import java.io.File
 
 
@@ -79,6 +81,7 @@ class FilePickerFragment : BaseComposeFragment() {
         val path = arguments?.getString(PATH_KEY)
         val pickFolder = arguments?.getBoolean(PICK_FOLDER_KEY)
         val extensionName = arguments?.getString(EXTENSION_NAME_KEY)
+        val id = arguments?.getString(PICK_FOLDER_ID_KEY)
         if (path == null || pickFolder == null || extensionName == null) {
             findMainNavController().popBackStackWithLifecycle()
         } else {
@@ -86,6 +89,7 @@ class FilePickerFragment : BaseComposeFragment() {
                 path = path,
                 pickFolder = pickFolder,
                 extensionName = extensionName,
+                id = id,
             )
         }
     }
@@ -95,16 +99,21 @@ const val PATH_KEY = "path"
 const val PICK_FOLDER_KEY = "pickFolder"
 const val EXTENSION_NAME_KEY = "extensionName"
 const val FILE_PICKER_NEW_PATH_KEY = "newPath"
+const val PICK_FOLDER_ID_KEY = "id"
 
 @Composable
-fun ListenToFilePicker(onNewPath: CoroutineScope.(String) -> Unit) {
+fun ListenToFilePicker(onNewPath: CoroutineScope.(FilePickerResult) -> Unit) {
     val navController = LocalNavController.current
     LaunchedEffect(Unit) {
-        navController.currentBackStackEntry?.savedStateHandle
-            ?.getStateFlow<String?>(FILE_PICKER_NEW_PATH_KEY, null)
-            ?.filterNotNull()
-            ?.onEach { this.onNewPath(it) }
-            ?.collect()
+        navController.currentBackStackEntry?.savedStateHandle?.apply {
+            getStateFlow<FilePickerResult?>(FILE_PICKER_NEW_PATH_KEY, null)
+                .filterNotNull()
+                .onEach {
+                    onNewPath(it)
+                    remove<FilePickerResult?>(FILE_PICKER_NEW_PATH_KEY)
+                }
+                .collect()
+        }
     }
 }
 
@@ -113,6 +122,7 @@ fun navigateToFilePicker(
     path: String,
     pickFolder: Boolean = true,
     extensionName: String = "",
+    id: String? = null,
 ) {
     navController.navigate(
         R.id.action_to_file_picker_fragment,
@@ -125,9 +135,19 @@ fun navigateToFilePicker(
                 } else path
             )
             putString(EXTENSION_NAME_KEY, extensionName)
+            putString(PICK_FOLDER_ID_KEY, id)
         }
     )
 }
+
+@Parcelize
+data class FilePickerResult(
+    val id: String?,
+    val path: String,
+    val pickFolder: Boolean,
+    val extensionName: String?,
+    val result: String,
+) : Parcelable
 
 
 @Composable
@@ -135,6 +155,7 @@ fun FilePickerScreen(
     path: String,
     pickFolder: Boolean = false,
     extensionName: String? = null,
+    id: String?,
     viewModel: FilePickerViewModel = hiltViewModel(),
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -168,7 +189,14 @@ fun FilePickerScreen(
             AniVuTopBar(
                 style = AniVuTopBarStyle.Small,
                 scrollBehavior = scrollBehavior,
-                title = { Text(text = stringResource(R.string.file_picker_screen_name)) },
+                title = {
+                    Text(
+                        text = stringResource(
+                            if (pickFolder) R.string.file_picker_screen_open_folder
+                            else R.string.file_picker_screen_open_file
+                        )
+                    )
+                },
                 navigationIcon = {
                     AniVuIconButton(
                         onClick = { navController.popBackStackWithLifecycle() },
@@ -211,7 +239,17 @@ fun FilePickerScreen(
                                     if (!pickFolder) {
                                         navController.previousBackStackEntry
                                             ?.savedStateHandle
-                                            ?.set(FILE_PICKER_NEW_PATH_KEY, file.absolutePath)
+                                            ?.set(
+                                                FILE_PICKER_NEW_PATH_KEY,
+                                                FilePickerResult(
+                                                    id = id,
+                                                    path = path,
+                                                    pickFolder = false,
+                                                    extensionName = extensionName,
+                                                    result = file.absolutePath,
+                                                )
+                                            )
+                                        navController.popBackStackWithLifecycle()
                                     }
                                 }
                             },
@@ -243,7 +281,16 @@ fun FilePickerScreen(
                     onClick = {
                         navController.previousBackStackEntry
                             ?.savedStateHandle
-                            ?.set(FILE_PICKER_NEW_PATH_KEY, uiState.path)
+                            ?.set(
+                                FILE_PICKER_NEW_PATH_KEY,
+                                FilePickerResult(
+                                    id = id,
+                                    path = path,
+                                    pickFolder = true,
+                                    extensionName = extensionName,
+                                    result = uiState.path,
+                                )
+                            )
                         navController.popBackStackWithLifecycle()
                     },
                 ) {

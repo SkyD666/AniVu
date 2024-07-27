@@ -296,7 +296,8 @@
     <string name="storage_permission_request_screen_rationale">Application can\'t be launched without storage permission, please grant the permission</string>
     <string name="storage_permission_request_screen_title">AniVu requires storage access</string>
     <string name="storage_permission_request_screen_request_permission">Request permission</string>
-    <string name="file_picker_screen_name">File picker</string>
+    <string name="file_picker_screen_open_file">Open file</string>
+    <string name="file_picker_screen_open_folder">Open a folder</string>
     <string name="file_picker_screen_pick">Pick this folder</string>
     <string name="file_picker_screen_internal_storage">Internal storage</string>
     <string name="media_screen_delete_file_warning">Delete this file?</string>
@@ -312,6 +313,7 @@
     <string name="player_config_screen_auto_pip">Auto PIP</string>
     <string name="player_config_screen_auto_pip_description">Switch to PiP mode if the Home or Recents button is pressed</string>
     <string name="player_picture_in_picture">Picture in picture</string>
+    <string name="open_file">Open file</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>

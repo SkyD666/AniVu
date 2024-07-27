@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 18
-        versionName = "1.1-beta56"
+        versionName = "1.1-beta57"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -159,17 +159,17 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.activity:activity-ktx:1.9.0")
+    implementation("androidx.activity:activity-ktx:1.9.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha13")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
-    implementation("androidx.compose.ui:ui:1.7.0-beta05")
-    implementation("androidx.compose.material:material:1.7.0-beta05")
-    implementation("androidx.compose.material3:material3:1.3.0-beta04")
-    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-beta04")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
+    implementation("androidx.compose.ui:ui:1.7.0-beta06")
+    implementation("androidx.compose.material:material:1.7.0-beta06")
+    implementation("androidx.compose.material3:material3:1.3.0-beta05")
+    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-beta05")
     implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta04")
     implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta04")
     implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta04")
@@ -183,8 +183,8 @@ dependencies {
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.paging:paging-runtime-ktx:3.3.0")
-    implementation("androidx.paging:paging-compose:3.3.0")
+    implementation("androidx.paging:paging-runtime-ktx:3.3.1")
+    implementation("androidx.paging:paging-compose:3.3.1")
     implementation("androidx.preference:preference-ktx:1.2.1")
 
     implementation("com.google.android.material:material:1.12.0")

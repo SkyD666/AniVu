@@ -77,8 +77,8 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
     val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val dispatch = viewModel.getDispatcher(startWith = DataIntent.Init)
 
-    ListenToFilePicker { newPath ->
-        MediaLibLocationPreference.put(context, this, newPath)
+    ListenToFilePicker { result ->
+        MediaLibLocationPreference.put(context, this, result.result)
     }
 
     Scaffold(

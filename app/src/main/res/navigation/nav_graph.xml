@@ -204,7 +204,7 @@
     <fragment
         android:id="@+id/file_picker_fragment"
         android:name="com.skyd.anivu.ui.fragment.filepicker.FilePickerFragment"
-        android:label="@string/file_picker_screen_name" />
+        android:label="@string/file_picker_screen_open_file" />
     <action
         android:id="@+id/action_to_file_picker_fragment"
         app:destination="@id/file_picker_fragment" />

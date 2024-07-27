@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.fragment.media
 
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -16,13 +17,16 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Workspaces
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PrimaryScrollableTabRow
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
@@ -37,19 +41,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.getDispatcher
+import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
+import com.skyd.anivu.ui.activity.PlayActivity
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -63,6 +73,7 @@ import com.skyd.anivu.ui.fragment.media.list.MediaList
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import kotlinx.coroutines.launch
+import java.io.File
 import kotlin.math.min
 
 const val MEDIA_SCREEN_ROUTE = "mediaScreen"
@@ -86,8 +97,15 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
     val pagerState = rememberPagerState(pageCount = { uiState.groups.size })
     var openEditGroupDialog by rememberSaveable { mutableStateOf<MediaGroupBean?>(value = null) }
 
-    ListenToFilePicker { newPath ->
-        MediaLibLocationPreference.put(context, this, newPath)
+    ListenToFilePicker { result ->
+        if (result.pickFolder) {
+            MediaLibLocationPreference.put(context, this, result.result)
+        } else {
+            PlayActivity.play(
+                context.activity,
+                File(result.result).toUri(),
+            )
+        }
     }
 
     Scaffold(
@@ -129,14 +147,40 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
             )
         },
         floatingActionButton = {
-            AniVuFloatingActionButton(
-                onClick = { openEditGroupDialog = uiState.groups[pagerState.currentPage].first },
-                onSizeWithSinglePaddingChanged = { width, height ->
-                    fabWidth = width
-                    fabHeight = height
+            val density = LocalDensity.current
+            Column(
+                modifier = Modifier.onSizeChanged {
+                    with(density) {
+                        fabWidth = it.width.toDp() + 16.dp
+                        fabHeight = it.height.toDp() + 16.dp
+                    }
                 },
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.End
             ) {
-                Icon(imageVector = Icons.Outlined.Edit, contentDescription = null)
+                SmallFloatingActionButton(
+                    onClick = {
+                        navigateToFilePicker(
+                            navController = navController,
+                            path = path,
+                            pickFolder = false,
+                        )
+                    },
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.secondary,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.FileOpen,
+                        contentDescription = stringResource(id = R.string.open_file),
+                    )
+                }
+                AniVuFloatingActionButton(
+                    onClick = {
+                        openEditGroupDialog = uiState.groups[pagerState.currentPage].first
+                    },
+                ) {
+                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = null)
+                }
             }
         },
         contentWindowInsets = WindowInsets.safeDrawing.run {
