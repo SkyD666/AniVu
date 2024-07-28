@@ -1,0 +1,19 @@
+AniVu, an all-in-one tool for RSS subscription and updates, bit torrent downloads, and video playback.
+AniVu utilizes the MVI architecture and fully adopts the Material You design style. All pages are developed using Android View and Jetpack Compose. 
+<h3>💡 Features</h3>
+<ol>
+<li><strong>Subscribe to RSS</strong>, Update RSS, <strong>Read</strong> RSS</li>
+<li><strong>Automatically update RSS</strong> subscriptions</li>
+<li><strong>Download enclosures</strong> (enclosure tags) of <strong>torrent or magnet</strong> links in RSS articles</li>
+<li><strong>Seeding</strong> downloaded files</li>
+<li><strong>Play media enclosures or downloaded videos</strong></li>
+<li>Support variable playback <strong>speed</strong>, setup <strong>audio track</strong>, <strong>subtitle track</strong>, etc</li>
+<li><strong>Double-finger</strong> gesture to <strong>rotate and zoom</strong> video, <strong>long press</strong> to speed up playback</li>
+<li><strong>Swipe</strong> on the video to <strong>control volume</strong>, <strong>brightness</strong>, and <strong>playback position</strong></li>
+<li><strong>Searching</strong> existing <strong>RSS subscription content</strong></li>
+<li><strong>Play other videos on the phone</strong></li>
+<li>Support <strong>custom MPV player</strong></li>
+<li>Support <strong>import and export</strong> subscriptions via <strong>OPML</strong></li>
+<li>Support <strong>dark mode</strong></li>
+<li>......</li>
+</ol>
