@@ -227,6 +227,7 @@ fun FilePickerScreen(
                 contentPadding = PaddingValues(
                     start = paddingValues.calculateStartPadding(LocalLayoutDirection.current),
                     end = paddingValues.calculateEndPadding(LocalLayoutDirection.current),
+                    bottom = if (pickFolder) 0.dp else paddingValues.calculateBottomPadding(),
                 ),
             ) {
                 (uiState.fileListState as? FileListState.Success)?.list?.forEach { file ->

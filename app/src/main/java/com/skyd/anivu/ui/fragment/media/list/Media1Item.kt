@@ -69,8 +69,9 @@ fun Media1Item(
     val isMedia = rememberSaveable(data) { data.isMedia }
     val isDir = rememberSaveable(data) { data.isDir }
 
-    val fileNameWithoutExtension = data.name.substringBeforeLast(".")
-    val fileExtension = data.name.substringAfterLast(".", "")
+    val fileNameWithoutExtension = if (isDir) data.name else data.name.substringBeforeLast(".")
+    val fileExtension = if (isDir) "" else data.name.substringAfterLast(".", "")
+
 
     Row(
         modifier = Modifier

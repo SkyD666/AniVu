@@ -112,20 +112,12 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AniVuTopBar(
-                style = AniVuTopBarStyle.CenterAligned,
+                style = AniVuTopBarStyle.Small,
                 title = { Text(text = stringResource(R.string.media_screen_name)) },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    navigationIconContentColor = TopAppBarDefaults.centerAlignedTopAppBarColors().actionIconContentColor
+                colors = TopAppBarDefaults.topAppBarColors(
+                    navigationIconContentColor = TopAppBarDefaults.topAppBarColors().actionIconContentColor
                 ),
-                navigationIcon = {
-                    AniVuIconButton(
-                        onClick = {
-                            navigateToFilePicker(navController = navController, path = path)
-                        },
-                        imageVector = Icons.Outlined.MyLocation,
-                        contentDescription = stringResource(id = R.string.data_screen_media_lib_location),
-                    )
-                },
+                navigationIcon = {},
                 scrollBehavior = scrollBehavior,
                 windowInsets = WindowInsets.safeDrawing.run {
                     var sides = WindowInsetsSides.Top + WindowInsetsSides.Right
@@ -133,6 +125,13 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                     only(sides)
                 },
                 actions = {
+                    AniVuIconButton(
+                        onClick = {
+                            navigateToFilePicker(navController = navController, path = path)
+                        },
+                        imageVector = Icons.Outlined.MyLocation,
+                        contentDescription = stringResource(id = R.string.data_screen_media_lib_location),
+                    )
                     AniVuIconButton(
                         onClick = { dispatch(MediaIntent.Refresh(path)) },
                         imageVector = Icons.Outlined.Refresh,

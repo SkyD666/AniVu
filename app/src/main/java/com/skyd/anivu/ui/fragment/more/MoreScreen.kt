@@ -67,7 +67,7 @@ fun MoreScreen() {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AniVuTopBar(
-                style = AniVuTopBarStyle.CenterAligned,
+                style = AniVuTopBarStyle.Small,
                 title = { Text(text = stringResource(id = R.string.more_screen_name)) },
                 navigationIcon = {},
                 windowInsets = WindowInsets.safeDrawing.only(

@@ -196,7 +196,7 @@ private fun FeedList(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AniVuTopBar(
-                style = AniVuTopBarStyle.CenterAligned,
+                style = AniVuTopBarStyle.Small,
                 title = { Text(text = stringResource(id = R.string.feed_screen_name)) },
                 actions = {
                     AniVuIconButton(
