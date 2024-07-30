@@ -10,6 +10,9 @@
         <a href="https://github.com/SkyD666/AniVu/releases/latest" style="text-decoration:none">
             <img src="https://img.shields.io/github/v/release/SkyD666/AniVu?display_name=release&style=for-the-badge" alt="GitHub release (latest by date)"/>
         </a>
+        <a href="https://f-droid.org/packages/com.skyd.anivu/" style="text-decoration:none">
+            <img src="https://img.shields.io/f-droid/v/com.skyd.anivu?style=for-the-badge&logo=F-Droid&color=1976d2" alt="F-Droid Version"/>
+        </a>
         <a href="https://github.com/SkyD666/AniVu/releases/latest" style="text-decoration:none" >
             <img src="https://img.shields.io/github/downloads/SkyD666/AniVu/total?style=for-the-badge" alt="GitHub all downloads"/>
         </a>
