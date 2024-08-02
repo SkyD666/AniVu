@@ -168,6 +168,14 @@ class FeedRepository @Inject constructor(
         emit(feedDao.getFeed(url))
     }.flowOn(Dispatchers.IO)
 
+    suspend fun editFeedSortXmlArticlesOnUpdate(
+        url: String,
+        sort: Boolean,
+    ): Flow<FeedBean> = flow {
+        feedDao.updateFeedSortXmlArticlesOnUpdate(feedUrl = url, sort = sort)
+        emit(feedDao.getFeed(url))
+    }.flowOn(Dispatchers.IO)
+
     suspend fun removeFeed(url: String): Flow<Int> {
         return flow {
             feedDao.getFeed(url).customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }

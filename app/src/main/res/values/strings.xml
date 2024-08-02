@@ -314,6 +314,8 @@
     <string name="player_config_screen_auto_pip_description">Switch to PiP mode if the Home or Recents button is pressed</string>
     <string name="player_picture_in_picture">Picture in picture</string>
     <string name="open_file">Open file</string>
+    <string name="feed_screen_sort_xml_articles_on_update">Use full refresh</string>
+    <string name="feed_screen_sort_xml_articles_on_update_tip">Enabling full refresh may increase the refresh time</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>

@@ -33,6 +33,8 @@ data class FeedBean(
     val customDescription: String? = null,
     @ColumnInfo(name = CUSTOM_ICON_COLUMN)
     val customIcon: String? = null,
+    @ColumnInfo(name = SORT_XML_ARTICLES_ON_UPDATE)
+    val sortXmlArticlesOnUpdate: Boolean = false,
 ) : BaseBean, Parcelable {
     companion object {
         const val URL_COLUMN = "url"
@@ -44,6 +46,7 @@ data class FeedBean(
         const val NICKNAME_COLUMN = "nickname"
         const val CUSTOM_DESCRIPTION_COLUMN = "customDescription"
         const val CUSTOM_ICON_COLUMN = "customIcon"
+        const val SORT_XML_ARTICLES_ON_UPDATE = "sortXmlArticlesOnUpdate"
 
         fun FeedBean.isDefaultGroup(): Boolean =
             this.groupId == null || this.groupId == GroupBean.DEFAULT_GROUP_ID

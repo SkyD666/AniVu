@@ -307,6 +307,8 @@
     <string name="player_config_screen_auto_pip_description">如果按下主页或最近任务按钮，则切换到画中画模式</string>
     <string name="player_picture_in_picture">画中画</string>
     <string name="open_file">打开文件</string>
+    <string name="feed_screen_sort_xml_articles_on_update">启用完整刷新</string>
+    <string name="feed_screen_sort_xml_articles_on_update_tip">启用完整刷新可能会增加刷新时间</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>

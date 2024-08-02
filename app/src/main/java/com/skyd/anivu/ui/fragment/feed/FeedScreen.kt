@@ -391,8 +391,14 @@ private fun FeedList(
                 onCustomIconChange = {
                     dispatch(
                         FeedIntent.EditFeedCustomIcon(
-                            url = openEditFeedDialog!!.url,
-                            customIcon = it
+                            url = openEditFeedDialog!!.url, customIcon = it,
+                        )
+                    )
+                },
+                onSortXmlArticlesOnUpdateChanged = {
+                    dispatch(
+                        FeedIntent.EditFeedSortXmlArticlesOnUpdate(
+                            url = openEditFeedDialog!!.url, sort = it,
                         )
                     )
                 },

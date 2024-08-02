@@ -19,6 +19,7 @@ sealed interface FeedIntent : MviIntent {
         FeedIntent
 
     data class EditFeedCustomIcon(val url: String, val customIcon: Uri?) : FeedIntent
+    data class EditFeedSortXmlArticlesOnUpdate(val url: String, val sort: Boolean) : FeedIntent
 
     data class RemoveFeed(val url: String) : FeedIntent
     data class ReadAllInFeed(val feedUrl: String) : FeedIntent

@@ -148,6 +148,9 @@ class FeedViewModel @Inject constructor(
                 filterIsInstance<FeedIntent.EditFeedCustomIcon>().map { intent ->
                     feedRepo.editFeedCustomIcon(url = intent.url, customIcon = intent.customIcon)
                 },
+                filterIsInstance<FeedIntent.EditFeedSortXmlArticlesOnUpdate>().map { intent ->
+                    feedRepo.editFeedSortXmlArticlesOnUpdate(url = intent.url, sort = intent.sort)
+                },
                 filterIsInstance<FeedIntent.EditFeedNickname>().map { intent ->
                     feedRepo.editFeedNickname(url = intent.url, nickname = intent.nickname)
                 },

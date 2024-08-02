@@ -65,6 +65,13 @@ class RssHelper @Inject constructor(
                             ),
                             articles = syndFeed.entries
                                 .asSequence()
+                                .run {
+                                    if (feed.sortXmlArticlesOnUpdate) {
+                                        sortedByDescending { it.publishedDate }
+                                    } else {
+                                        this
+                                    }
+                                }
                                 .takeWhile { latestLink == null || latestLink != it.link }
                                 .map { article(feed, it) }
                                 .toList(),

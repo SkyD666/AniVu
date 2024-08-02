@@ -106,6 +106,16 @@ interface FeedDao {
     suspend fun updateFeedIcon(feedUrl: String, icon: String?): Int
 
     @Transaction
+    @Query(
+        """
+        UPDATE $FEED_TABLE_NAME
+        SET ${FeedBean.SORT_XML_ARTICLES_ON_UPDATE} = :sort
+        WHERE ${FeedBean.URL_COLUMN} = :feedUrl
+        """
+    )
+    suspend fun updateFeedSortXmlArticlesOnUpdate(feedUrl: String, sort: Boolean): Int
+
+    @Transaction
     @Query("SELECT * FROM $FEED_TABLE_NAME")
     fun getFeedPagingSource(): PagingSource<Int, FeedBean>
 

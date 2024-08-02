@@ -26,9 +26,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ToggleOn
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Image
@@ -36,6 +39,8 @@ import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.PhoneAndroid
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Refresh
+import androidx.compose.material.icons.outlined.ToggleOff
+import androidx.compose.material.icons.outlined.ToggleOn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
@@ -86,6 +91,7 @@ fun EditFeedSheet(
     onNicknameChange: (String?) -> Unit,
     onCustomDescriptionChange: (String?) -> Unit,
     onCustomIconChange: (Uri?) -> Unit,
+    onSortXmlArticlesOnUpdateChanged: (Boolean) -> Unit,
     onGroupChange: (GroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
@@ -120,12 +126,14 @@ fun EditFeedSheet(
 
             // Options
             OptionArea(
+                sortXmlArticlesOnUpdate = feed.sortXmlArticlesOnUpdate,
                 onReadAll = { onReadAll(feed.url) },
                 onRefresh = { onRefresh(feed.url) },
                 onDelete = {
                     onDelete(feed.url)
                     onDismissRequest()
                 },
+                onSortXmlArticlesOnUpdateChanged = onSortXmlArticlesOnUpdateChanged,
             )
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -345,10 +353,13 @@ private fun LinkArea(link: String, onLinkClick: () -> Unit) {
 internal fun OptionArea(
     deleteEnabled: Boolean = true,
     deleteWarningText: String = stringResource(id = R.string.feed_screen_delete_feed_warning),
+    sortXmlArticlesOnUpdate: Boolean? = null,
     onReadAll: () -> Unit,
     onRefresh: () -> Unit,
     onDelete: () -> Unit,
+    onSortXmlArticlesOnUpdateChanged: ((Boolean) -> Unit)? = null,
 ) {
+    val context = LocalContext.current
     var openDeleteWarningDialog by rememberSaveable { mutableStateOf(false) }
 
     Text(
@@ -379,6 +390,20 @@ internal fun OptionArea(
                 iconBackgroundColor = MaterialTheme.colorScheme.error,
                 text = stringResource(id = R.string.delete),
                 onClick = { openDeleteWarningDialog = true },
+            )
+        }
+        if (sortXmlArticlesOnUpdate != null) {
+            SheetChip(
+                icon = if (sortXmlArticlesOnUpdate) Icons.Filled.ToggleOn
+                else Icons.Outlined.ToggleOff,
+                text = stringResource(id = R.string.feed_screen_sort_xml_articles_on_update),
+                onClick = {
+                    onSortXmlArticlesOnUpdateChanged?.invoke(!sortXmlArticlesOnUpdate)
+                    if (!sortXmlArticlesOnUpdate) {
+                        context.getString(R.string.feed_screen_sort_xml_articles_on_update_tip)
+                            .showToast()
+                    }
+                },
             )
         }
     }
