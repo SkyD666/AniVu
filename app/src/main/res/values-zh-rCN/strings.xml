@@ -75,11 +75,11 @@
     <string name="data_fragment_data_cleared_size">%s 数据被删除</string>
     <string name="data_screen_clear_cache_warning">确定要删除这些缓存吗？</string>
     <string name="clear">清除</string>
-    <string name="rss_config_fragment_name">RSS</string>
+    <string name="rss_config_screen_name">RSS</string>
     <string name="rss_config_fragment_description">配置 RSS 同步、解析规则等</string>
-    <string name="rss_config_fragment_parse_link_tag_as_enclosure">解析 Link 为附件</string>
-    <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">解析 Link 标签，若符合磁力链或 Torrent 格式，则显示为附件</string>
-    <string name="rss_config_fragment_parse_category">解析</string>
+    <string name="rss_config_screen_parse_link_tag_as_enclosure">解析 Link 为附件</string>
+    <string name="rss_config_screen_parse_link_tag_as_enclosure_description">解析 Link 标签，若符合磁力链或 Torrent 格式，则显示为附件</string>
+    <string name="rss_config_screen_parse_category">解析</string>
     <string name="transmission_screen_name">传输</string>
     <string name="transmission_fragment_description">数据传输配置、行为等</string>
     <string name="transmission_screen_transmission_behavior_category">行为</string>
@@ -107,13 +107,13 @@
     <plurals name="data_fragment_deleted_count">
         <item quantity="other">删除了 %d 项</item>
     </plurals>
-    <string name="rss_config_fragment_sync_category">自动同步</string>
+    <string name="rss_config_screen_sync_category">自动同步</string>
     <string name="frequency_manual">手动</string>
-    <string name="rss_config_fragment_sync_frequency">同步频率</string>
+    <string name="rss_config_screen_sync_frequency">同步频率</string>
     <string name="share">分享</string>
-    <string name="rss_config_fragment_sync_wifi_constraint">仅在 Wi-Fi 连接时</string>
-    <string name="rss_config_fragment_sync_charging_constraint">仅在充电时</string>
-    <string name="rss_config_fragment_sync_battery_not_low_constraint">仅在电量充足时</string>
+    <string name="rss_config_screen_sync_wifi_constraint">仅在 Wi-Fi 连接时</string>
+    <string name="rss_config_screen_sync_charging_constraint">仅在充电时</string>
+    <string name="rss_config_screen_sync_battery_not_low_constraint">仅在电量充足时</string>
     <string name="crashed"><![CDATA[崩溃了 (＃＞＜)]]></string>
     <string name="submit_an_issue_on_github">在 GitHub 上报告</string>
     <string name="copied">已复制</string>
