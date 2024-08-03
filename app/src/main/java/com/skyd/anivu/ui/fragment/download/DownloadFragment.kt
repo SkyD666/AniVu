@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.fragment.download
 
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -34,6 +35,10 @@ import kotlinx.coroutines.flow.onEach
 
 @AndroidEntryPoint
 class DownloadFragment : BaseFragment<FragmentDownloadBinding>() {
+    companion object {
+        const val RESOURCE_URI_KEY = "resourceUri"
+    }
+
     private val feedViewModel by viewModels<DownloadViewModel>()
     private val intents = Channel<DownloadIntent>()
     private val adapter = VarietyAdapter(mutableListOf()).apply {
@@ -96,26 +101,17 @@ class DownloadFragment : BaseFragment<FragmentDownloadBinding>() {
             .launchIn(lifecycleScope)
 
         feedViewModel.viewState.collectIn(this) { updateState(it) }
+
+        arguments?.getParcelable<Uri>(RESOURCE_URI_KEY)?.let {
+            openInputDialog(text = it.toString())
+        }
     }
 
     override fun FragmentDownloadBinding.initView() {
         topAppBar.setNavigationOnClickListener { findNavController().popBackStackWithLifecycle() }
 
         fabDownloadFragment.setOnClickListener {
-            InputDialogBuilder(requireContext())
-                .setHint(getString(R.string.download_fragment_add_download_hint))
-                .setPositiveButton(getString(R.string.download)) { _, _, text ->
-                    doIfMagnetOrTorrentLink(
-                        link = text,
-                        onMagnet = { intents.trySend(DownloadIntent.AddDownload(text)) },
-                        onTorrent = { intents.trySend(DownloadIntent.AddDownload(text)) },
-                        onUnsupported = { showSnackbar(getString(R.string.download_fragment_unsupported_link)) },
-                    )
-                }
-                .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
-                .setTitle(R.string.download)
-                .setIcon(R.drawable.ic_download_2_24)
-                .show()
+            openInputDialog()
         }
 
         rvDownloadFragment.layoutManager = GridLayoutManager(
@@ -129,6 +125,24 @@ class DownloadFragment : BaseFragment<FragmentDownloadBinding>() {
         divider.isLastItemDecorated = false
         rvDownloadFragment.addItemDecoration(divider)
         rvDownloadFragment.adapter = adapter
+    }
+
+    private fun openInputDialog(text: String = "") {
+        InputDialogBuilder(requireContext())
+            .setText(text)
+            .setHint(getString(R.string.download_fragment_add_download_hint))
+            .setPositiveButton(getString(R.string.download)) { _, _, text ->
+                doIfMagnetOrTorrentLink(
+                    link = text,
+                    onMagnet = { intents.trySend(DownloadIntent.AddDownload(text)) },
+                    onTorrent = { intents.trySend(DownloadIntent.AddDownload(text)) },
+                    onUnsupported = { showSnackbar(getString(R.string.download_fragment_unsupported_link)) },
+                )
+            }
+            .setNegativeButton(getString(R.string.cancel)) { _, _ -> }
+            .setTitle(R.string.download)
+            .setIcon(R.drawable.ic_download_2_24)
+            .show()
     }
 
     override fun FragmentDownloadBinding.setWindowInsets() {

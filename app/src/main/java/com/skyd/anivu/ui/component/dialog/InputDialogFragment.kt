@@ -72,13 +72,16 @@ open class InputDialogBuilder(
             count: Int
         ) -> Unit = { _, _, _, _ -> },
         afterTextChanged: (text: Editable?) -> Unit = {}
-    ): InputDialogBuilder {
+    ): InputDialogBuilder = apply {
         textField.editText?.addTextChangedListener(
             beforeTextChanged,
             onTextChanged,
             afterTextChanged,
         )
-        return this
+    }
+
+    fun setText(text: String): InputDialogBuilder = apply {
+        textField.editText?.setText(text)
     }
 
     fun setPositiveButton(
@@ -99,17 +102,15 @@ open class InputDialogBuilder(
         } as InputDialogBuilder
     }
 
-    fun setInitInputText(text: String): InputDialogBuilder {
+    fun setInitInputText(text: String): InputDialogBuilder = apply {
         textField.editText?.apply {
             setText(text)
             setSelection(text.length)
         }
-        return this
     }
 
-    fun setHint(text: String): InputDialogBuilder {
+    fun setHint(text: String): InputDialogBuilder = apply {
         textField.hint = text
-        return this
     }
 
     override fun show(): AlertDialog {

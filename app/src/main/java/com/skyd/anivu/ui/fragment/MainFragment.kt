@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.fragment
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -8,6 +9,7 @@ import android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.tween
@@ -46,6 +48,8 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,9 +57,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.util.Consumer
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -66,9 +72,11 @@ import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
+import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.ui.fragment.about.update.UpdateDialog
+import com.skyd.anivu.ui.fragment.download.DownloadFragment
 import com.skyd.anivu.ui.fragment.feed.FEED_SCREEN_ROUTE
 import com.skyd.anivu.ui.fragment.feed.FeedScreen
 import com.skyd.anivu.ui.fragment.media.MEDIA_SCREEN_ROUTE
@@ -76,6 +84,7 @@ import com.skyd.anivu.ui.fragment.media.MediaScreen
 import com.skyd.anivu.ui.fragment.more.MORE_SCREEN_ROUTE
 import com.skyd.anivu.ui.fragment.more.MoreScreen
 import com.skyd.anivu.ui.local.LocalMediaLibLocation
+import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import dagger.hilt.android.AndroidEntryPoint
@@ -140,13 +149,54 @@ class MainFragment : BaseComposeFragment() {
     }
 }
 
+private fun handleIntent(intent: Intent?, navController: NavController) {
+    intent ?: return
+    val data = intent.data
+    if (Intent.ACTION_VIEW == intent.action && data != null) {
+        val scheme = data.scheme
+        var url: String? = null
+        when (scheme) {
+            "magnet" -> url = data.toString()
+            "http", "https" -> {
+                val path = data.path
+                if (path != null && path.endsWith(".torrent")) {
+                    url = data.toString()
+                }
+            }
+        }
+        if (url != null) {
+            navController.navigate(R.id.action_to_download_fragment, Bundle().apply {
+                putParcelable(DownloadFragment.RESOURCE_URI_KEY, Uri.parse(url))
+            })
+        }
+    }
+}
+
 @Composable
 fun MainScreen() {
     val windowSizeClass = LocalWindowSizeClass.current
+    val navController = LocalNavController.current
     val mainNavController = rememberNavController()
+    val context = LocalContext.current
 
     val navigationBarOrRail: @Composable () -> Unit = @Composable {
         NavigationBarOrRail(navController = mainNavController)
+    }
+
+    var needHandleIntent by rememberSaveable { mutableStateOf(true) }
+    if (needHandleIntent) {
+        LaunchedEffect(Unit) {
+            needHandleIntent = false
+            handleIntent(intent = context.activity.intent, navController = navController)
+        }
+    }
+
+    DisposableEffect(navController) {
+        val listener = Consumer<Intent> { newIntent ->
+            handleIntent(intent = newIntent, navController = navController)
+        }
+        (context.activity as ComponentActivity).addOnNewIntentListener(listener)
+        onDispose { (context.activity as ComponentActivity).removeOnNewIntentListener(listener) }
     }
 
     Scaffold(
