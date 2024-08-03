@@ -49,6 +49,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -67,6 +68,7 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
+import com.skyd.anivu.ui.fragment.about.update.UpdateDialog
 import com.skyd.anivu.ui.fragment.feed.FEED_SCREEN_ROUTE
 import com.skyd.anivu.ui.fragment.feed.FeedScreen
 import com.skyd.anivu.ui.fragment.media.MEDIA_SCREEN_ROUTE
@@ -125,6 +127,15 @@ class MainFragment : BaseComposeFragment() {
                     },
                 )
             }
+        }
+
+        var openUpdateDialog by rememberSaveable { mutableStateOf(true) }
+        if (openUpdateDialog) {
+            UpdateDialog(
+                silence = true,
+                onClosed = { openUpdateDialog = false },
+                onError = { openUpdateDialog = false },
+            )
         }
     }
 }

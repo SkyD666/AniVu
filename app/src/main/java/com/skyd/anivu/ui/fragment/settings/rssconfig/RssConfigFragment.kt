@@ -1,126 +1,194 @@
 package com.skyd.anivu.ui.fragment.settings.rssconfig
 
-import android.content.Context
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
-import androidx.preference.DropDownPreference
-import androidx.preference.ListPreference
-import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceScreen
-import androidx.preference.SwitchPreferenceCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.BatteryFull
+import androidx.compose.material.icons.outlined.Bolt
+import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.Link
+import androidx.compose.material.icons.outlined.Timer
+import androidx.compose.material.icons.outlined.Wifi
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.skyd.anivu.R
-import com.skyd.anivu.base.BasePreferenceFragmentCompat
-import com.skyd.anivu.ext.dataStore
-import com.skyd.anivu.ext.getOrDefault
+import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.preference.rss.RssSyncBatteryNotLowConstraintPreference
 import com.skyd.anivu.model.preference.rss.RssSyncChargingConstraintPreference
 import com.skyd.anivu.model.preference.rss.RssSyncFrequencyPreference
 import com.skyd.anivu.model.preference.rss.RssSyncWifiConstraintPreference
+import com.skyd.anivu.ui.component.AniVuTopBar
+import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.BaseSettingsItem
+import com.skyd.anivu.ui.component.CategorySettingsItem
+import com.skyd.anivu.ui.component.SwitchSettingsItem
+import com.skyd.anivu.ui.local.LocalParseLinkTagAsEnclosure
+import com.skyd.anivu.ui.local.LocalRssSyncBatteryNotLowConstraint
+import com.skyd.anivu.ui.local.LocalRssSyncChargingConstraint
+import com.skyd.anivu.ui.local.LocalRssSyncFrequency
+import com.skyd.anivu.ui.local.LocalRssSyncWifiConstraint
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class RssConfigFragment : BasePreferenceFragmentCompat() {
-    override val title by lazy { resources.getString(R.string.rss_config_fragment_name) }
-    override fun Context.onAddPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-        screen: PreferenceScreen
+class RssConfigFragment : BaseComposeFragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = setContentBase { RssConfigScreen() }
+}
+
+@Composable
+fun RssConfigScreen() {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var expandRssSyncFrequencyMenu by rememberSaveable { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            AniVuTopBar(
+                style = AniVuTopBarStyle.Large,
+                scrollBehavior = scrollBehavior,
+                title = { Text(text = stringResource(R.string.rss_config_screen_name)) },
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentPadding = paddingValues,
+        ) {
+            item {
+                CategorySettingsItem(text = stringResource(id = R.string.rss_config_screen_sync_category))
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Outlined.Timer),
+                    text = stringResource(id = R.string.rss_config_screen_sync_frequency),
+                    descriptionText = RssSyncFrequencyPreference.toDisplayName(
+                        context, LocalRssSyncFrequency.current,
+                    ),
+                    dropdownMenu = {
+                        RssSyncFrequencyMenu(
+                            expanded = expandRssSyncFrequencyMenu,
+                            onDismissRequest = { expandRssSyncFrequencyMenu = false }
+                        )
+                    },
+                    onClick = { expandRssSyncFrequencyMenu = true },
+                )
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.Wifi,
+                    text = stringResource(id = R.string.rss_config_screen_sync_wifi_constraint),
+                    checked = LocalRssSyncWifiConstraint.current,
+                    onCheckedChange = {
+                        RssSyncWifiConstraintPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.Bolt,
+                    text = stringResource(id = R.string.rss_config_screen_sync_charging_constraint),
+                    checked = LocalRssSyncChargingConstraint.current,
+                    onCheckedChange = {
+                        RssSyncChargingConstraintPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.BatteryFull,
+                    text = stringResource(id = R.string.rss_config_screen_sync_battery_not_low_constraint),
+                    checked = LocalRssSyncBatteryNotLowConstraint.current,
+                    onCheckedChange = {
+                        RssSyncBatteryNotLowConstraintPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
+            }
+            item {
+                CategorySettingsItem(text = stringResource(id = R.string.rss_config_screen_parse_category))
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.Link,
+                    text = stringResource(id = R.string.rss_config_screen_parse_link_tag_as_enclosure),
+                    description = stringResource(id = R.string.rss_config_screen_parse_link_tag_as_enclosure_description),
+                    checked = LocalParseLinkTagAsEnclosure.current,
+                    onCheckedChange = {
+                        ParseLinkTagAsEnclosurePreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RssSyncFrequencyMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val rssSyncFrequency = LocalRssSyncFrequency.current
+
+    DropdownMenu(
+        expanded = expanded,
+        onDismissRequest = onDismissRequest,
     ) {
-        val rssSyncCategory = PreferenceCategory(this).apply {
-            key = "rssSyncCategory"
-            title = getString(R.string.rss_config_fragment_sync_category)
-            screen.addPreference(this)
-        }
-        DropDownPreference(this).apply {
-            key = "rssSyncFrequency"
-            title = getString(R.string.rss_config_fragment_sync_frequency)
-            setIcon(R.drawable.ic_timer_24)
-            value = context.dataStore.getOrDefault(RssSyncFrequencyPreference).toString()
-            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
-            entries = RssSyncFrequencyPreference.frequencies.map {
-                RssSyncFrequencyPreference.toDisplayName(context, it)
-            }.toTypedArray()
-            entryValues =
-                RssSyncFrequencyPreference.frequencies.map { it.toString() }.toTypedArray()
-            setOnPreferenceChangeListener { _, newValue ->
-                RssSyncFrequencyPreference.put(
-                    requireContext(), lifecycleScope, (newValue as String).toLong(),
-                )
-                true
-            }
-            rssSyncCategory.addPreference(this)
-        }
-        SwitchPreferenceCompat(this).apply {
-            key = "rssSyncWifiConstraint"
-            title = getString(R.string.rss_config_fragment_sync_wifi_constraint)
-            setIcon(R.drawable.ic_wifi_24)
-            isChecked = requireContext().dataStore.getOrDefault(RssSyncWifiConstraintPreference)
-            setOnPreferenceChangeListener { _, newValue ->
-                RssSyncWifiConstraintPreference.put(
-                    context = requireContext(),
-                    scope = lifecycleScope,
-                    value = newValue as Boolean,
-                )
-                true
-            }
-            rssSyncCategory.addPreference(this)
-        }
-        SwitchPreferenceCompat(this).apply {
-            key = "rssSyncChargingConstraint"
-            title = getString(R.string.rss_config_fragment_sync_charging_constraint)
-            setIcon(R.drawable.ic_battery_charging_full_24)
-            isChecked = requireContext().dataStore.getOrDefault(RssSyncChargingConstraintPreference)
-            setOnPreferenceChangeListener { _, newValue ->
-                RssSyncChargingConstraintPreference.put(
-                    context = requireContext(),
-                    scope = lifecycleScope,
-                    value = newValue as Boolean,
-                )
-                true
-            }
-            rssSyncCategory.addPreference(this)
-        }
-        SwitchPreferenceCompat(this).apply {
-            key = "rssSyncBatteryNotLowConstraint"
-            title = getString(R.string.rss_config_fragment_sync_battery_not_low_constraint)
-            setIcon(R.drawable.ic_battery_full_alt_24)
-            isChecked =
-                requireContext().dataStore.getOrDefault(RssSyncBatteryNotLowConstraintPreference)
-            setOnPreferenceChangeListener { _, newValue ->
-                RssSyncBatteryNotLowConstraintPreference.put(
-                    context = requireContext(),
-                    scope = lifecycleScope,
-                    value = newValue as Boolean,
-                )
-                true
-            }
-            rssSyncCategory.addPreference(this)
-        }
-
-        val rssParseCategory = PreferenceCategory(this).apply {
-            key = "rssParseCategory"
-            title = getString(R.string.rss_config_fragment_parse_category)
-            screen.addPreference(this)
-        }
-
-        SwitchPreferenceCompat(this).apply {
-            key = "parseLinkTagAsEnclosure"
-            title = getString(R.string.rss_config_fragment_parse_link_tag_as_enclosure)
-            summary =
-                getString(R.string.rss_config_fragment_parse_link_tag_as_enclosure_description)
-            setIcon(R.drawable.ic_link_24)
-            isChecked = requireContext().dataStore.getOrDefault(ParseLinkTagAsEnclosurePreference)
-            setOnPreferenceChangeListener { _, newValue ->
-                ParseLinkTagAsEnclosurePreference.put(
-                    context = requireContext(),
-                    scope = lifecycleScope,
-                    value = newValue as Boolean,
-                )
-                true
-            }
-            rssParseCategory.addPreference(this)
+        RssSyncFrequencyPreference.frequencies.forEach { frequency ->
+            DropdownMenuItem(
+                text = {
+                    Text(text = RssSyncFrequencyPreference.toDisplayName(context, frequency))
+                },
+                leadingIcon = {
+                    if (rssSyncFrequency == frequency) {
+                        Icon(imageVector = Icons.Outlined.Done, contentDescription = null)
+                    }
+                },
+                onClick = {
+                    RssSyncFrequencyPreference.put(context, scope, frequency)
+                    onDismissRequest()
+                },
+            )
         }
     }
 }

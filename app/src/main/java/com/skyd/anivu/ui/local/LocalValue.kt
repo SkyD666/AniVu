@@ -37,6 +37,11 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
+import com.skyd.anivu.model.preference.rss.RssSyncBatteryNotLowConstraintPreference
+import com.skyd.anivu.model.preference.rss.RssSyncChargingConstraintPreference
+import com.skyd.anivu.model.preference.rss.RssSyncFrequencyPreference
+import com.skyd.anivu.model.preference.rss.RssSyncWifiConstraintPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 
 val LocalNavController = compositionLocalOf<NavHostController> {
@@ -83,6 +88,15 @@ val LocalArticleSwipeLeftAction = compositionLocalOf { ArticleSwipeLeftActionPre
 val LocalArticleSwipeRightAction = compositionLocalOf { ArticleSwipeRightActionPreference.default }
 val LocalHideEmptyDefault = compositionLocalOf { HideEmptyDefaultPreference.default }
 val LocalPickImageMethod = compositionLocalOf { PickImageMethodPreference.default }
+
+// RSS
+val LocalRssSyncFrequency = compositionLocalOf { RssSyncFrequencyPreference.default }
+val LocalRssSyncWifiConstraint = compositionLocalOf { RssSyncWifiConstraintPreference.default }
+val LocalRssSyncChargingConstraint =
+    compositionLocalOf { RssSyncChargingConstraintPreference.default }
+val LocalRssSyncBatteryNotLowConstraint =
+    compositionLocalOf { RssSyncBatteryNotLowConstraintPreference.default }
+val LocalParseLinkTagAsEnclosure = compositionLocalOf { ParseLinkTagAsEnclosurePreference.default }
 
 // Player
 val LocalPlayerDoubleTap = compositionLocalOf { PlayerDoubleTapPreference.default }

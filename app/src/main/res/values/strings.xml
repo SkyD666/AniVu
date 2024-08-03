@@ -79,11 +79,11 @@
     <string name="data_fragment_data_cleared_size">%s data cleared</string>
     <string name="data_screen_clear_cache_warning">Sure to clear the caches?</string>
     <string name="clear">Clear</string>
-    <string name="rss_config_fragment_name">RSS</string>
+    <string name="rss_config_screen_name">RSS</string>
     <string name="rss_config_fragment_description">Configure RSS sync, parsing rules</string>
-    <string name="rss_config_fragment_parse_link_tag_as_enclosure">Parse link as enclosure</string>
-    <string name="rss_config_fragment_parse_link_tag_as_enclosure_description">Parses and displays the link tag as an enclosure if it\'s a magnet or torrent link</string>
-    <string name="rss_config_fragment_parse_category">Parse</string>
+    <string name="rss_config_screen_parse_link_tag_as_enclosure">Parse link as enclosure</string>
+    <string name="rss_config_screen_parse_link_tag_as_enclosure_description">Parses and displays the link tag as an enclosure if it\'s a magnet or torrent link</string>
+    <string name="rss_config_screen_parse_category">Parse</string>
     <string name="transmission_screen_name">Transmission</string>
     <string name="transmission_fragment_description">Data transfer setup, behavior</string>
     <string name="transmission_screen_transmission_behavior_category">Behavior</string>
@@ -112,13 +112,13 @@
         <item quantity="one">%d item deleted</item>
         <item quantity="other">%d items deleted</item>
     </plurals>
-    <string name="rss_config_fragment_sync_category">Auto sync</string>
+    <string name="rss_config_screen_sync_category">Auto sync</string>
     <string name="frequency_manual">Manual</string>
-    <string name="rss_config_fragment_sync_frequency">Sync frequency</string>
+    <string name="rss_config_screen_sync_frequency">Sync frequency</string>
     <string name="share">Share</string>
-    <string name="rss_config_fragment_sync_wifi_constraint">Only on Wi-Fi</string>
-    <string name="rss_config_fragment_sync_charging_constraint">Only when charging</string>
-    <string name="rss_config_fragment_sync_battery_not_low_constraint">Only not in low battery mode</string>
+    <string name="rss_config_screen_sync_wifi_constraint">Only on Wi-Fi</string>
+    <string name="rss_config_screen_sync_charging_constraint">Only when charging</string>
+    <string name="rss_config_screen_sync_battery_not_low_constraint">Only not in low battery mode</string>
     <string name="crashed"><![CDATA[Crashed (＃＞＜)]]></string>
     <string name="submit_an_issue_on_github">Report on GitHub</string>
     <string name="copied">Copied</string>

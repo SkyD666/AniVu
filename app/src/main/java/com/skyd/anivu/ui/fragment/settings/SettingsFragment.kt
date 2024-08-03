@@ -77,7 +77,7 @@ fun SettingsScreen() {
             item {
                 BaseSettingsItem(
                     icon = rememberVectorPainter(Icons.Outlined.RssFeed),
-                    text = stringResource(id = R.string.rss_config_fragment_name),
+                    text = stringResource(id = R.string.rss_config_screen_name),
                     descriptionText = stringResource(id = R.string.rss_config_fragment_description),
                     onClick = { navController.navigate(R.id.action_to_rss_config_fragment) }
                 )

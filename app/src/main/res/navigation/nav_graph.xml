@@ -92,7 +92,7 @@
     <fragment
         android:id="@+id/rss_config_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.rssconfig.RssConfigFragment"
-        android:label="@string/rss_config_fragment_name" />
+        android:label="@string/rss_config_screen_name" />
     <action
         android:id="@+id/action_to_rss_config_fragment"
         app:destination="@id/rss_config_fragment" />

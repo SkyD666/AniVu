@@ -36,6 +36,11 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
+import com.skyd.anivu.model.preference.rss.RssSyncBatteryNotLowConstraintPreference
+import com.skyd.anivu.model.preference.rss.RssSyncChargingConstraintPreference
+import com.skyd.anivu.model.preference.rss.RssSyncFrequencyPreference
+import com.skyd.anivu.model.preference.rss.RssSyncWifiConstraintPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 
 fun Preferences.toSettings(): Settings {
@@ -69,6 +74,13 @@ fun Preferences.toSettings(): Settings {
         articleSwipeRightAction = ArticleSwipeRightActionPreference.fromPreferences(this),
         hideEmptyDefault = HideEmptyDefaultPreference.fromPreferences(this),
         pickImageMethod = PickImageMethodPreference.fromPreferences(this),
+
+        // RSS
+        rssSyncFrequency = RssSyncFrequencyPreference.fromPreferences(this),
+        rssSyncWifiConstraint = RssSyncWifiConstraintPreference.fromPreferences(this),
+        rssSyncChargingConstraint = RssSyncChargingConstraintPreference.fromPreferences(this),
+        rssSyncBatteryNotLowConstraint = RssSyncBatteryNotLowConstraintPreference.fromPreferences(this),
+        parseLinkTagAsEnclosure = ParseLinkTagAsEnclosurePreference.fromPreferences(this),
 
         // Player
         playerDoubleTap = PlayerDoubleTapPreference.fromPreferences(this),

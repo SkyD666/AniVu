@@ -41,6 +41,11 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
+import com.skyd.anivu.model.preference.rss.RssSyncBatteryNotLowConstraintPreference
+import com.skyd.anivu.model.preference.rss.RssSyncChargingConstraintPreference
+import com.skyd.anivu.model.preference.rss.RssSyncFrequencyPreference
+import com.skyd.anivu.model.preference.rss.RssSyncWifiConstraintPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 import com.skyd.anivu.ui.local.LocalArticleItemMinWidth
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
@@ -63,11 +68,16 @@ import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import com.skyd.anivu.ui.local.LocalMediaLibLocation
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalOpmlExportDir
+import com.skyd.anivu.ui.local.LocalParseLinkTagAsEnclosure
 import com.skyd.anivu.ui.local.LocalPickImageMethod
 import com.skyd.anivu.ui.local.LocalPlayerAutoPip
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
+import com.skyd.anivu.ui.local.LocalRssSyncBatteryNotLowConstraint
+import com.skyd.anivu.ui.local.LocalRssSyncChargingConstraint
+import com.skyd.anivu.ui.local.LocalRssSyncFrequency
+import com.skyd.anivu.ui.local.LocalRssSyncWifiConstraint
 import com.skyd.anivu.ui.local.LocalSearchItemMinWidth
 import com.skyd.anivu.ui.local.LocalSearchListTonalElevation
 import com.skyd.anivu.ui.local.LocalSearchTopBarTonalElevation
@@ -108,6 +118,12 @@ data class Settings(
     val articleSwipeRightAction: String = ArticleSwipeRightActionPreference.default,
     val hideEmptyDefault: Boolean = HideEmptyDefaultPreference.default,
     val pickImageMethod: String = PickImageMethodPreference.default,
+    // RSS
+    val rssSyncFrequency: Long = RssSyncFrequencyPreference.default,
+    val rssSyncWifiConstraint: Boolean = RssSyncWifiConstraintPreference.default,
+    val rssSyncChargingConstraint: Boolean = RssSyncChargingConstraintPreference.default,
+    val rssSyncBatteryNotLowConstraint: Boolean = RssSyncBatteryNotLowConstraintPreference.default,
+    val parseLinkTagAsEnclosure: Boolean = ParseLinkTagAsEnclosurePreference.default,
     // Player
     val playerDoubleTap: String = PlayerDoubleTapPreference.default,
     val playerShow85sButton: Boolean = PlayerShow85sButtonPreference.default,
@@ -160,6 +176,12 @@ fun SettingsProvider(
         LocalArticleSwipeRightAction provides settings.articleSwipeRightAction,
         LocalHideEmptyDefault provides settings.hideEmptyDefault,
         LocalPickImageMethod provides settings.pickImageMethod,
+        // rss
+        LocalRssSyncFrequency provides settings.rssSyncFrequency,
+        LocalRssSyncWifiConstraint provides settings.rssSyncWifiConstraint,
+        LocalRssSyncChargingConstraint provides settings.rssSyncChargingConstraint,
+        LocalRssSyncBatteryNotLowConstraint provides settings.rssSyncBatteryNotLowConstraint,
+        LocalParseLinkTagAsEnclosure provides settings.parseLinkTagAsEnclosure,
         // Player
         LocalPlayerDoubleTap provides settings.playerDoubleTap,
         LocalPlayerShow85sButton provides settings.playerShow85sButton,

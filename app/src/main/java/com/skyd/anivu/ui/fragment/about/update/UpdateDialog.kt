@@ -132,6 +132,7 @@ private fun NewerDialog(
         icon = { Icon(imageVector = Icons.Outlined.Update, contentDescription = null) },
         title = { Text(text = stringResource(R.string.update_newer)) },
         selectable = false,
+        scrollable = false,
         text = {
             Column {
                 Column(
@@ -145,7 +146,7 @@ private fun NewerDialog(
                                 R.string.update_newer_text,
                                 updateBean!!.name,
                                 updateBean.publishedAt,
-                                updateBean.assets.firstOrNull()?.downloadCount.toString(),
+                                updateBean.assets.sumOf { it.downloadCount ?: 0 }.toString(),
                             )
                         )
                     }
