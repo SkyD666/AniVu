@@ -9,13 +9,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BatteryFull
 import androidx.compose.material.icons.outlined.Bolt
-import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material.icons.outlined.Wifi
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -41,6 +37,7 @@ import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
+import com.skyd.anivu.ui.component.CheckableListMenu
 import com.skyd.anivu.ui.component.SwitchSettingsItem
 import com.skyd.anivu.ui.local.LocalParseLinkTagAsEnclosure
 import com.skyd.anivu.ui.local.LocalRssSyncBatteryNotLowConstraint
@@ -170,25 +167,12 @@ private fun RssSyncFrequencyMenu(expanded: Boolean, onDismissRequest: () -> Unit
     val scope = rememberCoroutineScope()
     val rssSyncFrequency = LocalRssSyncFrequency.current
 
-    DropdownMenu(
+    CheckableListMenu(
         expanded = expanded,
+        current = rssSyncFrequency,
+        values = RssSyncFrequencyPreference.frequencies,
+        displayName = { RssSyncFrequencyPreference.toDisplayName(context, it) },
+        onChecked = { RssSyncFrequencyPreference.put(context, scope, it) },
         onDismissRequest = onDismissRequest,
-    ) {
-        RssSyncFrequencyPreference.frequencies.forEach { frequency ->
-            DropdownMenuItem(
-                text = {
-                    Text(text = RssSyncFrequencyPreference.toDisplayName(context, frequency))
-                },
-                leadingIcon = {
-                    if (rssSyncFrequency == frequency) {
-                        Icon(imageVector = Icons.Outlined.Done, contentDescription = null)
-                    }
-                },
-                onClick = {
-                    RssSyncFrequencyPreference.put(context, scope, frequency)
-                    onDismissRequest()
-                },
-            )
-        }
-    }
+    )
 }

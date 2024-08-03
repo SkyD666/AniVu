@@ -7,20 +7,17 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.FastForward
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.PictureInPictureAlt
 import androidx.compose.material.icons.outlined.TouchApp
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -39,6 +36,7 @@ import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
+import com.skyd.anivu.ui.component.CheckableListMenu
 import com.skyd.anivu.ui.component.SwitchSettingsItem
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalPlayerAutoPip
@@ -168,23 +166,12 @@ private fun DoubleTapMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
     val scope = rememberCoroutineScope()
     val playerDoubleTap = LocalPlayerDoubleTap.current
 
-    DropdownMenu(
+    CheckableListMenu(
         expanded = expanded,
+        current = playerDoubleTap,
+        values = remember { PlayerDoubleTapPreference.values.toList() },
+        displayName = { PlayerDoubleTapPreference.toDisplayName(context, it) },
+        onChecked = { PlayerDoubleTapPreference.put(context, scope, it) },
         onDismissRequest = onDismissRequest,
-    ) {
-        PlayerDoubleTapPreference.values.forEach { v ->
-            DropdownMenuItem(
-                text = { Text(text = PlayerDoubleTapPreference.toDisplayName(context, v)) },
-                leadingIcon = {
-                    if (playerDoubleTap == v) {
-                        Icon(imageVector = Icons.Outlined.Done, contentDescription = null)
-                    }
-                },
-                onClick = {
-                    PlayerDoubleTapPreference.put(context, scope, v)
-                    onDismissRequest()
-                },
-            )
-        }
-    }
+    )
 }

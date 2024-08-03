@@ -61,7 +61,7 @@ fun SettingsScreen() {
             item {
                 BaseSettingsItem(
                     icon = rememberVectorPainter(Icons.Outlined.Palette),
-                    text = stringResource(id = R.string.appearance_fragment_name),
+                    text = stringResource(id = R.string.appearance_screen_name),
                     descriptionText = stringResource(id = R.string.appearance_fragment_description),
                     onClick = { navController.navigate(R.id.action_to_appearance_fragment) }
                 )

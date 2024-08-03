@@ -51,5 +51,5 @@ object Const {
 
     val PICTURES_DIR = appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
 
-    val INTERNAL_STORAGE = Environment.getExternalStorageDirectory().absolutePath
+    val INTERNAL_STORAGE: String = Environment.getExternalStorageDirectory().absolutePath
 }

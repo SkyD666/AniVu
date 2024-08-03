@@ -44,6 +44,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.model.repository.ArticleSort
+import com.skyd.anivu.ui.component.ListMenu
 
 @Composable
 fun FilterIcon(
@@ -209,22 +210,14 @@ internal fun SortSetting(
                 )
             }
         )
-        DropdownMenu(
+        ListMenu(
             expanded = expandMenu,
+            values = remember(items) { items.keys },
+            displayName = { items[it]?.first.orEmpty() },
+            leadingIcon = { Icon(imageVector = items[it]!!.second, contentDescription = null) },
+            onClick = onSort,
             onDismissRequest = { expandMenu = false },
-        ) {
-            items.forEach { (value, pair) ->
-                val (text, icon) = pair
-                DropdownMenuItem(
-                    text = { Text(text = text) },
-                    leadingIcon = { Icon(imageVector = icon, contentDescription = null) },
-                    onClick = {
-                        onSort(value)
-                        expandMenu = false
-                    },
-                )
-            }
-        }
+        )
     }
 }
 
@@ -319,20 +312,13 @@ private fun FavoriteReadFilter(
                 )
             }
         )
-        DropdownMenu(
+        ListMenu(
             expanded = expandMenu,
+            values = remember(items) { items.keys },
+            displayName = { items[it]?.first.orEmpty() },
+            leadingIcon = { Icon(imageVector = items[it]!!.second, contentDescription = null) },
+            onClick = onFilter,
             onDismissRequest = { expandMenu = false },
-        ) {
-            items.forEach { (t, u) ->
-                DropdownMenuItem(
-                    text = { Text(text = u.first) },
-                    leadingIcon = { Icon(imageVector = u.second, contentDescription = null) },
-                    onClick = {
-                        onFilter(t)
-                        expandMenu = false
-                    },
-                )
-            }
-        }
+        )
     }
 }

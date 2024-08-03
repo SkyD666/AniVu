@@ -132,7 +132,7 @@
     <fragment
         android:id="@+id/appearance_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.appearance.AppearanceFragment"
-        android:label="@string/appearance_fragment_name" />
+        android:label="@string/appearance_screen_name" />
     <action
         android:id="@+id/action_to_appearance_fragment"
         app:destination="@id/appearance_fragment" />

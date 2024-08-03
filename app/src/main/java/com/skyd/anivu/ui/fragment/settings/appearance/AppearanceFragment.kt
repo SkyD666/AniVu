@@ -1,241 +1,392 @@
 package com.skyd.anivu.ui.fragment.settings.appearance
 
-import android.content.Context
 import android.os.Bundle
-import android.util.TypedValue
-import androidx.lifecycle.lifecycleScope
-import androidx.preference.DropDownPreference
-import androidx.preference.ListPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceCategory
-import androidx.preference.PreferenceScreen
-import androidx.preference.SwitchPreferenceCompat
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Colorize
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.android.material.color.DynamicColors
+import com.materialkolor.ktx.from
+import com.materialkolor.palettes.TonalPalette
 import com.skyd.anivu.R
-import com.skyd.anivu.base.BasePreferenceFragmentCompat
-import com.skyd.anivu.ext.dataStore
-import com.skyd.anivu.ext.findMainNavController
-import com.skyd.anivu.ext.getOrDefault
-import com.skyd.anivu.ext.inDarkMode
+import com.skyd.anivu.base.BaseComposeFragment
+import com.skyd.anivu.ext.activity
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
 import com.skyd.anivu.model.preference.appearance.TextFieldStylePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
-import com.skyd.anivu.ui.component.preference.ColorPalettesPreference
-import com.skyd.anivu.ui.component.preference.ToggleGroupPreference
+import com.skyd.anivu.ui.component.AniVuTopBar
+import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.BaseSettingsItem
+import com.skyd.anivu.ui.component.CategorySettingsItem
+import com.skyd.anivu.ui.component.CheckableListMenu
+import com.skyd.anivu.ui.component.SwitchSettingsItem
+import com.skyd.anivu.ui.local.LocalDarkMode
+import com.skyd.anivu.ui.local.LocalDateStyle
+import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.local.LocalNavigationBarLabel
+import com.skyd.anivu.ui.local.LocalTextFieldStyle
+import com.skyd.anivu.ui.local.LocalTheme
+import com.skyd.anivu.ui.theme.extractColors
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class AppearanceFragment : BasePreferenceFragmentCompat() {
-    override val title by lazy { resources.getString(R.string.appearance_fragment_name) }
+class AppearanceFragment : BaseComposeFragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = setContentBase { AppearanceScreen() }
+}
 
-    private var useDynamicTheme: SwitchPreferenceCompat? = null
+@Composable
+fun AppearanceScreen() {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val context = LocalContext.current
+    val navController = LocalNavController.current
+    val scope = rememberCoroutineScope()
+    var expandTextFieldStyleMenu by rememberSaveable { mutableStateOf(false) }
+    var expandDateStyleMenu by rememberSaveable { mutableStateOf(false) }
+    var expandNavigationBarLabelMenu by rememberSaveable { mutableStateOf(false) }
 
-    override fun Context.onAddPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-        screen: PreferenceScreen
-    ) {
-        val themeCategory = PreferenceCategory(this).apply {
-            key = "themeCategory"
-            title = getString(R.string.appearance_fragment_theme_category)
-            screen.addPreference(this)
+    Scaffold(
+        topBar = {
+            AniVuTopBar(
+                style = AniVuTopBarStyle.Large,
+                scrollBehavior = scrollBehavior,
+                title = { Text(text = stringResource(R.string.appearance_screen_name)) },
+            )
         }
-
-        ToggleGroupPreference(this).apply {
-            buttons = DarkModePreference.values.map {
-                ToggleGroupPreference.ButtonData(
-                    tag = it,
-                    text = DarkModePreference.toDisplayName(requireContext(), it),
-                )
+    ) { paddingValues ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentPadding = paddingValues,
+        ) {
+            item {
+                CategorySettingsItem(text = stringResource(id = R.string.appearance_screen_theme_category))
             }
-            check(requireContext().dataStore.getOrDefault(DarkModePreference))
-            setOnPreferenceChangeListener { _, newValue ->
-                DarkModePreference.put(requireContext(), lifecycleScope, newValue as Int)
-                true
-            }
-            themeCategory.addPreference(this)
-        }
-
-        val colorPalettesPreference = ColorPalettesPreference(this).apply {
-            key = "colorPalettes"
-            isPersistent = false
-            colorPalettes = getColorPalettes()
-            setOnPreferenceChangeListener { _, newValue ->
-                ThemePreference.put(requireContext(), lifecycleScope, newValue as String) {
-                    requireActivity().recreate()
-                    useDynamicTheme?.isChecked = requireContext().dataStore
-                        .getOrDefault(ThemePreference) == ThemePreference.DYNAMIC
-                }
-                true
-            }
-            themeCategory.addPreference(this)
-        }
-
-        if (DynamicColors.isDynamicColorAvailable()) {
-            useDynamicTheme = SwitchPreferenceCompat(this).apply {
-                key = "useDynamicTheme"
-                title = getString(R.string.appearance_fragment_use_dynamic_theme)
-                summary = getString(R.string.appearance_fragment_use_dynamic_theme_description)
-                setIcon(R.drawable.ic_colorize_24)
-                isChecked =
-                    requireContext().dataStore.getOrDefault(ThemePreference) == ThemePreference.DYNAMIC
-                setOnPreferenceChangeListener { _, newValue ->
-                    ThemePreference.put(
-                        context = requireContext(),
-                        scope = lifecycleScope,
-                        value = if (newValue as Boolean) ThemePreference.DYNAMIC
-                        else ThemePreference.basicValues.first(),
-                    ) {
-                        requireActivity().recreate()
-                        colorPalettesPreference.colorPalettes = getColorPalettes()
+            item {
+                SingleChoiceSegmentedButtonRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                ) {
+                    DarkModePreference.values.forEachIndexed { index, id ->
+                        SegmentedButton(
+                            shape = SegmentedButtonDefaults.itemShape(
+                                index = index,
+                                count = DarkModePreference.values.size,
+                            ),
+                            onClick = {
+                                DarkModePreference.put(
+                                    context, scope, DarkModePreference.values[index],
+                                )
+                            },
+                            selected = index == DarkModePreference.values.indexOf(LocalDarkMode.current)
+                        ) {
+                            Text(DarkModePreference.toDisplayName(context, id))
+                        }
                     }
-                    true
                 }
-                themeCategory.addPreference(this)
             }
-        }
-
-        val styleCategory = PreferenceCategory(this).apply {
-            key = "styleCategory"
-            title = getString(R.string.appearance_fragment_style_category)
-            screen.addPreference(this)
-        }
-
-        DropDownPreference(this).apply {
-            key = "textFieldStyle"
-            title = getString(R.string.appearance_fragment_text_field_style)
-            value = TextFieldStylePreference.toDisplayName(context)
-            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
-            entries = TextFieldStylePreference.values.map {
-                TextFieldStylePreference.toDisplayName(context, it)
-            }.toTypedArray()
-            entryValues = TextFieldStylePreference.values.toTypedArray()
-            setOnPreferenceChangeListener { _, newValue ->
-                TextFieldStylePreference.put(requireContext(), lifecycleScope, newValue as String)
-                true
+            item {
+                Palettes(colors = extractColors(darkTheme = false))
             }
-            styleCategory.addPreference(this)
-        }
-
-        DropDownPreference(this).apply {
-            key = "dateStyle"
-            title = getString(R.string.appearance_fragment_date_style)
-            value = DateStylePreference.toDisplayName(context)
-            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
-            entries = DateStylePreference.values.map {
-                DateStylePreference.toDisplayName(context, it)
-            }.toTypedArray()
-            entryValues = DateStylePreference.values
-            setOnPreferenceChangeListener { _, newValue ->
-                DateStylePreference.put(requireContext(), lifecycleScope, newValue as String)
-                true
+            if (DynamicColors.isDynamicColorAvailable()) {
+                item {
+                    SwitchSettingsItem(
+                        imageVector = Icons.Outlined.Colorize,
+                        text = stringResource(id = R.string.appearance_screen_use_dynamic_theme),
+                        description = stringResource(id = R.string.appearance_screen_use_dynamic_theme_description),
+                        checked = LocalTheme.current == ThemePreference.DYNAMIC,
+                        onCheckedChange = {
+                            ThemePreference.put(
+                                context = context,
+                                scope = scope,
+                                value = if (it) ThemePreference.DYNAMIC
+                                else ThemePreference.basicValues.first(),
+                            ) {
+                                context.activity.recreate()
+                            }
+                        }
+                    )
+                }
             }
-            styleCategory.addPreference(this)
-        }
-
-        DropDownPreference(this).apply {
-            key = "navigationBarLabel"
-            title = getString(R.string.appearance_fragment_navigation_bar_label)
-            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
-            entries = NavigationBarLabelPreference.values.map {
-                NavigationBarLabelPreference.toDisplayName(context, it)
-            }.toTypedArray()
-            entryValues = NavigationBarLabelPreference.values
-            value = NavigationBarLabelPreference.toDisplayName(context)
-            setOnPreferenceChangeListener { _, newValue ->
-                NavigationBarLabelPreference.put(
-                    requireContext(),
-                    lifecycleScope,
-                    newValue as String
+            item {
+                CategorySettingsItem(text = stringResource(id = R.string.appearance_screen_style_category))
+            }
+            item {
+                BaseSettingsItem(
+                    icon = null,
+                    text = stringResource(id = R.string.appearance_screen_text_field_style),
+                    descriptionText = TextFieldStylePreference.toDisplayName(
+                        context, LocalTextFieldStyle.current,
+                    ),
+                    dropdownMenu = {
+                        TextFieldStyleMenu(
+                            expanded = expandTextFieldStyleMenu,
+                            onDismissRequest = { expandTextFieldStyleMenu = false }
+                        )
+                    },
+                    onClick = { expandTextFieldStyleMenu = true },
                 )
-                true
             }
-            styleCategory.addPreference(this)
-        }
-
-        val screenStyleCategory = PreferenceCategory(this).apply {
-            key = "screenStyleCategory"
-            title = getString(R.string.appearance_fragment_screen_style_category)
-            screen.addPreference(this)
-        }
-
-        Preference(this).apply {
-            key = "feedScreenStyle"
-            title = getString(R.string.feed_style_screen_name)
-            setOnPreferenceClickListener {
-                findMainNavController().navigate(R.id.action_to_feed_style_fragment)
-                true
+            item {
+                BaseSettingsItem(
+                    icon = null,
+                    text = stringResource(id = R.string.appearance_screen_date_style),
+                    descriptionText = DateStylePreference.toDisplayName(
+                        context, LocalDateStyle.current,
+                    ),
+                    dropdownMenu = {
+                        DateStyleStyleMenu(
+                            expanded = expandDateStyleMenu,
+                            onDismissRequest = { expandDateStyleMenu = false }
+                        )
+                    },
+                    onClick = { expandDateStyleMenu = true },
+                )
             }
-            screenStyleCategory.addPreference(this)
-        }
-
-        Preference(this).apply {
-            key = "articleScreenStyle"
-            title = getString(R.string.article_style_screen_name)
-            setOnPreferenceClickListener {
-                findMainNavController().navigate(R.id.action_to_article_style_fragment)
-                true
+            item {
+                BaseSettingsItem(
+                    icon = null,
+                    text = stringResource(id = R.string.appearance_screen_navigation_bar_label),
+                    descriptionText = NavigationBarLabelPreference.toDisplayName(
+                        context, LocalNavigationBarLabel.current,
+                    ),
+                    dropdownMenu = {
+                        NavigationBarLabelStyleMenu(
+                            expanded = expandNavigationBarLabelMenu,
+                            onDismissRequest = { expandNavigationBarLabelMenu = false }
+                        )
+                    },
+                    onClick = { expandNavigationBarLabelMenu = true },
+                )
             }
-            screenStyleCategory.addPreference(this)
-        }
-
-        Preference(this).apply {
-            key = "searchScreenStyle"
-            title = getString(R.string.search_style_screen_name)
-            setOnPreferenceClickListener {
-                findMainNavController().navigate(R.id.action_to_search_style_fragment)
-                true
+            item {
+                CategorySettingsItem(text = stringResource(id = R.string.appearance_screen_screen_style_category))
             }
-            screenStyleCategory.addPreference(this)
+            item {
+                BaseSettingsItem(
+                    icon = null,
+                    text = stringResource(id = R.string.article_style_screen_name),
+                    description = null,
+                    onClick = { navController.navigate(R.id.action_to_article_style_fragment) },
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = null,
+                    text = stringResource(id = R.string.feed_style_screen_name),
+                    description = null,
+                    onClick = { navController.navigate(R.id.action_to_feed_style_fragment) },
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = null,
+                    text = stringResource(id = R.string.search_style_screen_name),
+                    description = null,
+                    onClick = { navController.navigate(R.id.action_to_search_style_fragment) },
+                )
+            }
         }
     }
+}
 
-    private fun getColorPalettes(): List<ColorPalettesPreference.ColorPalette> {
-        val iconBackgroundColorTypedValue = TypedValue()
-        val color1TypedValue = TypedValue()
-        val color2TypedValue = TypedValue()
-        val color3TypedValue = TypedValue()
-        val theme = resources.newTheme()
-        return ThemePreference.basicValues.map {
-            theme.applyStyle(ThemePreference.toResId(requireContext(), it), true)
+@Composable
+private fun TextFieldStyleMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val textFieldStyle = LocalTextFieldStyle.current
 
-            theme.resolveAttribute(
-                if (requireContext().inDarkMode()) {
-                    com.google.android.material.R.attr.colorOnPrimary
-                } else com.google.android.material.R.attr.colorOnPrimaryFixed,
-                iconBackgroundColorTypedValue,
-                true
+    CheckableListMenu(
+        expanded = expanded,
+        current = textFieldStyle,
+        values = TextFieldStylePreference.values,
+        displayName = { TextFieldStylePreference.toDisplayName(context, it) },
+        onChecked = { TextFieldStylePreference.put(context, scope, it) },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Composable
+private fun DateStyleStyleMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val dateStyle = LocalDateStyle.current
+
+    CheckableListMenu(
+        expanded = expanded,
+        current = dateStyle,
+        values = remember { DateStylePreference.values.toList() },
+        displayName = { DateStylePreference.toDisplayName(context, it) },
+        onChecked = { DateStylePreference.put(context, scope, it) },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Composable
+private fun NavigationBarLabelStyleMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val navigationBarLabel = LocalNavigationBarLabel.current
+
+    CheckableListMenu(
+        expanded = expanded,
+        current = navigationBarLabel,
+        values = remember { NavigationBarLabelPreference.values.toList() },
+        displayName = { NavigationBarLabelPreference.toDisplayName(context, it) },
+        onChecked = { NavigationBarLabelPreference.put(context, scope, it) },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Composable
+fun Palettes(
+    colors: Map<String, ColorScheme>,
+    themeName: String = LocalTheme.current,
+) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    Row(
+        modifier = Modifier
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        colors.forEach { (t, u) ->
+            SelectableMiniPalette(
+                selected = t == themeName,
+                onClick = {
+                    ThemePreference.put(context, scope, t) {
+                        context.activity.recreate()
+                    }
+                },
+                accents = remember(u) {
+                    listOf(
+                        TonalPalette.from(u.primary),
+                        TonalPalette.from(u.secondary),
+                        TonalPalette.from(u.tertiary)
+                    )
+                }
             )
-            theme.resolveAttribute(
-                if (requireContext().inDarkMode()) {
-                    com.google.android.material.R.attr.colorPrimaryContainer
-                } else com.google.android.material.R.attr.colorPrimary,
-                color1TypedValue,
-                true
-            )
-            theme.resolveAttribute(
-                com.google.android.material.R.attr.colorSecondaryFixedDim,
-                color2TypedValue,
-                true
-            )
-            theme.resolveAttribute(
-                if (requireContext().inDarkMode()) {
-                    com.google.android.material.R.attr.colorTertiaryContainer
-                } else com.google.android.material.R.attr.colorTertiary,
-                color3TypedValue,
-                true
-            )
-            ColorPalettesPreference.ColorPalette(
-                name = it,
-                iconBackgroundColor = iconBackgroundColorTypedValue.data,
-                color1 = color1TypedValue.data,
-                color2 = color2TypedValue.data,
-                color3 = color3TypedValue.data,
-                description = ThemePreference.toDisplayName(requireContext(), it),
-            )
+        }
+    }
+}
+
+@Composable
+fun SelectableMiniPalette(
+    modifier: Modifier = Modifier,
+    selected: Boolean,
+    onClick: () -> Unit,
+    accents: List<TonalPalette>,
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.inverseOnSurface,
+    ) {
+        Surface(
+            modifier = Modifier
+                .clickable { onClick() }
+                .padding(12.dp)
+                .size(50.dp),
+            shape = CircleShape,
+            color = Color(accents[0].tone(60)),
+        ) {
+            Box {
+                Surface(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .offset((-25).dp, 25.dp),
+                    color = Color(accents[1].tone(85)),
+                ) {}
+                Surface(
+                    modifier = Modifier
+                        .size(50.dp)
+                        .offset(25.dp, 25.dp),
+                    color = Color(accents[2].tone(75)),
+                ) {}
+                val animationSpec = spring<Float>(stiffness = Spring.StiffnessMedium)
+                AnimatedVisibility(
+                    visible = selected,
+                    enter = scaleIn(animationSpec) + fadeIn(animationSpec),
+                    exit = scaleOut(animationSpec) + fadeOut(animationSpec),
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .fillMaxSize()
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.primary),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Check,
+                            contentDescription = "Checked",
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .size(16.dp),
+                            tint = MaterialTheme.colorScheme.surface
+                        )
+                    }
+                }
+            }
         }
     }
 }
