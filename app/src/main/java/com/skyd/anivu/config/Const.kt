@@ -13,7 +13,7 @@ object Const {
 
     const val TRANSLATION_URL = "https://crowdin.com/project/anivu"
 
-    const val AFADIAN_LINK = "https://afdian.net/a/SkyD666"
+    const val AFADIAN_LINK = "https://afdian.com/a/SkyD666"
     const val BUY_ME_A_COFFEE_LINK = "https://www.buymeacoffee.com/SkyD666"
 
     const val RAYS_ANDROID_URL = "https://github.com/SkyD666/Rays-Android"

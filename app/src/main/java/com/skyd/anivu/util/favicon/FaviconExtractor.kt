@@ -1,9 +1,9 @@
 package com.skyd.anivu.util.favicon
 
 import androidx.compose.ui.util.fastMaxBy
-import com.skyd.anivu.util.favicon.interceptor.BaseUrlIconTagInterceptor
-import com.skyd.anivu.util.favicon.interceptor.HardCodedInterceptor
-import com.skyd.anivu.util.favicon.interceptor.IconTagInterceptor
+import com.skyd.anivu.util.favicon.extractor.BaseUrlIconTagExtractor
+import com.skyd.anivu.util.favicon.extractor.HardCodedExtractor
+import com.skyd.anivu.util.favicon.extractor.IconTagExtractor
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import retrofit2.Retrofit
@@ -12,14 +12,14 @@ import javax.inject.Inject
 class FaviconExtractor @Inject constructor(
     retrofit: Retrofit,
 ) {
-    private val interceptors = listOf(
-        HardCodedInterceptor(retrofit),
-        IconTagInterceptor(retrofit),
-        BaseUrlIconTagInterceptor(retrofit),
+    private val extractors = listOf(
+        HardCodedExtractor(retrofit),
+        IconTagExtractor(retrofit),
+        BaseUrlIconTagExtractor(retrofit),
     )
 
     fun extractFavicon(url: String): String? = runBlocking {
-        interceptors
+        extractors
             .map { async { it.intercept(url) } }
             .map { it.await() }
             .flatten()

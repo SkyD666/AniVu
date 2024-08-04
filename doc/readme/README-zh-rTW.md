@@ -33,7 +33,7 @@
         <b><a href="../../README.md">English</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="README-zh-rCN.md">中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b>正體中文</b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">幫助我們翻譯</a></b>
     </p>
 </div>
-
+<a href="https://f-droid.org/packages/com.skyd.anivu"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on-zh-tw.png" alt="Get it on F-Droid" height="80"></a>
 
 ## 💡主要功能
 

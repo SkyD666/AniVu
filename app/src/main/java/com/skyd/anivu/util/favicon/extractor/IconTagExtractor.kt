@@ -1,4 +1,4 @@
-package com.skyd.anivu.util.favicon.interceptor
+package com.skyd.anivu.util.favicon.extractor
 
 import com.skyd.anivu.model.service.HttpService
 import kotlinx.coroutines.async
@@ -11,10 +11,10 @@ import java.io.IOException
 import java.nio.charset.Charset
 import javax.inject.Inject
 
-open class IconTagInterceptor @Inject constructor(
+open class IconTagExtractor @Inject constructor(
     private val retrofit: Retrofit,
-) : Interceptor {
-    override fun intercept(url: String): List<Interceptor.IconData> = runBlocking {
+) : Extractor {
+    override fun intercept(url: String): List<Extractor.IconData> = runBlocking {
         try {
             val html = retrofit.create(HttpService::class.java).body(url).run {
                 source().use { source ->
@@ -52,7 +52,7 @@ open class IconTagInterceptor @Inject constructor(
     }
 }
 
-fun extractIconFromHtml(html: String): List<Interceptor.IconData> {
+fun extractIconFromHtml(html: String): List<Extractor.IconData> {
     return Regex("(?i)<link[^>]+rel=[\"'](?:shortcut\\s+icon|icon|apple-touch-icon)[\"'][^>]*>")
         .findAll(html)
         .mapNotNull { it.groups[0]?.value }
@@ -81,10 +81,10 @@ fun extractIconFromHtml(html: String): List<Interceptor.IconData> {
                 ?.contains("svg", ignoreCase = true)
                 ?: false
 
-            Interceptor.IconData(
+            Extractor.IconData(
                 url = faviconUrl,
-                size = if (isSvg) Interceptor.IconSize.MAX_SIZE
-                else Interceptor.IconSize(width = width, height = height)
+                size = if (isSvg) Extractor.IconSize.MAX_SIZE
+                else Extractor.IconSize(width = width, height = height)
             )
         }
         .toList()

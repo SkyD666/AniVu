@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 20
-        versionName = "2.1-alpha04"
+        versionName = "2.1-alpha05"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -210,7 +210,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("io.coil-kt:coil-gif:2.7.0")
     implementation("io.coil-kt:coil-svg:2.7.0")
-    implementation("com.airbnb.android:lottie-compose:6.4.1")
+    implementation("com.airbnb.android:lottie-compose:6.5.0")
     implementation("com.rometools:rome:2.1.0")
     implementation("be.ceau:opml-parser:3.1.0") {
         exclude(group = "net.sf.kxml", module = "kxml2")

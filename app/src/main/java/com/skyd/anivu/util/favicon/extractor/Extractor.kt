@@ -1,13 +1,15 @@
-package com.skyd.anivu.util.favicon.interceptor
+package com.skyd.anivu.util.favicon.extractor
 
 import com.google.common.math.IntMath.sqrt
 import retrofit2.Response
 import java.math.RoundingMode
 
-interface Interceptor {
+interface Extractor {
     fun baseUrl(url: String) = Regex("^.+?[^/:](?=[?/]|$)").find(url)?.value
     fun <T> Response<T>.isImage() = headers()["Content-Type"]?.startsWith("image/") == true
-    fun <T> Response<T>.isSvg() = headers()["Content-Type"]?.contains("svg", ignoreCase = true) == true
+    fun <T> Response<T>.isSvg() =
+        headers()["Content-Type"]?.contains("svg", ignoreCase = true) == true
+
     fun intercept(url: String): List<IconData>
 
     data class IconData(
