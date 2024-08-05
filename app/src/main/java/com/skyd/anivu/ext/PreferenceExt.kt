@@ -36,6 +36,13 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
+import com.skyd.anivu.model.preference.proxy.ProxyModePreference
+import com.skyd.anivu.model.preference.proxy.ProxyPasswordPreference
+import com.skyd.anivu.model.preference.proxy.ProxyPortPreference
+import com.skyd.anivu.model.preference.proxy.ProxyTypePreference
+import com.skyd.anivu.model.preference.proxy.ProxyUsernamePreference
+import com.skyd.anivu.model.preference.proxy.UseProxyPreference
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.preference.rss.RssSyncBatteryNotLowConstraintPreference
 import com.skyd.anivu.model.preference.rss.RssSyncChargingConstraintPreference
@@ -79,7 +86,9 @@ fun Preferences.toSettings(): Settings {
         rssSyncFrequency = RssSyncFrequencyPreference.fromPreferences(this),
         rssSyncWifiConstraint = RssSyncWifiConstraintPreference.fromPreferences(this),
         rssSyncChargingConstraint = RssSyncChargingConstraintPreference.fromPreferences(this),
-        rssSyncBatteryNotLowConstraint = RssSyncBatteryNotLowConstraintPreference.fromPreferences(this),
+        rssSyncBatteryNotLowConstraint = RssSyncBatteryNotLowConstraintPreference.fromPreferences(
+            this
+        ),
         parseLinkTagAsEnclosure = ParseLinkTagAsEnclosurePreference.fromPreferences(this),
 
         // Player
@@ -98,5 +107,12 @@ fun Preferences.toSettings(): Settings {
 
         // Transmission
         seedingWhenComplete = SeedingWhenCompletePreference.fromPreferences(this),
+        useProxy = UseProxyPreference.fromPreferences(this),
+        proxyMode = ProxyModePreference.fromPreferences(this),
+        proxyType = ProxyTypePreference.fromPreferences(this),
+        proxyHostname = ProxyHostnamePreference.fromPreferences(this),
+        proxyPort = ProxyPortPreference.fromPreferences(this),
+        proxyUsername = ProxyUsernamePreference.fromPreferences(this),
+        proxyPassword = ProxyPasswordPreference.fromPreferences(this),
     )
 }

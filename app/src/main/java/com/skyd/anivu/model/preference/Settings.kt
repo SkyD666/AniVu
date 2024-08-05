@@ -41,6 +41,13 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
+import com.skyd.anivu.model.preference.proxy.ProxyModePreference
+import com.skyd.anivu.model.preference.proxy.ProxyPasswordPreference
+import com.skyd.anivu.model.preference.proxy.ProxyPortPreference
+import com.skyd.anivu.model.preference.proxy.ProxyTypePreference
+import com.skyd.anivu.model.preference.proxy.ProxyUsernamePreference
+import com.skyd.anivu.model.preference.proxy.UseProxyPreference
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.preference.rss.RssSyncBatteryNotLowConstraintPreference
 import com.skyd.anivu.model.preference.rss.RssSyncChargingConstraintPreference
@@ -74,6 +81,12 @@ import com.skyd.anivu.ui.local.LocalPlayerAutoPip
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
+import com.skyd.anivu.ui.local.LocalProxyHostname
+import com.skyd.anivu.ui.local.LocalProxyMode
+import com.skyd.anivu.ui.local.LocalProxyPassword
+import com.skyd.anivu.ui.local.LocalProxyPort
+import com.skyd.anivu.ui.local.LocalProxyType
+import com.skyd.anivu.ui.local.LocalProxyUsername
 import com.skyd.anivu.ui.local.LocalRssSyncBatteryNotLowConstraint
 import com.skyd.anivu.ui.local.LocalRssSyncChargingConstraint
 import com.skyd.anivu.ui.local.LocalRssSyncFrequency
@@ -87,6 +100,7 @@ import com.skyd.anivu.ui.local.LocalShowArticleTopBarRefresh
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
 import com.skyd.anivu.ui.local.LocalUseAutoDelete
+import com.skyd.anivu.ui.local.LocalUseProxy
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 
@@ -138,6 +152,13 @@ data class Settings(
     val mediaLibLocation: String = MediaLibLocationPreference.default,
     // Transmission
     val seedingWhenComplete: Boolean = SeedingWhenCompletePreference.default,
+    val useProxy: Boolean = UseProxyPreference.default,
+    val proxyMode: String = ProxyModePreference.default,
+    val proxyType: String = ProxyTypePreference.default,
+    val proxyHostname: String = ProxyHostnamePreference.default,
+    val proxyPort: Int = ProxyPortPreference.default,
+    val proxyUsername: String = ProxyUsernamePreference.default,
+    val proxyPassword: String = ProxyPasswordPreference.default,
 )
 
 @Composable
@@ -196,6 +217,13 @@ fun SettingsProvider(
         LocalMediaLibLocation provides settings.mediaLibLocation,
         // Transmission
         LocalSeedingWhenComplete provides settings.seedingWhenComplete,
+        LocalUseProxy provides settings.useProxy,
+        LocalProxyMode provides settings.proxyMode,
+        LocalProxyType provides settings.proxyType,
+        LocalProxyHostname provides settings.proxyHostname,
+        LocalProxyPort provides settings.proxyPort,
+        LocalProxyUsername provides settings.proxyUsername,
+        LocalProxyPassword provides settings.proxyPassword,
     ) {
         content()
     }

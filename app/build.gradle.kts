@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 34
         versionCode = 20
-        versionName = "2.1-alpha05"
+        versionName = "2.1-alpha06"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -185,7 +185,6 @@ dependencies {
     implementation("androidx.core:core-splashscreen:1.0.1")
     implementation("androidx.paging:paging-runtime-ktx:3.3.1")
     implementation("androidx.paging:paging-compose:3.3.1")
-    implementation("androidx.preference:preference-ktx:1.2.1")
 
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")

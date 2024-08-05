@@ -1,17 +1,36 @@
 package com.skyd.anivu.ui.fragment.settings.transmission.proxy
 
-import android.content.Context
 import android.os.Bundle
-import androidx.lifecycle.lifecycleScope
-import androidx.preference.DropDownPreference
-import androidx.preference.EditTextPreference
-import androidx.preference.ListPreference
-import androidx.preference.Preference.SummaryProvider
-import androidx.preference.PreferenceScreen
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Devices
+import androidx.compose.material.icons.outlined.Http
+import androidx.compose.material.icons.outlined.Password
+import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.Podcasts
+import androidx.compose.material.icons.outlined.VpnKey
+import androidx.compose.material.icons.outlined.VpnKeyOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.skyd.anivu.R
-import com.skyd.anivu.base.BasePreferenceFragmentCompat
-import com.skyd.anivu.ext.dataStore
-import com.skyd.anivu.ext.getOrDefault
+import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
 import com.skyd.anivu.model.preference.proxy.ProxyModePreference
 import com.skyd.anivu.model.preference.proxy.ProxyPasswordPreference
@@ -19,176 +38,288 @@ import com.skyd.anivu.model.preference.proxy.ProxyPortPreference
 import com.skyd.anivu.model.preference.proxy.ProxyTypePreference
 import com.skyd.anivu.model.preference.proxy.ProxyUsernamePreference
 import com.skyd.anivu.model.preference.proxy.UseProxyPreference
-import com.skyd.anivu.ui.component.preference.BannerSwitchPreference
+import com.skyd.anivu.ui.component.AniVuTopBar
+import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.BannerItem
+import com.skyd.anivu.ui.component.BaseSettingsItem
+import com.skyd.anivu.ui.component.CheckableListMenu
+import com.skyd.anivu.ui.component.SwitchSettingsItem
+import com.skyd.anivu.ui.component.dialog.TextFieldDialog
+import com.skyd.anivu.ui.local.LocalProxyHostname
+import com.skyd.anivu.ui.local.LocalProxyMode
+import com.skyd.anivu.ui.local.LocalProxyPassword
+import com.skyd.anivu.ui.local.LocalProxyPort
+import com.skyd.anivu.ui.local.LocalProxyType
+import com.skyd.anivu.ui.local.LocalProxyUsername
+import com.skyd.anivu.ui.local.LocalUseProxy
 import dagger.hilt.android.AndroidEntryPoint
 
 
 @AndroidEntryPoint
-class ProxyFragment : BasePreferenceFragmentCompat() {
-    override val title by lazy { resources.getString(R.string.proxy_screen_name) }
-    private lateinit var bannerSwitchPreference: BannerSwitchPreference
-    private lateinit var proxyModePreference: DropDownPreference
-    private lateinit var proxyTypePreference: DropDownPreference
-    private lateinit var proxyHostnamePreference: EditTextPreference
-    private lateinit var proxyPortPreference: EditTextPreference
-    private lateinit var proxyUsernamePreference: EditTextPreference
-    private lateinit var proxyPasswordPreference: EditTextPreference
+class ProxyFragment : BaseComposeFragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View = setContentBase { ProxyScreen() }
+}
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        super.onCreatePreferences(savedInstanceState, rootKey)
+@Composable
+fun ProxyScreen() {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var expandProxyModeMenu by rememberSaveable { mutableStateOf(false) }
+    var expandProxyTypeMenu by rememberSaveable { mutableStateOf(false) }
+    var openEditProxyHostnameDialog by rememberSaveable { mutableStateOf(false) }
+    var openEditProxyPortDialog by rememberSaveable { mutableStateOf(false) }
+    var openEditProxyUsernameDialog by rememberSaveable { mutableStateOf(false) }
+    var openEditProxyPasswordDialog by rememberSaveable { mutableStateOf(false) }
 
-        proxyModePreference.dependency = bannerSwitchPreference.key
-        proxyTypePreference.dependency = bannerSwitchPreference.key
-        proxyHostnamePreference.dependency = bannerSwitchPreference.key
-        proxyPortPreference.dependency = bannerSwitchPreference.key
-        proxyUsernamePreference.dependency = bannerSwitchPreference.key
-        proxyPasswordPreference.dependency = bannerSwitchPreference.key
-    }
-
-    override fun Context.onAddPreferences(
-        savedInstanceState: Bundle?,
-        rootKey: String?,
-        screen: PreferenceScreen
-    ) {
-        bannerSwitchPreference = BannerSwitchPreference(this).apply {
-            key = "useProxy"
-            title = getString(R.string.proxy_fragment_use_proxy)
-            isChecked = requireContext().dataStore.getOrDefault(UseProxyPreference)
-            setIcon(if (isChecked) R.drawable.ic_vpn_key_24 else R.drawable.ic_vpn_key_off_24)
-            setOnPreferenceChangeListener { _, newValue ->
-                val value = newValue as Boolean
-                setIcon(if (value) R.drawable.ic_vpn_key_24 else R.drawable.ic_vpn_key_off_24)
-                UseProxyPreference.put(requireContext(), lifecycleScope, value)
-                true
-            }
-            screen.addPreference(this)
-        }
-
-        proxyModePreference = DropDownPreference(this).apply {
-            key = "proxyMode"
-            title = getString(R.string.proxy_fragment_mode)
-            value = ProxyModePreference.toDisplayName(context)
-            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
-            entries = arrayOf(
-                ProxyModePreference.toDisplayName(context, ProxyModePreference.AUTO_MODE),
-                ProxyModePreference.toDisplayName(context, ProxyModePreference.MANUAL_MODE),
+    Scaffold(
+        topBar = {
+            AniVuTopBar(
+                style = AniVuTopBarStyle.Large,
+                scrollBehavior = scrollBehavior,
+                title = { Text(text = stringResource(R.string.proxy_screen_name)) },
             )
-            entryValues = arrayOf(
-                ProxyModePreference.AUTO_MODE,
-                ProxyModePreference.MANUAL_MODE,
-            )
-            setOnPreferenceChangeListener { _, newValue ->
-                val value = newValue as String
-                val enable = value != ProxyModePreference.AUTO_MODE
-                proxyTypePreference.isEnabled = enable
-                proxyHostnamePreference.isEnabled = enable
-                proxyPortPreference.isEnabled = enable
-                proxyUsernamePreference.isEnabled = enable
-                proxyPasswordPreference.isEnabled = enable
-                ProxyModePreference.put(requireContext(), lifecycleScope, value)
-                true
-            }
-            screen.addPreference(this)
         }
+    ) { paddingValues ->
+        val useProxy = LocalUseProxy.current
+        val proxyModeManual = LocalProxyMode.current == ProxyModePreference.MANUAL_MODE
 
-        proxyTypePreference = DropDownPreference(this).apply {
-            key = "proxyType"
-            title = getString(R.string.proxy_fragment_type)
-            setIcon(R.drawable.ic_http_24)
-            value = context.dataStore.getOrDefault(ProxyTypePreference)
-            summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
-            entries = arrayOf(
-                ProxyTypePreference.HTTP,
-                ProxyTypePreference.SOCKS4,
-                ProxyTypePreference.SOCKS5,
-            )
-            entryValues = arrayOf(
-                ProxyTypePreference.HTTP,
-                ProxyTypePreference.SOCKS4,
-                ProxyTypePreference.SOCKS5,
-            )
-            setOnPreferenceChangeListener { _, newValue ->
-                ProxyTypePreference.put(requireContext(), lifecycleScope, newValue as String)
-                true
-            }
-            isEnabled = requireContext().dataStore.getOrDefault(ProxyModePreference) !=
-                    ProxyModePreference.AUTO_MODE
-            screen.addPreference(this)
-        }
-
-        proxyHostnamePreference = EditTextPreference(this).apply {
-            key = "proxyHostname"
-            title = getString(R.string.proxy_fragment_hostname)
-            dialogTitle = getString(R.string.proxy_fragment_hostname)
-            setIcon(R.drawable.ic_devices_24)
-            setDialogIcon(R.drawable.ic_devices_24)
-            text = requireContext().dataStore.getOrDefault(ProxyHostnamePreference)
-            summaryProvider = EditTextPreference.SimpleSummaryProvider.getInstance()
-            setOnPreferenceChangeListener { _, newValue ->
-                ProxyHostnamePreference.put(requireContext(), lifecycleScope, newValue as String)
-                true
-            }
-            isEnabled = requireContext().dataStore.getOrDefault(ProxyModePreference) !=
-                    ProxyModePreference.AUTO_MODE
-            screen.addPreference(this)
-        }
-
-        proxyPortPreference = EditTextPreference(this).apply {
-            key = "proxyPort"
-            title = getString(R.string.proxy_fragment_port)
-            dialogTitle = getString(R.string.proxy_fragment_port)
-            setIcon(R.drawable.ic_podcasts_24)
-            setDialogIcon(R.drawable.ic_podcasts_24)
-            text = requireContext().dataStore.getOrDefault(ProxyPortPreference).toString()
-            summaryProvider = EditTextPreference.SimpleSummaryProvider.getInstance()
-            setOnPreferenceChangeListener { _, newValue ->
-                runCatching {
-                    val port = (newValue as String).toInt()
-                    check(port in 1..65535)
-                    ProxyPortPreference.put(requireContext(), lifecycleScope, port)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentPadding = paddingValues,
+        ) {
+            item {
+                BannerItem {
+                    SwitchSettingsItem(
+                        imageVector = if (useProxy) Icons.Outlined.VpnKey else Icons.Outlined.VpnKeyOff,
+                        text = stringResource(id = R.string.proxy_screen_use_proxy),
+                        checked = useProxy,
+                        onCheckedChange = { UseProxyPreference.put(context, scope, it) }
+                    )
                 }
-                true
             }
-            isEnabled = requireContext().dataStore.getOrDefault(ProxyModePreference) !=
-                    ProxyModePreference.AUTO_MODE
-            screen.addPreference(this)
-        }
-
-        proxyUsernamePreference = EditTextPreference(this).apply {
-            key = "proxyUsername"
-            title = getString(R.string.proxy_fragment_username)
-            dialogTitle = getString(R.string.proxy_fragment_username)
-            setIcon(R.drawable.ic_person_24)
-            setDialogIcon(R.drawable.ic_person_24)
-            text = requireContext().dataStore.getOrDefault(ProxyUsernamePreference).toString()
-            summaryProvider = EditTextPreference.SimpleSummaryProvider.getInstance()
-            setOnPreferenceChangeListener { _, newValue ->
-                ProxyUsernamePreference.put(requireContext(), lifecycleScope, newValue as String)
-                true
+            item {
+                BaseSettingsItem(
+                    icon = null,
+                    text = stringResource(id = R.string.proxy_screen_mode),
+                    descriptionText = ProxyModePreference.toDisplayName(
+                        context, LocalProxyMode.current,
+                    ),
+                    enabled = useProxy,
+                    dropdownMenu = {
+                        ProxyModeMenu(
+                            expanded = expandProxyModeMenu,
+                            onDismissRequest = { expandProxyModeMenu = false }
+                        )
+                    },
+                    onClick = { expandProxyModeMenu = true },
+                )
             }
-            isEnabled = requireContext().dataStore.getOrDefault(ProxyModePreference) !=
-                    ProxyModePreference.AUTO_MODE
-            screen.addPreference(this)
-        }
-
-        proxyPasswordPreference = EditTextPreference(this).apply {
-            key = "proxyPassword"
-            title = getString(R.string.proxy_fragment_password)
-            dialogTitle = getString(R.string.proxy_fragment_password)
-            setIcon(R.drawable.ic_key_vertical_24)
-            setDialogIcon(R.drawable.ic_key_vertical_24)
-            text = requireContext().dataStore.getOrDefault(ProxyPasswordPreference).toString()
-            summaryProvider = SummaryProvider<EditTextPreference> {
-                if (it.text.isNullOrBlank()) resources.getString(R.string.not_configure)
-                else resources.getString(R.string.configured)
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Outlined.Http),
+                    text = stringResource(id = R.string.proxy_screen_type),
+                    descriptionText = LocalProxyType.current,
+                    enabled = useProxy && proxyModeManual,
+                    dropdownMenu = {
+                        ProxyTypeMenu(
+                            expanded = expandProxyTypeMenu,
+                            onDismissRequest = { expandProxyTypeMenu = false }
+                        )
+                    },
+                    onClick = { expandProxyTypeMenu = true },
+                )
             }
-            setOnPreferenceChangeListener { _, newValue ->
-                ProxyPasswordPreference.put(requireContext(), lifecycleScope, newValue as String)
-                true
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Outlined.Devices),
+                    text = stringResource(id = R.string.proxy_screen_hostname),
+                    descriptionText = LocalProxyHostname.current,
+                    enabled = useProxy && proxyModeManual,
+                    dropdownMenu = {
+                        EditProxyHostnameDialog(
+                            visible = openEditProxyHostnameDialog,
+                            onDismissRequest = { openEditProxyHostnameDialog = false }
+                        )
+                    },
+                    onClick = { openEditProxyHostnameDialog = true },
+                )
             }
-            isEnabled = requireContext().dataStore.getOrDefault(ProxyModePreference) !=
-                    ProxyModePreference.AUTO_MODE
-            screen.addPreference(this)
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Outlined.Podcasts),
+                    text = stringResource(id = R.string.proxy_screen_port),
+                    descriptionText = LocalProxyPort.current.toString(),
+                    enabled = useProxy && proxyModeManual,
+                    dropdownMenu = {
+                        EditProxyPortDialog(
+                            visible = openEditProxyPortDialog,
+                            onDismissRequest = { openEditProxyPortDialog = false }
+                        )
+                    },
+                    onClick = { openEditProxyPortDialog = true },
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Outlined.Person),
+                    text = stringResource(id = R.string.proxy_screen_username),
+                    descriptionText = LocalProxyUsername.current.ifBlank { null },
+                    enabled = useProxy && proxyModeManual,
+                    dropdownMenu = {
+                        EditProxyUsernameDialog(
+                            visible = openEditProxyUsernameDialog,
+                            onDismissRequest = { openEditProxyUsernameDialog = false }
+                        )
+                    },
+                    onClick = { openEditProxyUsernameDialog = true },
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Outlined.Password),
+                    text = stringResource(id = R.string.proxy_screen_password),
+                    descriptionText = if (LocalProxyPassword.current.isBlank()) {
+                        stringResource(R.string.not_configure)
+                    } else stringResource(R.string.configured),
+                    enabled = useProxy && proxyModeManual,
+                    dropdownMenu = {
+                        EditProxyPasswordDialog(
+                            visible = openEditProxyPasswordDialog,
+                            onDismissRequest = { openEditProxyPasswordDialog = false }
+                        )
+                    },
+                    onClick = { openEditProxyPasswordDialog = true },
+                )
+            }
         }
     }
+}
+
+@Composable
+private fun ProxyModeMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val proxyMode = LocalProxyMode.current
+
+    CheckableListMenu(
+        expanded = expanded,
+        current = proxyMode,
+        values = ProxyModePreference.values,
+        displayName = { ProxyModePreference.toDisplayName(context, it) },
+        onChecked = { ProxyModePreference.put(context, scope, it) },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Composable
+private fun ProxyTypeMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val proxyType = LocalProxyType.current
+
+    CheckableListMenu(
+        expanded = expanded,
+        current = proxyType,
+        values = ProxyTypePreference.values,
+        displayName = { it },
+        onChecked = { ProxyTypePreference.put(context, scope, it) },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Composable
+private fun EditProxyHostnameDialog(visible: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val proxyHostname = LocalProxyHostname.current
+    var currentHostname by rememberSaveable { mutableStateOf(proxyHostname) }
+
+    TextFieldDialog(
+        visible = visible,
+        icon = { Icon(imageVector = Icons.Outlined.Devices, contentDescription = null) },
+        titleText = stringResource(id = R.string.proxy_screen_hostname),
+        value = currentHostname,
+        onValueChange = { currentHostname = it },
+        onConfirm = {
+            ProxyHostnamePreference.put(context, scope, it)
+            onDismissRequest()
+        },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Composable
+private fun EditProxyPortDialog(visible: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val proxyPort = LocalProxyPort.current
+    var currentPort by rememberSaveable { mutableStateOf(proxyPort.toString()) }
+
+    TextFieldDialog(
+        visible = visible,
+        icon = { Icon(imageVector = Icons.Outlined.Podcasts, contentDescription = null) },
+        titleText = stringResource(id = R.string.proxy_screen_port),
+        value = currentPort,
+        onValueChange = { currentPort = it },
+        onConfirm = {
+            runCatching {
+                val port = it.toInt()
+                check(port in 1..65535)
+                ProxyPortPreference.put(context, scope, port)
+                onDismissRequest()
+            }
+        },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Composable
+private fun EditProxyUsernameDialog(visible: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val proxyUsername = LocalProxyUsername.current
+    var currentUsername by rememberSaveable { mutableStateOf(proxyUsername) }
+
+    TextFieldDialog(
+        visible = visible,
+        icon = { Icon(imageVector = Icons.Outlined.Person, contentDescription = null) },
+        titleText = stringResource(id = R.string.proxy_screen_username),
+        value = currentUsername,
+        onValueChange = { currentUsername = it },
+        enableConfirm = { true },
+        onConfirm = {
+            ProxyUsernamePreference.put(context, scope, it)
+            onDismissRequest()
+        },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Composable
+private fun EditProxyPasswordDialog(visible: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val proxyPassword = LocalProxyPassword.current
+    var currentPassword by rememberSaveable { mutableStateOf(proxyPassword) }
+
+    TextFieldDialog(
+        visible = visible,
+        icon = { Icon(imageVector = Icons.Outlined.Password, contentDescription = null) },
+        titleText = stringResource(id = R.string.proxy_screen_password),
+        isPassword = true,
+        value = currentPassword,
+        onValueChange = { currentPassword = it },
+        onConfirm = {
+            ProxyPasswordPreference.put(context, scope, it)
+            onDismissRequest()
+        },
+        onDismissRequest = onDismissRequest,
+    )
 }

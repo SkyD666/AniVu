@@ -37,6 +37,13 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
+import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
+import com.skyd.anivu.model.preference.proxy.ProxyModePreference
+import com.skyd.anivu.model.preference.proxy.ProxyPasswordPreference
+import com.skyd.anivu.model.preference.proxy.ProxyPortPreference
+import com.skyd.anivu.model.preference.proxy.ProxyTypePreference
+import com.skyd.anivu.model.preference.proxy.ProxyUsernamePreference
+import com.skyd.anivu.model.preference.proxy.UseProxyPreference
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.preference.rss.RssSyncBatteryNotLowConstraintPreference
 import com.skyd.anivu.model.preference.rss.RssSyncChargingConstraintPreference
@@ -116,3 +123,10 @@ val LocalMediaLibLocation = compositionLocalOf { MediaLibLocationPreference.defa
 
 // Transmission
 val LocalSeedingWhenComplete = compositionLocalOf { SeedingWhenCompletePreference.default }
+val LocalUseProxy = compositionLocalOf { UseProxyPreference.default }
+val LocalProxyMode = compositionLocalOf { ProxyModePreference.default }
+val LocalProxyType = compositionLocalOf { ProxyTypePreference.default }
+val LocalProxyHostname = compositionLocalOf { ProxyHostnamePreference.default }
+val LocalProxyPort = compositionLocalOf { ProxyPortPreference.default }
+val LocalProxyUsername = compositionLocalOf { ProxyUsernamePreference.default }
+val LocalProxyPassword = compositionLocalOf { ProxyPasswordPreference.default }

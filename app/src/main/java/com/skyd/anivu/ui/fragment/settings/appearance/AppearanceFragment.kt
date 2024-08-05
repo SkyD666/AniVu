@@ -122,7 +122,7 @@ fun AppearanceScreen() {
                 SingleChoiceSegmentedButtonRow(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 20.dp),
                 ) {
                     DarkModePreference.values.forEachIndexed { index, id ->
                         SegmentedButton(

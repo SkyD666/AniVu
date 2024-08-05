@@ -75,8 +75,7 @@
     <fragment
         android:id="@+id/settings_fragment"
         android:name="com.skyd.anivu.ui.fragment.settings.SettingsFragment"
-        android:label="@string/settings_screen_name"
-        tools:layout="@layout/fragment_settings" />
+        android:label="@string/settings_screen_name" />
     <action
         android:id="@+id/action_to_settings_fragment"
         app:destination="@id/settings_fragment" />

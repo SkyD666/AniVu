@@ -22,6 +22,8 @@ object ProxyModePreference : BasePreference<String> {
 
     val key = stringPreferencesKey(PROXY_MODE)
 
+    val values = listOf(AUTO_MODE, MANUAL_MODE)
+
     fun put(context: Context, scope: CoroutineScope, value: String) {
         scope.launch(Dispatchers.IO) {
             context.dataStore.put(key, value)

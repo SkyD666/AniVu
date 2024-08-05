@@ -314,7 +314,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     }
 
     // Property getters/setters
-    val filename: String
+    val filename: String?
         get() = MPVLib.getPropertyString("filename")
     var paused: Boolean
         get() = MPVLib.getPropertyBoolean("pause")

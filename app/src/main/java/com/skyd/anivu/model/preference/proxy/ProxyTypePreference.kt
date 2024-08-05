@@ -21,6 +21,8 @@ object ProxyTypePreference : BasePreference<String> {
 
     val key = stringPreferencesKey(PROXY_TYPE)
 
+    val values = listOf(HTTP, SOCKS4, SOCKS5)
+
     fun put(context: Context, scope: CoroutineScope, value: String) {
         scope.launch(Dispatchers.IO) {
             context.dataStore.put(key, value)
