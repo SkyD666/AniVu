@@ -88,7 +88,7 @@ fun RssConfigScreen() {
                     descriptionText = RssSyncFrequencyPreference.toDisplayName(
                         context, LocalRssSyncFrequency.current,
                     ),
-                    dropdownMenu = {
+                    extraContent = {
                         RssSyncFrequencyMenu(
                             expanded = expandRssSyncFrequencyMenu,
                             onDismissRequest = { expandRssSyncFrequencyMenu = false }

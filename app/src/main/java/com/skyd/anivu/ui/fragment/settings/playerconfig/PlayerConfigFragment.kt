@@ -89,7 +89,7 @@ fun PlayerConfigScreen() {
                         context,
                         LocalPlayerDoubleTap.current,
                     ),
-                    dropdownMenu = {
+                    extraContent = {
                         DoubleTapMenu(
                             expanded = expandDoubleTapMenu,
                             onDismissRequest = { expandDoubleTapMenu = false }

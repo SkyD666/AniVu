@@ -175,7 +175,7 @@ fun AppearanceScreen() {
                     descriptionText = TextFieldStylePreference.toDisplayName(
                         context, LocalTextFieldStyle.current,
                     ),
-                    dropdownMenu = {
+                    extraContent = {
                         TextFieldStyleMenu(
                             expanded = expandTextFieldStyleMenu,
                             onDismissRequest = { expandTextFieldStyleMenu = false }
@@ -191,7 +191,7 @@ fun AppearanceScreen() {
                     descriptionText = DateStylePreference.toDisplayName(
                         context, LocalDateStyle.current,
                     ),
-                    dropdownMenu = {
+                    extraContent = {
                         DateStyleStyleMenu(
                             expanded = expandDateStyleMenu,
                             onDismissRequest = { expandDateStyleMenu = false }
@@ -207,7 +207,7 @@ fun AppearanceScreen() {
                     descriptionText = NavigationBarLabelPreference.toDisplayName(
                         context, LocalNavigationBarLabel.current,
                     ),
-                    dropdownMenu = {
+                    extraContent = {
                         NavigationBarLabelStyleMenu(
                             expanded = expandNavigationBarLabelMenu,
                             onDismissRequest = { expandNavigationBarLabelMenu = false }

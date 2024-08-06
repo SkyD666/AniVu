@@ -130,7 +130,7 @@ fun BehaviorScreen() {
                         context = context,
                         value = LocalArticleTapAction.current,
                     ),
-                    dropdownMenu = {
+                    extraContent = {
                         ArticleTapActionMenu(
                             expanded = expandArticleTapActionMenu,
                             onDismissRequest = { expandArticleTapActionMenu = false }
@@ -147,7 +147,7 @@ fun BehaviorScreen() {
                         context = context,
                         value = LocalArticleSwipeLeftAction.current,
                     ),
-                    dropdownMenu = {
+                    extraContent = {
                         ArticleSwipeActionMenu(
                             expanded = expandArticleSwipeLeftActionMenu,
                             onDismissRequest = { expandArticleSwipeLeftActionMenu = false },
@@ -170,7 +170,7 @@ fun BehaviorScreen() {
                         context = context,
                         value = LocalArticleSwipeRightAction.current,
                     ),
-                    dropdownMenu = {
+                    extraContent = {
                         ArticleSwipeActionMenu(
                             expanded = expandArticleSwipeRightActionMenu,
                             onDismissRequest = { expandArticleSwipeRightActionMenu = false },

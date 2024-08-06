@@ -33,6 +33,7 @@ fun ClipboardTextField(
     isPassword: Boolean = false,
     errorText: String = "",
     imeAction: ImeAction = ImeAction.Done,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = imeAction),
     keyboardAction: (KeyboardActionScope.(focusManager: FocusManager?, value: String) -> Unit)? = null,
     focusManager: FocusManager? = null,
     onConfirm: (String) -> Unit = {},
@@ -89,9 +90,7 @@ fun ClipboardTextField(
                     }
                 } else null,
             ),
-            keyboardOptions = KeyboardOptions(
-                imeAction = imeAction
-            ),
+            keyboardOptions = keyboardOptions,
         )
         if (errorText.isNotEmpty()) {
             SelectionContainer {

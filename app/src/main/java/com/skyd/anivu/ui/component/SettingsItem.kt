@@ -303,7 +303,7 @@ fun BaseSettingsItem(
     enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
-    dropdownMenu: (@Composable () -> Unit)? = null,
+    extraContent: (@Composable () -> Unit)? = null,
     content: (@Composable () -> Unit)? = null,
 ) {
     BaseSettingsItem(
@@ -323,7 +323,7 @@ fun BaseSettingsItem(
         enabled = enabled,
         onClick = if (enabled) onClick else null,
         onLongClick = if (enabled) onLongClick else null,
-        dropdownMenu = dropdownMenu,
+        extraContent = extraContent,
         content = content,
     )
 }
@@ -337,7 +337,7 @@ fun BaseSettingsItem(
     enabled: Boolean = true,
     onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
-    dropdownMenu: (@Composable () -> Unit)? = null,
+    extraContent: (@Composable () -> Unit)? = null,
     content: (@Composable () -> Unit)? = null
 ) {
     CompositionLocalProvider(
@@ -388,7 +388,7 @@ fun BaseSettingsItem(
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                 )
-                dropdownMenu?.invoke()
+                extraContent?.invoke()
                 if (description != null) {
                     Box(modifier = Modifier.padding(top = 4.dp)) {
                         description.invoke()

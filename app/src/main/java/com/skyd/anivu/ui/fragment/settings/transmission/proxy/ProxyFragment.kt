@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Devices
 import androidx.compose.material.icons.outlined.Http
@@ -29,6 +30,8 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
@@ -112,7 +115,7 @@ fun ProxyScreen() {
                         context, LocalProxyMode.current,
                     ),
                     enabled = useProxy,
-                    dropdownMenu = {
+                    extraContent = {
                         ProxyModeMenu(
                             expanded = expandProxyModeMenu,
                             onDismissRequest = { expandProxyModeMenu = false }
@@ -127,7 +130,7 @@ fun ProxyScreen() {
                     text = stringResource(id = R.string.proxy_screen_type),
                     descriptionText = LocalProxyType.current,
                     enabled = useProxy && proxyModeManual,
-                    dropdownMenu = {
+                    extraContent = {
                         ProxyTypeMenu(
                             expanded = expandProxyTypeMenu,
                             onDismissRequest = { expandProxyTypeMenu = false }
@@ -142,7 +145,7 @@ fun ProxyScreen() {
                     text = stringResource(id = R.string.proxy_screen_hostname),
                     descriptionText = LocalProxyHostname.current,
                     enabled = useProxy && proxyModeManual,
-                    dropdownMenu = {
+                    extraContent = {
                         EditProxyHostnameDialog(
                             visible = openEditProxyHostnameDialog,
                             onDismissRequest = { openEditProxyHostnameDialog = false }
@@ -157,7 +160,7 @@ fun ProxyScreen() {
                     text = stringResource(id = R.string.proxy_screen_port),
                     descriptionText = LocalProxyPort.current.toString(),
                     enabled = useProxy && proxyModeManual,
-                    dropdownMenu = {
+                    extraContent = {
                         EditProxyPortDialog(
                             visible = openEditProxyPortDialog,
                             onDismissRequest = { openEditProxyPortDialog = false }
@@ -172,7 +175,7 @@ fun ProxyScreen() {
                     text = stringResource(id = R.string.proxy_screen_username),
                     descriptionText = LocalProxyUsername.current.ifBlank { null },
                     enabled = useProxy && proxyModeManual,
-                    dropdownMenu = {
+                    extraContent = {
                         EditProxyUsernameDialog(
                             visible = openEditProxyUsernameDialog,
                             onDismissRequest = { openEditProxyUsernameDialog = false }
@@ -189,7 +192,7 @@ fun ProxyScreen() {
                         stringResource(R.string.not_configure)
                     } else stringResource(R.string.configured),
                     enabled = useProxy && proxyModeManual,
-                    dropdownMenu = {
+                    extraContent = {
                         EditProxyPasswordDialog(
                             visible = openEditProxyPasswordDialog,
                             onDismissRequest = { openEditProxyPasswordDialog = false }
@@ -236,90 +239,104 @@ private fun ProxyTypeMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
 
 @Composable
 private fun EditProxyHostnameDialog(visible: Boolean, onDismissRequest: () -> Unit) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val proxyHostname = LocalProxyHostname.current
-    var currentHostname by rememberSaveable { mutableStateOf(proxyHostname) }
+    if (visible) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val proxyHostname = LocalProxyHostname.current
+        var currentHostname by rememberSaveable { mutableStateOf(proxyHostname) }
 
-    TextFieldDialog(
-        visible = visible,
-        icon = { Icon(imageVector = Icons.Outlined.Devices, contentDescription = null) },
-        titleText = stringResource(id = R.string.proxy_screen_hostname),
-        value = currentHostname,
-        onValueChange = { currentHostname = it },
-        onConfirm = {
-            ProxyHostnamePreference.put(context, scope, it)
-            onDismissRequest()
-        },
-        onDismissRequest = onDismissRequest,
-    )
+        TextFieldDialog(
+            icon = { Icon(imageVector = Icons.Outlined.Devices, contentDescription = null) },
+            titleText = stringResource(id = R.string.proxy_screen_hostname),
+            value = currentHostname,
+            onValueChange = { currentHostname = it },
+            maxLines = 1,
+            onConfirm = {
+                ProxyHostnamePreference.put(context, scope, it)
+                onDismissRequest()
+            },
+            onDismissRequest = onDismissRequest,
+        )
+    }
 }
 
 @Composable
 private fun EditProxyPortDialog(visible: Boolean, onDismissRequest: () -> Unit) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val proxyPort = LocalProxyPort.current
-    var currentPort by rememberSaveable { mutableStateOf(proxyPort.toString()) }
+    if (visible) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val proxyPort = LocalProxyPort.current
+        var currentPort by rememberSaveable { mutableStateOf(proxyPort.toString()) }
 
-    TextFieldDialog(
-        visible = visible,
-        icon = { Icon(imageVector = Icons.Outlined.Podcasts, contentDescription = null) },
-        titleText = stringResource(id = R.string.proxy_screen_port),
-        value = currentPort,
-        onValueChange = { currentPort = it },
-        onConfirm = {
-            runCatching {
-                val port = it.toInt()
-                check(port in 1..65535)
-                ProxyPortPreference.put(context, scope, port)
-                onDismissRequest()
-            }
-        },
-        onDismissRequest = onDismissRequest,
-    )
+        TextFieldDialog(
+            icon = { Icon(imageVector = Icons.Outlined.Podcasts, contentDescription = null) },
+            titleText = stringResource(id = R.string.proxy_screen_port),
+            value = currentPort,
+            onValueChange = { currentPort = it },
+            maxLines = 1,
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Done,
+                keyboardType = KeyboardType.Decimal,
+            ),
+            errorText = if ((currentPort.toIntOrNull() ?: -1) in 0..65535) ""
+            else stringResource(R.string.proxy_screen_port_error_message),
+            onConfirm = {
+                runCatching {
+                    val port = it.toInt()
+                    check(port in 0..65535)
+                    ProxyPortPreference.put(context, scope, port)
+                    onDismissRequest()
+                }
+            },
+            onDismissRequest = onDismissRequest,
+        )
+    }
 }
 
 @Composable
 private fun EditProxyUsernameDialog(visible: Boolean, onDismissRequest: () -> Unit) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val proxyUsername = LocalProxyUsername.current
-    var currentUsername by rememberSaveable { mutableStateOf(proxyUsername) }
+    if (visible) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val proxyUsername = LocalProxyUsername.current
+        var currentUsername by rememberSaveable { mutableStateOf(proxyUsername) }
 
-    TextFieldDialog(
-        visible = visible,
-        icon = { Icon(imageVector = Icons.Outlined.Person, contentDescription = null) },
-        titleText = stringResource(id = R.string.proxy_screen_username),
-        value = currentUsername,
-        onValueChange = { currentUsername = it },
-        enableConfirm = { true },
-        onConfirm = {
-            ProxyUsernamePreference.put(context, scope, it)
-            onDismissRequest()
-        },
-        onDismissRequest = onDismissRequest,
-    )
+        TextFieldDialog(
+            icon = { Icon(imageVector = Icons.Outlined.Person, contentDescription = null) },
+            titleText = stringResource(id = R.string.proxy_screen_username),
+            value = currentUsername,
+            onValueChange = { currentUsername = it },
+            maxLines = 1,
+            enableConfirm = { true },
+            onConfirm = {
+                ProxyUsernamePreference.put(context, scope, it)
+                onDismissRequest()
+            },
+            onDismissRequest = onDismissRequest,
+        )
+    }
 }
 
 @Composable
 private fun EditProxyPasswordDialog(visible: Boolean, onDismissRequest: () -> Unit) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val proxyPassword = LocalProxyPassword.current
-    var currentPassword by rememberSaveable { mutableStateOf(proxyPassword) }
+    if (visible) {
+        val context = LocalContext.current
+        val scope = rememberCoroutineScope()
+        val proxyPassword = LocalProxyPassword.current
+        var currentPassword by rememberSaveable { mutableStateOf(proxyPassword) }
 
-    TextFieldDialog(
-        visible = visible,
-        icon = { Icon(imageVector = Icons.Outlined.Password, contentDescription = null) },
-        titleText = stringResource(id = R.string.proxy_screen_password),
-        isPassword = true,
-        value = currentPassword,
-        onValueChange = { currentPassword = it },
-        onConfirm = {
-            ProxyPasswordPreference.put(context, scope, it)
-            onDismissRequest()
-        },
-        onDismissRequest = onDismissRequest,
-    )
+        TextFieldDialog(
+            icon = { Icon(imageVector = Icons.Outlined.Password, contentDescription = null) },
+            titleText = stringResource(id = R.string.proxy_screen_password),
+            isPassword = true,
+            value = currentPassword,
+            onValueChange = { currentPassword = it },
+            maxLines = 1,
+            onConfirm = {
+                ProxyPasswordPreference.put(context, scope, it)
+                onDismissRequest()
+            },
+            onDismissRequest = onDismissRequest,
+        )
+    }
 }

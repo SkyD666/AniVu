@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.component.dialog
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -33,11 +34,12 @@ fun TextFieldDialog(
     errorText: String = "",
     dismissText: String = stringResource(R.string.cancel),
     confirmText: String = stringResource(R.string.ok),
-    enableConfirm: (String) -> Boolean = { it.isNotBlank() },
+    enableConfirm: (String) -> Boolean = { it.isNotBlank() && errorText.isEmpty() },
     onValueChange: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {},
     onConfirm: (String) -> Unit = {},
     imeAction: ImeAction = if (maxLines == 1) ImeAction.Done else ImeAction.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = imeAction),
 ) {
     TextFieldDialog(
         modifier = modifier,
@@ -61,6 +63,7 @@ fun TextFieldDialog(
         onDismissRequest = onDismissRequest,
         onConfirm = onConfirm,
         imeAction = imeAction,
+        keyboardOptions = keyboardOptions,
     )
 }
 
@@ -80,11 +83,12 @@ fun TextFieldDialog(
     errorText: String = "",
     dismissText: String = stringResource(R.string.cancel),
     confirmText: String = stringResource(R.string.ok),
-    enableConfirm: (String) -> Boolean = { it.isNotBlank() },
+    enableConfirm: (String) -> Boolean = { it.isNotBlank() && errorText.isEmpty() },
     onValueChange: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {},
     onConfirm: (String) -> Unit = {},
     imeAction: ImeAction = if (maxLines == 1) ImeAction.Done else ImeAction.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(imeAction = imeAction),
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -107,6 +111,7 @@ fun TextFieldDialog(
                 isPassword = isPassword,
                 errorText = errorText,
                 imeAction = imeAction,
+                keyboardOptions = keyboardOptions,
                 focusManager = focusManager,
                 onConfirm = onConfirm,
             )

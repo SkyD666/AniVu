@@ -316,6 +316,7 @@
     <string name="open_file">Open file</string>
     <string name="feed_screen_sort_xml_articles_on_update">Use full refresh</string>
     <string name="feed_screen_sort_xml_articles_on_update_tip">Enabling full refresh may increase the refresh time</string>
+    <string name="proxy_screen_port_error_message">Ports can only range from 0 to 65535</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>
