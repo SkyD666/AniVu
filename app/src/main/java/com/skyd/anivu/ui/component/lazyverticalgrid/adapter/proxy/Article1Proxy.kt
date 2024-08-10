@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.Drafts
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
@@ -456,7 +457,7 @@ private fun ArticleMenu(
             text = { Text(text = stringResource(id = R.string.bottom_sheet_enclosure_title)) },
             leadingIcon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_home_storage_24),
+                    imageVector = Icons.Outlined.AttachFile,
                     contentDescription = null,
                 )
             },
@@ -555,7 +556,7 @@ private fun SwipeBackgroundContent(
                 }
 
                 ArticleSwipeActionPreference.SHOW_ENCLOSURES -> {
-                    painterResource(id = R.drawable.ic_home_storage_24)
+                    rememberVectorPainter(image = Icons.Outlined.AttachFile)
                 }
 
                 ArticleSwipeActionPreference.SWITCH_READ_STATE -> {

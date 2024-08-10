@@ -71,7 +71,7 @@ fun Context.getAppVersionName(): String {
         } else {
             packageManager.getPackageInfo(packageName, 0)
         }
-        appVersionName = packageInfo.versionName
+        appVersionName = packageInfo.versionName.orEmpty()
     } catch (e: PackageManager.NameNotFoundException) {
         e.printStackTrace()
     }
@@ -94,7 +94,7 @@ fun Context.getAppVersionCode(): Long {
 fun Context.getAppName(): String? {
     return try {
         val packageInfo: PackageInfo = packageManager.getPackageInfo(packageName, 0)
-        val labelRes: Int = packageInfo.applicationInfo.labelRes
+        val labelRes: Int = packageInfo.applicationInfo?.labelRes ?: return null
         getString(labelRes)
     } catch (e: Exception) {
         e.printStackTrace()

@@ -27,8 +27,7 @@
     <fragment
         android:id="@+id/read_fragment"
         android:name="com.skyd.anivu.ui.fragment.read.ReadFragment"
-        android:label="@string/read_fragment_name"
-        tools:layout="@layout/fragment_read">
+        android:label="@string/read_screen_name">
 
         <argument
             android:name="articleId"

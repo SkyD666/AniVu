@@ -77,7 +77,7 @@ class ReadViewModel @Inject constructor(
                 }.map {
                     if (it == null) {
                         ReadPartialStateChange.ArticleResult.Failed(
-                            appContext.getString(R.string.read_fragment_article_id_illegal)
+                            appContext.getString(R.string.read_screen_article_id_illegal)
                         )
                     } else {
                         ReadPartialStateChange.ArticleResult.Success(article = it)

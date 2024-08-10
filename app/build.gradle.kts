@@ -15,14 +15,14 @@ apply(from = "../secret.gradle.kts")
 
 android {
     namespace = "com.skyd.anivu"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.skyd.anivu"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 20
-        versionName = "2.1-alpha07"
+        versionName = "2.1-alpha08"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -161,13 +161,13 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.activity:activity-ktx:1.9.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha13")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha14")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
-    implementation("androidx.compose.ui:ui:1.7.0-beta06")
-    implementation("androidx.compose.material:material:1.7.0-beta06")
+    implementation("androidx.compose.ui:ui:1.7.0-beta07")
+    implementation("androidx.compose.material:material:1.7.0-beta07")
     implementation("androidx.compose.material3:material3:1.3.0-beta05")
     implementation("androidx.compose.material3:material3-window-size-class:1.3.0-beta05")
     implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta04")
@@ -179,12 +179,12 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     implementation("androidx.room:room-paging:2.6.1")
     ksp("androidx.room:room-compiler:2.6.1")
-    implementation("androidx.work:work-runtime-ktx:2.9.0")
+    implementation("androidx.work:work-runtime-ktx:2.9.1")
     implementation("androidx.datastore:datastore-preferences:1.1.1")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.core:core-splashscreen:1.0.1")
-    implementation("androidx.paging:paging-runtime-ktx:3.3.1")
-    implementation("androidx.paging:paging-compose:3.3.1")
+    implementation("androidx.paging:paging-runtime-ktx:3.3.2")
+    implementation("androidx.paging:paging-compose:3.3.2")
 
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
