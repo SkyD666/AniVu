@@ -30,7 +30,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
@@ -39,29 +42,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.fragment.app.FragmentActivity
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeFragment
 import com.skyd.anivu.base.mvi.getDispatcher
-import com.skyd.anivu.ext.activity
-import com.skyd.anivu.ext.dataStore
-import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toHtml
 import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
-import com.skyd.anivu.model.bean.LinkEnclosureBean
-import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
-import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
-import com.skyd.anivu.ui.fragment.read.ReadFragment.Companion.getEnclosuresList
+import com.skyd.anivu.ui.fragment.article.enclosure.EnclosureBottomSheet
+import com.skyd.anivu.ui.fragment.article.enclosure.getEnclosuresList
 import com.skyd.anivu.util.ShareUtil
 import com.skyd.anivu.util.html.ImageGetter
 import dagger.hilt.android.AndroidEntryPoint
@@ -71,23 +68,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class ReadFragment : BaseComposeFragment() {
     companion object {
         const val ARTICLE_ID_KEY = "articleId"
-
-        fun getEnclosuresList(
-            context: Context,
-            articleWithEnclosureBean: ArticleWithEnclosureBean,
-        ): List<Any> {
-            val dataList: MutableList<Any> = articleWithEnclosureBean.enclosures.toMutableList()
-            if (context.dataStore.getOrDefault(ParseLinkTagAsEnclosurePreference)) {
-                articleWithEnclosureBean.article.link?.let { link ->
-                    doIfMagnetOrTorrentLink(
-                        link = link,
-                        onMagnet = { dataList += LinkEnclosureBean(link = link) },
-                        onTorrent = { dataList += LinkEnclosureBean(link = link) },
-                    )
-                }
-            }
-            return dataList
-        }
     }
 
     private val articleId by lazy { arguments?.getString(ARTICLE_ID_KEY) }
@@ -107,6 +87,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
     val context = LocalContext.current
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var openEnclosureBottomSheet by rememberSaveable { mutableStateOf<List<Any>?>(null) }
 
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
     val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
@@ -157,16 +138,9 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
         },
         floatingActionButton = {
             AniVuFloatingActionButton(onClick = {
-                val enclosureBottomSheet = EnclosureBottomSheet()
-                enclosureBottomSheet.show(
-                    (context.activity as FragmentActivity).supportFragmentManager,
-                    EnclosureBottomSheet.TAG
-                )
                 val articleState = viewModel.viewState.value.articleState
                 if (articleState is ArticleState.Success) {
-                    enclosureBottomSheet.updateData(
-                        getEnclosuresList(context, articleState.article)
-                    )
+                    openEnclosureBottomSheet = getEnclosuresList(context, articleState.article)
                 }
             }) {
                 Icon(
@@ -263,6 +237,13 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                 snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             null -> Unit
+        }
+
+        if (openEnclosureBottomSheet != null) {
+            EnclosureBottomSheet(
+                onDismissRequest = { openEnclosureBottomSheet = null },
+                dataList = openEnclosureBottomSheet.orEmpty()
+            )
         }
     }
 }

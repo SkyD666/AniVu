@@ -41,8 +41,7 @@
     <fragment
         android:id="@+id/download_fragment"
         android:name="com.skyd.anivu.ui.fragment.download.DownloadFragment"
-        android:label="@string/download_fragment_name"
-        tools:layout="@layout/fragment_download" />
+        android:label="@string/download_fragment_name" />
     <action
         android:id="@+id/action_to_download_fragment"
         app:destination="@id/download_fragment" />

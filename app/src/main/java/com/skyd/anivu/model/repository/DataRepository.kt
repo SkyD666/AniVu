@@ -25,17 +25,8 @@ class DataRepository @Inject constructor(
                 if (it.isFile) size += it.length()
                 true
             })
-            Const.DOWNLOADING_VIDEO_DIR.walkBottomUp().forEach {
-                val relativePath = it.toRelativeString(Const.DOWNLOADING_VIDEO_DIR)
-                if (relativePath.isNotBlank() && 0 == torrentFileDao.count(relativePath)) {
-                    val s = it.length()
-                    if (it.delete()) {
-                        size += s
-                    }
-                }
-            }
             Const.FEED_ICON_DIR.walkBottomUp().forEach {
-                if (it.path!=Const.FEED_ICON_DIR.path) {
+                if (it.path != Const.FEED_ICON_DIR.path) {
                     val contains = feedDao.containsByCustomIcon(it.path)
                     if (contains == 0) {
                         val s = it.length()

@@ -166,7 +166,7 @@ private fun handleIntent(intent: Intent?, navController: NavController) {
         }
         if (url != null) {
             navController.navigate(R.id.action_to_download_fragment, Bundle().apply {
-                putParcelable(DownloadFragment.RESOURCE_URI_KEY, Uri.parse(url))
+                putString(DownloadFragment.RESOURCE_URI_KEY, url)
             })
         }
     }

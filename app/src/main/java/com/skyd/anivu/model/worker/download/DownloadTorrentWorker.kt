@@ -14,6 +14,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -33,12 +34,10 @@ import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
 import com.skyd.anivu.model.bean.download.PeerInfoBean
-import com.skyd.anivu.model.db.dao.DownloadInfoDao
-import com.skyd.anivu.model.db.dao.SessionParamsDao
-import com.skyd.anivu.model.db.dao.TorrentFileDao
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
-import com.skyd.anivu.model.repository.DownloadRepository
+import com.skyd.anivu.model.repository.download.DownloadManager
+import com.skyd.anivu.model.repository.download.DownloadRepository
 import com.skyd.anivu.model.service.HttpService
 import com.skyd.anivu.util.uniqueInt
 import dagger.hilt.EntryPoint
@@ -57,6 +56,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
 import org.libtorrent4j.AlertListener
@@ -95,7 +95,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     private lateinit var torrentLink: String
     private var progress: Float = 0f
     private var name: String? = null
-    private var tempDownloadingDirName: String? = null
     private var description: String? = null
 
     private val notificationManager =
@@ -104,15 +103,14 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private val sessionManager = SessionManager(BuildConfig.DEBUG)
 
-    private fun initData(): Boolean {
-        torrentLinkUuid = inputData.getString(TORRENT_LINK_UUID) ?: return false
-        hiltEntryPoint.downloadInfoDao.apply {
-            torrentLink = getDownloadLinkByUuid(torrentLinkUuid) ?: return false
+    private fun initData(): Boolean = runBlocking {
+        torrentLinkUuid = inputData.getString(TORRENT_LINK_UUID) ?: return@runBlocking false
+        hiltEntryPoint.downloadManager.apply {
+            torrentLink = getDownloadLinkByUuid(torrentLinkUuid) ?: return@runBlocking false
             name = getDownloadName(link = torrentLink)
-            tempDownloadingDirName = getDownloadingDirName(link = torrentLink)
             progress = getDownloadProgress(link = torrentLink) ?: 0f
         }
-        return true
+        return@runBlocking true
     }
 
     override suspend fun doWork(): Result {
@@ -124,21 +122,22 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             }
             if (!initData()) return@withContext Result.failure()
             updateNotification()
+            val saveDir =
+                File(applicationContext.dataStore.getOrDefault(MediaLibLocationPreference))
             // 如果数据库中没有下载信息，就添加新的下载信息（为新下载任务添加信息）
             addNewDownloadInfoToDbIfNotExists(
                 link = torrentLink,
                 name = name,
                 progress = progress,
                 size = sessionManager.stats().totalDownload(),
-                downloadingDirName = tempDownloadingDirName.orEmpty(),
                 downloadRequestId = id.toString(),
             )
-            workerDownload()
+            workerDownload(saveDir)
         }
         removeWorkerFromFlow(id.toString())
         return Result.success(
             workDataOf(
-                STATE to (hiltEntryPoint.downloadInfoDao.getDownloadState(link = torrentLink)
+                STATE to (hiltEntryPoint.downloadManager.getDownloadState(link = torrentLink)
                     ?.ordinal ?: 0),
                 TORRENT_LINK_UUID to torrentLinkUuid,
             )
@@ -147,15 +146,8 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private var sessionIsStopping: Boolean = false
     private suspend fun workerDownload(
-        saveDir: File = applicationContext.dataStore.getOrDefault(MediaLibLocationPreference).let {
-            if (tempDownloadingDirName.isNullOrBlank()) {
-                File(it)
-            } else {
-                File(it, tempDownloadingDirName!!)
-            }
-        }
+        saveDir: File,
     ) = suspendCancellableCoroutine { continuation ->
-
         if (!saveDir.exists() && !saveDir.mkdirs()) {
             continuation.resumeWithException(RuntimeException("Mkdirs failed: $saveDir"))
         }
@@ -185,9 +177,9 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         }
     }
 
-    private fun howToDownload(saveDir: File) {
+    private fun howToDownload(saveDir: File) = runBlocking {
         sessionManager.apply {
-            val lastSessionParams = hiltEntryPoint.sessionParamsDao
+            val lastSessionParams = hiltEntryPoint.downloadManager
                 .getSessionParams(link = torrentLink)
             val sessionParams = if (lastSessionParams == null) SessionParams()
             else SessionParams(lastSessionParams.data)
@@ -203,14 +195,14 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             start(sessionParams)
             startDht()
 
-            if (hiltEntryPoint.downloadInfoDao.containsDownloadInfo(link = torrentLink) > 0) {
-                hiltEntryPoint.downloadInfoDao.updateDownloadInfoRequestId(
+            if (hiltEntryPoint.downloadManager.containsDownloadInfo(link = torrentLink)) {
+                hiltEntryPoint.downloadManager.updateDownloadInfoRequestId(
                     link = torrentLink,
                     downloadRequestId = id.toString(),
                 )
             }
             var newDownloadState: DownloadInfoBean.DownloadState? = null
-            when (hiltEntryPoint.downloadInfoDao.getDownloadState(link = torrentLink)) {
+            when (hiltEntryPoint.downloadManager.getDownloadState(link = torrentLink)) {
                 null,
                     // 重新下载
                 DownloadInfoBean.DownloadState.Seeding,
@@ -417,7 +409,11 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             // a torrent completes checking. ready to start downloading
             is TorrentCheckedAlert -> {
                 val handle = alert.handle()
-                updateTorrentFilesToDb(link = torrentLink, files = handle.torrentFile().files())
+                updateTorrentFilesToDb(
+                    link = torrentLink,
+                    savePath = handle.savePath(),
+                    files = handle.torrentFile().files(),
+                )
                 name = handle.name
                 updateNotificationAsync()     // update Notification
                 updateNameInfoToDb(link = torrentLink, name = name)
@@ -482,7 +478,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     private fun pauseWorker(
         handle: TorrentHandle?,
         state: DownloadInfoBean.DownloadState = getWhatPausedState(
-            hiltEntryPoint.downloadInfoDao.getDownloadState(link = torrentLink)
+            runBlocking { hiltEntryPoint.downloadManager.getDownloadState(link = torrentLink) }
         )
     ) {
         if (!sessionManager.isRunning || sessionIsStopping) {
@@ -551,9 +547,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         @InstallIn(SingletonComponent::class)
         interface WorkerEntryPoint {
             val retrofit: Retrofit
-            val downloadInfoDao: DownloadInfoDao
-            val torrentFileDao: TorrentFileDao
-            val sessionParamsDao: SessionParamsDao
+            val downloadManager: DownloadManager
             val downloadRepository: DownloadRepository
         }
 
@@ -564,10 +558,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         fun startWorker(context: Context, torrentLink: String, requestId: String? = null) {
             coroutineScope.launch {
                 var torrentLinkUuid =
-                    hiltEntryPoint.downloadInfoDao.getDownloadUuidByLink(torrentLink)
+                    hiltEntryPoint.downloadManager.getDownloadUuidByLink(torrentLink)
                 if (torrentLinkUuid == null) {
                     torrentLinkUuid = UUID.randomUUID().toString()
-                    hiltEntryPoint.downloadInfoDao.setDownloadLinkUuidMap(
+                    hiltEntryPoint.downloadManager.setDownloadLinkUuidMap(
                         DownloadLinkUuidMapBean(
                             link = torrentLink,
                             uuid = torrentLinkUuid,
@@ -582,13 +576,22 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     .build()
 
                 WorkManager.getInstance(context).apply {
+                    // ENQUEUED generally means in queue, but not running. So we replace it to start
+                    val existingWorkPolicy = if (getWorkInfoById(workRequest.id)
+                            .get()?.state == WorkInfo.State.ENQUEUED
+                    ) {
+                        ExistingWorkPolicy.REPLACE
+                    } else {
+                        ExistingWorkPolicy.KEEP
+                    }
                     enqueueUniqueWork(
                         torrentLinkUuid,
-                        ExistingWorkPolicy.KEEP,
+                        existingWorkPolicy,
                         workRequest
                     )
 
                     getWorkInfoByIdFlow(workRequest.id)
+                        .take(1)
                         .filter { it == null || it.state.isFinished }
                         .onEach {
                             removeWorkerFromFlow(workRequest.id.toString())
@@ -609,7 +612,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 val workerState = getWorkInfoById(requestUuid).get()?.state
                 if (workerState == null || workerState.isFinished) {
                     coroutineScope.launch {
-                        val state = hiltEntryPoint.downloadInfoDao.getDownloadState(link)
+                        val state = hiltEntryPoint.downloadManager.getDownloadState(link)
                         updateDownloadState(
                             link = link,
                             downloadState = getWhatPausedState(state),
@@ -625,7 +628,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             context: Context,
             requestId: String,
             link: String,
-            downloadingDirName: String
         ) {
             val requestUuid = UUID.fromString(requestId)
             val worker = WorkManager.getInstance(context)
@@ -635,10 +637,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 worker.getWorkInfoByIdFlow(requestUuid)
                     .filter { it == null || it.state.isFinished }
                     .flatMapConcat {
-                        hiltEntryPoint.downloadRepository.deleteDownloadTaskInfo(
-                            link = link,
-                            downloadingDirName = downloadingDirName,
-                        )
+                        hiltEntryPoint.downloadRepository.deleteDownloadTaskInfo(link = link)
                     }.take(1)
                     .collect()
             }

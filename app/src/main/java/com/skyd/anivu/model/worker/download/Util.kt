@@ -13,7 +13,6 @@ import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.toDecodedUrl
 import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
-import com.skyd.anivu.model.bean.download.SessionParamsBean
 import com.skyd.anivu.model.bean.download.TorrentFileBean
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
 import com.skyd.anivu.model.preference.proxy.ProxyModePreference
@@ -22,6 +21,7 @@ import com.skyd.anivu.model.preference.proxy.ProxyPortPreference
 import com.skyd.anivu.model.preference.proxy.ProxyTypePreference
 import com.skyd.anivu.model.preference.proxy.ProxyUsernamePreference
 import com.skyd.anivu.model.preference.proxy.UseProxyPreference
+import kotlinx.coroutines.runBlocking
 import org.libtorrent4j.FileStorage
 import org.libtorrent4j.SettingsPack
 import org.libtorrent4j.TorrentStatus
@@ -176,38 +176,30 @@ internal fun getWhatPausedState(oldState: DownloadInfoBean.DownloadState?) =
 internal fun updateDownloadState(
     link: String,
     downloadState: DownloadInfoBean.DownloadState,
-): Boolean {
+): Boolean = runBlocking {
     try {
-        val result = DownloadTorrentWorker.hiltEntryPoint.downloadInfoDao.updateDownloadState(
+        val result = DownloadTorrentWorker.hiltEntryPoint.downloadManager.updateDownloadState(
             link = link,
             downloadState = downloadState,
         )
-        if (result == 0) {
-            Log.w(
-                DownloadTorrentWorker.TAG,
-                "updateDownloadState return 0. downloadState: $downloadState"
-            )
-        }
-        return result != 0
+        return@runBlocking result != 0
     } catch (e: SQLiteConstraintException) {
         // 捕获link外键约束异常
         e.printStackTrace()
     }
-    return false
+    return@runBlocking false
 }
 
 internal fun updateDownloadStateAndSessionParams(
     link: String,
     sessionStateData: ByteArray,
     downloadState: DownloadInfoBean.DownloadState,
-) {
-    updateDownloadState(link, downloadState)
+) = runBlocking {
     try {
-        DownloadTorrentWorker.hiltEntryPoint.sessionParamsDao.updateSessionParams(
-            SessionParamsBean(
-                link = link,
-                data = sessionStateData,
-            )
+        DownloadTorrentWorker.hiltEntryPoint.downloadManager.updateDownloadStateAndSessionParams(
+            link = link,
+            sessionStateData = sessionStateData,
+            downloadState = downloadState,
         )
     } catch (e: SQLiteConstraintException) {
         // 捕获link外键约束异常
@@ -215,31 +207,33 @@ internal fun updateDownloadStateAndSessionParams(
     }
 }
 
-internal fun updateDescriptionInfoToDb(link: String, description: String): Boolean {
-    DownloadTorrentWorker.hiltEntryPoint.downloadInfoDao.apply {
-        val result = updateDownloadDescription(
-            link = link,
-            description = description,
+internal fun updateDescriptionInfoToDb(link: String, description: String): Boolean = runBlocking {
+    val result = DownloadTorrentWorker.hiltEntryPoint.downloadManager.updateDownloadDescription(
+        link = link,
+        description = description,
+    )
+    if (result == 0) {
+        Log.w(
+            DownloadTorrentWorker.TAG,
+            "updateDownloadDescription return 0. description: $description"
         )
-        if (result == 0) {
-            Log.w(
-                DownloadTorrentWorker.TAG,
-                "updateDownloadDescription return 0. description: $description"
-            )
-        }
-        return result != 0
     }
+    return@runBlocking result != 0
 }
 
-internal fun updateTorrentFilesToDb(link: String, files: FileStorage): Boolean {
-    DownloadTorrentWorker.hiltEntryPoint.torrentFileDao.apply {
+internal fun updateTorrentFilesToDb(
+    link: String,
+    savePath: String,
+    files: FileStorage,
+): Boolean {
+    DownloadTorrentWorker.hiltEntryPoint.downloadManager.apply {
         val list = mutableListOf<TorrentFileBean>()
         runCatching {
             for (i in 0..<files.numFiles()) {
                 list.add(
                     TorrentFileBean(
                         link = link,
-                        path = files.filePath(i),
+                        path = File(savePath, files.filePath(i)).path,
                         size = files.fileSize(i),
                     )
                 )
@@ -252,44 +246,38 @@ internal fun updateTorrentFilesToDb(link: String, files: FileStorage): Boolean {
     }
 }
 
-internal fun updateNameInfoToDb(link: String, name: String?): Boolean {
-    if (name.isNullOrBlank()) return false
-    DownloadTorrentWorker.hiltEntryPoint.downloadInfoDao.apply {
-        val result = updateDownloadName(
-            link = link,
-            name = name,
-        )
-        if (result == 0) {
-            Log.w(DownloadTorrentWorker.TAG, "updateDownloadName return 0. name: $name")
-        }
-        return result != 0
+internal fun updateNameInfoToDb(link: String, name: String?): Boolean = runBlocking {
+    if (name.isNullOrBlank()) return@runBlocking false
+    val result = DownloadTorrentWorker.hiltEntryPoint.downloadManager.updateDownloadName(
+        link = link,
+        name = name,
+    )
+    if (result == 0) {
+        Log.w(DownloadTorrentWorker.TAG, "updateDownloadName return 0. name: $name")
     }
+    return@runBlocking result != 0
 }
 
-internal fun updateProgressInfoToDb(link: String, progress: Float): Boolean {
-    DownloadTorrentWorker.hiltEntryPoint.downloadInfoDao.apply {
-        val result = updateDownloadProgress(
-            link = link,
-            progress = progress,
-        )
-        if (result == 0) {
-            Log.w(DownloadTorrentWorker.TAG, "updateDownloadProgress return 0. progress: $progress")
-        }
-        return result != 0
+internal fun updateProgressInfoToDb(link: String, progress: Float): Boolean = runBlocking {
+    val result = DownloadTorrentWorker.hiltEntryPoint.downloadManager.updateDownloadProgress(
+        link = link,
+        progress = progress,
+    )
+    if (result == 0) {
+        Log.w(DownloadTorrentWorker.TAG, "updateDownloadProgress return 0. progress: $progress")
     }
+    return@runBlocking result != 0
 }
 
-internal fun updateSizeInfoToDb(link: String, size: Long): Boolean {
-    DownloadTorrentWorker.hiltEntryPoint.downloadInfoDao.apply {
-        val result = updateDownloadSize(
-            link = link,
-            size = size,
-        )
-        if (result == 0) {
-            Log.w(DownloadTorrentWorker.TAG, "updateDownloadSize return 0. size: $size")
-        }
-        return result != 0
+internal fun updateSizeInfoToDb(link: String, size: Long): Boolean = runBlocking {
+    val result = DownloadTorrentWorker.hiltEntryPoint.downloadManager.updateDownloadSize(
+        link = link,
+        size = size,
+    )
+    if (result == 0) {
+        Log.w(DownloadTorrentWorker.TAG, "updateDownloadSize return 0. size: $size")
     }
+    return@runBlocking result != 0
 }
 
 /**
@@ -301,65 +289,27 @@ internal fun addNewDownloadInfoToDbIfNotExists(
     name: String?,
     progress: Float,
     size: Long,
-    downloadingDirName: String,
     downloadRequestId: String,
-) {
-    DownloadTorrentWorker.hiltEntryPoint.downloadInfoDao.apply {
-        if (!forceAdd) {
-            val video = getDownloadInfo(link = link)
-            if (video != null) return
-        }
-        updateDownloadInfo(
-            DownloadInfoBean(
-                link = link,
-                name = name.ifNullOfBlank {
-                    link.substringAfterLast('/')
-                        .toDecodedUrl()
-                        .validateFileName()
-                },
-                downloadingDirName = downloadingDirName,
-                downloadDate = System.currentTimeMillis(),
-                size = size,
-                progress = progress,
-                downloadRequestId = downloadRequestId,
-            )
+) = runBlocking {
+    val downloadManager = DownloadTorrentWorker.hiltEntryPoint.downloadManager
+    if (!forceAdd) {
+        val video = downloadManager.getDownloadInfo(link = link)
+        if (video != null) return@runBlocking
+    }
+    downloadManager.updateDownloadInfo(
+        DownloadInfoBean(
+            link = link,
+            name = name.ifNullOfBlank {
+                link.substringAfterLast('/')
+                    .toDecodedUrl()
+                    .validateFileName()
+            },
+            downloadDate = System.currentTimeMillis(),
+            size = size,
+            progress = progress,
+            downloadRequestId = downloadRequestId,
         )
-    }
-}
-
-internal fun updateAllDownloadVideoInfoToDb(
-    link: String,
-    name: String?,
-    progress: Float,
-    size: Long,
-    downloadingDirName: String,
-    downloadRequestId: String,
-) {
-    DownloadTorrentWorker.hiltEntryPoint.downloadInfoDao.apply {
-        val video = getDownloadInfo(link = link)
-        if (video != null) {
-            updateDownloadInfo(
-                link = link,
-                name = name.ifNullOfBlank {
-                    link.substringAfterLast('/')
-                        .toDecodedUrl()
-                        .validateFileName()
-                },
-                size = size,
-                progress = progress,
-            )
-        } else {
-            addNewDownloadInfoToDbIfNotExists(
-                forceAdd = true,
-                link = link,
-                name = name,
-                progress = progress,
-                size = size,
-                downloadingDirName = downloadingDirName,
-                downloadRequestId = downloadRequestId,
-            )
-        }
-    }
+    )
 }
 
 fun serializeResumeData(name: String, alert: SaveResumeDataAlert) {

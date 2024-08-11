@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
 
-import android.content.Context
 import android.os.Bundle
 import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
@@ -57,18 +56,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavController
 import coil.EventListener
 import coil.request.ErrorResult
 import coil.request.ImageRequest
 import com.skyd.anivu.R
-import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.readable
@@ -84,7 +80,8 @@ import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreferen
 import com.skyd.anivu.ui.component.AniVuImage
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
-import com.skyd.anivu.ui.fragment.read.EnclosureBottomSheet
+import com.skyd.anivu.ui.fragment.article.enclosure.EnclosureBottomSheet
+import com.skyd.anivu.ui.fragment.article.enclosure.getEnclosuresList
 import com.skyd.anivu.ui.fragment.read.ReadFragment
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
@@ -113,6 +110,7 @@ fun Article1Item(
     val context = LocalContext.current
     var expandMenu by rememberSaveable { mutableStateOf(false) }
     val dataWrapper by rememberUpdatedState(newValue = data)
+    var openEnclosureBottomSheet by rememberSaveable { mutableStateOf<List<Any>?>(null) }
 
     val swipeToDismissBoxState = rememberSwipeToDismissBoxState(
         confirmValueChange = { dismissValue ->
@@ -128,7 +126,6 @@ fun Article1Item(
                     val articleWithEnclosure = dataWrapper.articleWithEnclosure
                     swipeAction(
                         articleSwipeAction = articleSwipeAction,
-                        context = context,
                         navController = navController,
                         data = articleWithEnclosure,
                         onMarkAsRead = {
@@ -137,6 +134,9 @@ fun Article1Item(
                         onMarkAsFavorite = {
                             onFavorite(dataWrapper, !articleWithEnclosure.article.isFavorite)
                         },
+                        onShowEnclosureBottomSheet = {
+                            openEnclosureBottomSheet = getEnclosuresList(context, it)
+                        }
                     )
                 }
 
@@ -177,6 +177,9 @@ fun Article1Item(
                 onLongClick = { expandMenu = true },
                 onFavorite = onFavorite,
                 onRead = onRead,
+                onShowEnclosureBottomSheet = {
+                    openEnclosureBottomSheet = getEnclosuresList(context, it)
+                }
             )
             ArticleMenu(
                 expanded = expandMenu,
@@ -184,8 +187,18 @@ fun Article1Item(
                 data = data,
                 onFavorite = onFavorite,
                 onRead = onRead,
+                onShowEnclosureBottomSheet = {
+                    openEnclosureBottomSheet = getEnclosuresList(context, it)
+                }
             )
         }
+    }
+
+    if (openEnclosureBottomSheet != null) {
+        EnclosureBottomSheet(
+            onDismissRequest = { openEnclosureBottomSheet = null },
+            dataList = openEnclosureBottomSheet.orEmpty()
+        )
     }
 }
 
@@ -195,6 +208,7 @@ private fun Article1ItemContent(
     onLongClick: () -> Unit,
     onFavorite: (ArticleWithFeed, Boolean) -> Unit,
     onRead: (ArticleWithFeed, Boolean) -> Unit,
+    onShowEnclosureBottomSheet: (ArticleWithEnclosureBean) -> Unit,
 ) {
     val context = LocalContext.current
     val navController = LocalNavController.current
@@ -221,9 +235,9 @@ private fun Article1ItemContent(
                     onClick = {
                         tapAction(
                             articleTapAction,
-                            context,
                             navController,
                             articleWithEnclosure,
+                            onShowEnclosureBottomSheet,
                         )
                     },
                 ),
@@ -383,9 +397,9 @@ private fun ArticleMenu(
     data: ArticleWithFeed,
     onFavorite: (ArticleWithFeed, Boolean) -> Unit,
     onRead: (ArticleWithFeed, Boolean) -> Unit,
+    onShowEnclosureBottomSheet: (ArticleWithEnclosureBean) -> Unit,
 ) {
     val navController = LocalNavController.current
-    val context = LocalContext.current
     val articleWithEnclosure = data.articleWithEnclosure
     val isFavorite = articleWithEnclosure.article.isFavorite
     val isRead = articleWithEnclosure.article.isRead
@@ -462,10 +476,7 @@ private fun ArticleMenu(
                 )
             },
             onClick = {
-                showEnclosureBottomSheet(
-                    context = context,
-                    data = articleWithEnclosure
-                )
+                onShowEnclosureBottomSheet(articleWithEnclosure)
                 onDismissRequest()
             },
         )
@@ -600,11 +611,11 @@ private fun SwipeBackgroundContent(
 
 private fun swipeAction(
     articleSwipeAction: String,
-    context: Context,
     navController: NavController,
     data: ArticleWithEnclosureBean,
     onMarkAsRead: () -> Unit,
     onMarkAsFavorite: () -> Unit,
+    onShowEnclosureBottomSheet: (ArticleWithEnclosureBean) -> Unit,
 ) {
     when (articleSwipeAction) {
         ArticleSwipeActionPreference.READ -> {
@@ -612,7 +623,7 @@ private fun swipeAction(
         }
 
         ArticleSwipeActionPreference.SHOW_ENCLOSURES -> {
-            showEnclosureBottomSheet(context = context, data = data)
+            onShowEnclosureBottomSheet(data)
         }
 
         ArticleSwipeActionPreference.SWITCH_READ_STATE -> onMarkAsRead()
@@ -622,9 +633,9 @@ private fun swipeAction(
 
 private fun tapAction(
     articleTapAction: String,
-    context: Context,
     navController: NavController,
     data: ArticleWithEnclosureBean,
+    onShowEnclosureBottomSheet: (ArticleWithEnclosureBean) -> Unit,
 ) {
     when (articleTapAction) {
         ArticleTapActionPreference.READ -> {
@@ -632,7 +643,7 @@ private fun tapAction(
         }
 
         ArticleTapActionPreference.SHOW_ENCLOSURES -> {
-            showEnclosureBottomSheet(context = context, data = data)
+            onShowEnclosureBottomSheet(data)
         }
     }
 }
@@ -642,14 +653,4 @@ private fun navigateToReadScreen(navController: NavController, data: ArticleWith
         putString(ReadFragment.ARTICLE_ID_KEY, data.article.articleId)
     }
     navController.navigate(R.id.action_to_read_fragment, bundle)
-}
-
-private fun showEnclosureBottomSheet(context: Context, data: ArticleWithEnclosureBean) {
-    EnclosureBottomSheet().apply {
-        show(
-            (context.activity as FragmentActivity).supportFragmentManager,
-            EnclosureBottomSheet.TAG,
-        )
-        updateData(ReadFragment.getEnclosuresList(context, data))
-    }
 }

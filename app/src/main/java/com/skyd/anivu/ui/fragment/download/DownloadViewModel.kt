@@ -6,7 +6,7 @@ import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.base.mvi.MviSingleEvent
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
-import com.skyd.anivu.model.repository.DownloadRepository
+import com.skyd.anivu.model.repository.download.DownloadRepository
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

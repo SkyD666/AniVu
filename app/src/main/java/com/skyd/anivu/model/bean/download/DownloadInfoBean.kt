@@ -6,7 +6,6 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.Index
 import com.skyd.anivu.base.BaseBean
-import com.skyd.anivu.ui.adapter.variety.Diff
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
@@ -29,8 +28,6 @@ data class DownloadInfoBean(
     val link: String,
     @ColumnInfo(name = NAME_COLUMN)
     val name: String,
-    @ColumnInfo(name = DOWNLOADING_DIR_NAME_COLUMN)
-    var downloadingDirName: String,
     @ColumnInfo(name = DOWNLOAD_DATE_COLUMN)
     var downloadDate: Long,
     @ColumnInfo(name = SIZE_COLUMN)
@@ -43,7 +40,7 @@ data class DownloadInfoBean(
     val downloadState: DownloadState = DownloadState.Init,
     @ColumnInfo(name = DOWNLOAD_REQUEST_ID_COLUMN)
     val downloadRequestId: String,
-) : BaseBean, Parcelable, Diff {
+) : BaseBean, Parcelable {
     @IgnoredOnParcel
     @Ignore
     var peerInfoList: List<PeerInfoBean> = emptyList()
@@ -82,30 +79,6 @@ data class DownloadInfoBean(
         const val PAYLOAD_SIZE = "size"
     }
 
-    override fun sameAs(o: Any?): Boolean {
-        return o is DownloadInfoBean && link == o.link
-    }
-
-    override fun contentSameAs(o: Any?): Boolean {
-        return this == o
-    }
-
-    override fun diff(o: Any?): Any? {
-        if (o !is DownloadInfoBean) return null
-
-        val list: MutableList<Any> = mutableListOf()
-        if (progress != o.progress) list += PAYLOAD_PROGRESS
-        if (description != o.description) list += PAYLOAD_DESCRIPTION
-        if (peerInfoList != o.peerInfoList) list += PAYLOAD_PEER_INFO
-        if (uploadPayloadRate != o.uploadPayloadRate) list += PAYLOAD_UPLOAD_PAYLOAD_RATE
-        if (downloadPayloadRate != o.downloadPayloadRate) list += PAYLOAD_DOWNLOAD_PAYLOAD_RATE
-        if (downloadState != o.downloadState) list += PAYLOAD_DOWNLOAD_STATE
-        if (name != o.name) list += PAYLOAD_NAME
-        if (downloadingDirName != o.downloadingDirName) list += PAYLOAD_DOWNLOADING_DIR_NAME
-        if (size != o.size) list += PAYLOAD_SIZE
-        return list.ifEmpty { null }
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -114,7 +87,6 @@ data class DownloadInfoBean(
 
         if (link != other.link) return false
         if (name != other.name) return false
-        if (downloadingDirName != other.downloadingDirName) return false
         if (downloadDate != other.downloadDate) return false
         if (size != other.size) return false
         if (progress != other.progress) return false
@@ -129,7 +101,6 @@ data class DownloadInfoBean(
     override fun hashCode(): Int {
         var result = link.hashCode()
         result = 31 * result + name.hashCode()
-        result = 31 * result + downloadingDirName.hashCode()
         result = 31 * result + downloadDate.hashCode()
         result = 31 * result + size.hashCode()
         result = 31 * result + progress.hashCode()

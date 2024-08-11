@@ -188,17 +188,6 @@ interface DownloadInfoDao {
     @Transaction
     @Query(
         """
-        SELECT ${DownloadInfoBean.DOWNLOADING_DIR_NAME_COLUMN} FROM $DOWNLOAD_INFO_TABLE_NAME
-        WHERE ${DownloadInfoBean.LINK_COLUMN} = :link
-        """
-    )
-    fun getDownloadingDirName(
-        link: String,
-    ): String?
-
-    @Transaction
-    @Query(
-        """
         UPDATE $DOWNLOAD_INFO_TABLE_NAME
         SET ${DownloadInfoBean.NAME_COLUMN} = :name
         WHERE ${DownloadInfoBean.LINK_COLUMN} = :link
@@ -294,5 +283,5 @@ interface DownloadInfoDao {
         WHERE ${DownloadLinkUuidMapBean.LINK_COLUMN} == :link
         """
     )
-    fun removeDownloadLinkByLink(link: String): Int
+    fun removeDownloadLinkUuidMap(link: String): Int
 }

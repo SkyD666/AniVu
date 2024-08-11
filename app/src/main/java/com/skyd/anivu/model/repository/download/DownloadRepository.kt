@@ -1,11 +1,8 @@
-package com.skyd.anivu.model.repository
+package com.skyd.anivu.model.repository.download
 
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
-import com.skyd.anivu.model.db.dao.DownloadInfoDao
-import com.skyd.anivu.model.db.dao.SessionParamsDao
-import com.skyd.anivu.model.db.dao.TorrentFileDao
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -17,13 +14,11 @@ import java.io.File
 import javax.inject.Inject
 
 class DownloadRepository @Inject constructor(
-    private val downloadInfoDao: DownloadInfoDao,
-    private val torrentFileDao: TorrentFileDao,
-    private val sessionParamsDao: SessionParamsDao,
+    private val downloadManager: DownloadManager,
 ) : BaseRepository() {
-    fun requestDownloadingVideos(): Flow<List<DownloadInfoBean>> {
+    suspend fun requestDownloadingVideos(): Flow<List<DownloadInfoBean>> {
         return combine(
-            downloadInfoDao.getAllDownloadListFlow().distinctUntilChanged(),
+            downloadManager.getDownloadInfoList().distinctUntilChanged(),
             DownloadTorrentWorker.peerInfoMapFlow,
             DownloadTorrentWorker.torrentStatusMapFlow,
         ) { list, peerInfoMap, uploadPayloadRateMap ->
@@ -42,24 +37,19 @@ class DownloadRepository @Inject constructor(
 
     suspend fun deleteDownloadTaskInfo(
         link: String,
-        downloadingDirName: String,
     ): Flow<Unit> {
         return flow {
-            if (downloadingDirName.isNotBlank()) {
-                File(Const.DOWNLOADING_VIDEO_DIR, downloadingDirName).deleteRecursively()
-            } else {
-                torrentFileDao.getTorrentFilesByLink(link = link).forEach {
-                    File(Const.DOWNLOADING_VIDEO_DIR, it.path).deleteRecursively()
-                }
+            downloadManager.getTorrentFilesByLink(link = link).forEach {
+                File(it.path).deleteRecursively()
             }
-            val requestUuid = downloadInfoDao.getDownloadInfo(link)?.downloadRequestId
+            val requestUuid = downloadManager.getDownloadInfo(link)?.downloadRequestId
             if (!requestUuid.isNullOrBlank()) {
                 File(Const.TORRENT_RESUME_DATA_DIR, requestUuid).deleteRecursively()
             }
             // 这些最后删除，防止上面会使用
-            downloadInfoDao.deleteDownloadInfo(link)
-            sessionParamsDao.deleteSessionParams(link)
-            downloadInfoDao.removeDownloadLinkByLink(link)
+            downloadManager.deleteDownloadInfo(link)
+            downloadManager.deleteSessionParams(link)
+            downloadManager.removeDownloadLinkUuidMap(link)
             emit(Unit)
         }.flowOn(Dispatchers.IO)
     }

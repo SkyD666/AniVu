@@ -99,10 +99,6 @@ public static final ** CREATOR;
 -keep class org.libtorrent4j.** { *; }
 
 # VarietyAdapter
--keep class * extends com.skyd.anivu.ui.adapter.variety.VarietyAdapter$Proxy
--keep class com.skyd.anivu.ui.adapter.variety.VarietyAdapter$Proxy { *; }
--keep class com.skyd.anivu.ui.adapter.variety.AsyncListDiffer { *; }
-
 -keep class * extends com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter$Proxy
 -keep class com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter$Proxy { *; }
 
