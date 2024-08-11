@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">AniVu</string>
-    <string name="main_fragment_name">主頁</string>
     <string name="feed_screen_name">訂閱</string>
     <string name="media_screen_name">媒體</string>
     <string name="more_screen_name">更多</string>
@@ -19,14 +18,14 @@
     <string name="delete">刪除</string>
     <string name="edit">編輯</string>
     <string name="article_screen_name">文章</string>
-    <string name="article_fragment_feed_url_illegal">RSS 訂閱連結格式錯誤</string>
+    <string name="article_screen_feed_url_illegal">RSS 訂閱連結格式錯誤</string>
     <string name="search_screen_hint">搜尋</string>
     <string name="back">返回</string>
     <string name="read_screen_name">詳情</string>
     <string name="bottom_sheet_enclosure_title">附件</string>
     <string name="download">下載</string>
     <string name="downloading">下載中…</string>
-    <string name="download_fragment_name">下載任務</string>
+    <string name="download_screen_name">下載任務</string>
     <string name="download_pause">暫停</string>
     <string name="download_retry">重試</string>
     <string name="download_error_paused">下載失敗</string>
@@ -39,7 +38,7 @@
     <string name="torrent_status_downloading_metadata">下載後設資料中…</string>
     <string name="torrent_status_downloading">下載中…</string>
     <string name="torrent_status_finished">已結束</string>
-    <string name="torrent_status_seeding">做種中…</string>
+    <string name="download_seeding">做種中…</string>
     <string name="torrent_status_checking_resume_data">檢查恢復資料中…</string>
     <string name="video">影片</string>
     <string name="player_reset_zoom">還原螢幕</string>
@@ -56,7 +55,6 @@
     <string name="about_screen_other_works_night_screen_description">當您在夜間🌙使用手機時，Night Screen 可以幫助您減少螢幕亮度，減少對眼睛的傷害。</string>
     <string name="no_browser_found">找不到瀏覽器！網址：%s</string>
     <string name="license_screen_name">開源許可證</string>
-    <string name="search_screen_name">搜尋</string>
     <string name="clear_input_text">清除</string>
     <string name="password_visibility_off">隱藏</string>
     <string name="password_visibility_on">顯示</string>
@@ -69,19 +67,19 @@
     <string name="open_with">開啟方式</string>
     <string name="settings_screen_name">設定</string>
     <string name="data_screen_name">資料</string>
-    <string name="data_fragment_description">管理資料、檔案、快取等</string>
+    <string name="data_screen_description">管理資料、檔案、快取等</string>
     <string name="data_screen_clear_cache">清空快取</string>
     <string name="data_screen_clear_cache_description">刪除遊離的下載臨時檔案、快取的 Torrent 檔案等資料</string>
-    <string name="data_fragment_data_cleared_size">%s 資料被刪除</string>
+    <string name="data_screen_data_cleared_size">%s 資料被刪除</string>
     <string name="data_screen_clear_cache_warning">確定要刪除這些快取嗎？</string>
     <string name="clear">清除</string>
     <string name="rss_config_screen_name">RSS</string>
-    <string name="rss_config_fragment_description">配置 RSS 等</string>
+    <string name="rss_config_screen_description">配置 RSS 等</string>
     <string name="rss_config_screen_parse_link_tag_as_enclosure">解析 Link 為附件</string>
     <string name="rss_config_screen_parse_link_tag_as_enclosure_description">解析 Link 標籤，若符合磁力鏈或 Torrent 格式，則顯示為附件</string>
     <string name="rss_config_screen_parse_category">解析</string>
     <string name="transmission_screen_name">傳輸</string>
-    <string name="transmission_fragment_description">資料傳輸配置、行為等</string>
+    <string name="transmission_screen_description">資料傳輸配置、行為等</string>
     <string name="transmission_screen_transmission_behavior_category">行為</string>
     <string name="transmission_screen_seeding_when_complete">自動做種</string>
     <string name="transmission_screen_seeding_when_complete_description">下載完成後自動做種</string>
@@ -104,7 +102,7 @@
     <string name="data_screen_delete_article_before_description">刪除更新日期在指定日期之前的所有文章資料</string>
     <string name="select_date">選擇日期</string>
     <string name="data_screen_clear_up_category">清理</string>
-    <plurals name="data_fragment_deleted_count">
+    <plurals name="data_screen_deleted_count">
         <item quantity="other">刪除了 %d 項</item>
     </plurals>
     <string name="rss_config_screen_sync_category">自動同步</string>
@@ -119,20 +117,20 @@
     <string name="copied">已複製</string>
     <string name="read_screen_article_id_illegal">文章 ID 無效，可能是已被刪除。</string>
     <string name="auto_delete_screen_name">自動刪除</string>
-    <string name="auto_delete_article_fragment_description">自動刪除一段時間之前的文章</string>
+    <string name="auto_delete_article_screen_description">自動刪除一段時間之前的文章</string>
     <string name="enable">啟用</string>
-    <string name="auto_delete_article_fragment_delete_frequency">執行頻率</string>
-    <string name="auto_delete_article_fragment_delete_before">刪除範圍</string>
+    <string name="auto_delete_article_screen_delete_frequency">執行頻率</string>
+    <string name="auto_delete_article_screen_delete_before">刪除範圍</string>
     <string name="player_pause">暫停/播放</string>
     <string name="player_backward_forward">後退/快進</string>
     <string name="player_backward_pause_forward">後退/快進 &amp; 暫停/播放</string>
     <string name="player_config_screen_name">播放器</string>
     <string name="player_config_screen_behavior_category">行為</string>
     <string name="player_config_screen_double_tap">雙擊</string>
-    <string name="player_config_fragment_description">配置播放器行為等</string>
+    <string name="player_config_screen_description">配置播放器行為等</string>
     <string name="appearance_screen_name">外觀和樣式</string>
     <string name="appearance_screen_theme_category">主題</string>
-    <string name="appearance_fragment_description">配置主題、外觀等</string>
+    <string name="appearance_screen_description">配置主題、外觀等</string>
     <string name="theme_dynamic">動態主題</string>
     <string name="theme_pink">櫻花粉</string>
     <string name="theme_green">綠帽綠</string>
@@ -189,9 +187,9 @@
     <string name="crash_screen_crash_log">日誌</string>
     <string name="crash_screen_copy_crash_log">複製日誌</string>
     <string name="feed_screen_all_articles">所有文章</string>
-    <string name="download_fragment_add_download">新增</string>
-    <string name="download_fragment_add_download_hint">磁力 / 種子連結</string>
-    <string name="download_fragment_unsupported_link">不支援的連結</string>
+    <string name="download_screen_add_download">新增</string>
+    <string name="download_screen_add_download_hint">磁力 / 種子連結</string>
+    <string name="download_screen_unsupported_link">不支援的連結</string>
     <string name="date_style_relative">相對</string>
     <string name="date_style_full">完整</string>
     <string name="appearance_screen_date_style">日期風格</string>
