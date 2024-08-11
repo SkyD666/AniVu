@@ -1,20 +1,276 @@
 package com.skyd.anivu.ui.activity
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.fragment.NavHostFragment
-import com.skyd.anivu.base.BaseActivity
-import com.skyd.anivu.databinding.ActivityMainBinding
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.skyd.anivu.base.BaseComposeActivity
+import com.skyd.anivu.ext.toDecodedUrl
+import com.skyd.anivu.ui.screen.MAIN_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.MainScreen
+import com.skyd.anivu.ui.screen.RequestStoragePermissionScreen
+import com.skyd.anivu.ui.screen.about.ABOUT_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.about.AboutScreen
+import com.skyd.anivu.ui.screen.about.update.UpdateDialog
+import com.skyd.anivu.ui.screen.article.ARTICLE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.article.ArticleScreen
+import com.skyd.anivu.ui.screen.article.FEED_URLS_KEY
+import com.skyd.anivu.ui.screen.download.DOWNLOAD_LINK_KEY
+import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK
+import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.download.DownloadScreen
+import com.skyd.anivu.ui.screen.filepicker.EXTENSION_NAME_KEY
+import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_ID_KEY
+import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.filepicker.FilePickerScreen
+import com.skyd.anivu.ui.screen.filepicker.PATH_KEY
+import com.skyd.anivu.ui.screen.filepicker.PICK_FOLDER_KEY
+import com.skyd.anivu.ui.screen.license.LICENSE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.license.LicenseScreen
+import com.skyd.anivu.ui.screen.media.sub.SUB_MEDIA_SCREEN_PATH_KEY
+import com.skyd.anivu.ui.screen.media.sub.SUB_MEDIA_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.media.sub.SubMediaScreenRoute
+import com.skyd.anivu.ui.screen.read.ARTICLE_ID_KEY
+import com.skyd.anivu.ui.screen.read.READ_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.read.ReadScreen
+import com.skyd.anivu.ui.screen.search.SEARCH_DOMAIN_KEY
+import com.skyd.anivu.ui.screen.search.SEARCH_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.search.SearchDomain
+import com.skyd.anivu.ui.screen.search.SearchScreen
+import com.skyd.anivu.ui.screen.settings.SETTINGS_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.SettingsScreen
+import com.skyd.anivu.ui.screen.settings.appearance.APPEARANCE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.appearance.AppearanceScreen
+import com.skyd.anivu.ui.screen.settings.appearance.article.ARTICLE_STYLE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.appearance.article.ArticleStyleScreen
+import com.skyd.anivu.ui.screen.settings.appearance.feed.FEED_STYLE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.appearance.feed.FeedStyleScreen
+import com.skyd.anivu.ui.screen.settings.appearance.search.SEARCH_STYLE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.appearance.search.SearchStyleScreen
+import com.skyd.anivu.ui.screen.settings.behavior.BEHAVIOR_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.behavior.BehaviorScreen
+import com.skyd.anivu.ui.screen.settings.data.DATA_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.data.DataScreen
+import com.skyd.anivu.ui.screen.settings.data.autodelete.AUTO_DELETE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.data.autodelete.AutoDeleteScreen
+import com.skyd.anivu.ui.screen.settings.data.importexport.IMPORT_EXPORT_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.data.importexport.ImportExportScreen
+import com.skyd.anivu.ui.screen.settings.data.importexport.exportopml.EXPORT_OPML_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.data.importexport.exportopml.ExportOpmlScreen
+import com.skyd.anivu.ui.screen.settings.data.importexport.importopml.IMPORT_OPML_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.data.importexport.importopml.ImportOpmlScreen
+import com.skyd.anivu.ui.screen.settings.playerconfig.PLAYER_CONFIG_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.playerconfig.PlayerConfigScreen
+import com.skyd.anivu.ui.screen.settings.playerconfig.advanced.PLAYER_CONFIG_ADVANCED_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.playerconfig.advanced.PlayerConfigAdvancedScreen
+import com.skyd.anivu.ui.screen.settings.rssconfig.RSS_CONFIG_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.rssconfig.RssConfigScreen
+import com.skyd.anivu.ui.screen.settings.transmission.TRANSMISSION_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.transmission.TransmissionScreen
+import com.skyd.anivu.ui.screen.settings.transmission.proxy.PROXY_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.transmission.proxy.ProxyScreen
+import com.skyd.anivu.ui.local.LocalNavController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : BaseActivity<ActivityMainBinding>() {
+class MainActivity : BaseComposeActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        binding.navHostFragmentMain.getFragment<NavHostFragment>().navController
+        setContentBase {
+            CompositionLocalProvider(
+                LocalNavController provides rememberNavController(),
+            ) {
+                MainContent()
+            }
+        }
+    }
+}
+
+@Composable
+private fun MainNavHost() {
+    val navController = LocalNavController.current
+
+    NavHost(
+        modifier = Modifier.background(MaterialTheme.colorScheme.background),
+        navController = navController,
+        startDestination = MAIN_SCREEN_ROUTE,
+        enterTransition = {
+            fadeIn(animationSpec = tween(220, delayMillis = 30)) + scaleIn(
+                animationSpec = tween(220, delayMillis = 30),
+                initialScale = 0.92f,
+            )
+        },
+        exitTransition = { fadeOut(animationSpec = tween(90)) },
+        popEnterTransition = {
+            fadeIn(animationSpec = tween(220)) + scaleIn(
+                animationSpec = tween(220),
+                initialScale = 0.92f,
+            )
+        },
+        popExitTransition = {
+            fadeOut(animationSpec = tween(220)) + scaleOut(
+                animationSpec = tween(220),
+                targetScale = 0.92f,
+            )
+        },
+    ) {
+        composable(route = MAIN_SCREEN_ROUTE) { MainScreen() }
+        composable(route = ARTICLE_SCREEN_ROUTE) {
+            ArticleScreen(feedUrls = it.arguments?.getStringArrayList(FEED_URLS_KEY).orEmpty())
+        }
+        composable(route = LICENSE_SCREEN_ROUTE) { LicenseScreen() }
+        composable(route = ABOUT_SCREEN_ROUTE) { AboutScreen() }
+        composable(route = SETTINGS_SCREEN_ROUTE) { SettingsScreen() }
+        composable(route = APPEARANCE_SCREEN_ROUTE) { AppearanceScreen() }
+        composable(route = ARTICLE_STYLE_SCREEN_ROUTE) { ArticleStyleScreen() }
+        composable(route = FEED_STYLE_SCREEN_ROUTE) { FeedStyleScreen() }
+        composable(route = SEARCH_STYLE_SCREEN_ROUTE) { SearchStyleScreen() }
+        composable(route = BEHAVIOR_SCREEN_ROUTE) { BehaviorScreen() }
+        composable(route = AUTO_DELETE_SCREEN_ROUTE) { AutoDeleteScreen() }
+        composable(route = EXPORT_OPML_SCREEN_ROUTE) { ExportOpmlScreen() }
+        composable(route = IMPORT_OPML_SCREEN_ROUTE) { ImportOpmlScreen() }
+        composable(route = IMPORT_EXPORT_SCREEN_ROUTE) { ImportExportScreen() }
+        composable(route = DATA_SCREEN_ROUTE) { DataScreen() }
+        composable(route = PLAYER_CONFIG_SCREEN_ROUTE) { PlayerConfigScreen() }
+        composable(route = PLAYER_CONFIG_ADVANCED_SCREEN_ROUTE) { PlayerConfigAdvancedScreen() }
+        composable(route = RSS_CONFIG_SCREEN_ROUTE) { RssConfigScreen() }
+        composable(route = PROXY_SCREEN_ROUTE) { ProxyScreen() }
+        composable(route = TRANSMISSION_SCREEN_ROUTE) { TransmissionScreen() }
+        composable(
+            route = "$FILE_PICKER_SCREEN_ROUTE/{$PATH_KEY}/{$PICK_FOLDER_KEY}",
+            arguments = listOf(
+                navArgument(PATH_KEY) { type = NavType.StringType },
+                navArgument(PICK_FOLDER_KEY) { type = NavType.BoolType },
+                navArgument(EXTENSION_NAME_KEY) { nullable = true },
+                navArgument(FILE_PICKER_ID_KEY) { nullable = true },
+            ),
+        ) {
+            val arguments = it.arguments
+            if (arguments != null) {
+                FilePickerScreen(
+                    path = arguments.getString(PATH_KEY)!!.toDecodedUrl(),
+                    pickFolder = arguments.getBoolean(PICK_FOLDER_KEY),
+                    extensionName = arguments.getString(EXTENSION_NAME_KEY),
+                    id = arguments.getString(FILE_PICKER_ID_KEY),
+                )
+            }
+        }
+        composable(
+            route = DOWNLOAD_SCREEN_ROUTE,
+            arguments = listOf(navArgument(DOWNLOAD_LINK_KEY) { nullable = true }),
+            deepLinks = listOf(navDeepLink { uriPattern = DOWNLOAD_SCREEN_DEEP_LINK }),
+        ) {
+            DownloadScreen(downloadLink = it.arguments?.getString(DOWNLOAD_LINK_KEY))
+        }
+        composable(
+            route = "$READ_SCREEN_ROUTE/{$ARTICLE_ID_KEY}",
+            arguments = listOf(navArgument(ARTICLE_ID_KEY) { type = NavType.StringType }),
+        ) {
+            ReadScreen(articleId = it.arguments?.getString(ARTICLE_ID_KEY).orEmpty().toDecodedUrl())
+        }
+        composable(
+            route = SEARCH_SCREEN_ROUTE,
+            arguments = listOf(navArgument(SEARCH_DOMAIN_KEY) {
+                type = NavType.SerializableType(SearchDomain::class.java)
+                defaultValue = SearchDomain.Feed
+            }),
+        ) {
+            SearchScreen(
+                searchDomain = (it.arguments?.getSerializable(SEARCH_DOMAIN_KEY) as? SearchDomain)
+                    ?: SearchDomain.Feed
+            )
+        }
+        composable(
+            route = "$SUB_MEDIA_SCREEN_ROUTE/{$SUB_MEDIA_SCREEN_PATH_KEY}",
+            arguments = listOf(navArgument(SUB_MEDIA_SCREEN_PATH_KEY) {
+                type = NavType.StringType
+            }),
+        ) {
+            SubMediaScreenRoute(
+                path = it.arguments?.getString(SUB_MEDIA_SCREEN_PATH_KEY)?.toDecodedUrl()
+            )
+        }
+    }
+}
+
+@Composable
+private fun MainContent() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        var permissionGranted by remember {
+            mutableStateOf(Environment.isExternalStorageManager())
+        }
+        val permissionRequester = rememberLauncherForActivityResult(
+            ActivityResultContracts.StartActivityForResult()
+        ) { permissionGranted = Environment.isExternalStorageManager() }
+
+        if (permissionGranted) {
+            MainNavHost()
+        } else {
+            RequestStoragePermissionScreen(
+                shouldShowRationale = false,
+                onPermissionRequest = {
+                    permissionGranted = Environment.isExternalStorageManager()
+                    if (!permissionGranted) {
+                        permissionRequester.launch(
+                            Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                        )
+                    }
+                },
+            )
+        }
+    } else {
+        val storagePermissionState = rememberMultiplePermissionsState(
+            mutableListOf<String>().apply {
+                add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                add(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+            }
+        )
+        if (storagePermissionState.allPermissionsGranted) {
+            MainNavHost()
+        } else {
+            RequestStoragePermissionScreen(
+                shouldShowRationale = storagePermissionState.shouldShowRationale,
+                onPermissionRequest = {
+                    storagePermissionState.launchMultiplePermissionRequest()
+                },
+            )
+        }
     }
 
-    override fun getViewBinding() = ActivityMainBinding.inflate(layoutInflater)
+    var openUpdateDialog by rememberSaveable { mutableStateOf(true) }
+    if (openUpdateDialog) {
+        UpdateDialog(
+            silence = true,
+            onClosed = { openUpdateDialog = false },
+            onError = { openUpdateDialog = false },
+        )
+    }
 }

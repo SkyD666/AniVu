@@ -2,13 +2,16 @@ package com.skyd.anivu.model.worker.download
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.navigation.NavDeepLinkBuilder
+import androidx.core.app.TaskStackBuilder
+import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
@@ -39,6 +42,8 @@ import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreferenc
 import com.skyd.anivu.model.repository.download.DownloadManager
 import com.skyd.anivu.model.repository.download.DownloadRepository
 import com.skyd.anivu.model.service.HttpService
+import com.skyd.anivu.ui.activity.MainActivity
+import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK
 import com.skyd.anivu.util.uniqueInt
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -283,10 +288,18 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         // This PendingIntent can be used to cancel the worker
         val cancelIntent = WorkManager.getInstance(applicationContext)
             .createCancelPendingIntent(id)
-        val contentIntent = NavDeepLinkBuilder(applicationContext)
-            .setGraph(R.navigation.nav_graph)
-            .setDestination(R.id.download_fragment)
-            .createPendingIntent()
+
+        val contentIntent = TaskStackBuilder.create(applicationContext).run {
+            addNextIntentWithParentStack(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    DOWNLOAD_SCREEN_DEEP_LINK.toUri(),
+                    applicationContext,
+                    MainActivity::class.java
+                )
+            )
+            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
+        }
 
         // Create a Notification channel if necessary
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {

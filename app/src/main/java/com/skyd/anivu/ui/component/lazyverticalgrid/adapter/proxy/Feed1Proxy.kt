@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
 
-import android.os.Bundle
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -25,13 +24,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.skyd.anivu.R
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
-import com.skyd.anivu.ui.fragment.article.ArticleFragment
+import com.skyd.anivu.ui.screen.article.openArticleScreen
 import com.skyd.anivu.ui.local.LocalNavController
 
 class Feed1Proxy(
@@ -98,12 +96,10 @@ fun Feed1Item(
                     } else null,
                     onClick = {
                         if (onClick == null) {
-                            navController.navigate(R.id.action_to_article_fragment, Bundle().apply {
-                                putStringArrayList(
-                                    ArticleFragment.FEED_URLS_KEY,
-                                    arrayListOf(feed.url)
-                                )
-                            })
+                            openArticleScreen(
+                                navController = navController,
+                                feedUrls = arrayListOf(feed.url)
+                            )
                         } else onClick(feed)
                     },
                 )

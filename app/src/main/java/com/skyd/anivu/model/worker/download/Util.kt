@@ -86,7 +86,7 @@ fun TorrentStatus.State.toDisplayString(context: Context): String {
         TorrentStatus.State.DOWNLOADING_METADATA -> context.getString(R.string.torrent_status_downloading_metadata)
         TorrentStatus.State.DOWNLOADING -> context.getString(R.string.torrent_status_downloading)
         TorrentStatus.State.FINISHED -> context.getString(R.string.torrent_status_finished)
-        TorrentStatus.State.SEEDING -> context.getString(R.string.torrent_status_seeding)
+        TorrentStatus.State.SEEDING -> context.getString(R.string.download_seeding)
         TorrentStatus.State.CHECKING_RESUME_DATA -> context.getString(R.string.torrent_status_checking_resume_data)
         TorrentStatus.State.UNKNOWN -> ""
     }

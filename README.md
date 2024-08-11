@@ -33,12 +33,13 @@
         <b>AniVu</b>, an <b>all-in-one tool</b> for <b>RSS subscription and updates</b>, <b>bit torrent downloads</b>, and <b>video playback</b>.
     </p>
     <p>
-        AniVu utilizes the <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> architecture and fully adopts the <b><a href="https://m3.material.io/">Material You</a></b> design style. All pages are developed using <b>Android View</b> and <b>Jetpack Compose</b>.
+        AniVu utilizes the <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> architecture and fully adopts the <b><a href="https://m3.material.io/">Material You</a></b> design style. All pages are developed using <b>Jetpack Compose</b>.
     </p>
     <p>
         <b><a href="doc/readme/README-zh-rCN.md">中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="doc/readme/README-zh-rTW.md">正體中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">Help us translate</a></b>
     </p>
 </div>
+
 <a href="https://f-droid.org/packages/com.skyd.anivu"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>
 
 ## 💡 Features
@@ -60,11 +61,11 @@
 
 ## 🤩 Screenshots
 
-<img src="doc/image/en/ic_rss_fragment.jpg" alt="ic_rss_fragment" style="zoom:80%;" /> <img src="doc/image/en/ic_media_fragment.jpg" alt="ic_media_fragment" style="zoom:80%;" />
-<img src="doc/image/en/ic_article_fragment.jpg" alt="ic_article_fragment" style="zoom:80%;" /> <img src="doc/image/en/ic_read_fragment.jpg" alt="ic_read_fragment" style="zoom:80%;" />
-<img src="doc/image/en/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="doc/image/en/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
-<img src="doc/image/en/ic_setting_fragment.jpg" alt="ic_setting_fragment" style="zoom:80%;" /> <img src="doc/image/en/ic_appearance_fragment.jpg" alt="ic_appearance_fragment" style="zoom:80%;" />
-<img src="doc/image/en/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="doc/image/en/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
+<img src="doc/image/en/ic_rss_screen.jpg" alt="ic_rss_screen" style="zoom:80%;" /> <img src="doc/image/en/ic_media_screen.jpg" alt="ic_media_screen" style="zoom:80%;" />
+<img src="doc/image/en/ic_article_screen.jpg" alt="ic_article_screen" style="zoom:80%;" /> <img src="doc/image/en/ic_read_screen.jpg" alt="ic_read_screen" style="zoom:80%;" />
+<img src="doc/image/en/ic_read_screen_enclosure.jpg" alt="ic_read_screen_enclosure" style="zoom:80%;" /> <img src="doc/image/en/ic_download_screen.jpg" alt="ic_download_screen" style="zoom:80%;" />
+<img src="doc/image/en/ic_setting_screen.jpg" alt="ic_setting_screen" style="zoom:80%;" /> <img src="doc/image/en/ic_appearance_screen.jpg" alt="ic_appearance_screen" style="zoom:80%;" />
+<img src="doc/image/en/ic_rss_config_screen.jpg" alt="ic_rss_config_screen" style="zoom:80%;" /> <img src="doc/image/en/ic_about_screen.jpg" alt="ic_about_screen" style="zoom:80%;" />
 <img src="doc/image/en/ic_player_activity.jpg" alt="ic_player_activity" style="zoom:80%;" />
 
 ## 🌏 Translation

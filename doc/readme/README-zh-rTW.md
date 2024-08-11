@@ -27,12 +27,13 @@
         <b>AniVu</b>，一個集<b> RSS 訂閱與更新、BitTorrent下載、影片播放</b>為一體的工具。
     </p>
     <p>
-        使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架構，完全採用 <b><a href="https://m3.material.io/">Material You</a></b> 設計風格。使用 <b>Android View</b> 和 <b>Jetpack Compose</b> 混合開發。
+        使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架構，完全採用 <b><a href="https://m3.material.io/">Material You</a></b> 設計風格。使用 <b>Jetpack Compose</b> 開發。
     </p>
     <p>
         <b><a href="../../README.md">English</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="README-zh-rCN.md">中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b>正體中文</b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">幫助我們翻譯</a></b>
     </p>
 </div>
+
 <a href="https://f-droid.org/packages/com.skyd.anivu"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on-zh-tw.png" alt="Get it on F-Droid" height="80"></a>
 
 ## 💡主要功能
@@ -54,12 +55,12 @@
 
 ## 🤩應用截圖
 
-<img src="../image/zh-rTW/ic_rss_fragment.jpg" alt="ic_rss_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_media_fragment.jpg" alt="ic_media_fragment" style="zoom:80%;" />
-<img src="../image/zh-rTW/ic_article_fragment.jpg" alt="ic_article_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_read_fragment.jpg" alt="ic_read_fragment" style="zoom:80%;" />
-<img src="../image/zh-rTW/ic_read_fragment_enclosure.jpg" alt="ic_read_fragment_enclosure" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_download_fragment.jpg" alt="ic_download_fragment" style="zoom:80%;" />
-<img src="../image/zh-rTW/ic_setting_fragment.jpg" alt="ic_setting_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_appearance_fragment.jpg" alt="ic_appearance_fragment" style="zoom:80%;" />
-<img src="../image/zh-rTW/ic_rss_config_fragment.jpg" alt="ic_rss_config_fragment" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_about_fragment.jpg" alt="ic_about_fragment" style="zoom:80%;" />
-<img src="../image/zh-rTW/ic_player_activity.jpg" alt="ic_player_activity" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_rss_screen.jpg" alt="ic_rss_screen" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_media_screen.jpg" alt="ic_media_screen" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_article_screen.jpg" alt="ic_article_screen" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_read_screen.jpg" alt="ic_read_screen" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_read_screen_enclosure.jpg" alt="ic_read_screen_enclosure" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_download_screen.jpg" alt="ic_download_screen" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_setting_screen.jpg" alt="ic_setting_screen" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_appearance_screen.jpg" alt="ic_appearance_screen" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_rss_config_screen.jpg" alt="ic_rss_config_screen" style="zoom:80%;" /> <img src="../image/zh-rTW/ic_about_screen.jpg" alt="ic_about_screen" style="zoom:80%;" />
+<img src="../image/zh-rTW/ic_player_screen.jpg" alt="ic_player_activity" style="zoom:80%;" />
 
 ## 🌏翻譯
 

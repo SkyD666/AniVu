@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
 
-import android.os.Bundle
 import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -80,9 +79,9 @@ import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreferen
 import com.skyd.anivu.ui.component.AniVuImage
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
-import com.skyd.anivu.ui.fragment.article.enclosure.EnclosureBottomSheet
-import com.skyd.anivu.ui.fragment.article.enclosure.getEnclosuresList
-import com.skyd.anivu.ui.fragment.read.ReadFragment
+import com.skyd.anivu.ui.screen.article.enclosure.EnclosureBottomSheet
+import com.skyd.anivu.ui.screen.article.enclosure.getEnclosuresList
+import com.skyd.anivu.ui.screen.read.openReadScreen
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleSwipeRightAction
@@ -649,8 +648,8 @@ private fun tapAction(
 }
 
 private fun navigateToReadScreen(navController: NavController, data: ArticleWithEnclosureBean) {
-    val bundle = Bundle().apply {
-        putString(ReadFragment.ARTICLE_ID_KEY, data.article.articleId)
-    }
-    navController.navigate(R.id.action_to_read_fragment, bundle)
+    openReadScreen(
+        navController = navController,
+        articleId = data.article.articleId,
+    )
 }

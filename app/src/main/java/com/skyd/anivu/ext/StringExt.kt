@@ -10,8 +10,8 @@ import android.text.Spanned
 import androidx.core.text.HtmlCompat
 import net.dankito.readability4j.extended.Readability4JExtended
 
-fun String.toEncodedUrl(): String {
-    return Uri.encode(this, ":/-![].,%?&=")
+fun String.toEncodedUrl(allow: String? = ":/-![].,%?&="): String {
+    return Uri.encode(this, allow)
 }
 
 fun String.toDecodedUrl(): String {

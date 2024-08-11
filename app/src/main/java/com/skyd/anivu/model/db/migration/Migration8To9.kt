@@ -32,6 +32,6 @@ class Migration8To9 : Migration(8, 9) {
                 " FROM $DOWNLOAD_INFO_TABLE_NAME")
         db.execSQL("DROP TABLE $DOWNLOAD_INFO_TABLE_NAME")
         db.execSQL("ALTER TABLE ${DOWNLOAD_INFO_TABLE_NAME}_Backup RENAME to $DOWNLOAD_INFO_TABLE_NAME")
-        db.execSQL("CREATE UNIQUE INDEX index_DownloadInfo_link ON $DOWNLOAD_INFO_TABLE_NAME ($LINK_COLUMN)");
+        db.execSQL("CREATE UNIQUE INDEX index_DownloadInfo_link ON $DOWNLOAD_INFO_TABLE_NAME ($LINK_COLUMN)")
     }
 }
