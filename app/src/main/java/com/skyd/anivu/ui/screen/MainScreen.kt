@@ -83,16 +83,13 @@ private fun handleIntent(intent: Intent?, navController: NavController) {
         val scheme = data.scheme
         var url: String? = null
         when (scheme) {
+            "anivu" -> navController.navigate(data)
             "magnet" -> url = data.toString()
             "http", "https" -> {
                 val path = data.path
                 if (path != null && path.endsWith(".torrent")) {
                     url = data.toString()
                 }
-            }
-
-            "anivu" -> {
-                navController.navigate(data)
             }
         }
         if (url != null) {

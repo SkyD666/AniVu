@@ -117,13 +117,15 @@ fun DownloadItem(
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.weight(1f)) {
                 Row {
-                    Text(
-                        modifier = Modifier.padding(end = 12.dp),
-                        text = data.description.orEmpty(),
-                        style = MaterialTheme.typography.bodySmall,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    description?.let { desc ->
+                        Text(
+                            modifier = Modifier.padding(end = 12.dp),
+                            text = desc,
+                            style = MaterialTheme.typography.bodySmall,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                     Text(
                         text = stringResource(
                             R.string.download_peer_count,
