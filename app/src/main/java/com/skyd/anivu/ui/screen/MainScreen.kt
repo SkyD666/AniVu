@@ -43,7 +43,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -63,6 +62,10 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
+import com.skyd.anivu.ui.local.LocalMediaLibLocation
+import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.local.LocalNavigationBarLabel
+import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import com.skyd.anivu.ui.screen.download.openDownloadScreen
 import com.skyd.anivu.ui.screen.feed.FEED_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.feed.FeedScreen
@@ -70,10 +73,6 @@ import com.skyd.anivu.ui.screen.media.MEDIA_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.media.MediaScreen
 import com.skyd.anivu.ui.screen.more.MORE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.more.MoreScreen
-import com.skyd.anivu.ui.local.LocalMediaLibLocation
-import com.skyd.anivu.ui.local.LocalNavController
-import com.skyd.anivu.ui.local.LocalNavigationBarLabel
-import com.skyd.anivu.ui.local.LocalWindowSizeClass
 
 const val MAIN_SCREEN_ROUTE = "mainScreen"
 
@@ -91,6 +90,10 @@ private fun handleIntent(intent: Intent?, navController: NavController) {
                     url = data.toString()
                 }
             }
+
+            "anivu" -> {
+                navController.navigate(data)
+            }
         }
         if (url != null) {
             openDownloadScreen(
@@ -100,6 +103,8 @@ private fun handleIntent(intent: Intent?, navController: NavController) {
         }
     }
 }
+
+private var needHandleIntent by mutableStateOf(true)
 
 @Composable
 fun MainScreen() {
@@ -112,7 +117,6 @@ fun MainScreen() {
         NavigationBarOrRail(navController = mainNavController)
     }
 
-    var needHandleIntent by rememberSaveable { mutableStateOf(true) }
     if (needHandleIntent) {
         LaunchedEffect(Unit) {
             needHandleIntent = false

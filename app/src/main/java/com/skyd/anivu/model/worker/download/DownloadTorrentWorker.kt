@@ -288,18 +288,17 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         // This PendingIntent can be used to cancel the worker
         val cancelIntent = WorkManager.getInstance(applicationContext)
             .createCancelPendingIntent(id)
-
-        val contentIntent = TaskStackBuilder.create(applicationContext).run {
-            addNextIntentWithParentStack(
-                Intent(
-                    Intent.ACTION_VIEW,
-                    DOWNLOAD_SCREEN_DEEP_LINK.toUri(),
-                    applicationContext,
-                    MainActivity::class.java
-                )
-            )
-            getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
-        }
+        val contentIntent = PendingIntent.getActivity(
+            applicationContext,
+            0,
+            Intent(
+                Intent.ACTION_VIEW,
+                DOWNLOAD_SCREEN_DEEP_LINK.toUri(),
+                applicationContext,
+                MainActivity::class.java
+            ),
+            PendingIntent.FLAG_UPDATE_CURRENT
+        )
 
         // Create a Notification channel if necessary
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
