@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavOptions
+import androidx.navigation.navOptions
 import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.navigate
@@ -38,24 +38,27 @@ import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.deeplink.DeepLinkData
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 
 
 const val DOWNLOAD_SCREEN_ROUTE = "downloadScreen"
-const val DOWNLOAD_SCREEN_DEEP_LINK = "anivu://download.screen"
+val DOWNLOAD_SCREEN_DEEP_LINK = DeepLinkData(
+    deepLink = "anivu://download.screen",
+    navOptions = navOptions { launchSingleTop = true },
+)
 const val DOWNLOAD_LINK_KEY = "downloadLink"
 
 fun openDownloadScreen(
     navController: NavController,
-    downloadLink: String?,
-    navOptions: NavOptions? = null,
+    downloadLink: String? = null,
 ) {
     navController.navigate(
         DOWNLOAD_SCREEN_ROUTE,
         Bundle().apply {
             putString(DOWNLOAD_LINK_KEY, downloadLink)
         },
-        navOptions = navOptions,
+        navOptions = navOptions { launchSingleTop = true },
     )
 }
 

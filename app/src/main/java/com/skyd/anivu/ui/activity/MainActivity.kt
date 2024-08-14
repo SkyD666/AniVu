@@ -13,16 +13,38 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Storage
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.util.Consumer
+import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,11 +52,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeActivity
 import com.skyd.anivu.ext.toDecodedUrl
+import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.screen.MAIN_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.MainScreen
-import com.skyd.anivu.ui.screen.RequestStoragePermissionScreen
 import com.skyd.anivu.ui.screen.about.ABOUT_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.about.AboutScreen
 import com.skyd.anivu.ui.screen.about.update.UpdateDialog
@@ -45,6 +68,7 @@ import com.skyd.anivu.ui.screen.download.DOWNLOAD_LINK_KEY
 import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK
 import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.download.DownloadScreen
+import com.skyd.anivu.ui.screen.download.openDownloadScreen
 import com.skyd.anivu.ui.screen.filepicker.EXTENSION_NAME_KEY
 import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_ID_KEY
 import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_SCREEN_ROUTE
@@ -95,11 +119,14 @@ import com.skyd.anivu.ui.screen.settings.transmission.TRANSMISSION_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.transmission.TransmissionScreen
 import com.skyd.anivu.ui.screen.settings.transmission.proxy.PROXY_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.transmission.proxy.ProxyScreen
-import com.skyd.anivu.ui.local.LocalNavController
 import dagger.hilt.android.AndroidEntryPoint
+
+private val deepLinks = listOf(DOWNLOAD_SCREEN_DEEP_LINK)
 
 @AndroidEntryPoint
 class MainActivity : BaseComposeActivity() {
+    private var needHandleOnCreateIntent = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
@@ -108,7 +135,59 @@ class MainActivity : BaseComposeActivity() {
             CompositionLocalProvider(
                 LocalNavController provides rememberNavController(),
             ) {
-                MainContent()
+                MainContent(onHandleIntent = { IntentHandler() })
+            }
+        }
+    }
+
+    @Composable
+    private fun IntentHandler() {
+        val navController = LocalNavController.current
+        if (needHandleOnCreateIntent) {
+            LaunchedEffect(Unit) {
+                needHandleOnCreateIntent = false
+                handleIntent(intent = intent, navController = navController)
+            }
+        }
+
+        DisposableEffect(navController) {
+            val listener = Consumer<Intent> { newIntent ->
+                handleIntent(intent = newIntent, navController = navController)
+            }
+            addOnNewIntentListener(listener)
+            onDispose { removeOnNewIntentListener(listener) }
+        }
+    }
+
+    private fun handleIntent(intent: Intent?, navController: NavController) {
+        intent ?: return
+        val data = intent.data
+        if (Intent.ACTION_VIEW == intent.action && data != null) {
+            val scheme = data.scheme
+            var url: String? = null
+            when (scheme) {
+                "anivu" -> {
+                    navController.navigate(
+                        data,
+                        deepLinks.firstOrNull {
+                            data.toString().startsWith(it.deepLink)
+                        }?.navOptions
+                    )
+                }
+
+                "magnet" -> url = data.toString()
+                "http", "https" -> {
+                    val path = data.path
+                    if (path != null && path.endsWith(".torrent")) {
+                        url = data.toString()
+                    }
+                }
+            }
+            if (url != null) {
+                openDownloadScreen(
+                    navController = navController,
+                    downloadLink = url,
+                )
             }
         }
     }
@@ -186,7 +265,7 @@ private fun MainNavHost() {
         composable(
             route = DOWNLOAD_SCREEN_ROUTE,
             arguments = listOf(navArgument(DOWNLOAD_LINK_KEY) { nullable = true }),
-            deepLinks = listOf(navDeepLink { uriPattern = DOWNLOAD_SCREEN_DEEP_LINK }),
+            deepLinks = listOf(navDeepLink { uriPattern = DOWNLOAD_SCREEN_DEEP_LINK.deepLink }),
         ) {
             DownloadScreen(downloadLink = it.arguments?.getString(DOWNLOAD_LINK_KEY))
         }
@@ -194,7 +273,9 @@ private fun MainNavHost() {
             route = "$READ_SCREEN_ROUTE/{$ARTICLE_ID_KEY}",
             arguments = listOf(navArgument(ARTICLE_ID_KEY) { type = NavType.StringType }),
         ) {
-            ReadScreen(articleId = it.arguments?.getString(ARTICLE_ID_KEY).orEmpty().toDecodedUrl())
+            ReadScreen(
+                articleId = it.arguments?.getString(ARTICLE_ID_KEY).orEmpty().toDecodedUrl()
+            )
         }
         composable(
             route = SEARCH_SCREEN_ROUTE,
@@ -222,7 +303,7 @@ private fun MainNavHost() {
 }
 
 @Composable
-private fun MainContent() {
+private fun MainContent(onHandleIntent: @Composable () -> Unit) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         var permissionGranted by remember {
             mutableStateOf(Environment.isExternalStorageManager())
@@ -233,6 +314,7 @@ private fun MainContent() {
 
         if (permissionGranted) {
             MainNavHost()
+            onHandleIntent()
         } else {
             RequestStoragePermissionScreen(
                 shouldShowRationale = false,
@@ -255,6 +337,7 @@ private fun MainContent() {
         )
         if (storagePermissionState.allPermissionsGranted) {
             MainNavHost()
+            onHandleIntent()
         } else {
             RequestStoragePermissionScreen(
                 shouldShowRationale = storagePermissionState.shouldShowRationale,
@@ -272,5 +355,67 @@ private fun MainContent() {
             onClosed = { openUpdateDialog = false },
             onError = { openUpdateDialog = false },
         )
+    }
+}
+
+@Composable
+fun RequestStoragePermissionScreen(
+    shouldShowRationale: Boolean,
+    onPermissionRequest: () -> Unit
+) {
+    Scaffold { padding ->
+        Column(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 30.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(Modifier.height(50.dp))
+
+            Text(
+                text = stringResource(R.string.storage_permission_request_screen_title),
+                style = MaterialTheme.typography.titleLarge,
+                textAlign = TextAlign.Center,
+            )
+
+            Icon(
+                modifier = Modifier
+                    .padding(30.dp)
+                    .size(110.dp),
+                imageVector = Icons.Rounded.Storage,
+                contentDescription = null,
+            )
+
+            val textToShow = if (shouldShowRationale) {
+                // If the user has denied the permission but the rationale can be shown,
+                // then gently explain why the app requires this permission
+                stringResource(R.string.storage_permission_request_screen_rationale)
+            } else {
+                // If it's the first time the user lands on this feature, or the user
+                // doesn't want to be asked again for this permission, explain that the
+                // permission is required
+                stringResource(R.string.storage_permission_request_screen_first_tip)
+            }
+            Text(
+                text = textToShow,
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+            )
+
+            Spacer(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(vertical = 20.dp)
+            )
+
+            Button(
+                modifier = Modifier.padding(vertical = 30.dp),
+                onClick = onPermissionRequest,
+            ) {
+                Text(stringResource(R.string.storage_permission_request_screen_request_permission))
+            }
+        }
     }
 }

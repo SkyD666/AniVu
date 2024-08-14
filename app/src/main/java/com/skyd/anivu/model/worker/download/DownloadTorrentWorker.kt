@@ -293,7 +293,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             0,
             Intent(
                 Intent.ACTION_VIEW,
-                DOWNLOAD_SCREEN_DEEP_LINK.toUri(),
+                DOWNLOAD_SCREEN_DEEP_LINK.deepLink.toUri(),
                 applicationContext,
                 MainActivity::class.java
             ),

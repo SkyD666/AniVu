@@ -20,6 +20,11 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.SwapVert
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +39,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
@@ -48,12 +52,14 @@ import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.shape.CloverShape
 import com.skyd.anivu.ui.component.shape.CurlyCornerShape
+import com.skyd.anivu.ui.component.shape.RoundedCornerStarShape
 import com.skyd.anivu.ui.component.shape.SquircleShape
-import com.skyd.anivu.ui.screen.about.ABOUT_SCREEN_ROUTE
-import com.skyd.anivu.ui.screen.settings.SETTINGS_SCREEN_ROUTE
-import com.skyd.anivu.ui.screen.settings.data.importexport.IMPORT_EXPORT_SCREEN_ROUTE
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
+import com.skyd.anivu.ui.screen.about.ABOUT_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.download.openDownloadScreen
+import com.skyd.anivu.ui.screen.settings.SETTINGS_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.data.importexport.IMPORT_EXPORT_SCREEN_ROUTE
 
 
 const val MORE_SCREEN_ROUTE = "moreScreen"
@@ -135,7 +141,7 @@ fun More1Item(
             ) {
                 Icon(
                     modifier = Modifier.size(35.dp),
-                    painter = painterResource(id = data.icon),
+                    imageVector = data.icon,
                     contentDescription = null,
                     tint = data.iconTint
                 )
@@ -162,27 +168,35 @@ private fun getMoreBeanList(
 ): MutableList<MoreBean> {
     return mutableListOf(
         MoreBean(
-            title = context.getString(R.string.import_export_screen_name),
-            icon = R.drawable.ic_swap_vert_24,
+            title = context.getString(R.string.download_screen_name),
+            icon = Icons.Outlined.Download,
             iconTint = colorScheme.onPrimary,
-            shape = SquircleShape,
+            shape = RoundedCornerStarShape,
             shapeColor = colorScheme.primary,
+            action = { openDownloadScreen(navController) },
+        ),
+        MoreBean(
+            title = context.getString(R.string.import_export_screen_name),
+            icon = Icons.Outlined.SwapVert,
+            iconTint = colorScheme.onSecondary,
+            shape = CloverShape,
+            shapeColor = colorScheme.secondary,
             action = { navController.navigate(IMPORT_EXPORT_SCREEN_ROUTE) },
         ),
         MoreBean(
             title = context.getString(R.string.settings_screen_name),
-            icon = R.drawable.ic_settings_24,
-            iconTint = colorScheme.onSecondary,
-            shape = CloverShape,
-            shapeColor = colorScheme.secondary,
+            icon = Icons.Outlined.Settings,
+            iconTint = colorScheme.onTertiary,
+            shape = SquircleShape,
+            shapeColor = colorScheme.tertiary,
             action = { navController.navigate(SETTINGS_SCREEN_ROUTE) },
         ),
         MoreBean(
             title = context.getString(R.string.about_screen_name),
-            icon = R.drawable.ic_info_24,
-            iconTint = colorScheme.onTertiary,
+            icon = Icons.Outlined.Info,
+            iconTint = colorScheme.onPrimary,
             shape = CurlyCornerShape(amp = with(density) { 1.6.dp.toPx() }, count = 10),
-            shapeColor = colorScheme.tertiary,
+            shapeColor = colorScheme.primary,
             action = { navController.navigate(ABOUT_SCREEN_ROUTE) }
         ),
     )

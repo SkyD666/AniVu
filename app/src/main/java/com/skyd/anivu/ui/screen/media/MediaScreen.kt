@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.FileOpen
 import androidx.compose.material.icons.outlined.MyLocation
@@ -66,13 +65,12 @@ import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
-import com.skyd.anivu.ui.screen.download.openDownloadScreen
+import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import com.skyd.anivu.ui.screen.filepicker.ListenToFilePicker
 import com.skyd.anivu.ui.screen.filepicker.openFilePicker
 import com.skyd.anivu.ui.screen.media.list.GroupInfo
 import com.skyd.anivu.ui.screen.media.list.MediaList
-import com.skyd.anivu.ui.local.LocalNavController
-import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.min
@@ -137,16 +135,6 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                         onClick = { dispatch(MediaIntent.Refresh(path)) },
                         imageVector = Icons.Outlined.Refresh,
                         contentDescription = stringResource(id = R.string.refresh),
-                    )
-                    AniVuIconButton(
-                        onClick = {
-                            openDownloadScreen(
-                                navController = navController,
-                                downloadLink = null,
-                            )
-                        },
-                        imageVector = Icons.Outlined.Download,
-                        contentDescription = stringResource(R.string.download_screen_name),
                     )
                 }
             )

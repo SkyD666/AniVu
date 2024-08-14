@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 21
-        versionName = "2.1-alpha12"
+        versionName = "2.1-alpha13"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -184,8 +184,8 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    ksp("com.google.dagger:hilt-android-compiler:2.51.1")
+    implementation("com.google.dagger:hilt-android:2.52")
+    ksp("com.google.dagger:hilt-android-compiler:2.52")
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation("androidx.profileinstaller:profileinstaller:1.3.1")
 
