@@ -1,7 +1,6 @@
 package com.skyd.anivu.model.db.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -10,7 +9,7 @@ import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.GROUP_TABLE_NAME
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.model.bean.GroupWithFeedBean
-import com.skyd.anivu.model.repository.tryDeleteFeedIconFile
+import com.skyd.anivu.model.repository.feed.tryDeleteFeedIconFile
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -34,12 +33,8 @@ interface GroupDao {
     suspend fun getGroupById(groupId: String): GroupBean
 
     @Transaction
-    @Delete
-    suspend fun removeGroup(groupBean: GroupBean): Int
-
-    @Transaction
     @Query("DELETE FROM `$GROUP_TABLE_NAME` WHERE ${GroupBean.GROUP_ID_COLUMN} = :groupId")
-    suspend fun removeGroup(groupId: String): Int
+    suspend fun innerRemoveGroup(groupId: String): Int
 
     @Transaction
     @Query(
@@ -49,8 +44,90 @@ interface GroupDao {
     suspend fun renameGroup(groupId: String, name: String): Int
 
     @Transaction
+    @Query(
+        "UPDATE `$GROUP_TABLE_NAME` SET ${GroupBean.PREVIOUS_GROUP_ID_COLUMN} = :previousGroupId " +
+                "WHERE ${GroupBean.GROUP_ID_COLUMN} = :currentGroupId"
+    )
+    suspend fun updatePreviousGroup(currentGroupId: String, previousGroupId: String?): Int
+
+    @Transaction
+    @Query(
+        "UPDATE `$GROUP_TABLE_NAME` SET ${GroupBean.NEXT_GROUP_ID_COLUMN} = :nextGroupId " +
+                "WHERE ${GroupBean.GROUP_ID_COLUMN} = :currentGroupId"
+    )
+    suspend fun updateNextGroup(currentGroupId: String, nextGroupId: String?): Int
+
+    @Transaction
+    @Query(
+        "SELECT ${GroupBean.PREVIOUS_GROUP_ID_COLUMN} FROM `$GROUP_TABLE_NAME` " +
+                "WHERE ${GroupBean.GROUP_ID_COLUMN} = :currentGroupId"
+    )
+    suspend fun getPreviousGroupId(currentGroupId: String): String?
+
+    @Transaction
+    @Query(
+        "SELECT ${GroupBean.NEXT_GROUP_ID_COLUMN} FROM `$GROUP_TABLE_NAME` " +
+                "WHERE ${GroupBean.GROUP_ID_COLUMN} = :currentGroupId"
+    )
+    suspend fun getNextGroupId(currentGroupId: String): String?
+
+    private suspend fun removeGroupIdFromList(groupId: String) {
+        // Linked list
+        val previousGroupId = getPreviousGroupId(groupId)
+        val nextGroupId = getNextGroupId(groupId)
+        if (groupId == previousGroupId ||
+            groupId == nextGroupId ||
+            previousGroupId != null && previousGroupId == nextGroupId
+        ) {
+            return
+        }
+        if (previousGroupId != null) {
+            updateNextGroup(currentGroupId = previousGroupId, nextGroupId = nextGroupId)
+        }
+        if (nextGroupId != null) {
+            updatePreviousGroup(currentGroupId = nextGroupId, previousGroupId = previousGroupId)
+        }
+    }
+
+    private suspend fun addGroupIdToList(
+        groupId: String,
+        previousGroupId: String?,
+        nextGroupId: String?,
+    ): Boolean {
+        if (groupId == previousGroupId ||
+            groupId == nextGroupId ||
+            previousGroupId != null && previousGroupId == nextGroupId
+        ) {
+            return false
+        }
+        // Linked list
+        if (previousGroupId != null) {
+            updateNextGroup(
+                currentGroupId = previousGroupId,
+                nextGroupId = groupId,
+            )
+        }
+        if (nextGroupId != null) {
+            updatePreviousGroup(
+                currentGroupId = nextGroupId,
+                previousGroupId = groupId,
+            )
+        }
+        updatePreviousGroup(
+            currentGroupId = groupId,
+            previousGroupId = previousGroupId,
+        )
+        updateNextGroup(
+            currentGroupId = groupId,
+            nextGroupId = nextGroupId,
+        )
+        return true
+    }
+
+    @Transaction
     suspend fun removeGroupWithFeed(groupId: String): Int {
-        removeGroup(groupId)
+        removeGroupIdFromList(groupId)
+        innerRemoveGroup(groupId)
         return EntryPointAccessors.fromApplication(appContext, GroupDaoEntryPoint::class.java).run {
             feedDao.getFeedsIn(listOf(groupId)).forEach {
                 it.feed.customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
@@ -58,6 +135,34 @@ interface GroupDao {
             feedDao.removeFeedByGroupId(groupId)
         }
     }
+
+    @Transaction
+    suspend fun reorderGroup(
+        groupId: String,
+        newPreviousGroupId: String? = null,
+        newNextGroupId: String? = null,
+    ): Boolean {
+        if (groupId == newPreviousGroupId ||
+            groupId == newNextGroupId ||
+            newPreviousGroupId != null && newPreviousGroupId == newNextGroupId
+        ) {
+            return false
+        }
+        // Linked list
+        removeGroupIdFromList(groupId)
+        return addGroupIdToList(
+            groupId,
+            previousGroupId = newPreviousGroupId,
+            nextGroupId = newNextGroupId,
+        )
+    }
+
+    @Transaction
+    @Query(
+        "UPDATE `$GROUP_TABLE_NAME` SET ${GroupBean.PREVIOUS_GROUP_ID_COLUMN} = NULL, " +
+                "${GroupBean.NEXT_GROUP_ID_COLUMN} = NULL"
+    )
+    suspend fun resetGroupOrder(): Int
 
     @Transaction
     suspend fun moveGroupFeedsTo(fromGroupId: String?, toGroupId: String?): Int {
@@ -69,6 +174,10 @@ interface GroupDao {
     @Transaction
     @Query("SELECT * FROM `$GROUP_TABLE_NAME`")
     fun getGroupWithFeeds(): Flow<List<GroupWithFeedBean>>
+
+    @Transaction
+    @Query("SELECT * FROM `$GROUP_TABLE_NAME`")
+    fun getGroups(): Flow<List<GroupBean>>
 
     @Transaction
     @Query("SELECT DISTINCT ${GroupBean.GROUP_ID_COLUMN} FROM `$GROUP_TABLE_NAME`")

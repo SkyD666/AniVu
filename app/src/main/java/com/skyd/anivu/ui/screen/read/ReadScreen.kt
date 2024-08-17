@@ -1,8 +1,5 @@
 package com.skyd.anivu.ui.screen.read
 
-import android.content.Context
-import android.text.method.LinkMovementMethod
-import android.widget.TextView
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,7 +14,6 @@ import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -32,12 +28,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -46,19 +40,18 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.openBrowser
+import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toEncodedUrl
-import com.skyd.anivu.ext.toHtml
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.html.HtmlText
 import com.skyd.anivu.ui.screen.article.enclosure.EnclosureBottomSheet
 import com.skyd.anivu.ui.screen.article.enclosure.getEnclosuresList
 import com.skyd.anivu.util.ShareUtil
-import com.skyd.anivu.util.html.ImageGetter
 
 
 const val READ_SCREEN_ROUTE = "readScreen"
@@ -86,6 +79,8 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
     val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     viewModel.getDispatcher(startWith = ReadIntent.Init(articleId))
+
+    var fabHeight by remember { mutableStateOf(0.dp) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -131,12 +126,15 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             )
         },
         floatingActionButton = {
-            AniVuFloatingActionButton(onClick = {
-                val articleState = viewModel.viewState.value.articleState
-                if (articleState is ArticleState.Success) {
-                    openEnclosureBottomSheet = getEnclosuresList(context, articleState.article)
-                }
-            }) {
+            AniVuFloatingActionButton(
+                onSizeWithSinglePaddingChanged = { _, height -> fabHeight = height },
+                onClick = {
+                    val articleState = viewModel.viewState.value.articleState
+                    if (articleState is ArticleState.Success) {
+                        openEnclosureBottomSheet = getEnclosuresList(context, articleState.article)
+                    }
+                },
+            ) {
                 Icon(
                     imageVector = Icons.Outlined.AttachFile,
                     contentDescription = stringResource(R.string.bottom_sheet_enclosure_title),
@@ -148,8 +146,8 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             modifier = Modifier
                 .fillMaxHeight()
                 .verticalScroll(rememberScrollState())
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(paddingValues + 16.dp)
+                .padding(bottom = fabHeight),
         ) {
             when (val articleState = uiState.articleState) {
                 is ArticleState.Failed -> {
@@ -205,18 +203,9 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                             }
                         }
                     }
-                    val textColor = LocalContentColor.current
-                    AndroidView(
-                        factory = { context ->
-                            TextView(context).apply {
-                                movementMethod = LinkMovementMethod.getInstance()
-                                setTextIsSelectable(true)
-                                setTextColor(textColor.toArgb())
-                                setArticleBody(context, article)
-                            }
-                        },
-                        update = { textView ->
-                            textView.setArticleBody(context, article)
+                    HtmlText(
+                        text = article.article.content.ifNullOfBlank {
+                            article.article.description.orEmpty()
                         }
                     )
                 }
@@ -240,19 +229,4 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             )
         }
     }
-}
-
-private fun TextView.setArticleBody(context: Context, article: ArticleWithEnclosureBean) {
-    text = article.article.content
-        .ifNullOfBlank { article.article.description.orEmpty() }
-        .toHtml(
-            imageGetter = ImageGetter(
-                context = context,
-                maxWidth = { width },
-                onSuccess = { _, _ ->
-                    text = text
-                }
-            ),
-            tagHandler = null,
-        )
 }

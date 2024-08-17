@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.repository
+package com.skyd.anivu.model.repository.feed
 
 import android.net.Uri
 import android.webkit.URLUtil
@@ -8,10 +8,11 @@ import com.skyd.anivu.ext.copyTo
 import com.skyd.anivu.ext.isLocal
 import com.skyd.anivu.ext.isNetwork
 import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
+import com.skyd.anivu.model.repository.RssHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -27,6 +28,7 @@ class FeedRepository @Inject constructor(
     private val groupDao: GroupDao,
     private val feedDao: FeedDao,
     private val articleDao: ArticleDao,
+    private val reorderGroupRepository: ReorderGroupRepository,
     private val rssHelper: RssHelper,
 ) : BaseRepository() {
     suspend fun requestGroupAnyList(): Flow<List<Any>> {
@@ -37,10 +39,10 @@ class FeedRepository @Inject constructor(
             groupList to feedDao.getFeedsNotIn(groupIds)
         }.map { (groupList, defaultFeeds) ->
             mutableListOf<Any>().apply {
-                add(GroupBean.DefaultGroup)
+                add(GroupVo.DefaultGroup)
                 addAll(defaultFeeds)
-                groupList.forEach { group ->
-                    add(group.group)
+                reorderGroupRepository.sortGroupWithFeed(groupList).forEach { group ->
+                    add(group.group.toVo())
                     addAll(group.feeds)
                 }
             }
@@ -48,22 +50,22 @@ class FeedRepository @Inject constructor(
     }
 
     suspend fun deleteGroup(groupId: String): Flow<Int> {
-        return if (groupId == GroupBean.DEFAULT_GROUP_ID) flowOf(0)
+        return if (groupId == GroupVo.DEFAULT_GROUP_ID) flowOf(0)
         else flowOf(groupDao.removeGroupWithFeed(groupId)).flowOn(Dispatchers.IO)
     }
 
-    suspend fun renameGroup(groupId: String, name: String): Flow<GroupBean> {
-        return if (groupId == GroupBean.DEFAULT_GROUP_ID) flow {
-            emit(GroupBean.DefaultGroup)
+    suspend fun renameGroup(groupId: String, name: String): Flow<GroupVo> {
+        return if (groupId == GroupVo.DEFAULT_GROUP_ID) flow {
+            emit(GroupVo.DefaultGroup)
         } else flow {
             groupDao.renameGroup(groupId, name)
-            emit(groupDao.getGroupById(groupId))
+            emit(groupDao.getGroupById(groupId).toVo())
         }.flowOn(Dispatchers.IO)
     }
 
     suspend fun moveGroupFeedsTo(fromGroupId: String, toGroupId: String): Flow<Int> {
-        val realFromGroupId = if (fromGroupId == GroupBean.DEFAULT_GROUP_ID) null else fromGroupId
-        val realToGroupId = if (toGroupId == GroupBean.DEFAULT_GROUP_ID) null else toGroupId
+        val realFromGroupId = if (fromGroupId == GroupVo.DEFAULT_GROUP_ID) null else fromGroupId
+        val realToGroupId = if (toGroupId == GroupVo.DEFAULT_GROUP_ID) null else toGroupId
         return flowOf(groupDao.moveGroupFeedsTo(realFromGroupId, realToGroupId))
             .flowOn(Dispatchers.IO)
     }
@@ -81,7 +83,7 @@ class FeedRepository @Inject constructor(
         return flow {
             val realNickname = if (nickname.isNullOrBlank()) null else nickname
             val realGroupId =
-                if (groupId.isNullOrBlank() || groupId == GroupBean.DEFAULT_GROUP_ID) null else groupId
+                if (groupId.isNullOrBlank() || groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
             val feedWithArticleBean = rssHelper.searchFeed(url = url).run {
                 copy(
                     feed = feed.copy(
@@ -131,7 +133,7 @@ class FeedRepository @Inject constructor(
         groupId: String?,
     ): Flow<FeedBean> = flow {
         val realGroupId =
-            if (groupId.isNullOrBlank() || groupId == GroupBean.DEFAULT_GROUP_ID) null
+            if (groupId.isNullOrBlank() || groupId == GroupVo.DEFAULT_GROUP_ID) null
             else groupId
 
         feedDao.updateFeed(feedDao.getFeed(url).copy(groupId = realGroupId))
@@ -183,10 +185,10 @@ class FeedRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun createGroup(group: GroupBean): Flow<Unit> {
+    suspend fun createGroup(group: GroupVo): Flow<Unit> {
         return flow {
             if (groupDao.containsByName(group.name) == 0) {
-                emit(groupDao.setGroup(group))
+                emit(groupDao.setGroup(group.toPo()))
             } else {
                 emit(Unit)
             }
@@ -195,7 +197,7 @@ class FeedRepository @Inject constructor(
 
     suspend fun readAllInGroup(groupId: String?): Flow<Int> {
         return flow {
-            val realGroupId = if (groupId == GroupBean.DEFAULT_GROUP_ID) null else groupId
+            val realGroupId = if (groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
             emit(articleDao.readAllInGroup(realGroupId))
         }.flowOn(Dispatchers.IO)
     }

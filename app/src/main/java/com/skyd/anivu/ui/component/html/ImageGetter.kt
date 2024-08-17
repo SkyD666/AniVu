@@ -1,4 +1,4 @@
-package com.skyd.anivu.util.html
+package com.skyd.anivu.ui.component.html
 
 import android.content.Context
 import android.graphics.drawable.Drawable

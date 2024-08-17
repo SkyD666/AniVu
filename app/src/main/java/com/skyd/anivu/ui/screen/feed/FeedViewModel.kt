@@ -5,7 +5,7 @@ import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.model.repository.ArticleRepository
-import com.skyd.anivu.model.repository.FeedRepository
+import com.skyd.anivu.model.repository.feed.FeedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow

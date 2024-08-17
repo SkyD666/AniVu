@@ -49,6 +49,6 @@ data class FeedBean(
         const val SORT_XML_ARTICLES_ON_UPDATE = "sortXmlArticlesOnUpdate"
 
         fun FeedBean.isDefaultGroup(): Boolean =
-            this.groupId == null || this.groupId == GroupBean.DEFAULT_GROUP_ID
+            this.groupId == null || this.groupId == GroupVo.DEFAULT_GROUP_ID
     }
 }

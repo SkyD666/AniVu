@@ -21,8 +21,8 @@ android {
         applicationId = "com.skyd.anivu"
         minSdk = 24
         targetSdk = 35
-        versionCode = 21
-        versionName = "2.1-alpha13"
+        versionCode = 22
+        versionName = "2.1-alpha15"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -209,6 +209,7 @@ dependencies {
         exclude(group = "net.sf.kxml", module = "kxml2")
     }
     implementation("net.dankito.readability4j:readability4j:1.0.8")
+    implementation("sh.calvin.reorderable:reorderable:2.3.0")
 
     implementation("org.libtorrent4j:libtorrent4j-android-arm64:2.1.0-31")
     implementation("org.libtorrent4j:libtorrent4j-android-arm:2.1.0-31")

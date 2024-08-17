@@ -27,10 +27,10 @@ import androidx.compose.ui.unit.dp
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedViewBean
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
-import com.skyd.anivu.ui.screen.article.openArticleScreen
 import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.screen.article.openArticleScreen
 
 class Feed1Proxy(
     private val visible: (groupId: String) -> Boolean = { true },
@@ -70,7 +70,7 @@ fun Feed1Item(
     val feed = data.feed
 
     AnimatedVisibility(
-        visible = visible(feed.groupId ?: GroupBean.DEFAULT_GROUP_ID),
+        visible = visible(feed.groupId ?: GroupVo.DEFAULT_GROUP_ID),
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically(),
     ) {

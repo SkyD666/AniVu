@@ -3,7 +3,7 @@ package com.skyd.anivu.model.repository.importexport
 import android.os.Parcelable
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
 import kotlinx.parcelize.Parcelize
@@ -29,17 +29,17 @@ sealed interface ImportOpmlConflictStrategy : Parcelable {
      *
      * @return groupId. return null if the group is default group.
      */
-    suspend fun addOrMergeGroup(groupDao: GroupDao, group: GroupBean): String? {
-        if (group.groupId == GroupBean.DEFAULT_GROUP_ID) {
+    suspend fun addOrMergeGroup(groupDao: GroupDao, group: GroupVo): String? {
+        if (group.groupId == GroupVo.DEFAULT_GROUP_ID) {
             return null
         }
         var groupId = UUID.randomUUID().toString()
         if (groupDao.containsByName(group.name) == 0) {
             groupDao.setGroup(
-                GroupBean(
+                GroupVo(
                     groupId = groupId,
                     name = group.name,
-                )
+                ).toPo()
             )
         } else {
             groupId = groupDao.queryGroupIdByName(group.name)

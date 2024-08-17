@@ -69,6 +69,8 @@ import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK
 import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.download.DownloadScreen
 import com.skyd.anivu.ui.screen.download.openDownloadScreen
+import com.skyd.anivu.ui.screen.feed.reorder.REORDER_GROUP_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.feed.reorder.ReorderGroupScreen
 import com.skyd.anivu.ui.screen.filepicker.EXTENSION_NAME_KEY
 import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_ID_KEY
 import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_SCREEN_ROUTE
@@ -231,6 +233,7 @@ private fun MainNavHost() {
         composable(route = APPEARANCE_SCREEN_ROUTE) { AppearanceScreen() }
         composable(route = ARTICLE_STYLE_SCREEN_ROUTE) { ArticleStyleScreen() }
         composable(route = FEED_STYLE_SCREEN_ROUTE) { FeedStyleScreen() }
+        composable(route = REORDER_GROUP_SCREEN_ROUTE) { ReorderGroupScreen() }
         composable(route = SEARCH_STYLE_SCREEN_ROUTE) { SearchStyleScreen() }
         composable(route = BEHAVIOR_SCREEN_ROUTE) { BehaviorScreen() }
         composable(route = AUTO_DELETE_SCREEN_ROUTE) { AutoDeleteScreen() }

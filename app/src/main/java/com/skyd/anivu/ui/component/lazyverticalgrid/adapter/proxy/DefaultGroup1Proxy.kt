@@ -1,15 +1,15 @@
 package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
 
 import androidx.compose.runtime.Composable
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 
 class DefaultGroup1Proxy(
     private val group1Proxy: Group1Proxy,
     private val hide: (index: Int) -> Boolean,
-) : LazyGridAdapter.Proxy<GroupBean.DefaultGroup>() {
+) : LazyGridAdapter.Proxy<GroupVo.DefaultGroup>() {
     @Composable
-    override fun Draw(index: Int, data: GroupBean.DefaultGroup) {
+    override fun Draw(index: Int, data: GroupVo.DefaultGroup) {
         if (!hide(index)) {
             Group1Item(
                 index = index,

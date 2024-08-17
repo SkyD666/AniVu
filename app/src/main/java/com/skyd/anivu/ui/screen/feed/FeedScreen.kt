@@ -13,10 +13,14 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
+import androidx.compose.material.icons.automirrored.outlined.Sort
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.RssFeed
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Workspaces
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
@@ -71,8 +75,8 @@ import com.skyd.anivu.ext.snapshotStateMapSaver
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedBean.Companion.isDefaultGroup
 import com.skyd.anivu.model.bean.FeedViewBean
-import com.skyd.anivu.model.bean.GroupBean
-import com.skyd.anivu.model.bean.GroupBean.Companion.isDefaultGroup
+import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.GroupVo.Companion.isDefaultGroup
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
@@ -87,16 +91,17 @@ import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.DefaultGroup1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Feed1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Group1Proxy
-import com.skyd.anivu.ui.screen.article.ArticleScreen
-import com.skyd.anivu.ui.screen.article.openArticleScreen
-import com.skyd.anivu.ui.screen.search.SearchDomain
-import com.skyd.anivu.ui.screen.search.openSearchScreen
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
 import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
+import com.skyd.anivu.ui.screen.article.ArticleScreen
+import com.skyd.anivu.ui.screen.article.openArticleScreen
+import com.skyd.anivu.ui.screen.feed.reorder.REORDER_GROUP_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.search.SearchDomain
+import com.skyd.anivu.ui.screen.search.openSearchScreen
 import kotlinx.coroutines.android.awaitFrame
 import java.util.UUID
 
@@ -173,10 +178,11 @@ private fun FeedList(
     val navController = LocalNavController.current
     val snackbarHostState = remember { SnackbarHostState() }
     val windowSizeClass = LocalWindowSizeClass.current
+    var openMoreMenu by rememberSaveable { mutableStateOf(false) }
     var openAddDialog by rememberSaveable { mutableStateOf(false) }
     var addDialogUrl by rememberSaveable { mutableStateOf("") }
     var openEditFeedDialog by rememberSaveable { mutableStateOf<FeedBean?>(null) }
-    var openEditGroupDialog by rememberSaveable { mutableStateOf<GroupBean?>(value = null) }
+    var openEditGroupDialog by rememberSaveable { mutableStateOf<GroupVo?>(value = null) }
 
     var openCreateGroupDialog by rememberSaveable { mutableStateOf(false) }
     var createGroupDialogGroup by rememberSaveable { mutableStateOf("") }
@@ -218,6 +224,12 @@ private fun FeedList(
                         imageVector = Icons.Outlined.Search,
                         contentDescription = stringResource(id = R.string.feed_screen_search_feed),
                     )
+                    AniVuIconButton(
+                        onClick = { openMoreMenu = true },
+                        imageVector = Icons.Outlined.MoreVert,
+                        contentDescription = stringResource(id = R.string.more),
+                    )
+                    MoreMenu(expanded = openMoreMenu, onDismissRequest = { openMoreMenu = false })
                 },
                 navigationIcon = {},
                 windowInsets = WindowInsets.safeDrawing.only(
@@ -352,7 +364,7 @@ private fun FeedList(
         if (openEditFeedDialog != null) {
             val groups = remember(uiState.groupListState) {
                 (uiState.groupListState as? GroupListState.Success)
-                    ?.dataList?.filterIsInstance<GroupBean>().orEmpty()
+                    ?.dataList?.filterIsInstance<GroupVo>().orEmpty()
             }
             EditFeedSheet(
                 onDismissRequest = { openEditFeedDialog = null },
@@ -411,7 +423,7 @@ private fun FeedList(
         if (openEditGroupDialog != null) {
             val groups = remember(uiState.groupListState) {
                 (uiState.groupListState as? GroupListState.Success)
-                    ?.dataList?.filterIsInstance<GroupBean>().orEmpty()
+                    ?.dataList?.filterIsInstance<GroupVo>().orEmpty()
             }
             EditGroupSheet(
                 onDismissRequest = { openEditGroupDialog = null },
@@ -522,7 +534,7 @@ private fun CreateGroupDialog(
     visible: Boolean,
     value: String,
     onValueChange: (String) -> Unit,
-    onCreateGroup: (GroupBean) -> Unit,
+    onCreateGroup: (GroupVo) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
     TextFieldDialog(
@@ -534,7 +546,7 @@ private fun CreateGroupDialog(
         onValueChange = onValueChange,
         onConfirm = { text ->
             onCreateGroup(
-                GroupBean(
+                GroupVo(
                     groupId = UUID.randomUUID().toString(),
                     name = text,
                 )
@@ -552,15 +564,15 @@ private fun FeedList(
     selectedFeedUrls: List<String>? = null,
     onShowArticleList: (List<String>) -> Unit,
     onEditFeed: (FeedBean) -> Unit,
-    onEditGroup: (GroupBean) -> Unit,
+    onEditGroup: (GroupVo) -> Unit,
 ) {
     val context = LocalContext.current
     val hideEmptyDefault = LocalHideEmptyDefault.current
     val feedGroupExpand = LocalFeedGroupExpand.current
-    val groups by remember { derivedStateOf { result.filterIsInstance<GroupBean>() } }
+    val groups by remember { derivedStateOf { result.filterIsInstance<GroupVo>() } }
     val feedVisible = rememberSaveable(saver = snapshotStateMapSaver()) {
         mutableStateMapOf(
-            GroupBean.DEFAULT_GROUP_ID to feedGroupExpand,
+            GroupVo.DEFAULT_GROUP_ID to feedGroupExpand,
             *(groups
                 .map { it.groupId to feedGroupExpand }
                 .toTypedArray())
@@ -585,7 +597,7 @@ private fun FeedList(
         val group1Proxy = Group1Proxy(
             isExpand = { feedVisible[it.groupId] ?: false },
             onExpandChange = { data, expand -> feedVisible[data.groupId] = expand },
-            isEmpty = { it == result.lastIndex || result[it + 1] is GroupBean },
+            isEmpty = { it == result.lastIndex || result[it + 1] is GroupVo },
             onShowAllArticles = { group ->
                 val feedUrls = result
                     .filterIsInstance<FeedViewBean>()
@@ -607,7 +619,7 @@ private fun FeedList(
                     selected = { selectedFeedUrls != null && it.url in selectedFeedUrls },
                     inGroup = { true },
                     onClick = { onShowArticleList(listOf(it.url)) },
-                    isEnded = { it == result.lastIndex || result[it + 1] is GroupBean },
+                    isEnded = { it == result.lastIndex || result[it + 1] is GroupVo },
                     onEdit = onEditFeed
                 )
             )
@@ -621,11 +633,34 @@ private fun FeedList(
         contentPadding = contentPadding + PaddingValues(horizontal = 16.dp),
         key = { _, item ->
             when (item) {
-                is GroupBean.DefaultGroup -> item.groupId
-                is GroupBean -> item.groupId
+                is GroupVo.DefaultGroup -> item.groupId
+                is GroupVo -> item.groupId
                 is FeedViewBean -> item.feed.url
                 else -> item
             }
         },
     )
+}
+
+@Composable
+private fun MoreMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+) {
+    val navController = LocalNavController.current
+    DropdownMenu(expanded = expanded, onDismissRequest = onDismissRequest) {
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.reorder_group_screen_name)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Outlined.Sort,
+                    contentDescription = null,
+                )
+            },
+            onClick = {
+                onDismissRequest()
+                navController.navigate(REORDER_GROUP_SCREEN_ROUTE)
+            },
+        )
+    }
 }

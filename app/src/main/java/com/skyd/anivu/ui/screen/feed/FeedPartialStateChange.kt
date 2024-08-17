@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.screen.feed
 
 import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 
 
 internal sealed interface FeedPartialStateChange {
@@ -162,7 +162,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data class Success(val group: GroupBean) : EditGroup
+        data class Success(val group: GroupVo) : EditGroup
         data class Failed(val msg: String) : EditGroup
     }
 

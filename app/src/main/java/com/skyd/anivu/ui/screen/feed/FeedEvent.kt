@@ -2,7 +2,7 @@ package com.skyd.anivu.ui.screen.feed
 
 import com.skyd.anivu.base.mvi.MviSingleEvent
 import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 
 sealed interface FeedEvent : MviSingleEvent {
     sealed interface InitFeetListResultEvent : FeedEvent {
@@ -45,7 +45,7 @@ sealed interface FeedEvent : MviSingleEvent {
     }
 
     sealed interface EditGroupResultEvent : FeedEvent {
-        data class Success(val group: GroupBean) : EditGroupResultEvent
+        data class Success(val group: GroupVo) : EditGroupResultEvent
         data class Failed(val msg: String) : EditGroupResultEvent
     }
 

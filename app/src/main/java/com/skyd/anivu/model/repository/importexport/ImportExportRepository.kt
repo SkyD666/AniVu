@@ -15,7 +15,7 @@ import com.skyd.anivu.ext.toAbsoluteDateTimeString
 import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedViewBean
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.model.bean.GroupWithFeedBean
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
@@ -79,7 +79,7 @@ class ImportExportRepository @Inject constructor(
     )
 
     private fun parseOpml(inputStream: InputStream): List<OpmlGroupWithFeed> {
-        fun MutableList<OpmlGroupWithFeed>.addGroup(group: GroupBean) = add(
+        fun MutableList<OpmlGroupWithFeed>.addGroup(group: GroupVo) = add(
             OpmlGroupWithFeed(group = group, feeds = mutableListOf())
         )
 
@@ -104,7 +104,7 @@ class ImportExportRepository @Inject constructor(
 
         val opml = OpmlParser().parse(inputStream)
         val groupWithFeedList = mutableListOf<OpmlGroupWithFeed>().apply {
-            addGroup(GroupBean.DefaultGroup)
+            addGroup(GroupVo.DefaultGroup)
         }
 
         opml.body.outlines.forEach {
@@ -114,19 +114,19 @@ class ImportExportRepository @Inject constructor(
                 if (it.attributes["xmlUrl"] == null) {
                     if (!it.attributes["isDefault"].toBoolean()) {
                         groupWithFeedList.addGroup(
-                            GroupBean(
+                            GroupVo(
                                 groupId = "",
                                 name = it.attributes["title"] ?: it.text.toString(),
                             )
                         )
                     }
                 } else {
-                    groupWithFeedList.addFeedToDefault(it.toFeed(groupId = GroupBean.DefaultGroup.groupId))
+                    groupWithFeedList.addFeedToDefault(it.toFeed(groupId = GroupVo.DefaultGroup.groupId))
                 }
             } else {
                 if (!it.attributes["isDefault"].toBoolean()) {
                     groupWithFeedList.addGroup(
-                        GroupBean(
+                        GroupVo(
                             groupId = "",
                             name = it.attributes["title"] ?: it.text.toString(),
                         )
@@ -142,7 +142,7 @@ class ImportExportRepository @Inject constructor(
     }
 
     data class OpmlGroupWithFeed(
-        val group: GroupBean,
+        val group: GroupVo,
         val feeds: MutableList<FeedBean>,
     )
 

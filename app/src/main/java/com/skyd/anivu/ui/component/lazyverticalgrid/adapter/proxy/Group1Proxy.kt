@@ -21,19 +21,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 
 open class Group1Proxy(
-    val isExpand: (GroupBean) -> Boolean = { false },
-    val onExpandChange: (GroupBean, Boolean) -> Unit = { _, _ -> },
+    val isExpand: (GroupVo) -> Boolean = { false },
+    val onExpandChange: (GroupVo, Boolean) -> Unit = { _, _ -> },
     val isEmpty: (index: Int) -> Boolean,
-    val onShowAllArticles: (GroupBean) -> Unit = { },
-    val onEdit: ((GroupBean) -> Unit)? = null,
-) : LazyGridAdapter.Proxy<GroupBean>() {
+    val onShowAllArticles: (GroupVo) -> Unit = { },
+    val onEdit: ((GroupVo) -> Unit)? = null,
+) : LazyGridAdapter.Proxy<GroupVo>() {
     @Composable
-    override fun Draw(index: Int, data: GroupBean) {
+    override fun Draw(index: Int, data: GroupVo) {
         Group1Item(
             index = index,
             data = data,
@@ -51,12 +51,12 @@ val SHAPE_CORNER_DP = 26.dp
 @Composable
 fun Group1Item(
     index: Int,
-    data: GroupBean,
-    initExpand: (GroupBean) -> Boolean = { false },
-    onExpandChange: (GroupBean, Boolean) -> Unit,
+    data: GroupVo,
+    initExpand: (GroupVo) -> Boolean = { false },
+    onExpandChange: (GroupVo, Boolean) -> Unit,
     isEmpty: (index: Int) -> Boolean,
-    onShowAllArticles: (GroupBean) -> Unit,
-    onEdit: ((GroupBean) -> Unit)? = null,
+    onShowAllArticles: (GroupVo) -> Unit,
+    onEdit: ((GroupVo) -> Unit)? = null,
 ) {
     var expand by remember(data) { mutableStateOf(initExpand(data)) }
 

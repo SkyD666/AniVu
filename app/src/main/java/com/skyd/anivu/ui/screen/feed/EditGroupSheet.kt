@@ -24,20 +24,20 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
-import com.skyd.anivu.model.bean.GroupBean
-import com.skyd.anivu.model.bean.GroupBean.Companion.isDefaultGroup
+import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.GroupVo.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 
 @Composable
 fun EditGroupSheet(
     onDismissRequest: () -> Unit,
-    group: GroupBean,
-    groups: List<GroupBean>,
+    group: GroupVo,
+    groups: List<GroupVo>,
     onReadAll: (String) -> Unit,
     onRefresh: (String) -> Unit,
     onDelete: (String) -> Unit,
     onNameChange: (String) -> Unit,
-    onMoveTo: (GroupBean) -> Unit,
+    onMoveTo: (GroupVo) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
     var openNameDialog by rememberSaveable { mutableStateOf(false) }
@@ -113,7 +113,7 @@ fun EditGroupSheet(
 
 @Composable
 private fun InfoArea(
-    group: GroupBean,
+    group: GroupVo,
     onNameChanged: () -> Unit,
 ) {
     Text(

@@ -66,7 +66,7 @@ import com.skyd.anivu.ext.copy
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
@@ -80,7 +80,7 @@ import com.skyd.anivu.util.rememberImagePicker
 fun EditFeedSheet(
     onDismissRequest: () -> Unit,
     feed: FeedBean,
-    groups: List<GroupBean>,
+    groups: List<GroupVo>,
     onReadAll: (String) -> Unit,
     onRefresh: (String) -> Unit,
     onDelete: (String) -> Unit,
@@ -89,7 +89,7 @@ fun EditFeedSheet(
     onCustomDescriptionChange: (String?) -> Unit,
     onCustomIconChange: (Uri?) -> Unit,
     onSortXmlArticlesOnUpdateChanged: (Boolean) -> Unit,
-    onGroupChange: (GroupBean) -> Unit,
+    onGroupChange: (GroupVo) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
     var openUrlDialog by rememberSaveable { mutableStateOf(false) }
@@ -421,8 +421,8 @@ internal fun OptionArea(
 internal fun GroupArea(
     title: String = stringResource(id = R.string.feed_group),
     currentGroupId: String?,
-    groups: List<GroupBean>,
-    onGroupChange: (GroupBean) -> Unit,
+    groups: List<GroupVo>,
+    onGroupChange: (GroupVo) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
     Text(
@@ -437,7 +437,7 @@ internal fun GroupArea(
         overflow = FlowRowOverflow.Visible
     ) {
         groups.forEach { group ->
-            val selected = (currentGroupId ?: GroupBean.DefaultGroup.groupId) == group.groupId
+            val selected = (currentGroupId ?: GroupVo.DefaultGroup.groupId) == group.groupId
             SheetChip(
                 modifier = Modifier.animateContentSize(),
                 icon = if (selected) Icons.Outlined.Check else null,

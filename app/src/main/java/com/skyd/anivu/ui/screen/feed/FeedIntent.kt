@@ -2,14 +2,14 @@ package com.skyd.anivu.ui.screen.feed
 
 import android.net.Uri
 import com.skyd.anivu.base.mvi.MviIntent
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.GroupVo
 
 sealed interface FeedIntent : MviIntent {
     data object Init : FeedIntent
     data class AddFeed(
         val url: String,
         val nickname: String? = null,
-        val group: GroupBean = GroupBean.DefaultGroup
+        val group: GroupVo = GroupVo.DefaultGroup
     ) : FeedIntent
 
     data class EditFeedUrl(val oldUrl: String, val newUrl: String) : FeedIntent
@@ -26,7 +26,7 @@ sealed interface FeedIntent : MviIntent {
     data class ReadAllInGroup(val groupId: String?) : FeedIntent
     data class RefreshFeed(val url: String) : FeedIntent
     data class RefreshGroupFeed(val groupId: String?) : FeedIntent
-    data class CreateGroup(val group: GroupBean) : FeedIntent
+    data class CreateGroup(val group: GroupVo) : FeedIntent
     data class DeleteGroup(val groupId: String) : FeedIntent
     data class RenameGroup(val groupId: String, val name: String) : FeedIntent
     data class MoveFeedsToGroup(val fromGroupId: String, val toGroupId: String) : FeedIntent

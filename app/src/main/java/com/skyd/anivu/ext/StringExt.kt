@@ -1,13 +1,10 @@
 package com.skyd.anivu.ext
 
-import android.annotation.SuppressLint
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
-import android.text.Html
-import android.text.Spanned
-import androidx.core.text.HtmlCompat
+import androidx.core.text.parseAsHtml
 import net.dankito.readability4j.extended.Readability4JExtended
 
 fun String.toEncodedUrl(allow: String? = ":/-![].,%?&="): String {
@@ -18,21 +15,7 @@ fun String.toDecodedUrl(): String {
     return Uri.decode(this)
 }
 
-fun String.toHtml(@SuppressLint("InlinedApi") flag: Int = Html.FROM_HTML_MODE_LEGACY): Spanned {
-    return Html.fromHtml(this, flag)
-}
-
-fun String.toHtml(
-    @SuppressLint("InlinedApi") flag: Int = Html.FROM_HTML_MODE_LEGACY,
-    imageGetter: Html.ImageGetter,
-    tagHandler: Html.TagHandler?,
-): Spanned {
-    return Html.fromHtml(this, flag, imageGetter, tagHandler)
-}
-
-fun String.toRemoveHtml(): String {
-    return Html.fromHtml(this, HtmlCompat.FROM_HTML_MODE_LEGACY).toString()
-}
+fun String.toRemoveHtml(): String = parseAsHtml().toString()
 
 fun String.readable(): String =
     Readability4JExtended("", this).parse().textContent?.trim().orEmpty()
