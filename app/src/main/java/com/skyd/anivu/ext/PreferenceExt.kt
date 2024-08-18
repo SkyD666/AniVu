@@ -34,6 +34,8 @@ import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
+import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
+import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
@@ -97,6 +99,8 @@ fun Preferences.toSettings(): Settings {
         playerShowScreenshotButton = PlayerShowScreenshotButtonPreference.fromPreferences(this),
         hardwareDecode = HardwareDecodePreference.fromPreferences(this),
         playerAutoPip = PlayerAutoPipPreference.fromPreferences(this),
+        playerMaxCacheSize = PlayerMaxCacheSizePreference.fromPreferences(this),
+        playerMaxBackCacheSize = PlayerMaxBackCacheSizePreference.fromPreferences(this),
 
         // Data
         useAutoDelete = UseAutoDeletePreference.fromPreferences(this),

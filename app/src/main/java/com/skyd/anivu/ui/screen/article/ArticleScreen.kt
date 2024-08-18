@@ -58,7 +58,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
-import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.skyd.anivu.R
@@ -73,6 +72,8 @@ import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.BackIcon
+import com.skyd.anivu.ui.component.CircularProgressPlaceholder
+import com.skyd.anivu.ui.component.EmptyPlaceholder
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
@@ -86,7 +87,6 @@ import com.skyd.anivu.ui.local.LocalShowArticlePullRefresh
 import com.skyd.anivu.ui.local.LocalShowArticleTopBarRefresh
 import com.skyd.anivu.ui.screen.search.SearchDomain
 import com.skyd.anivu.ui.screen.search.openSearchScreen
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 
@@ -325,21 +325,24 @@ private fun Content(
                     HorizontalDivider()
                 }
             }
-            val articleListState = uiState.articleListState
-            ArticleList(
-                modifier = Modifier.nestedScroll(nestedScrollConnection),
-                articles = ((articleListState as? ArticleListState.Success)
-                    ?.articlePagingDataFlow
-                    ?: flowOf(PagingData.empty())).collectAsLazyPagingItems(),
-                listState = listState,
-                onFavorite = onFavorite,
-                onRead = onRead,
-                contentPadding = PaddingValues(
-                    start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
-                    end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
-                    bottom = contentPadding.calculateBottomPadding(),
-                ) + PaddingValues(vertical = 4.dp),
-            )
+
+            val currentContentPadding = PaddingValues(
+                start = contentPadding.calculateStartPadding(LocalLayoutDirection.current),
+                end = contentPadding.calculateEndPadding(LocalLayoutDirection.current),
+                bottom = contentPadding.calculateBottomPadding(),
+            ) + PaddingValues(vertical = 4.dp)
+            when (val articleListState = uiState.articleListState) {
+                is ArticleListState.Failed -> Unit
+                is ArticleListState.Init -> CircularProgressPlaceholder(contentPadding = currentContentPadding)
+                is ArticleListState.Success -> ArticleList(
+                    modifier = Modifier.nestedScroll(nestedScrollConnection),
+                    articles = articleListState.articlePagingDataFlow.collectAsLazyPagingItems(),
+                    listState = listState,
+                    onFavorite = onFavorite,
+                    onRead = onRead,
+                    contentPadding = currentContentPadding,
+                )
+            }
         }
 
         if (LocalShowArticlePullRefresh.current) {
@@ -361,18 +364,22 @@ private fun ArticleList(
     onRead: (ArticleWithFeed, Boolean) -> Unit,
     contentPadding: PaddingValues,
 ) {
-    val adapter = remember {
-        LazyGridAdapter(mutableListOf(Article1Proxy(onFavorite = onFavorite, onRead = onRead)))
+    if (articles.itemCount > 0) {
+        val adapter = remember {
+            LazyGridAdapter(mutableListOf(Article1Proxy(onFavorite = onFavorite, onRead = onRead)))
+        }
+        AniVuLazyVerticalGrid(
+            modifier = modifier.fillMaxSize(),
+            columns = GridCells.Adaptive(LocalArticleItemMinWidth.current.dp),
+            dataList = articles,
+            listState = listState,
+            adapter = adapter,
+            contentPadding = contentPadding + PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            key = { _, item -> (item as ArticleWithFeed).articleWithEnclosure.article.articleId },
+        )
+    } else {
+        EmptyPlaceholder(contentPadding = contentPadding)
     }
-    AniVuLazyVerticalGrid(
-        modifier = modifier.fillMaxSize(),
-        columns = GridCells.Adaptive(LocalArticleItemMinWidth.current.dp),
-        dataList = articles,
-        listState = listState,
-        adapter = adapter,
-        contentPadding = contentPadding + PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
-        key = { _, item -> (item as ArticleWithFeed).articleWithEnclosure.article.articleId },
-    )
 }

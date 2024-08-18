@@ -39,6 +39,8 @@ import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
+import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
+import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
@@ -79,6 +81,8 @@ import com.skyd.anivu.ui.local.LocalParseLinkTagAsEnclosure
 import com.skyd.anivu.ui.local.LocalPickImageMethod
 import com.skyd.anivu.ui.local.LocalPlayerAutoPip
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
+import com.skyd.anivu.ui.local.LocalPlayerMaxBackCacheSize
+import com.skyd.anivu.ui.local.LocalPlayerMaxCacheSize
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.local.LocalProxyHostname
@@ -144,6 +148,8 @@ data class Settings(
     val playerShowScreenshotButton: Boolean = PlayerShowScreenshotButtonPreference.default,
     val hardwareDecode: Boolean = HardwareDecodePreference.default,
     val playerAutoPip: Boolean = PlayerAutoPipPreference.default,
+    val playerMaxCacheSize: Long = PlayerMaxCacheSizePreference.default,
+    val playerMaxBackCacheSize: Long = PlayerMaxBackCacheSizePreference.default,
     // Data
     val useAutoDelete: Boolean = UseAutoDeletePreference.default,
     val autoDeleteArticleFrequency: Long = AutoDeleteArticleFrequencyPreference.default,
@@ -209,6 +215,8 @@ fun SettingsProvider(
         LocalPlayerShowScreenshotButton provides settings.playerShowScreenshotButton,
         LocalHardwareDecode provides settings.hardwareDecode,
         LocalPlayerAutoPip provides settings.playerAutoPip,
+        LocalPlayerMaxCacheSize provides settings.playerMaxCacheSize,
+        LocalPlayerMaxBackCacheSize provides settings.playerMaxBackCacheSize,
         // Data
         LocalUseAutoDelete provides settings.useAutoDelete,
         LocalAutoDeleteArticleFrequency provides settings.autoDeleteArticleFrequency,

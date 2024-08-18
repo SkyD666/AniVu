@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.screen.media.sub
 
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.WarningAmber
 import androidx.compose.material3.Icon
@@ -72,7 +73,13 @@ private fun SubMediaScreen(path: String) {
             AniVuTopBar(
                 style = AniVuTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
-                title = { Text(text = path.substringAfterLast("/")) },
+                title = {
+                    Text(
+                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
+                        text = path.substringAfterLast("/"),
+                        maxLines = 1,
+                    )
+                },
             )
         }
     ) { paddingValues ->

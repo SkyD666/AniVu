@@ -12,3 +12,8 @@ fun <K, V> snapshotStateMapSaver() = Saver<SnapshotStateMap<K, V>, Any>(
         (value as? List<Pair<K, V>>)?.toMutableStateMap() ?: mutableStateMapOf()
     }
 )
+
+fun calculateHashMapInitialCapacity(
+    initialCapacity: Int,
+    loadFactor: Float = 0.75f,
+): Int = (initialCapacity / loadFactor).toInt() + 1

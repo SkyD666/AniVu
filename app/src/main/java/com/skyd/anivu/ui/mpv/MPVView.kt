@@ -1,7 +1,6 @@
 package com.skyd.anivu.ui.mpv
 
 import android.content.Context
-import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyCharacterMap
@@ -13,6 +12,8 @@ import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
+import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
+import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
 import com.skyd.anivu.ui.mpv.controller.bar.toDurationString
 import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_DOUBLE
@@ -89,6 +90,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         val disp = wm.defaultDisplay
         val refreshRate = disp.mode.refreshRate
 
+        val dataStore = context.dataStore
         Log.v(TAG, "Display ${disp.displayId} reports FPS of $refreshRate")
         MPVLib.setOptionString("display-fps-override", refreshRate.toString())
         MPVLib.setOptionString("video-sync", "audio")
@@ -98,14 +100,19 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.setOptionString("opengl-es", "yes")
         MPVLib.setOptionString(
             "hwdec",
-            if (context.dataStore.getOrDefault(HardwareDecodePreference)) "auto" else "no"
+            if (dataStore.getOrDefault(HardwareDecodePreference)) "auto" else "no"
         )
         MPVLib.setOptionString("ao", "audiotrack,opensles")
         MPVLib.setOptionString("input-default-bindings", "yes")
         // Limit demuxer cache since the defaults are too high for mobile devices
-        val cacheMegs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) 64 else 32
-        MPVLib.setOptionString("demuxer-max-bytes", "${cacheMegs * 1024 * 1024}")
-        MPVLib.setOptionString("demuxer-max-back-bytes", "${cacheMegs * 1024 * 1024}")
+        MPVLib.setOptionString(
+            "demuxer-max-bytes",
+            dataStore.getOrDefault(PlayerMaxCacheSizePreference).toString(),
+        )
+        MPVLib.setOptionString(
+            "demuxer-max-back-bytes",
+            dataStore.getOrDefault(PlayerMaxBackCacheSizePreference).toString(),
+        )
 
         MPVLib.setOptionString("screenshot-directory", Const.PICTURES_DIR.path)
     }

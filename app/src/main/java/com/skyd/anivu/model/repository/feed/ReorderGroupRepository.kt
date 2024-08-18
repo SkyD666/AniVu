@@ -1,6 +1,7 @@
 package com.skyd.anivu.model.repository.feed
 
 import com.skyd.anivu.base.BaseRepository
+import com.skyd.anivu.ext.calculateHashMapInitialCapacity
 import com.skyd.anivu.model.bean.GroupBean
 import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.model.bean.GroupWithFeedBean
@@ -17,7 +18,9 @@ class ReorderGroupRepository @Inject constructor(
 ) : BaseRepository() {
     private fun sortGroups(groupList: List<GroupBean>): List<GroupBean> {
         val groupsMap = groupList.associateBy { it.groupId }
-        val hasPreviousGroups = mutableSetOf<GroupBean>()
+        val hasPreviousGroups = LinkedHashSet<GroupBean>(
+            calculateHashMapInitialCapacity(groupList.size)
+        )
         groupList.forEach { group ->
             val nextGroupId = group.nextGroupId
             if (nextGroupId != null) {
@@ -25,7 +28,9 @@ class ReorderGroupRepository @Inject constructor(
             }
         }
         val noPreviousGroups = (groupList - hasPreviousGroups).sortedBy { it.name }
-        val sortedList = mutableSetOf<GroupBean>()
+        val sortedList = LinkedHashSet<GroupBean>(
+            calculateHashMapInitialCapacity(groupList.size)
+        )
         noPreviousGroups.forEach { group ->
             var currentGroup: GroupBean? = group
             var currentGroupId: String? = group.groupId
@@ -44,7 +49,9 @@ class ReorderGroupRepository @Inject constructor(
         groupList: List<GroupWithFeedBean>
     ): List<GroupWithFeedBean> {
         val groupsMap = groupList.associateBy { it.group.groupId }
-        val hasPreviousGroups = mutableSetOf<GroupWithFeedBean>()
+        val hasPreviousGroups = LinkedHashSet<GroupWithFeedBean>(
+            calculateHashMapInitialCapacity(groupList.size)
+        )
         groupList.forEach { group ->
             val nextGroupId = group.group.nextGroupId
             if (nextGroupId != null) {
@@ -52,7 +59,9 @@ class ReorderGroupRepository @Inject constructor(
             }
         }
         val noPreviousGroups = (groupList - hasPreviousGroups).sortedBy { it.group.name }
-        val sortedList = mutableSetOf<GroupWithFeedBean>()
+        val sortedList = LinkedHashSet<GroupWithFeedBean>(
+            calculateHashMapInitialCapacity(groupList.size)
+        )
         noPreviousGroups.forEach { group ->
             var currentGroup: GroupWithFeedBean? = group
             var currentGroupId: String? = group.group.groupId

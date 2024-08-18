@@ -33,11 +33,14 @@ import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.showSnackbar
+import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.CircularProgressPlaceholder
+import com.skyd.anivu.ui.component.EmptyPlaceholder
 import com.skyd.anivu.ui.component.deeplink.DeepLinkData
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 
@@ -95,46 +98,14 @@ fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = 
         }
     ) { paddingValues ->
         when (val downloadListState = uiState.downloadListState) {
-            is DownloadListState.Failed,
+            is DownloadListState.Failed -> Unit
             DownloadListState.Init,
-            DownloadListState.Loading -> Unit
+            DownloadListState.Loading -> CircularProgressPlaceholder(contentPadding = paddingValues)
 
-            is DownloadListState.Success -> {
-                LazyColumn(
-                    contentPadding = paddingValues + PaddingValues(bottom = fabHeight + 16.dp),
-                ) {
-                    itemsIndexed(
-                        items = downloadListState.downloadInfoBeanList,
-                        key = { _, item -> item.link },
-                    ) { index, item ->
-                        if (index > 0) HorizontalDivider()
-                        DownloadItem(
-                            data = item,
-                            onPause = {
-                                DownloadTorrentWorker.pause(
-                                    context = context,
-                                    requestId = it.downloadRequestId,
-                                    link = it.link,
-                                )
-                            },
-                            onResume = { video ->
-                                DownloadTorrentWorker.startWorker(
-                                    context = context,
-                                    torrentLink = video.link,
-                                    requestId = video.downloadRequestId,
-                                )
-                            },
-                            onCancel = { video ->
-                                DownloadTorrentWorker.cancel(
-                                    context = context,
-                                    requestId = video.downloadRequestId,
-                                    link = video.link,
-                                )
-                            },
-                        )
-                    }
-                }
-            }
+            is DownloadListState.Success -> DownloadList(
+                downloadInfoBeanList = downloadListState.downloadInfoBeanList,
+                contentPadding = paddingValues + PaddingValues(bottom = fabHeight + 16.dp)
+            )
         }
     }
 
@@ -161,4 +132,48 @@ fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = 
             )
         },
     )
+}
+
+@Composable
+private fun DownloadList(
+    downloadInfoBeanList: List<DownloadInfoBean>,
+    contentPadding: PaddingValues,
+) {
+    if (downloadInfoBeanList.isNotEmpty()) {
+        val context = LocalContext.current
+        LazyColumn(contentPadding = contentPadding) {
+            itemsIndexed(
+                items = downloadInfoBeanList,
+                key = { _, item -> item.link },
+            ) { index, item ->
+                if (index > 0) HorizontalDivider()
+                DownloadItem(
+                    data = item,
+                    onPause = {
+                        DownloadTorrentWorker.pause(
+                            context = context,
+                            requestId = it.downloadRequestId,
+                            link = it.link,
+                        )
+                    },
+                    onResume = { video ->
+                        DownloadTorrentWorker.startWorker(
+                            context = context,
+                            torrentLink = video.link,
+                            requestId = video.downloadRequestId,
+                        )
+                    },
+                    onCancel = { video ->
+                        DownloadTorrentWorker.cancel(
+                            context = context,
+                            requestId = video.downloadRequestId,
+                            link = video.link,
+                        )
+                    },
+                )
+            }
+        }
+    } else {
+        EmptyPlaceholder(contentPadding = contentPadding)
+    }
 }

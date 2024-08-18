@@ -6,10 +6,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -26,11 +27,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.plus
@@ -39,10 +38,11 @@ import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.activity.PlayActivity
-import com.skyd.anivu.ui.component.AnimatedPlaceholder
+import com.skyd.anivu.ui.component.CircularProgressPlaceholder
+import com.skyd.anivu.ui.component.EmptyPlaceholder
+import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.screen.media.CreateGroupDialog
 import com.skyd.anivu.ui.screen.media.sub.openSubMediaScreen
-import com.skyd.anivu.ui.local.LocalNavController
 
 class GroupInfo(
     val group: MediaGroupBean,
@@ -55,6 +55,7 @@ class GroupInfo(
 internal fun MediaList(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
+    fabPadding: PaddingValues = PaddingValues(),
     path: String,
     groupInfo: GroupInfo? = null,
     viewModel: MediaListViewModel = hiltViewModel(key = path + groupInfo?.group)
@@ -83,22 +84,20 @@ internal fun MediaList(
         val state = rememberPullRefreshState(
             refreshing = uiState.listState.loading,
             onRefresh = {
-                dispatch(
-                    MediaListIntent.Refresh(
-                        path = path,
-                        group = groupInfo?.group
-                    )
-                )
+                dispatch(MediaListIntent.Refresh(path = path, group = groupInfo?.group))
             },
         )
         Box(modifier = Modifier.pullRefresh(state)) {
             when (val listState = uiState.listState) {
-                is ListState.Failed,
-                is ListState.Init -> Unit
+                is ListState.Failed -> Unit
+                is ListState.Init -> CircularProgressPlaceholder(contentPadding = innerPadding + contentPadding)
 
                 is ListState.Success -> {
                     if (listState.list.isEmpty()) {
-                        EmptyPlaceholder()
+                        EmptyPlaceholder(
+                            modifier = Modifier.verticalScroll(rememberScrollState()),
+                            contentPadding = innerPadding + contentPadding
+                        )
                     } else {
                         MediaList(
                             modifier = modifier,
@@ -128,7 +127,7 @@ internal fun MediaList(
                 refreshing = uiState.listState.loading,
                 state = state,
                 modifier = Modifier
-                    .padding(contentPadding)
+                    .padding(contentPadding + fabPadding)
                     .align(Alignment.TopCenter),
             )
         }
@@ -147,17 +146,6 @@ internal fun MediaList(
             null -> Unit
         }
     }
-}
-
-@Composable
-private fun EmptyPlaceholder() {
-    AnimatedPlaceholder(
-        modifier = Modifier
-            .width(220.dp)
-            .padding(vertical = 20.dp),
-        resId = R.raw.lottie_empty_1,
-        tip = stringResource(id = R.string.empty_tip_1),
-    )
 }
 
 @Composable

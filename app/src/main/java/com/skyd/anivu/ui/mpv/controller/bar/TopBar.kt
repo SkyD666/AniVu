@@ -73,14 +73,13 @@ internal fun TopBar(
         Text(
             modifier = Modifier
                 .weight(1f)
-                .basicMarquee(),
+                .basicMarquee(iterations = Int.MAX_VALUE),
             text = title,
             style = MaterialTheme.typography.titleMedium,
             color = Color.White,
             maxLines = 1,
         )
         Spacer(modifier = Modifier.width(3.dp))
-        Spacer(modifier = Modifier.weight(1f))
         BarIconButton(
             modifier = Modifier.padding(2.dp),
             onClick = topBarCallback.onPictureInPicture,

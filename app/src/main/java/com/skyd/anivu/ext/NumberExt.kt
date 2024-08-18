@@ -6,7 +6,7 @@ import android.text.format.Formatter
 import android.util.TypedValue
 
 fun Long.fileSize(context: Context): String =
-    Formatter.formatShortFileSize(context, this)
+    Formatter.formatFileSize(context, this)
 
 val Float.dp: Float
     get() = TypedValue.applyDimension(

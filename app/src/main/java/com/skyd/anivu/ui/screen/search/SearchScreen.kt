@@ -21,12 +21,13 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalAbsoluteTonalElevation
@@ -74,6 +75,8 @@ import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.BackIcon
+import com.skyd.anivu.ui.component.CircularProgressPlaceholder
+import com.skyd.anivu.ui.component.EmptyPlaceholder
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
@@ -192,6 +195,7 @@ fun SearchScreen(
                             searchFieldValueState = TextFieldValue(
                                 text = "", selection = TextRange(0)
                             )
+                            dispatch(SearchIntent.UpdateQuery(searchFieldValueState.text))
                         }
                     }
                 )
@@ -206,32 +210,40 @@ fun SearchScreen(
     ) { innerPaddings ->
         when (val searchResultState = uiState.searchResultState) {
             is SearchResultState.Failed -> Unit
-            SearchResultState.Init -> CircularProgressIndicator()
-            SearchResultState.Loading -> CircularProgressIndicator()
-            is SearchResultState.Success -> SearchResultList(
-                result = searchResultState.result.collectAsLazyPagingItems(),
-                listState = searchResultListState,
-                onFavorite = { articleWithFeed, favorite ->
-                    dispatch(
-                        SearchIntent.Favorite(
-                            articleId = articleWithFeed.articleWithEnclosure.article.articleId,
-                            favorite = favorite,
-                        )
+            SearchResultState.Init,
+            SearchResultState.Loading -> CircularProgressPlaceholder(contentPadding = innerPaddings)
+
+            is SearchResultState.Success -> {
+                val result = searchResultState.result.collectAsLazyPagingItems()
+                if (result.itemCount > 0) {
+                    SearchResultList(
+                        result = result,
+                        listState = searchResultListState,
+                        onFavorite = { articleWithFeed, favorite ->
+                            dispatch(
+                                SearchIntent.Favorite(
+                                    articleId = articleWithFeed.articleWithEnclosure.article.articleId,
+                                    favorite = favorite,
+                                )
+                            )
+                        },
+                        onRead = { articleWithFeed, read ->
+                            dispatch(
+                                SearchIntent.Read(
+                                    articleId = articleWithFeed.articleWithEnclosure.article.articleId,
+                                    read = read,
+                                )
+                            )
+                        },
+                        contentPadding = innerPaddings + PaddingValues(
+                            top = 4.dp,
+                            bottom = 4.dp + fabHeight,
+                        ),
                     )
-                },
-                onRead = { articleWithFeed, read ->
-                    dispatch(
-                        SearchIntent.Read(
-                            articleId = articleWithFeed.articleWithEnclosure.article.articleId,
-                            read = read,
-                        )
-                    )
-                },
-                contentPadding = innerPaddings + PaddingValues(
-                    top = 4.dp,
-                    bottom = 4.dp + fabHeight,
-                ),
-            )
+                } else {
+                    EmptyPlaceholder(contentPadding = innerPaddings)
+                }
+            }
         }
 
         WaitingDialog(visible = uiState.loadingDialog)

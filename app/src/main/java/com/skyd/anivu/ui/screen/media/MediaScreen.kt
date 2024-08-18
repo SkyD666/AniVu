@@ -208,7 +208,7 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                                 Text(
                                     modifier = Modifier
                                         .widthIn(max = 220.dp)
-                                        .basicMarquee(),
+                                        .basicMarquee(iterations = Int.MAX_VALUE),
                                     text = group.first.name,
                                     maxLines = 1,
                                 )
@@ -221,7 +221,7 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                 HorizontalPager(state = pagerState) { index ->
                     MediaList(
                         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-                        contentPadding = PaddingValues(bottom = fabHeight),
+                        fabPadding = PaddingValues(bottom = fabHeight),
                         path = path,
                         groupInfo = GroupInfo(
                             group = uiState.groups[index].first,
