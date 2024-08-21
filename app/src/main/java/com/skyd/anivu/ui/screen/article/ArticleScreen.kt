@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Refresh
@@ -380,6 +382,9 @@ private fun ArticleList(
             key = { _, item -> (item as ArticleWithFeed).articleWithEnclosure.article.articleId },
         )
     } else {
-        EmptyPlaceholder(contentPadding = contentPadding)
+        EmptyPlaceholder(
+            modifier = Modifier.verticalScroll(rememberScrollState()),
+            contentPadding = contentPadding,
+        )
     }
 }

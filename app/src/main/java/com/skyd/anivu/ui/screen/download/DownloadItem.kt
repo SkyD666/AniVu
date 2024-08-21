@@ -104,9 +104,7 @@ fun DownloadItem(
         }
     }
 
-    Column(
-        modifier = Modifier.padding(16.dp)
-    ) {
+    Column(modifier = Modifier.padding(16.dp)) {
         Text(
             text = data.name,
             style = MaterialTheme.typography.bodyMedium,
@@ -198,7 +196,8 @@ fun DownloadItem(
         ProgressIndicator(
             modifier = Modifier
                 .padding(top = 6.dp)
-                .fillMaxWidth(), data = data
+                .fillMaxWidth(),
+            data = data,
         )
     }
 }
@@ -209,8 +208,6 @@ private fun ProgressIndicator(
     data: DownloadInfoBean
 ) {
     when (data.downloadState) {
-        DownloadInfoBean.DownloadState.Seeding,
-        DownloadInfoBean.DownloadState.SeedingPaused,
         DownloadInfoBean.DownloadState.Downloading,
         DownloadInfoBean.DownloadState.StorageMovedFailed,
         DownloadInfoBean.DownloadState.ErrorPaused,
@@ -219,6 +216,8 @@ private fun ProgressIndicator(
         }
 
         DownloadInfoBean.DownloadState.Init -> LinearProgressIndicator(modifier = modifier)
+        DownloadInfoBean.DownloadState.Seeding,
+        DownloadInfoBean.DownloadState.SeedingPaused,
         DownloadInfoBean.DownloadState.Completed -> LinearProgressIndicator(
             modifier = modifier,
             progress = { 1f },

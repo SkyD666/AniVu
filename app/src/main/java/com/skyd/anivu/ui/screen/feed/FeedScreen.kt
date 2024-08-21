@@ -83,6 +83,7 @@ import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.ClipboardTextField
+import com.skyd.anivu.ui.component.Toast
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
@@ -285,32 +286,17 @@ private fun FeedList(
             is FeedEvent.AddFeedResultEvent.Failed ->
                 snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
-            is FeedEvent.EditFeedResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
             is FeedEvent.InitFeetListResultEvent.Failed ->
                 snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
-            is FeedEvent.RemoveFeedResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is FeedEvent.RefreshFeedResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is FeedEvent.CreateGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is FeedEvent.MoveFeedsToGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is FeedEvent.DeleteGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is FeedEvent.EditGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is FeedEvent.ReadAllResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+            is FeedEvent.EditFeedResultEvent.Failed -> Toast(event, text = event.msg)
+            is FeedEvent.RemoveFeedResultEvent.Failed -> Toast(event, text = event.msg)
+            is FeedEvent.RefreshFeedResultEvent.Failed -> Toast(event, text = event.msg)
+            is FeedEvent.CreateGroupResultEvent.Failed -> Toast(event, text = event.msg)
+            is FeedEvent.MoveFeedsToGroupResultEvent.Failed -> Toast(event, text = event.msg)
+            is FeedEvent.DeleteGroupResultEvent.Failed -> Toast(event, text = event.msg)
+            is FeedEvent.EditGroupResultEvent.Failed -> Toast(event, text = event.msg)
+            is FeedEvent.ReadAllResultEvent.Failed -> Toast(event, text = event.msg)
 
             is FeedEvent.EditFeedResultEvent.Success -> LaunchedEffect(event) {
                 if (openEditFeedDialog != null) openEditFeedDialog = event.feed

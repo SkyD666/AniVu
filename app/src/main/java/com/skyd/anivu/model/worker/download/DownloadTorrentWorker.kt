@@ -10,7 +10,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
@@ -286,8 +285,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     private fun createForegroundInfo(): ForegroundInfo {
         val title = name.ifNullOfBlank { applicationContext.getString(R.string.downloading) }
         // This PendingIntent can be used to cancel the worker
-        val cancelIntent = WorkManager.getInstance(applicationContext)
-            .createCancelPendingIntent(id)
+        val cancelIntent = WorkManager.getInstance(applicationContext).createCancelPendingIntent(id)
         val contentIntent = PendingIntent.getActivity(
             applicationContext,
             0,
@@ -335,7 +333,9 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createChannel() {
         val channel = NotificationChannel(
-            CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW
+            CHANNEL_ID,
+            applicationContext.getString(R.string.torrent_download_channel_name),
+            NotificationManager.IMPORTANCE_LOW,
         )
         notificationManager.createNotificationChannel(channel)
     }
@@ -527,7 +527,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         const val STATE = "state"
         const val TORRENT_LINK_UUID = "torrentLinkUuid"
         const val CHANNEL_ID = "downloadTorrent"
-        const val CHANNEL_NAME = "downloadMessage"
 
         private val coroutineScope = CoroutineScope(Dispatchers.IO)
 

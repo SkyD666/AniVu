@@ -320,6 +320,7 @@
     <string name="player_config_screen_cache_category">Cache</string>
     <string name="player_config_screen_max_cache_size">Max cache size</string>
     <string name="player_config_screen_max_back_cache_size">Max back cache size</string>
+    <string name="torrent_download_channel_name">Download task</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>
