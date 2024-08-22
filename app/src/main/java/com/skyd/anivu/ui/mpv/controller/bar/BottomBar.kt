@@ -52,6 +52,7 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ui.mpv.controller.ControllerBarGray
 import com.skyd.anivu.ui.mpv.controller.state.PlayState
 import com.skyd.anivu.ui.mpv.controller.state.PlayStateCallback
+import java.util.Locale
 import kotlin.math.abs
 
 
@@ -175,7 +176,7 @@ fun BottomBar(
                     .animateContentSize()
                     // For vertical centering
                     .wrapContentHeight(),
-                text = "${playStateValue.speed}x",
+                text = "${String.format(Locale.getDefault(), "%.2f", playStateValue.speed)}x",
                 style = MaterialTheme.typography.labelLarge,
                 fontSize = TextUnit(16f, TextUnitType.Sp),
                 textAlign = TextAlign.Center,
@@ -187,7 +188,7 @@ fun BottomBar(
                 imageVector = Icons.Rounded.MusicNote,
                 contentDescription = stringResource(R.string.player_audio_track),
             )
-            // Audio track button
+            // Subtitle track button
             BarIconButton(
                 onClick = bottomBarCallback.onSubtitleTrackClick,
                 imageVector = Icons.Rounded.ClosedCaption,

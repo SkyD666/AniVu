@@ -2,25 +2,28 @@ package com.skyd.anivu.ui.mpv.controller.dialog
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.RestartAlt
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
+import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.mpv.controller.state.dialog.SpeedDialogCallback
 import com.skyd.anivu.ui.mpv.controller.state.dialog.SpeedDialogState
+import java.util.Locale
 
-
-val speeds = listOf(
-    3f, 2f, 1.75f, 1.5f, 1.25f, 1f, 0.75f, 0.5f, 0.25f,
-)
 
 @Composable
 internal fun SpeedDialog(
@@ -30,32 +33,37 @@ internal fun SpeedDialog(
 ) {
     val state = speedDialogState()
     if (state.show) {
+        var value by rememberSaveable { mutableFloatStateOf(state.currentSpeed) }
         BasicPlayerDialog(onDismissRequest = onDismissRequest) {
             Column(modifier = Modifier.padding(PaddingValues(16.dp))) {
-                Text(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 6.dp),
-                    text = stringResource(id = R.string.player_speed),
-                    style = MaterialTheme.typography.headlineSmall,
-                )
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                ) {
-                    items(speeds.size) { index ->
-                        val speed = speeds[index]
-                        TrackDialogListItem(
-                            imageVector = if (state.currentSpeed == speed)
-                                Icons.Rounded.Check else null,
-                            iconContentDescription = stringResource(id = R.string.item_selected),
-                            text = "${speed}x",
-                            onClick = {
-                                speedDialogCallback.onSpeedChanged(speed)
-                                onDismissRequest()
-                            }
-                        )
-                    }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(bottom = 6.dp),
+                        text = stringResource(id = R.string.player_speed),
+                        style = MaterialTheme.typography.headlineSmall,
+                    )
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = String.format(Locale.getDefault(), "%.2f", value),
+                    )
+                    AniVuIconButton(
+                        onClick = {
+                            value = 1f
+                            speedDialogCallback.onSpeedChanged(value)
+                        },
+                        imageVector = Icons.Rounded.RestartAlt,
+                        contentDescription = stringResource(id = R.string.reset),
+                    )
                 }
+                Slider(
+                    modifier = Modifier.padding(horizontal = 10.dp),
+                    value = value,
+                    onValueChange = { value = it },
+                    onValueChangeFinished = { speedDialogCallback.onSpeedChanged(value) },
+                    valueRange = 0.25f..3f,
+                )
             }
         }
     }

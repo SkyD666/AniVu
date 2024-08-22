@@ -1,5 +1,7 @@
 package com.skyd.anivu.ui.screen.read
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -28,6 +31,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -162,53 +166,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                 ArticleState.Init,
                 ArticleState.Loading -> Unit
 
-                is ArticleState.Success -> {
-                    val article = articleState.article
-                    SelectionContainer {
-                        Column {
-                            article.article.title?.let { title ->
-                                Text(
-                                    text = title,
-                                    style = MaterialTheme.typography.titleLarge,
-                                    maxLines = 3,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-                            }
-                            val date = article.article.date
-                            val author = article.article.author
-                            if (date != null || !author.isNullOrBlank()) {
-                                Row(modifier = Modifier.padding(vertical = 10.dp)) {
-                                    if (date != null) {
-                                        Text(
-                                            text = date.toDateTimeString(context = context),
-                                            style = MaterialTheme.typography.labelLarge,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    }
-                                    if (date != null && !author.isNullOrBlank()) {
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                    }
-                                    if (!author.isNullOrBlank()) {
-                                        Text(
-                                            text = author,
-                                            style = MaterialTheme.typography.labelLarge,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    HtmlText(
-                        text = article.article.content.ifNullOfBlank {
-                            article.article.description.orEmpty()
-                        }
-                    )
-                }
+                is ArticleState.Success -> Content(articleState)
             }
         }
 
@@ -229,4 +187,60 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             )
         }
     }
+}
+
+@Composable
+private fun Content(articleState: ArticleState.Success) {
+    val context = LocalContext.current
+    val article = articleState.article
+
+    SelectionContainer {
+        Column {
+            var expandTitle by rememberSaveable { mutableStateOf(false) }
+            article.article.title?.let { title ->
+                Text(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(6.dp))
+                        .animateContentSize()
+                        .clickable { expandTitle = !expandTitle },
+                    text = title,
+                    style = MaterialTheme.typography.titleLarge,
+                    maxLines = if (expandTitle) Int.MAX_VALUE else 3,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            val date = article.article.date
+            val author = article.article.author
+            if (date != null || !author.isNullOrBlank()) {
+                Row(modifier = Modifier.padding(vertical = 10.dp)) {
+                    if (date != null) {
+                        Text(
+                            text = date.toDateTimeString(context = context),
+                            style = MaterialTheme.typography.labelLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                    if (date != null && !author.isNullOrBlank()) {
+                        Spacer(modifier = Modifier.width(12.dp))
+                    }
+                    if (!author.isNullOrBlank()) {
+                        Text(
+                            text = author,
+                            style = MaterialTheme.typography.labelLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            }
+        }
+    }
+    HtmlText(
+        text = article.article.content.ifNullOfBlank {
+            article.article.description.orEmpty()
+        }
+    )
 }
