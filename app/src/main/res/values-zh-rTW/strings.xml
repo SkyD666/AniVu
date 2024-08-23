@@ -314,6 +314,12 @@
     <string name="player_config_screen_max_cache_size">Max cache size</string>
     <string name="player_config_screen_max_back_cache_size">Max back cache size</string>
     <string name="torrent_download_channel_name">Download task</string>
+    <string name="player_seek_fast">Fast, but not precise</string>
+    <string name="player_seek_exact">Precise, but slow</string>
+    <string name="player_config_screen_seek_option">Seek option</string>
+    <string name="read_screen_open_image_in_browser">Open in browser</string>
+    <string name="read_screen_download_image">Download image</string>
+    <string name="read_screen_download_image_success">Save success</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已讀 %d 項</item>
     </plurals>
