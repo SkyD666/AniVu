@@ -14,6 +14,7 @@ import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
+import com.skyd.anivu.model.preference.player.PlayerSeekOptionPreference
 import com.skyd.anivu.ui.mpv.controller.bar.toDurationString
 import `is`.xyz.mpv.MPVLib
 import `is`.xyz.mpv.MPVLib.mpvFormat.MPV_FORMAT_DOUBLE
@@ -487,7 +488,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.command(arrayOf("stop"))
     }
 
-    fun seek(position: Int, precise: Boolean = false) {
+    fun seek(position: Int, precise: Boolean = PlayerSeekOptionPreference.isPrecise(context)) {
         if (precise) {
             timePos = position
         } else {

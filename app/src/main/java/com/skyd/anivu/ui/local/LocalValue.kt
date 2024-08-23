@@ -37,6 +37,7 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
+import com.skyd.anivu.model.preference.player.PlayerSeekOptionPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
@@ -116,6 +117,7 @@ val LocalHardwareDecode = compositionLocalOf { HardwareDecodePreference.default 
 val LocalPlayerAutoPip = compositionLocalOf { PlayerAutoPipPreference.default }
 val LocalPlayerMaxCacheSize = compositionLocalOf { PlayerMaxCacheSizePreference.default }
 val LocalPlayerMaxBackCacheSize = compositionLocalOf { PlayerMaxBackCacheSizePreference.default }
+val LocalPlayerSeekOption = compositionLocalOf { PlayerSeekOptionPreference.default }
 
 // Data
 val LocalUseAutoDelete = compositionLocalOf { UseAutoDeletePreference.default }

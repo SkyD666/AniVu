@@ -3,7 +3,9 @@ package com.skyd.anivu.ui.screen.download
 import android.os.Bundle
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Download
@@ -21,6 +23,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -104,6 +109,7 @@ fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = 
 
             is DownloadListState.Success -> DownloadList(
                 downloadInfoBeanList = downloadListState.downloadInfoBeanList,
+                nestedScrollConnection = scrollBehavior.nestedScrollConnection,
                 contentPadding = paddingValues + PaddingValues(bottom = fabHeight + 16.dp)
             )
         }
@@ -137,11 +143,15 @@ fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = 
 @Composable
 private fun DownloadList(
     downloadInfoBeanList: List<DownloadInfoBean>,
+    nestedScrollConnection: NestedScrollConnection,
     contentPadding: PaddingValues,
 ) {
     if (downloadInfoBeanList.isNotEmpty()) {
         val context = LocalContext.current
-        LazyColumn(contentPadding = contentPadding) {
+        LazyColumn(
+            modifier = Modifier.nestedScroll(nestedScrollConnection),
+            contentPadding = contentPadding,
+        ) {
             itemsIndexed(
                 items = downloadInfoBeanList,
                 key = { _, item -> item.link },

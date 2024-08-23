@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -14,10 +15,12 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachFile
+import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -32,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -52,6 +56,8 @@ import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.Toast
+import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.html.HtmlText
 import com.skyd.anivu.ui.screen.article.enclosure.EnclosureBottomSheet
 import com.skyd.anivu.ui.screen.article.enclosure.getEnclosuresList
@@ -82,7 +88,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
 
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
     val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
-    viewModel.getDispatcher(startWith = ReadIntent.Init(articleId))
+    val dispatcher = viewModel.getDispatcher(startWith = ReadIntent.Init(articleId))
 
     var fabHeight by remember { mutableStateOf(0.dp) }
 
@@ -166,7 +172,17 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                 ArticleState.Init,
                 ArticleState.Loading -> Unit
 
-                is ArticleState.Success -> Content(articleState)
+                is ArticleState.Success -> Content(
+                    articleState = articleState,
+                    downloadImage = {
+                        dispatcher(
+                            ReadIntent.DownloadImage(
+                                url = it,
+                                title = articleState.article.article.title,
+                            )
+                        )
+                    },
+                )
             }
         }
 
@@ -177,8 +193,18 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             is ReadEvent.ReadArticleResultEvent.Failed ->
                 snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
+            is ReadEvent.DownloadImageResultEvent.Failed ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+
+            is ReadEvent.DownloadImageResultEvent.Success -> Toast(
+                event,
+                text = stringResource(R.string.read_screen_download_image_success),
+            )
+
             null -> Unit
         }
+
+        WaitingDialog(visible = uiState.loadingDialog)
 
         if (openEnclosureBottomSheet != null) {
             EnclosureBottomSheet(
@@ -190,9 +216,10 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun Content(articleState: ArticleState.Success) {
+private fun Content(articleState: ArticleState.Success, downloadImage: (url: String) -> Unit) {
     val context = LocalContext.current
     val article = articleState.article
+    var openImageSheet by rememberSaveable { mutableStateOf<String?>(null) }
 
     SelectionContainer {
         Column {
@@ -241,6 +268,57 @@ private fun Content(articleState: ArticleState.Success) {
     HtmlText(
         text = article.article.content.ifNullOfBlank {
             article.article.description.orEmpty()
-        }
+        },
+        onImageClick = { imageUrl -> openImageSheet = imageUrl }
     )
+
+    if (openImageSheet != null) {
+        ImageBottomSheet(
+            imageUrl = openImageSheet!!,
+            onDismissRequest = { openImageSheet = null },
+            downloadImage = downloadImage,
+        )
+    }
+}
+
+@Composable
+private fun ImageBottomSheet(
+    imageUrl: String,
+    onDismissRequest: () -> Unit,
+    downloadImage: (url: String) -> Unit,
+) {
+    val context = LocalContext.current
+    ModalBottomSheet(onDismissRequest = onDismissRequest) {
+        Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+            ImageBottomSheetItem(
+                icon = Icons.Outlined.Download,
+                title = stringResource(id = R.string.read_screen_download_image),
+                onClick = { downloadImage(imageUrl) }
+            )
+            ImageBottomSheetItem(
+                icon = Icons.Outlined.Public,
+                title = stringResource(id = R.string.read_screen_open_image_in_browser),
+                onClick = { imageUrl.openBrowser(context) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun ImageBottomSheetItem(
+    icon: ImageVector,
+    title: String,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp, vertical = 16.dp),
+    ) {
+        Icon(imageVector = icon, contentDescription = null)
+        Spacer(modifier = Modifier.width(20.dp))
+        Text(text = title)
+    }
 }

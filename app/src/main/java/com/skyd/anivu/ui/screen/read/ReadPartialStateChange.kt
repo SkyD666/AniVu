@@ -17,14 +17,17 @@ internal sealed interface ReadPartialStateChange {
             return when (this) {
                 is Success -> oldState.copy(
                     articleState = ArticleState.Success(article = article),
+                    loadingDialog = false,
                 )
 
                 is Failed -> oldState.copy(
                     articleState = ArticleState.Failed(msg = msg),
+                    loadingDialog = false,
                 )
 
                 Loading -> oldState.copy(
                     articleState = ArticleState.Loading,
+                    loadingDialog = false,
                 )
             }
         }
@@ -60,5 +63,19 @@ internal sealed interface ReadPartialStateChange {
 
         data object Success : ReadArticle
         data class Failed(val msg: String) : ReadArticle
+    }
+
+    sealed interface DownloadImage : ReadPartialStateChange {
+        override fun reduce(oldState: ReadState): ReadState {
+            return when (this) {
+                is Success,
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val url: String) : DownloadImage
+        data class Failed(val msg: String) : DownloadImage
     }
 }

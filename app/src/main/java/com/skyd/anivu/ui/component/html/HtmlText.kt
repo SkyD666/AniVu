@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.component.html
 
+import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.widget.TextView
 import androidx.compose.material3.LocalContentColor
@@ -21,6 +22,7 @@ fun HtmlText(
     modifier: Modifier = Modifier,
     htmlFlags: Int = FROM_HTML_MODE_LEGACY,
     text: String,
+    onImageClick: ((String) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val textColor = LocalContentColor.current
@@ -31,8 +33,10 @@ fun HtmlText(
         },
         factory = { c ->
             TextView(c).apply {
-                movementMethod = LinkMovementMethod.getInstance()
+                // setTextIsSelectable should come before movementMethod,
+                // otherwise movementMethod is invalid.
                 setTextIsSelectable(true)
+                movementMethod = LinkMovementMethod.getInstance()
                 setTextColor(textColor.toArgb())
             }
         },
@@ -46,7 +50,13 @@ fun HtmlText(
                         textView.text = textView.text
                     }
                 ),
-                tagHandler = null,
+                tagHandler = TagHandler(
+                    handlers = mutableListOf<Html.TagHandler>().apply {
+                        if (onImageClick != null) {
+                            add(ImgTagHandler(onImageClick))
+                        }
+                    }
+                ),
             )
         }
     )

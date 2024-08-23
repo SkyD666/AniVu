@@ -36,6 +36,7 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
+import com.skyd.anivu.model.preference.player.PlayerSeekOptionPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
@@ -101,6 +102,7 @@ fun Preferences.toSettings(): Settings {
         playerAutoPip = PlayerAutoPipPreference.fromPreferences(this),
         playerMaxCacheSize = PlayerMaxCacheSizePreference.fromPreferences(this),
         playerMaxBackCacheSize = PlayerMaxBackCacheSizePreference.fromPreferences(this),
+        playerSeekOption = PlayerSeekOptionPreference.fromPreferences(this),
 
         // Data
         useAutoDelete = UseAutoDeletePreference.fromPreferences(this),

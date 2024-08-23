@@ -41,6 +41,7 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
+import com.skyd.anivu.model.preference.player.PlayerSeekOptionPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
@@ -83,6 +84,7 @@ import com.skyd.anivu.ui.local.LocalPlayerAutoPip
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalPlayerMaxBackCacheSize
 import com.skyd.anivu.ui.local.LocalPlayerMaxCacheSize
+import com.skyd.anivu.ui.local.LocalPlayerSeekOption
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.local.LocalProxyHostname
@@ -150,6 +152,7 @@ data class Settings(
     val playerAutoPip: Boolean = PlayerAutoPipPreference.default,
     val playerMaxCacheSize: Long = PlayerMaxCacheSizePreference.default,
     val playerMaxBackCacheSize: Long = PlayerMaxBackCacheSizePreference.default,
+    val playerSeekOption: String = PlayerSeekOptionPreference.default,
     // Data
     val useAutoDelete: Boolean = UseAutoDeletePreference.default,
     val autoDeleteArticleFrequency: Long = AutoDeleteArticleFrequencyPreference.default,
@@ -217,6 +220,7 @@ fun SettingsProvider(
         LocalPlayerAutoPip provides settings.playerAutoPip,
         LocalPlayerMaxCacheSize provides settings.playerMaxCacheSize,
         LocalPlayerMaxBackCacheSize provides settings.playerMaxBackCacheSize,
+        LocalPlayerSeekOption provides settings.playerSeekOption,
         // Data
         LocalUseAutoDelete provides settings.useAutoDelete,
         LocalAutoDeleteArticleFrequency provides settings.autoDeleteArticleFrequency,

@@ -182,6 +182,7 @@ fun DownloadItem(
                     }
                 },
                 imageVector = pauseButtonIcon,
+                contentDescription = pauseButtonContentDescription,
             )
             AniVuIconButton(
                 enabled = cancelButtonEnabled,
@@ -191,6 +192,7 @@ fun DownloadItem(
                     cancelButtonEnabled = false
                 },
                 imageVector = Icons.Outlined.Close,
+                contentDescription = stringResource(id = R.string.delete)
             )
         }
         ProgressIndicator(

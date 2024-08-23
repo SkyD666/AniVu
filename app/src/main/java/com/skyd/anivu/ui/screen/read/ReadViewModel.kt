@@ -63,6 +63,14 @@ class ReadViewModel @Inject constructor(
                     ReadEvent.FavoriteArticleResultEvent.Failed(change.msg)
                 }
 
+                is ReadPartialStateChange.DownloadImage.Success -> {
+                    ReadEvent.DownloadImageResultEvent.Success(change.url)
+                }
+
+                is ReadPartialStateChange.DownloadImage.Failed -> {
+                    ReadEvent.DownloadImageResultEvent.Failed(change.msg)
+                }
+
                 else -> return@onEach
             }
             sendEvent(event)
@@ -96,6 +104,13 @@ class ReadViewModel @Inject constructor(
                     ReadPartialStateChange.ReadArticle.Success
                 }.startWith(ReadPartialStateChange.LoadingDialog.Show).catchMap {
                     ReadPartialStateChange.ReadArticle.Failed(it.message.toString())
+                }
+            },
+            filterIsInstance<ReadIntent.DownloadImage>().flatMapConcat { intent ->
+                articleRepo.downloadImage(intent.url, intent.title).map {
+                    ReadPartialStateChange.DownloadImage.Success(intent.url)
+                }.startWith(ReadPartialStateChange.LoadingDialog.Show).catchMap {
+                    ReadPartialStateChange.DownloadImage.Failed(it.message.toString())
                 }
             },
         )

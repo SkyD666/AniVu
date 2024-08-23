@@ -9,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.outlined.Redo
 import androidx.compose.material.icons.outlined.FastForward
 import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.PictureInPictureAlt
@@ -41,6 +42,7 @@ import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
+import com.skyd.anivu.model.preference.player.PlayerSeekOptionPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.ui.component.AniVuIconButton
@@ -56,6 +58,7 @@ import com.skyd.anivu.ui.local.LocalPlayerAutoPip
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.local.LocalPlayerMaxBackCacheSize
 import com.skyd.anivu.ui.local.LocalPlayerMaxCacheSize
+import com.skyd.anivu.ui.local.LocalPlayerSeekOption
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.screen.settings.playerconfig.advanced.PLAYER_CONFIG_ADVANCED_SCREEN_ROUTE
@@ -70,6 +73,7 @@ fun PlayerConfigScreen() {
     val scope = rememberCoroutineScope()
     val navController = LocalNavController.current
     var expandDoubleTapMenu by rememberSaveable { mutableStateOf(false) }
+    var expandSeekOptionMenu by rememberSaveable { mutableStateOf(false) }
     var openMaxCacheSizeDialog by rememberSaveable { mutableStateOf(false) }
     var openMaxBackCacheSizeDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -121,6 +125,23 @@ fun PlayerConfigScreen() {
                             value = it,
                         )
                     }
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(Icons.AutoMirrored.Outlined.Redo),
+                    text = stringResource(id = R.string.player_config_screen_seek_option),
+                    descriptionText = PlayerSeekOptionPreference.toDisplayName(
+                        context = context,
+                        value = LocalPlayerSeekOption.current,
+                    ),
+                    extraContent = {
+                        SeekOptionMenu(
+                            expanded = expandSeekOptionMenu,
+                            onDismissRequest = { expandSeekOptionMenu = false },
+                        )
+                    },
+                    onClick = { expandSeekOptionMenu = true },
                 )
             }
             item {
@@ -234,6 +255,22 @@ private fun DoubleTapMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
         values = remember { PlayerDoubleTapPreference.values.toList() },
         displayName = { PlayerDoubleTapPreference.toDisplayName(context, it) },
         onChecked = { PlayerDoubleTapPreference.put(context, scope, it) },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Composable
+private fun SeekOptionMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val playerSeekOption = LocalPlayerSeekOption.current
+
+    CheckableListMenu(
+        expanded = expanded,
+        current = playerSeekOption,
+        values = remember { PlayerSeekOptionPreference.values.toList() },
+        displayName = { PlayerSeekOptionPreference.toDisplayName(context, it) },
+        onChecked = { PlayerSeekOptionPreference.put(context, scope, it) },
         onDismissRequest = onDismissRequest,
     )
 }

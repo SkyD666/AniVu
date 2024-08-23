@@ -1,12 +1,20 @@
 package com.skyd.anivu.model.repository
 
 import android.database.DatabaseUtils
+import android.graphics.drawable.BitmapDrawable
 import android.os.Parcelable
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.sqlite.db.SimpleSQLiteQuery
+import coil.Coil
+import coil.request.ErrorResult
+import coil.request.ImageRequest
+import coil.request.SuccessResult
+import com.skyd.anivu.appContext
 import com.skyd.anivu.base.BaseRepository
+import com.skyd.anivu.ext.saveToGallery
+import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.ArticleWithFeed
@@ -26,6 +34,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
+import kotlin.random.Random
 
 @Parcelize
 sealed class ArticleSort(open val asc: Boolean) : Parcelable {
@@ -130,6 +139,28 @@ class ArticleRepository @Inject constructor(
     fun readArticle(articleId: String, read: Boolean): Flow<Unit> {
         return flow {
             emit(articleDao.readArticle(articleId, read))
+        }.flowOn(Dispatchers.IO)
+    }
+
+    fun downloadImage(url: String, title: String?): Flow<Unit> {
+        return flow {
+            val request = ImageRequest.Builder(appContext)
+                .data(url)
+                .build()
+            when (val result = Coil.imageLoader(appContext).execute(request)) {
+                is ErrorResult -> throw result.throwable
+                is SuccessResult -> {
+                    check(
+                        (result.drawable as? BitmapDrawable)?.saveToGallery(
+                            context = appContext,
+                            filename = (title.orEmpty()
+                                .ifEmpty { url.substringAfterLast('/') } +
+                                    "_" + Random.nextInt()).validateFileName(),
+                        ) ?: false
+                    ) { "saveToGallery failed" }
+                }
+            }
+            emit(Unit)
         }.flowOn(Dispatchers.IO)
     }
 
