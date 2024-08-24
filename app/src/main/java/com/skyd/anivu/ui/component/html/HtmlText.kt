@@ -16,6 +16,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.parseAsHtml
+import androidx.lifecycle.compose.LocalLifecycleOwner
 
 @Composable
 fun HtmlText(
@@ -25,6 +26,7 @@ fun HtmlText(
     onImageClick: ((String) -> Unit)? = null,
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
     val textColor = LocalContentColor.current
     var componentWidth by remember { mutableIntStateOf(0) }
     AndroidView(
@@ -45,6 +47,7 @@ fun HtmlText(
                 htmlFlags,
                 imageGetter = ImageGetter(
                     context = context,
+                    lifecycleOwner = lifecycleOwner,
                     maxWidth = { componentWidth },
                     onSuccess = { _, _ ->
                         textView.text = textView.text

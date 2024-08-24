@@ -1,16 +1,15 @@
 package com.skyd.anivu.ext
 
-import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.os.Build
-import android.os.Environment
 import android.provider.DocumentsContract
-import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.skyd.anivu.R
+import com.skyd.anivu.config.Const.ANIVU_PICTURES_DIR
+import com.skyd.anivu.ext.content.saveToGallery
 import com.skyd.anivu.ui.component.showToast
 import java.io.File
 
@@ -38,30 +37,23 @@ fun File.getMimeType(): String? {
     return type
 }
 
-fun File.savePictureToMediaStore(context: Context, autoDelete: Boolean = true) {
+fun File.savePictureToMediaStore(
+    context: Context,
+    mimetype: String? = null,
+    fileName: String = name,
+    autoDelete: Boolean = true,
+) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        val contentValues = ContentValues()
-        contentValues.put(
-            MediaStore.Images.Media.RELATIVE_PATH,
-            "${Environment.DIRECTORY_PICTURES}/AniVu",
-        )
-        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, name)
-        val uri = context.contentResolver.insert(
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues
-        )!!
-        context.contentResolver.openOutputStream(uri)?.use { output ->
-            inputStream().use { input ->
-                input.copyTo(output)
+        context.contentResolver.saveToGallery(
+            fileNameWithExt = fileName,
+            mimetype = mimetype,
+            output = { output ->
+                inputStream().use { input -> input.copyTo(output) }
+                true
             }
-        }
-    } else {
-        val dir = File(
-            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-            "AniVu"
         )
-        if (!dir.exists()) dir.mkdirs()
-        this.copyTo(File(dir, name))
+    } else {
+        this.copyTo(File(ANIVU_PICTURES_DIR, fileName))
     }
     context.getString(R.string.save_picture_to_media_store_saved).showToast()
     if (autoDelete) delete()

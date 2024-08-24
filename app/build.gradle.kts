@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 22
-        versionName = "2.1-alpha19"
+        versionName = "2.1-alpha21"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -163,13 +163,13 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha14")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
-    implementation("androidx.compose.ui:ui:1.7.0-beta07")
-    implementation("androidx.compose.material:material:1.7.0-beta07")
-    implementation("androidx.compose.material3:material3:1.3.0-beta05")
-    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-beta05")
-    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-beta04")
-    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-beta04")
-    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-beta04")
+    implementation("androidx.compose.ui:ui:1.7.0-rc01")
+    implementation("androidx.compose.material:material:1.7.0-rc01")
+    implementation("androidx.compose.material3:material3:1.3.0-rc01")
+    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-rc01")
+    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-rc01")
+    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-rc01")
+    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-rc01")
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
     implementation("com.materialkolor:material-kolor:1.7.0")
     implementation("androidx.room:room-runtime:2.6.1")

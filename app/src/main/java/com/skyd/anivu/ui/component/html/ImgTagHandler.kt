@@ -12,11 +12,11 @@ internal class ImgTagHandler(private val onClick: (String) -> Unit) : TagHandler
     override fun handleTag(opening: Boolean, tag: String, output: Editable, xmlReader: XMLReader) {
         if (tag.equals("img", ignoreCase = true)) {
             val len = output.length
-            val images = output.getSpans(0, len, ImageSpan::class.java)
+            val images = output.getSpans(len - 1, len, ImageSpan::class.java)
             val imgURL = images.firstOrNull()?.source ?: return
             output.setSpan(
                 ClickableImage(imgURL, onClick),
-                0,
+                len - 1,
                 len,
                 Spanned.SPAN_INCLUSIVE_EXCLUSIVE,
             )
@@ -28,7 +28,5 @@ internal class ClickableImage(
     private val url: String,
     private val onClick: (String) -> Unit,
 ) : ClickableSpan() {
-    override fun onClick(widget: View) {
-        onClick(url)
-    }
+    override fun onClick(widget: View) = onClick(url)
 }

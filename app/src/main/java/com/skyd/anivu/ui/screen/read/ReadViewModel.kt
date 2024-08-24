@@ -107,7 +107,7 @@ class ReadViewModel @Inject constructor(
                 }
             },
             filterIsInstance<ReadIntent.DownloadImage>().flatMapConcat { intent ->
-                articleRepo.downloadImage(intent.url, intent.title).map {
+                readRepo.downloadImage(intent.url, intent.title).map {
                     ReadPartialStateChange.DownloadImage.Success(intent.url)
                 }.startWith(ReadPartialStateChange.LoadingDialog.Show).catchMap {
                     ReadPartialStateChange.DownloadImage.Failed(it.message.toString())

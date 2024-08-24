@@ -8,9 +8,14 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Point
 import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.view.Window
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.PackageInfoCompat
+import coil.ImageLoader
+import coil.decode.GifDecoder
+import coil.decode.ImageDecoderDecoder
+import coil.decode.SvgDecoder
 
 val Context.activity: Activity
     get() {
@@ -66,7 +71,7 @@ fun Context.screenWidth(includeVirtualKey: Boolean): Int {
 fun Context.getAppVersionName(): String {
     var appVersionName = ""
     try {
-        val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val packageInfo = if (SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0L))
         } else {
             packageManager.getPackageInfo(packageName, 0)
@@ -105,4 +110,16 @@ fun Context.getAppName(): String? {
 fun Context.inDarkMode(): Boolean {
     return (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
             Configuration.UI_MODE_NIGHT_YES
+}
+
+fun Context.imageLoaderBuilder(): ImageLoader.Builder {
+    return ImageLoader.Builder(this)
+        .components {
+            if (SDK_INT >= 28) {
+                add(ImageDecoderDecoder.Factory())
+            } else {
+                add(GifDecoder.Factory())
+            }
+            add(SvgDecoder.Factory())
+        }
 }

@@ -56,7 +56,6 @@ import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
-import com.skyd.anivu.ui.component.Toast
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.html.HtmlText
 import com.skyd.anivu.ui.screen.article.enclosure.EnclosureBottomSheet
@@ -196,11 +195,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             is ReadEvent.DownloadImageResultEvent.Failed ->
                 snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
-            is ReadEvent.DownloadImageResultEvent.Success -> Toast(
-                event,
-                text = stringResource(R.string.read_screen_download_image_success),
-            )
-
+            is ReadEvent.DownloadImageResultEvent.Success,
             null -> Unit
         }
 
@@ -289,7 +284,11 @@ private fun ImageBottomSheet(
 ) {
     val context = LocalContext.current
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
-        Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(bottom = 12.dp),
+        ) {
             ImageBottomSheetItem(
                 icon = Icons.Outlined.Download,
                 title = stringResource(id = R.string.read_screen_download_image),
@@ -315,7 +314,7 @@ private fun ImageBottomSheetItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
-            .padding(horizontal = 20.dp, vertical = 16.dp),
+            .padding(16.dp),
     ) {
         Icon(imageVector = icon, contentDescription = null)
         Spacer(modifier = Modifier.width(20.dp))

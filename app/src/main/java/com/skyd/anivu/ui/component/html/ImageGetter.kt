@@ -1,20 +1,24 @@
 package com.skyd.anivu.ui.component.html
 
 import android.content.Context
+import android.graphics.drawable.AnimatedImageDrawable
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.DrawableWrapper
+import android.os.Build
 import android.text.Html
 import androidx.appcompat.content.res.AppCompatResources
-import coil.Coil
-import coil.ImageLoader
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import coil.drawable.ScaleDrawable
 import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.skyd.anivu.R
+import com.skyd.anivu.ext.imageLoaderBuilder
 
 class ImageGetter(
     private val context: Context,
-    private val imageLoader: ImageLoader = Coil.imageLoader(context),
+    private val lifecycleOwner: LifecycleOwner,
     private val maxWidth: () -> Int,
     private val onSuccess: (ImageRequest, SuccessResult) -> Unit,
     private val onError: (ImageRequest, ErrorResult) -> Unit = { _, _ -> },
@@ -55,6 +59,7 @@ class ImageGetter(
             .error(R.drawable.ic_error_24)
             .listener(
                 onSuccess = { request, result ->
+                    preProcessDrawable(result.drawable)
                     setAndResizeDrawable(result.drawable)
                     onSuccess(request, result)
                 },
@@ -68,9 +73,26 @@ class ImageGetter(
             .build()
 
         // 返回占位符，直到图片加载完成
-        imageLoader.enqueue(request)
+        context.imageLoaderBuilder().build().enqueue(request)
 
         return drawable
+    }
+
+    private fun preProcessDrawable(drawable: Drawable) {
+        if (drawable is ScaleDrawable) {
+            val child = drawable.child
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P && child is AnimatedImageDrawable) {
+                lifecycleOwner.lifecycle.addObserver(
+                    object : DefaultLifecycleObserver {
+                        override fun onResume(owner: LifecycleOwner) = child.start()
+                        override fun onPause(owner: LifecycleOwner) = child.stop()
+                        override fun onDestroy(owner: LifecycleOwner) {
+                            lifecycleOwner.lifecycle.removeObserver(this)
+                        }
+                    }
+                )
+            }
+        }
     }
 
     inner class ImageGetterDrawable(
