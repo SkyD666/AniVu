@@ -117,6 +117,7 @@ class ImportExportRepository @Inject constructor(
                             GroupVo(
                                 groupId = "",
                                 name = it.attributes["title"] ?: it.text.toString(),
+                                isExpanded = true,
                             )
                         )
                     }
@@ -129,6 +130,7 @@ class ImportExportRepository @Inject constructor(
                         GroupVo(
                             groupId = "",
                             name = it.attributes["title"] ?: it.text.toString(),
+                            isExpanded = true,
                         )
                     )
                 }

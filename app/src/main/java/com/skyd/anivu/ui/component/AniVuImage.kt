@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.EventListener
 import coil.ImageLoader
 import coil.compose.AsyncImage
@@ -22,13 +23,19 @@ fun AniVuImage(
     contentScale: ContentScale = ContentScale.FillWidth,
     alpha: Float = DefaultAlpha,
 ) {
-    val context = LocalContext.current
     AsyncImage(
-        model = remember(model) {
-            ImageRequest.Builder(context)
-                .data(model)
-                .crossfade(true)
-                .build()
+        model = if (model is ImageRequest) {
+            model
+        } else {
+            val context = LocalContext.current
+            val lifecycleOwner = LocalLifecycleOwner.current
+            remember(model) {
+                ImageRequest.Builder(context)
+                    .lifecycle(lifecycleOwner)
+                    .data(model)
+                    .crossfade(true)
+                    .build()
+            }
         },
         modifier = modifier,
         contentDescription = contentDescription,

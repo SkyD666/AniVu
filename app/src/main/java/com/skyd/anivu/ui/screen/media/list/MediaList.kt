@@ -117,7 +117,7 @@ internal fun MediaList(
                                 )
                             },
                             onRemove = { dispatch(MediaListIntent.DeleteFile(it.file)) },
-                            contentPadding = innerPadding + contentPadding,
+                            contentPadding = innerPadding + contentPadding + fabPadding,
                         )
                     }
                 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoDelete
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.PermMedia
 import androidx.compose.material.icons.outlined.Replay
 import androidx.compose.material.icons.outlined.SwapVert
@@ -44,12 +45,12 @@ import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
+import com.skyd.anivu.ui.local.LocalMediaLibLocation
+import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.screen.filepicker.ListenToFilePicker
 import com.skyd.anivu.ui.screen.filepicker.openFilePicker
 import com.skyd.anivu.ui.screen.settings.data.autodelete.AUTO_DELETE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.data.importexport.IMPORT_EXPORT_SCREEN_ROUTE
-import com.skyd.anivu.ui.local.LocalMediaLibLocation
-import com.skyd.anivu.ui.local.LocalNavController
 
 
 const val DATA_SCREEN_ROUTE = "dataScreen"
@@ -81,6 +82,7 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
         }
     ) { paddingValues ->
         var openDeleteWarningDialog by rememberSaveable { mutableStateOf(false) }
+        var openDeletePlayHistoryWarningDialog by rememberSaveable { mutableStateOf(false) }
         var openDeleteBeforeDatePickerDialog by rememberSaveable { mutableStateOf(false) }
 
         LazyColumn(
@@ -149,6 +151,14 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
                 )
             }
             item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(Icons.Outlined.History),
+                    text = stringResource(id = R.string.data_screen_clear_play_history),
+                    descriptionText = stringResource(id = R.string.data_screen_clear_play_history_description),
+                    onClick = { openDeletePlayHistoryWarningDialog = true }
+                )
+            }
+            item {
                 CategorySettingsItem(
                     text = stringResource(id = R.string.data_screen_sync_category),
                 )
@@ -178,6 +188,14 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
             onConfirm = { dispatch(DataIntent.ClearCache) },
         )
 
+        DeleteWarningDialog(
+            visible = openDeletePlayHistoryWarningDialog,
+            text = stringResource(id = R.string.data_screen_clear_play_history_warning),
+            onDismissRequest = { openDeletePlayHistoryWarningDialog = false },
+            onDismiss = { openDeletePlayHistoryWarningDialog = false },
+            onConfirm = { dispatch(DataIntent.DeletePlayHistory) },
+        )
+
         WaitingDialog(visible = uiState.loadingDialog)
 
         when (val event = uiEvent) {
@@ -192,6 +210,18 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
 
             is DataEvent.DeleteArticleBeforeResultEvent.Success ->
                 snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+
+            is DataEvent.DeletePlayHistoryResultEvent.Failed ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+
+            is DataEvent.DeletePlayHistoryResultEvent.Success ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(
+                    message = stringResource(
+                        R.string.data_screen_clear_play_history_success,
+                        event.count
+                    ),
+                    key1 = event
+                )
 
             null -> Unit
         }

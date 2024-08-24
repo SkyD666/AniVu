@@ -15,6 +15,7 @@ import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachFile
+import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Share
@@ -173,6 +174,8 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
 
                 is ArticleState.Success -> Content(
                     articleState = articleState,
+                    shareImage = { dispatcher(ReadIntent.ShareImage(url = it)) },
+                    copyImage = { dispatcher(ReadIntent.CopyImage(url = it)) },
                     downloadImage = {
                         dispatcher(
                             ReadIntent.DownloadImage(
@@ -192,11 +195,24 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             is ReadEvent.ReadArticleResultEvent.Failed ->
                 snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
+            is ReadEvent.ShareImageResultEvent.Failed ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+
+            is ReadEvent.CopyImageResultEvent.Failed ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+
+            is ReadEvent.CopyImageResultEvent.Success ->
+                snackbarHostState.showSnackbarWithLaunchedEffect(
+                    message = stringResource(R.string.copied),
+                    key1 = event,
+                )
+
             is ReadEvent.DownloadImageResultEvent.Failed ->
                 snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
 
             is ReadEvent.DownloadImageResultEvent.Success,
             null -> Unit
+
         }
 
         WaitingDialog(visible = uiState.loadingDialog)
@@ -211,7 +227,12 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
 }
 
 @Composable
-private fun Content(articleState: ArticleState.Success, downloadImage: (url: String) -> Unit) {
+private fun Content(
+    articleState: ArticleState.Success,
+    downloadImage: (url: String) -> Unit,
+    copyImage: (url: String) -> Unit,
+    shareImage: (url: String) -> Unit,
+) {
     val context = LocalContext.current
     val article = articleState.article
     var openImageSheet by rememberSaveable { mutableStateOf<String?>(null) }
@@ -271,6 +292,8 @@ private fun Content(articleState: ArticleState.Success, downloadImage: (url: Str
         ImageBottomSheet(
             imageUrl = openImageSheet!!,
             onDismissRequest = { openImageSheet = null },
+            shareImage = shareImage,
+            copyImage = copyImage,
             downloadImage = downloadImage,
         )
     }
@@ -280,6 +303,8 @@ private fun Content(articleState: ArticleState.Success, downloadImage: (url: Str
 private fun ImageBottomSheet(
     imageUrl: String,
     onDismissRequest: () -> Unit,
+    shareImage: (url: String) -> Unit,
+    copyImage: (url: String) -> Unit,
     downloadImage: (url: String) -> Unit,
 ) {
     val context = LocalContext.current
@@ -292,12 +317,34 @@ private fun ImageBottomSheet(
             ImageBottomSheetItem(
                 icon = Icons.Outlined.Download,
                 title = stringResource(id = R.string.read_screen_download_image),
-                onClick = { downloadImage(imageUrl) }
+                onClick = {
+                    downloadImage(imageUrl)
+                    onDismissRequest()
+                }
+            )
+            ImageBottomSheetItem(
+                icon = Icons.Outlined.Share,
+                title = stringResource(id = R.string.share),
+                onClick = {
+                    shareImage(imageUrl)
+                    onDismissRequest()
+                }
+            )
+            ImageBottomSheetItem(
+                icon = Icons.Outlined.ContentCopy,
+                title = stringResource(id = android.R.string.copy),
+                onClick = {
+                    copyImage(imageUrl)
+                    onDismissRequest()
+                }
             )
             ImageBottomSheetItem(
                 icon = Icons.Outlined.Public,
                 title = stringResource(id = R.string.read_screen_open_image_in_browser),
-                onClick = { imageUrl.openBrowser(context) }
+                onClick = {
+                    imageUrl.openBrowser(context)
+                    onDismissRequest()
+                }
             )
         }
     }

@@ -54,13 +54,16 @@ data class DownloadInfoBean(
     var downloadPayloadRate: Int = 0
 
     enum class DownloadState {
-        Init, Downloading, Paused, Completed, ErrorPaused, StorageMovedFailed, Seeding, SeedingPaused
+        Init, Downloading, Paused, Completed, ErrorPaused, StorageMovedFailed, Seeding, SeedingPaused;
+
+        fun downloadComplete(): Boolean {
+            return this == Completed || this == Seeding || this == SeedingPaused
+        }
     }
 
     companion object {
         const val LINK_COLUMN = "link"
         const val NAME_COLUMN = "name"
-        const val DOWNLOADING_DIR_NAME_COLUMN = "downloadingDirName"
         const val DOWNLOAD_DATE_COLUMN = "downloadDate"
         const val SIZE_COLUMN = "size"
         const val PROGRESS_COLUMN = "progress"

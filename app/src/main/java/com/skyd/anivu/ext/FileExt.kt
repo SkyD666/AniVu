@@ -27,6 +27,15 @@ fun File.deleteRecursivelyExclude(hook: (File) -> Boolean = { true }): Boolean =
         (it != this && hook(it) && (it.delete() || !it.exists())) && res
     }
 
+fun File.deleteDirs(
+    maxSize: Int = 5_242_880,
+    exclude: (file: File) -> Boolean,
+) {
+    if (walkTopDown().filter { it.isFile }.map { it.length() }.sum() > maxSize) {
+        walkBottomUp().forEach { if (!exclude(it)) it.deleteRecursively() }
+    }
+}
+
 fun File.getMimeType(): String? {
     if (isDirectory) return DocumentsContract.Document.MIME_TYPE_DIR
     var type: String? = null

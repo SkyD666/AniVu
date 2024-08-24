@@ -39,8 +39,10 @@ class DownloadRepository @Inject constructor(
         link: String,
     ): Flow<Unit> {
         return flow {
-            downloadManager.getTorrentFilesByLink(link = link).forEach {
-                File(it.path).deleteRecursively()
+            if (downloadManager.getDownloadState(link)?.downloadComplete() != true) {
+                downloadManager.getTorrentFilesByLink(link).forEach {
+                    File(it.path).deleteRecursively()
+                }
             }
             val requestUuid = downloadManager.getDownloadInfo(link)?.downloadRequestId
             if (!requestUuid.isNullOrBlank()) {

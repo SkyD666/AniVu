@@ -10,6 +10,7 @@ import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.MediaPlayHistoryBean
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
 import com.skyd.anivu.model.bean.download.SessionParamsBean
@@ -19,8 +20,10 @@ import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.EnclosureDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
+import com.skyd.anivu.model.db.dao.MediaPlayHistoryDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
 import com.skyd.anivu.model.db.dao.TorrentFileDao
+import com.skyd.anivu.model.db.migration.Migration10To11
 import com.skyd.anivu.model.db.migration.Migration1To2
 import com.skyd.anivu.model.db.migration.Migration2To3
 import com.skyd.anivu.model.db.migration.Migration3To4
@@ -43,9 +46,10 @@ const val APP_DATA_BASE_FILE_NAME = "app.db"
         SessionParamsBean::class,
         TorrentFileBean::class,
         GroupBean::class,
+        MediaPlayHistoryBean::class,
     ],
     views = [FeedViewBean::class],
-    version = 10,
+    version = 11,
 )
 @TypeConverters(
     value = []
@@ -58,6 +62,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun downloadInfoDao(): DownloadInfoDao
     abstract fun torrentFileDao(): TorrentFileDao
     abstract fun sessionParamsDao(): SessionParamsDao
+    abstract fun mediaPlayHistoryDao(): MediaPlayHistoryDao
 
     companion object {
         @Volatile
@@ -66,7 +71,7 @@ abstract class AppDatabase : RoomDatabase() {
         private val migrations = arrayOf(
             Migration1To2(), Migration2To3(), Migration3To4(), Migration4To5(),
             Migration5To6(), Migration6To7(), Migration7To8(), Migration8To9(),
-            Migration9To10(),
+            Migration9To10(), Migration10To11(),
         )
 
         fun getInstance(context: Context): AppDatabase {

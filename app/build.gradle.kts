@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 22
-        versionName = "2.1-alpha21"
+        versionName = "2.1-alpha22"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -203,6 +203,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("io.coil-kt:coil-gif:2.7.0")
     implementation("io.coil-kt:coil-svg:2.7.0")
+    implementation("io.coil-kt:coil-video:2.7.0")
     implementation("com.airbnb.android:lottie-compose:6.5.0")
     implementation("com.rometools:rome:2.1.0")
     implementation("be.ceau:opml-parser:3.1.0") {

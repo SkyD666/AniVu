@@ -410,10 +410,7 @@ internal fun OptionArea(
         text = deleteWarningText,
         onDismissRequest = { openDeleteWarningDialog = false },
         onDismiss = { openDeleteWarningDialog = false },
-        onConfirm = {
-            onDelete()
-            openDeleteWarningDialog = false
-        },
+        onConfirm = onDelete,
     )
 }
 

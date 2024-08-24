@@ -18,7 +18,10 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.doOnAttach
 import androidx.core.view.doOnDetach
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ui.component.OnLifecycleEvent
@@ -40,6 +43,9 @@ import com.skyd.anivu.ui.mpv.controller.state.dialog.track.AudioTrackDialogCallb
 import com.skyd.anivu.ui.mpv.controller.state.dialog.track.AudioTrackDialogState
 import com.skyd.anivu.ui.mpv.controller.state.dialog.track.SubtitleTrackDialogCallback
 import com.skyd.anivu.ui.mpv.controller.state.dialog.track.SubtitleTrackDialogState
+import com.skyd.anivu.ui.mpv.mvi.PlayerEvent
+import com.skyd.anivu.ui.mpv.mvi.PlayerIntent
+import com.skyd.anivu.ui.mpv.mvi.PlayerViewModel
 import com.skyd.anivu.ui.mpv.pip.PipBroadcastReceiver
 import com.skyd.anivu.ui.mpv.pip.PipListenerPreAPI12
 import com.skyd.anivu.ui.mpv.pip.manualEnterPictureInPictureMode
@@ -140,6 +146,7 @@ fun PlayerView(
     cacheDir: String = Const.MPV_CACHE_DIR.path,
     fontDir: String = Const.MPV_FONT_DIR.path,
     onPlayerChanged: (MPVView?) -> Unit,
+    viewModel: PlayerViewModel = hiltViewModel(),
 ) {
     val systemUiController = rememberSystemUiController().apply {
         isSystemBarsVisible = false
@@ -149,6 +156,10 @@ fun PlayerView(
     val commandQueue = remember { Channel<PlayerCommand>(capacity = UNLIMITED) }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
+    val uiState by viewModel.viewState.collectAsStateWithLifecycle()
+    val dispatcher = viewModel.getDispatcher(startWith = null)
 
     val currentUri by rememberUpdatedState(newValue = uri)
 
@@ -164,6 +175,11 @@ fun PlayerView(
     var speedDialogState by remember { mutableStateOf(SpeedDialogState.initial) }
     LaunchedEffect(playState.speed) {
         speedDialogState = speedDialogState.copy(currentSpeed = playState.speed)
+    }
+    LaunchedEffect(mediaLoaded) {
+        if (uiState.needLoadLastPlayPosition && mediaLoaded && playState.duration > 0) {
+            dispatcher(PlayerIntent.TrySeekToLast(uri.toString(), playState.duration * 1000L))
+        }
     }
     val dialogState by remember {
         mutableStateOf(
@@ -281,6 +297,15 @@ fun PlayerView(
             override fun efEvent(err: String?) {
             }
         }
+    }
+
+    when (val event = uiEvent) {
+        is PlayerEvent.TrySeekToLastResultEvent.Success -> LaunchedEffect(Unit) {
+            commandQueue.trySend(PlayerCommand.SeekTo((event.position / 1000).toInt().coerceAtLeast(0)))
+        }
+
+        PlayerEvent.TrySeekToLastResultEvent.NoNeed,
+        null -> Unit
     }
 
     val autoPip = LocalPlayerAutoPip.current
@@ -429,7 +454,10 @@ fun PlayerView(
             }
 
             Lifecycle.Event.ON_DESTROY -> {
-                commandQueue.trySend(PlayerCommand.Destroy)
+                viewModel.updatePlayHistory(
+                    uri.toString(),
+                    playState.currentPosition * 1000L,
+                )
             }
 
             else -> Unit

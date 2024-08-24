@@ -8,6 +8,11 @@ sealed interface DataEvent : MviSingleEvent {
         data class Failed(val msg: String) : ClearCacheResultEvent
     }
 
+    sealed interface DeletePlayHistoryResultEvent : DataEvent {
+        data class Success(val count: Int) : DeletePlayHistoryResultEvent
+        data class Failed(val msg: String) : DeletePlayHistoryResultEvent
+    }
+
     sealed interface DeleteArticleBeforeResultEvent : DataEvent {
         data class Success(val msg: String) : DeleteArticleBeforeResultEvent
         data class Failed(val msg: String) : DeleteArticleBeforeResultEvent

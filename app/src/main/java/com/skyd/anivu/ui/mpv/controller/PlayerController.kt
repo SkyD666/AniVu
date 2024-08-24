@@ -311,6 +311,7 @@ private fun AutoHiddenBox(
                 )
                 BottomBar(
                     modifier = Modifier.constrainAs(bottomBar) { bottom.linkTo(parent.bottom) },
+                    enabled = enabled,
                     playStateCallback = playStateCallback,
                     playState = playState,
                     bottomBarCallback = bottomBarCallback,

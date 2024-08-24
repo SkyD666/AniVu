@@ -320,6 +320,11 @@
     <string name="read_screen_open_image_in_browser">在浏览器中打开图片</string>
     <string name="read_screen_download_image">保存到相册</string>
     <string name="read_screen_download_image_success">保存成功</string>
+    <string name="data_screen_clear_play_history">删除播放历史</string>
+    <string name="data_screen_clear_play_history_description">包括上次播放的位置等</string>
+    <string name="data_screen_clear_play_history_warning">确定删除播放历史？</string>
+    <string name="data_screen_clear_play_history_success">已删除 %d 项</string>
+    <string name="folder">文件夹</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>

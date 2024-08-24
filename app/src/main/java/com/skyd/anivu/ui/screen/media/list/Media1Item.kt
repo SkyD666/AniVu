@@ -1,7 +1,5 @@
 package com.skyd.anivu.ui.screen.media.list
 
-import android.graphics.Bitmap
-import android.media.MediaMetadataRetriever
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
@@ -25,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +38,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import coil.EventListener
+import coil.decode.VideoFrameDecoder
+import coil.request.ErrorResult
+import coil.request.ImageRequest
+import coil.request.videoFramePercent
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.openWith
@@ -49,9 +52,7 @@ import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.component.AniVuImage
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.File
+import com.skyd.anivu.ui.component.rememberAniVuImageLoader
 import java.util.Locale
 
 @Composable
@@ -64,14 +65,13 @@ fun Media1Item(
 ) {
     val context = LocalContext.current
     var expandMenu by rememberSaveable { mutableStateOf(false) }
-    val retriever: MediaMetadataRetriever = remember { MediaMetadataRetriever() }
 
-    val isMedia = rememberSaveable(data) { data.isMedia }
-    val isDir = rememberSaveable(data) { data.isDir }
-
-    val fileNameWithoutExtension = if (isDir) data.name else data.name.substringBeforeLast(".")
-    val fileExtension = if (isDir) "" else data.name.substringAfterLast(".", "")
-
+    val fileNameWithoutExtension = rememberSaveable(data) {
+        if (data.isDir) data.name else data.name.substringBeforeLast(".")
+    }
+    val fileExtension = rememberSaveable(data) {
+        if (data.isDir) "" else data.name.substringAfterLast(".", "")
+    }
 
     Row(
         modifier = Modifier
@@ -85,18 +85,19 @@ fun Media1Item(
                         expandMenu = false
                         onLongClick(data)
                     }
-                }
-            ) {
-                if (isDir) {
-                    onOpenDir(data)
-                } else if (isMedia) {
-                    onPlay(data)
-                } else {
-                    data.file
-                        .toUri(context)
-                        .openWith(context)
-                }
-            }
+                },
+                onClick = {
+                    if (data.isDir) {
+                        onOpenDir(data)
+                    } else if (data.isMedia) {
+                        onPlay(data)
+                    } else {
+                        data.file
+                            .toUri(context)
+                            .openWith(context)
+                    }
+                },
+            )
             .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -106,7 +107,7 @@ fun Media1Item(
                 .size(50.dp),
             contentAlignment = Alignment.Center,
         ) {
-            var bitmap by remember(data) { mutableStateOf<Bitmap?>(null) }
+            var showThumbnail by remember(data) { mutableStateOf(true) }
             val fileIcon = @Composable {
                 Icon(
                     modifier = Modifier.size(25.dp),
@@ -114,16 +115,24 @@ fun Media1Item(
                     contentDescription = null
                 )
             }
-            if (isMedia) {
-                LaunchedEffect(data) {
-                    bitmap = withContext(Dispatchers.IO) {
-                        getMediaThumbnail(retriever = retriever, file = data.file)
-                    }
-                }
-                if (bitmap != null) {
+            if (data.isMedia) {
+                if (showThumbnail) {
+                    val lifecycleOwner = LocalLifecycleOwner.current
                     AniVuImage(
                         modifier = Modifier.fillMaxSize(),
-                        model = bitmap,
+                        model = remember(data.file.path) {
+                            ImageRequest.Builder(context)
+                                .lifecycle(lifecycleOwner)
+                                .data(data.file.path)
+                                .videoFramePercent(0.5)
+                                .crossfade(true)
+                                .build()
+                        },
+                        imageLoader = rememberAniVuImageLoader(listener = object : EventListener {
+                            override fun onError(request: ImageRequest, result: ErrorResult) {
+                                showThumbnail = false
+                            }
+                        }),
                         contentScale = ContentScale.Crop,
                     )
                 } else {
@@ -144,21 +153,17 @@ fun Media1Item(
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (fileExtension.isNotBlank()) {
-                    Text(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(3.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
-                            .padding(horizontal = 4.dp),
-                        text = fileExtension.uppercase(Locale.getDefault()),
-                        style = MaterialTheme.typography.labelSmall,
-                        fontSize = TextUnit(10f, TextUnitType.Sp),
-                    )
+                    TagText(text = fileExtension.uppercase(Locale.getDefault()))
                     Spacer(modifier = Modifier.width(12.dp))
+                } else if (data.isDir) {
+                    TagText(text = stringResource(id = R.string.folder))
                 }
-                Text(
-                    text = data.size.fileSize(context),
-                    style = MaterialTheme.typography.labelMedium,
-                )
+                if (!data.isDir) {
+                    Text(
+                        text = data.size.fileSize(context),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     text = data.date.toDateTimeString(context = context),
@@ -216,14 +221,15 @@ fun Media1Item(
     }
 }
 
-private fun getMediaThumbnail(retriever: MediaMetadataRetriever, file: File): Bitmap? {
-    runCatching { retriever.setDataSource(file.path) }
-        .onFailure { return null }
-    val duration = retriever
-        .extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-        ?.toLongOrNull() ?: return null
-    return retriever.getFrameAtTime(
-        (1000 * duration) shr 1,
-        MediaMetadataRetriever.OPTION_CLOSEST_SYNC,
+@Composable
+private fun TagText(text: String) {
+    Text(
+        modifier = Modifier
+            .clip(RoundedCornerShape(3.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+            .padding(horizontal = 4.dp),
+        text = text,
+        style = MaterialTheme.typography.labelSmall,
+        fontSize = TextUnit(10f, TextUnitType.Sp),
     )
 }

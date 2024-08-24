@@ -66,6 +66,7 @@ data class BottomBarCallback(
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
+    enabled: () -> Boolean,
     playState: () -> PlayState,
     playStateCallback: PlayStateCallback,
     bottomBarCallback: BottomBarCallback,
@@ -113,6 +114,7 @@ fun BottomBar(
                     .padding(6.dp)
                     .height(10.dp)
                     .weight(1f),
+                enabled = enabled(),
                 value = sliderValue,
                 onValueChange = {
                     valueIsChanging = true
@@ -171,7 +173,7 @@ fun BottomBar(
                     .padding(horizontal = 3.dp)
                     .clip(CircleShape)
                     .height(45.dp)
-                    .clickable(onClick = bottomBarCallback.onSpeedClick)
+                    .clickable(enabled = enabled(), onClick = bottomBarCallback.onSpeedClick)
                     .padding(9.dp)
                     .animateContentSize()
                     // For vertical centering
@@ -184,12 +186,14 @@ fun BottomBar(
             )
             // Audio track button
             BarIconButton(
+                enabled = enabled(),
                 onClick = bottomBarCallback.onAudioTrackClick,
                 imageVector = Icons.Rounded.MusicNote,
                 contentDescription = stringResource(R.string.player_audio_track),
             )
             // Subtitle track button
             BarIconButton(
+                enabled = enabled(),
                 onClick = bottomBarCallback.onSubtitleTrackClick,
                 imageVector = Icons.Rounded.ClosedCaption,
                 contentDescription = stringResource(R.string.player_subtitle_track),

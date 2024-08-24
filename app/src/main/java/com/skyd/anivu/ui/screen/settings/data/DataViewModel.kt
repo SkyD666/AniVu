@@ -67,6 +67,14 @@ class DataViewModel @Inject constructor(
                     DataEvent.ClearCacheResultEvent.Failed(change.msg)
                 }
 
+                is DataPartialStateChange.DeletePlayHistoryResult.Success -> {
+                    DataEvent.DeletePlayHistoryResultEvent.Success(change.count)
+                }
+
+                is DataPartialStateChange.DeletePlayHistoryResult.Failed -> {
+                    DataEvent.DeletePlayHistoryResultEvent.Failed(change.msg)
+                }
+
                 is DataPartialStateChange.DeleteArticleBeforeResult.Success -> {
                     DataEvent.DeleteArticleBeforeResultEvent.Success(
                         appContext.resources.getQuantityString(
@@ -96,6 +104,12 @@ class DataViewModel @Inject constructor(
                     DataPartialStateChange.ClearCacheResult.Success(deletedSize = it)
                 }.startWith(DataPartialStateChange.LoadingDialog.Show)
                     .catchMap { DataPartialStateChange.ClearCacheResult.Failed(it.message.toString()) }
+            },
+            filterIsInstance<DataIntent.DeletePlayHistory>().flatMapConcat {
+                dataRepo.requestDeletePlayHistory().map {
+                    DataPartialStateChange.DeletePlayHistoryResult.Success(count = it)
+                }.startWith(DataPartialStateChange.LoadingDialog.Show)
+                    .catchMap { DataPartialStateChange.DeletePlayHistoryResult.Failed(it.message.toString()) }
             },
             filterIsInstance<DataIntent.DeleteArticleBefore>().flatMapConcat { intent ->
                 dataRepo.requestDeleteArticleBefore(intent.timestamp).map {

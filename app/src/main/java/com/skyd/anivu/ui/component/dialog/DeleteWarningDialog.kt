@@ -28,7 +28,12 @@ fun DeleteWarningDialog(
         text = if (text == null) null else {
             { Text(text = text) }
         },
-        confirmButton = { TextButton(onClick = onConfirm) { Text(confirmText) } },
+        confirmButton = {
+            TextButton(onClick = {
+                onConfirm()
+                onDismiss()
+            }) { Text(confirmText) }
+        },
         dismissButton = { TextButton(onClick = onDismiss) { Text(dismissText) } },
     )
 }

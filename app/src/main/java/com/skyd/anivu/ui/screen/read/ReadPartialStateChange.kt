@@ -78,4 +78,32 @@ internal sealed interface ReadPartialStateChange {
         data class Success(val url: String) : DownloadImage
         data class Failed(val msg: String) : DownloadImage
     }
+
+    sealed interface ShareImage : ReadPartialStateChange {
+        override fun reduce(oldState: ReadState): ReadState {
+            return when (this) {
+                is Success,
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : ShareImage
+        data class Failed(val msg: String) : ShareImage
+    }
+
+    sealed interface CopyImage : ReadPartialStateChange {
+        override fun reduce(oldState: ReadState): ReadState {
+            return when (this) {
+                is Success,
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val url: String) : CopyImage
+        data class Failed(val msg: String) : CopyImage
+    }
 }

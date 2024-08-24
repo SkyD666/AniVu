@@ -39,6 +39,7 @@ sealed interface ImportOpmlConflictStrategy : Parcelable {
                 GroupVo(
                     groupId = groupId,
                     name = group.name,
+                    isExpanded = true,
                 ).toPo()
             )
         } else {

@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal fun BarIconButton(
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     onClick: () -> Unit,
     imageVector: ImageVector,
     contentDescription: String?,
@@ -23,7 +24,7 @@ internal fun BarIconButton(
             .padding(horizontal = 3.dp)
             .clip(CircleShape)
             .size(45.dp)
-            .clickable(onClick = onClick)
+            .clickable(enabled = enabled, onClick = onClick)
             .padding(9.dp)
             .then(modifier),
         imageVector = imageVector,

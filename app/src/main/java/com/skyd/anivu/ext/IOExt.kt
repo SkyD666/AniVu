@@ -1,6 +1,8 @@
 package com.skyd.anivu.ext
 
 import android.content.ActivityNotFoundException
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.Context
 import android.content.Intent
@@ -70,24 +72,33 @@ fun Uri.openWith(context: Context) = openChooser(
     chooserTitle = context.getString(R.string.open_with),
 )
 
-fun Uri.share(context: Context) = openChooser(
+fun Uri.share(context: Context, mimeType: String? = null) = openChooser(
     context = context,
     action = Intent.ACTION_SEND,
     chooserTitle = context.getString(R.string.share),
+    mimeType = mimeType,
 )
 
-private fun Uri.openChooser(context: Context, action: String, chooserTitle: CharSequence) {
+private fun Uri.openChooser(
+    context: Context,
+    action: String,
+    chooserTitle: CharSequence,
+    mimeType: String? = null,
+) {
     try {
-        val mimeType = context.contentResolver.getType(this)
+        val currentMimeType = mimeType ?: context.contentResolver.getType(this)
         val intent = Intent.createChooser(
             Intent().apply {
                 this.action = action
                 putExtra(Intent.EXTRA_STREAM, this@openChooser)
-                setDataAndType(this@openChooser, mimeType)
+                setDataAndType(this@openChooser, currentMimeType)
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             },
             chooserTitle
         )
+        if (context.tryActivity == null) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
         ContextCompat.startActivity(context, intent, null)
     } catch (e: Exception) {
         e.printStackTrace()
@@ -229,3 +240,12 @@ fun File.md5(): String? {
 
 inline val String.extName: String
     get() = substringAfterLast(".", missingDelimiterValue = "")
+
+fun Uri.copyToClipboard(context: Context, mimeType: String? = null) {
+    val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    clipboard.setPrimaryClip(
+        ClipData("AniVu", arrayOf(mimeType), ClipData.Item(this)).apply {
+            addItem(ClipData.Item(this@copyToClipboard))
+        }
+    )
+}

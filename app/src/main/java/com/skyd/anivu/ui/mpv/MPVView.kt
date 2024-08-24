@@ -40,8 +40,12 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    @Volatile
-    private var initialized = false
+    companion object {
+        private const val TAG = "mpv"
+
+        @Volatile
+        private var initialized = false
+    }
 
     fun initialize(
         configDir: String,
@@ -51,7 +55,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         vo: String = "gpu",
     ) {
         if (initialized) return
-        synchronized(this) {
+        synchronized(MPVView::class.java) {
             if (initialized) return
             initialized = true
         }
@@ -126,6 +130,8 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         holder.removeCallback(this)
 
         MPVLib.destroy()
+
+        initialized = false
     }
 
     fun onKey(event: KeyEvent): Boolean {
@@ -332,7 +338,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     val eofReached: Boolean
         get() = MPVLib.getPropertyBoolean("eof-reached")
     val keepOpen: Boolean
-        get() = MPVLib.getPropertyBoolean("keep-open")
+        get() = MPVLib.getPropertyBoolean("keep-open") ?: false
 
     val duration: Int?
         get() = MPVLib.getPropertyInt("duration")
@@ -552,9 +558,5 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     fun addAudio(filePath: String) {
         MPVLib.command(arrayOf("audio-add", filePath, "cached"))
         loadAudioTrack()
-    }
-
-    companion object {
-        private const val TAG = "mpv"
     }
 }

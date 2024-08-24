@@ -18,25 +18,25 @@ interface MviIntent
 
 @Composable
 fun <I : MviIntent, S : MviViewState, E : MviSingleEvent>
-        AbstractMviViewModel<I, S, E>.getDispatcher(startWith: I): (I) -> Unit {
+        AbstractMviViewModel<I, S, E>.getDispatcher(startWith: I?): (I) -> Unit {
     return getDispatcher(Unit, startWith = startWith)
 }
 
 @Composable
 fun <I : MviIntent, S : MviViewState, E : MviSingleEvent>
-        AbstractMviViewModel<I, S, E>.getDispatcher(key1: Any?, startWith: I): (I) -> Unit {
+        AbstractMviViewModel<I, S, E>.getDispatcher(key1: Any?, startWith: I?): (I) -> Unit {
     return getDispatcher(*arrayOf(key1), startWith = startWith)
 }
 
 @Composable
 fun <I : MviIntent, S : MviViewState, E : MviSingleEvent>
-        AbstractMviViewModel<I, S, E>.getDispatcher(vararg keys: Any?, startWith: I): (I) -> Unit {
+        AbstractMviViewModel<I, S, E>.getDispatcher(vararg keys: Any?, startWith: I?): (I) -> Unit {
     val intentChannel = remember(*keys) { Channel<I>(Channel.UNLIMITED) }
     LaunchedEffect(*keys, intentChannel) {
         withContext(Dispatchers.Main.immediate) {
             intentChannel
                 .consumeAsFlow()
-                .startWith(startWith)
+                .run { if (startWith == null) this else startWith(startWith) }
                 .onEach(this@getDispatcher::processIntent)
                 .collect()
         }

@@ -535,6 +535,7 @@ private fun CreateGroupDialog(
                 GroupVo(
                     groupId = UUID.randomUUID().toString(),
                     name = text,
+                    isExpanded = true,
                 )
             )
         },

@@ -23,6 +23,8 @@ open class GroupBean(
     open val previousGroupId: String? = null,
     @ColumnInfo(name = NEXT_GROUP_ID_COLUMN)
     open val nextGroupId: String? = null,
+    @ColumnInfo(name = IS_EXPANDED_COLUMN)
+    open val isExpanded: Boolean = true,
 ) : BaseBean, Parcelable {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -41,7 +43,7 @@ open class GroupBean(
     }
 
     fun toVo(): GroupVo {
-        return GroupVo(groupId, name)
+        return GroupVo(groupId, name, isExpanded)
     }
 
     companion object {
@@ -49,5 +51,6 @@ open class GroupBean(
         const val GROUP_ID_COLUMN = "groupId"
         const val PREVIOUS_GROUP_ID_COLUMN = "previousGroupId"
         const val NEXT_GROUP_ID_COLUMN = "nextGroupId"
+        const val IS_EXPANDED_COLUMN = "isExpanded"
     }
 }

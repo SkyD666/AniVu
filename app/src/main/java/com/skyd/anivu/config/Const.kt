@@ -50,6 +50,9 @@ object Const {
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
         "AniVu"
     ).apply { if (!exists()) mkdirs() }
+    val TEMP_PICTURES_DIR = File(appContext.cacheDir.path, "Pictures").apply {
+        if (!exists()) mkdirs()
+    }
 
     val INTERNAL_STORAGE: String = Environment.getExternalStorageDirectory().absolutePath
 }

@@ -16,6 +16,7 @@ import coil.ImageLoader
 import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
+import coil.decode.VideoFrameDecoder
 
 val Context.activity: Activity
     get() {
@@ -121,5 +122,6 @@ fun Context.imageLoaderBuilder(): ImageLoader.Builder {
                 add(GifDecoder.Factory())
             }
             add(SvgDecoder.Factory())
+            add(VideoFrameDecoder.Factory())
         }
 }
