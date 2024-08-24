@@ -317,8 +317,8 @@
     <string name="player_seek_fast">Fast, but not precise</string>
     <string name="player_seek_exact">Precise, but slow</string>
     <string name="player_config_screen_seek_option">Seek option</string>
-    <string name="read_screen_open_image_in_browser">Open in browser</string>
-    <string name="read_screen_download_image">Download image</string>
+    <string name="read_screen_open_image_in_browser">Open image in browser</string>
+    <string name="read_screen_download_image">Save to gallery</string>
     <string name="read_screen_download_image_success">Save success</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已讀 %d 項</item>
