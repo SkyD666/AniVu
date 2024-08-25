@@ -80,7 +80,7 @@ import com.skyd.anivu.ui.component.shape.CloverShape
 import com.skyd.anivu.ui.component.shape.CurlyCornerShape
 import com.skyd.anivu.ui.component.shape.SquircleShape
 import com.skyd.anivu.ui.screen.about.update.UpdateDialog
-import com.skyd.anivu.ui.screen.license.LICENSE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.about.license.LICENSE_SCREEN_ROUTE
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import kotlinx.coroutines.launch

@@ -21,10 +21,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Clear
@@ -66,10 +64,10 @@ import androidx.navigation.NavOptions
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
@@ -123,7 +121,6 @@ fun SearchScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val searchResultListState = rememberLazyGridState()
@@ -248,14 +245,13 @@ fun SearchScreen(
 
         WaitingDialog(visible = uiState.loadingDialog)
 
-        when (val event = uiEvent) {
-            is SearchEvent.FavoriteArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+        MviEventListener(viewModel.singleEvent) { event ->
+            when (event) {
+                is SearchEvent.FavoriteArticleResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is SearchEvent.ReadArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            null -> Unit
+                is SearchEvent.ReadArticleResultEvent.Failed -> snackbarHostState.showSnackbar(event.msg)
+            }
         }
     }
 }

@@ -30,10 +30,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.VideoBean
@@ -68,10 +68,7 @@ internal fun MediaList(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
     ) { innerPadding ->
-
         val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-        val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
-
         val dispatch = viewModel.getDispatcher(
             path,
             groupInfo?.version,
@@ -132,18 +129,14 @@ internal fun MediaList(
             )
         }
 
-        when (val event = uiEvent) {
-            is MediaListEvent.DeleteFileResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = event.msg, key1 = event
-                )
+        MviEventListener(viewModel.singleEvent) { event ->
+            when (event) {
+                is MediaListEvent.DeleteFileResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is MediaListEvent.MediaListResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = event.msg, key1 = event
-                )
-
-            null -> Unit
+                is MediaListEvent.MediaListResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
+            }
         }
     }
 }

@@ -46,12 +46,12 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.getMimeType
 import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.popBackStackWithLifecycle
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ext.toEncodedUrl
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.ui.component.AniVuIconButton
@@ -132,7 +132,6 @@ fun FilePickerScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val navController = LocalNavController.current
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val dispatch = viewModel.getDispatcher(
         startWith = FilePickerIntent.NewLocation(
             path = path,
@@ -270,11 +269,11 @@ fun FilePickerScreen(
             }
         }
 
-        when (val event = uiEvent) {
-            is FilePickerEvent.FileListResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            null -> Unit
+        MviEventListener(viewModel.singleEvent) { event ->
+            when (event) {
+                is FilePickerEvent.FileListResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
+            }
         }
     }
 }

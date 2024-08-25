@@ -1,23 +1,30 @@
 package com.skyd.anivu.ui.mpv.controller
 
 import android.content.Context
+import android.graphics.Rect
 import android.media.AudioManager
 import android.os.Build
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.window.layout.WindowMetricsCalculator
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.detectDoubleFingerTransformGestures
 import com.skyd.anivu.ext.getScreenBrightness
+import com.skyd.anivu.ext.toRect
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
 import com.skyd.anivu.ui.mpv.controller.state.PlayState
@@ -25,6 +32,25 @@ import com.skyd.anivu.ui.mpv.controller.state.PlayStateCallback
 import com.skyd.anivu.ui.mpv.controller.state.TransformState
 import com.skyd.anivu.ui.mpv.controller.state.TransformStateCallback
 import kotlin.math.abs
+
+private val inSystemBarArea: PointerInputScope.(
+    context: Context,
+    safeGestures: Rect,
+    x: Float,
+    y: Float,
+) -> Boolean = { context, safeGestures, x, y ->
+    val bounds = WindowMetricsCalculator
+        .getOrCreate()
+        .computeCurrentWindowMetrics(context)
+        .bounds
+    val width = bounds.width()
+    val height = bounds.height()
+    val inGesturesArea = x <= safeGestures.left ||
+            x >= width - safeGestures.right ||
+            y <= safeGestures.top ||
+            y >= height - safeGestures.bottom
+    inGesturesArea || y / density <= 60 || (width - x) / density <= 60
+}
 
 @Composable
 internal fun Modifier.detectPressGestures(
@@ -132,6 +158,7 @@ internal fun Modifier.detectControllerGestures(
         return this
     }
 
+    val safeGestures by rememberUpdatedState(newValue = WindowInsets.safeGestures.toRect())
     var pointerStartX by rememberSaveable { mutableFloatStateOf(0f) }
     var pointerStartY by rememberSaveable { mutableFloatStateOf(0f) }
 
@@ -155,6 +182,9 @@ internal fun Modifier.detectControllerGestures(
                 cancelAutoHideControllerRunnable()
                 pointerStartX = it.x
                 pointerStartY = it.y
+                if (inSystemBarArea(context, safeGestures, it.x, it.y)) {
+                    return@onVerticalDragStart
+                }
                 when (pointerStartX) {
                     in 0f..controllerWidth() / 3f -> {
                         onBrightnessRangeChanged(0.01f..1f)
@@ -191,7 +221,9 @@ internal fun Modifier.detectControllerGestures(
             },
             onVerticalDrag = onVerticalDrag@{ change, _ ->
                 val deltaY = change.position.y - pointerStartY
-                if (abs(deltaY) < 50) {
+                if (inSystemBarArea(context, safeGestures, pointerStartX, pointerStartY) ||
+                    abs(deltaY) < 50
+                ) {
                     return@onVerticalDrag
                 }
                 when (pointerStartX) {
@@ -217,6 +249,9 @@ internal fun Modifier.detectControllerGestures(
                 cancelAutoHideControllerRunnable()
                 pointerStartX = it.x
                 pointerStartY = it.y
+                if (inSystemBarArea(context, safeGestures, it.x, it.y)) {
+                    return@onHorizontalDragStart
+                }
                 seekTimePreviewStartPosition = playState().currentPosition
                 seekTimePreviewPositionDelta = 0
                 onShowSeekTimePreview(true)
@@ -224,6 +259,9 @@ internal fun Modifier.detectControllerGestures(
             onHorizontalDragEnd = onHorizontalDragEnd@{
                 onShowSeekTimePreview(false)
                 restartAutoHideControllerRunnable()
+                if (inSystemBarArea(context, safeGestures, pointerStartX, pointerStartY)) {
+                    return@onHorizontalDragEnd
+                }
                 playStateCallback.onSeekTo(seekTimePreviewStartPosition + seekTimePreviewPositionDelta)
             },
             onHorizontalDragCancel = {
@@ -231,6 +269,9 @@ internal fun Modifier.detectControllerGestures(
                 restartAutoHideControllerRunnable()
             },
             onHorizontalDrag = onHorizontalDrag@{ change, _ ->
+                if (inSystemBarArea(context, safeGestures, pointerStartX, pointerStartY)) {
+                    return@onHorizontalDrag
+                }
                 seekTimePreviewPositionDelta =
                     ((change.position.x - pointerStartX) / density / 8).toInt()
                 onTimePreviewChanged(seekTimePreviewStartPosition + seekTimePreviewPositionDelta)

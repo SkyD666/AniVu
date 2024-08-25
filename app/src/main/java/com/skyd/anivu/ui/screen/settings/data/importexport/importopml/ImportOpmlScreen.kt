@@ -39,11 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.safeLaunch
 import com.skyd.anivu.ext.showSnackbar
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.repository.importexport.ImportOpmlConflictStrategy
 import com.skyd.anivu.ui.component.AniVuExtendedFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -62,7 +62,6 @@ fun ImportOpmlScreen(viewModel: ImportOpmlViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val importedStickerProxyList = rememberSaveable {
         listOf(ImportOpmlConflictStrategy.SkipStrategy, ImportOpmlConflictStrategy.ReplaceStrategy)
     }
@@ -165,24 +164,19 @@ fun ImportOpmlScreen(viewModel: ImportOpmlViewModel = hiltViewModel()) {
 
     WaitingDialog(visible = uiState.loadingDialog)
 
-    when (val event = uiEvent) {
-        is ImportOpmlEvent.ImportOpmlResultEvent.Success ->
-            snackbarHostState.showSnackbarWithLaunchedEffect(
-                message = context.resources.getQuantityString(
+    MviEventListener(viewModel.singleEvent) { event ->
+        when (event) {
+            is ImportOpmlEvent.ImportOpmlResultEvent.Success -> snackbarHostState.showSnackbar(
+                context.resources.getQuantityString(
                     R.plurals.import_opml_result,
                     event.result.importedFeedCount,
                     event.result.importedFeedCount,
                     event.result.time / 1000f,
                 ),
-                key2 = event,
             )
 
-        is ImportOpmlEvent.ImportOpmlResultEvent.Failed ->
-            snackbarHostState.showSnackbarWithLaunchedEffect(
-                message = context.getString(R.string.failed_msg, event.msg),
-                key2 = event,
-            )
-
-        null -> Unit
+            is ImportOpmlEvent.ImportOpmlResultEvent.Failed ->
+                snackbarHostState.showSnackbar(context.getString(R.string.failed_msg, event.msg))
+        }
     }
 }

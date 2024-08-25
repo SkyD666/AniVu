@@ -16,7 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBackIosNew
+import androidx.compose.material.icons.automirrored.outlined.ArrowBackIos
 import androidx.compose.material.icons.outlined.PictureInPictureAlt
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -66,7 +66,7 @@ internal fun TopBar(
                 .size(56.dp)
                 .clickable(onClick = topBarCallback.onBack)
                 .padding(15.dp),
-            imageVector = Icons.Outlined.ArrowBackIosNew,
+            imageVector = Icons.AutoMirrored.Outlined.ArrowBackIos,
             contentDescription = stringResource(id = R.string.back),
         )
         Spacer(modifier = Modifier.width(3.dp))

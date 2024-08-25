@@ -338,10 +338,7 @@ private fun LinkArea(link: String, onLinkClick: () -> Unit) {
         text = link,
         contentDescription = stringResource(id = R.string.feed_screen_rss_url),
         onClick = onLinkClick,
-        onLongClick = {
-            link.copy(context)
-            context.getString(R.string.copied).showToast()
-        },
+        onLongClick = { link.copy(context) },
         onIconClick = { link.openBrowser(context) },
     )
 }

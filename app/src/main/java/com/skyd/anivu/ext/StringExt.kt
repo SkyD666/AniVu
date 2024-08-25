@@ -4,7 +4,10 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import androidx.core.text.parseAsHtml
+import com.skyd.anivu.R
+import com.skyd.anivu.ui.component.showToast
 import net.dankito.readability4j.extended.Readability4JExtended
 
 fun String.toEncodedUrl(allow: String? = ":/-![].,%?&="): String {
@@ -24,6 +27,10 @@ fun String.copy(context: Context) {
     try {
         val systemService = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         systemService.setPrimaryClip(ClipData.newPlainText("text", this))
+        // If you show a copy confirmation toast in Android 13, the user sees duplicate messages.
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+            context.getString(R.string.copied).showToast()
+        }
     } catch (e: Exception) {
         e.printStackTrace()
     }

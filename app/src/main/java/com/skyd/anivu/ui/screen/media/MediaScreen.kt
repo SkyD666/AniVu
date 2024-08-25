@@ -31,9 +31,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,10 +50,10 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.isCompact
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.ui.activity.PlayActivity
@@ -79,7 +77,7 @@ const val MEDIA_SCREEN_ROUTE = "mediaScreen"
 
 @Composable
 fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
     val navController = LocalNavController.current
     val context = LocalContext.current
@@ -91,7 +89,6 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
 
     val dispatch = viewModel.getDispatcher(key1 = path, startWith = MediaIntent.Init(path = path))
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
 
     val pagerState = rememberPagerState(pageCount = { uiState.groups.size })
     var openEditGroupDialog by rememberSaveable { mutableStateOf<MediaGroupBean?>(value = null) }
@@ -270,46 +267,34 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
             }
         )
 
-        when (val event = uiEvent) {
-            is MediaEvent.CreateGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = event.msg, key1 = event
-                )
+        MviEventListener(viewModel.singleEvent) { event ->
+            when (event) {
+                is MediaEvent.CreateGroupResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is MediaEvent.DeleteGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = event.msg,
-                    key1 = event
-                )
+                is MediaEvent.DeleteGroupResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is MediaEvent.EditGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = event.msg, key1 = event
-                )
+                is MediaEvent.EditGroupResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is MediaEvent.MoveFilesToGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = event.msg, key1 = event
-                )
+                is MediaEvent.MoveFilesToGroupResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is MediaEvent.ChangeFileGroupResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = event.msg, key1 = event
-                )
+                is MediaEvent.ChangeFileGroupResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is MediaEvent.EditGroupResultEvent.Success -> LaunchedEffect(event) {
-                dispatch(MediaIntent.Refresh(path = path))
-                if (openEditGroupDialog != null) openEditGroupDialog = event.group
+                is MediaEvent.EditGroupResultEvent.Success -> {
+                    dispatch(MediaIntent.Refresh(path = path))
+                    if (openEditGroupDialog != null) openEditGroupDialog = event.group
+                }
+
+                is MediaEvent.CreateGroupResultEvent.Success,
+                is MediaEvent.DeleteGroupResultEvent.Success,
+                is MediaEvent.ChangeFileGroupResultEvent.Success,
+                is MediaEvent.MoveFilesToGroupResultEvent.Success ->
+                    dispatch(MediaIntent.Refresh(path = path))
             }
-
-            is MediaEvent.CreateGroupResultEvent.Success,
-            is MediaEvent.DeleteGroupResultEvent.Success,
-            is MediaEvent.ChangeFileGroupResultEvent.Success,
-            is MediaEvent.MoveFilesToGroupResultEvent.Success -> LaunchedEffect(event) {
-                dispatch(MediaIntent.Refresh(path = path))
-            }
-
-            null -> Unit
         }
     }
 

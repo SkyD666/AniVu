@@ -74,11 +74,11 @@ fun <T> Flow<Flow<T>>.flattenFirst(): Flow<T> = channelFlow {
     }
 }
 
-// 用感知生命周期的方式收集流
+// collect with lifecycle
 fun <T> Flow<T>.collectIn(
     lifecycleOwner: LifecycleOwner,
     minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
-    action: (T) -> Unit
+    action: suspend (T) -> Unit = {},
 ): Job = lifecycleOwner.lifecycleScope.launch {
     flowWithLifecycle(lifecycleOwner.lifecycle, minActiveState).collect(action)
 }

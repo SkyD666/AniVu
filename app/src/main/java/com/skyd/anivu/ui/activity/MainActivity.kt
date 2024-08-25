@@ -77,8 +77,8 @@ import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.filepicker.FilePickerScreen
 import com.skyd.anivu.ui.screen.filepicker.PATH_KEY
 import com.skyd.anivu.ui.screen.filepicker.PICK_FOLDER_KEY
-import com.skyd.anivu.ui.screen.license.LICENSE_SCREEN_ROUTE
-import com.skyd.anivu.ui.screen.license.LicenseScreen
+import com.skyd.anivu.ui.screen.about.license.LICENSE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.about.license.LicenseScreen
 import com.skyd.anivu.ui.screen.media.sub.SUB_MEDIA_SCREEN_PATH_KEY
 import com.skyd.anivu.ui.screen.media.sub.SUB_MEDIA_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.media.sub.SubMediaScreenRoute

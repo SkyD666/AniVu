@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,11 +47,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toEncodedUrl
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
@@ -80,14 +81,13 @@ fun openReadScreen(
 
 @Composable
 fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val context = LocalContext.current
 
     val snackbarHostState = remember { SnackbarHostState() }
     var openEnclosureBottomSheet by rememberSaveable { mutableStateOf<List<Any>?>(null) }
 
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val dispatcher = viewModel.getDispatcher(startWith = ReadIntent.Init(articleId))
 
     var fabHeight by remember { mutableStateOf(0.dp) }
@@ -155,6 +155,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
         Column(
             modifier = Modifier
                 .fillMaxHeight()
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
                 .padding(paddingValues + 16.dp)
                 .padding(bottom = fabHeight),
@@ -188,31 +189,18 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             }
         }
 
-        when (val event = uiEvent) {
-            is ReadEvent.FavoriteArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+        MviEventListener(viewModel.singleEvent) { event ->
+            when (event) {
+                is ReadEvent.FavoriteArticleResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is ReadEvent.ReadArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is ReadEvent.ShareImageResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is ReadEvent.CopyImageResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is ReadEvent.CopyImageResultEvent.Success ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = stringResource(R.string.copied),
-                    key1 = event,
-                )
-
-            is ReadEvent.DownloadImageResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            is ReadEvent.DownloadImageResultEvent.Success,
-            null -> Unit
-
+                is ReadEvent.ReadArticleResultEvent.Failed -> snackbarHostState.showSnackbar(event.msg)
+                is ReadEvent.ShareImageResultEvent.Failed -> snackbarHostState.showSnackbar(event.msg)
+                is ReadEvent.CopyImageResultEvent.Failed -> snackbarHostState.showSnackbar(event.msg)
+                is ReadEvent.DownloadImageResultEvent.Failed -> snackbarHostState.showSnackbar(event.msg)
+                is ReadEvent.CopyImageResultEvent.Success,
+                is ReadEvent.DownloadImageResultEvent.Success -> Unit
+            }
         }
 
         WaitingDialog(visible = uiState.loadingDialog)

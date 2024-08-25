@@ -1,4 +1,4 @@
-package com.skyd.anivu.ui.screen.license
+package com.skyd.anivu.ui.screen.about.license
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -176,6 +176,11 @@ private fun getLicenseList(): List<LicenseBean> {
             name = "Lottie",
             license = "MIT",
             link = "https://github.com/airbnb/lottie",
+        ),
+        LicenseBean(
+            name = "Reorderable",
+            license = "Apache-2.0",
+            link = "https://github.com/Calvin-LL/Reorderable",
         ),
     ).sortedBy { it.name }
 }

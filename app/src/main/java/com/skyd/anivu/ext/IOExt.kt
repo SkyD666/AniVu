@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.webkit.URLUtil
@@ -244,8 +245,10 @@ inline val String.extName: String
 fun Uri.copyToClipboard(context: Context, mimeType: String? = null) {
     val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     clipboard.setPrimaryClip(
-        ClipData("AniVu", arrayOf(mimeType), ClipData.Item(this)).apply {
-            addItem(ClipData.Item(this@copyToClipboard))
-        }
+        ClipData(context.applicationInfo.name, arrayOf(mimeType), ClipData.Item(this))
     )
+    // If you show a copy confirmation toast in Android 13, the user sees duplicate messages.
+    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.S_V2) {
+        context.getString(R.string.copied).showToast()
+    }
 }

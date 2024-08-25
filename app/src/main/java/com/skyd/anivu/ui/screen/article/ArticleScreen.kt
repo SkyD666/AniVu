@@ -63,11 +63,11 @@ import androidx.navigation.NavOptions
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.popBackStackWithLifecycle
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.model.repository.ArticleSort
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
@@ -152,7 +152,6 @@ private fun ArticleContentScreen(
 
     val dispatch = viewModel.getDispatcher(feedUrls, startWith = ArticleIntent.Init(feedUrls))
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -269,20 +268,20 @@ private fun ArticleContentScreen(
 
         WaitingDialog(visible = uiState.loadingDialog)
 
-        when (val event = uiEvent) {
-            is ArticleEvent.InitArticleListResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+        MviEventListener(viewModel.singleEvent) { event ->
+            when (event) {
+                is ArticleEvent.InitArticleListResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is ArticleEvent.RefreshArticleListResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+                is ArticleEvent.RefreshArticleListResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is ArticleEvent.FavoriteArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+                is ArticleEvent.FavoriteArticleResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is ArticleEvent.ReadArticleResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-            null -> Unit
+                is ArticleEvent.ReadArticleResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
+            }
         }
     }
 }

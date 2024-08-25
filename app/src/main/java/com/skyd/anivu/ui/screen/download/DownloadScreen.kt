@@ -72,7 +72,7 @@ fun openDownloadScreen(
 
 @Composable
 fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = hiltViewModel()) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }

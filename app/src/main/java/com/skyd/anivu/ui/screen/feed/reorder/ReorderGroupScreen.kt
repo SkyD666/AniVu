@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.screen.feed.reorder
 
-import android.view.HapticFeedbackConstants
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -35,15 +34,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -62,7 +60,6 @@ fun ReorderGroupScreen(viewModel: ReorderGroupViewModel = hiltViewModel()) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val dispatcher = viewModel.getDispatcher(startWith = ReorderGroupIntent.Init)
 
     Scaffold(
@@ -95,14 +92,15 @@ fun ReorderGroupScreen(viewModel: ReorderGroupViewModel = hiltViewModel()) {
             }
         }
 
-        when (val event = uiEvent) {
-            is ReorderGroupEvent.GroupListResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+        MviEventListener(viewModel.singleEvent) { event ->
+            when (event) {
+                is ReorderGroupEvent.GroupListResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is ReorderGroupEvent.ReorderResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+                is ReorderGroupEvent.ReorderResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            null -> Unit
+            }
         }
 
         WaitingDialog(visible = uiState.loadingDialog)

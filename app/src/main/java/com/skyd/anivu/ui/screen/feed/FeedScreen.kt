@@ -58,19 +58,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.ext.snapshotStateMapSaver
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedBean.Companion.isDefaultGroup
@@ -83,7 +82,6 @@ import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.ClipboardTextField
-import com.skyd.anivu.ui.component.Toast
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
@@ -92,6 +90,7 @@ import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.DefaultGroup1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Feed1Proxy
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Group1Proxy
+import com.skyd.anivu.ui.component.showToast
 import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
 import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
@@ -177,6 +176,7 @@ private fun FeedList(
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val navController = LocalNavController.current
+    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val windowSizeClass = LocalWindowSizeClass.current
     var openMoreMenu by rememberSaveable { mutableStateOf(false) }
@@ -192,7 +192,6 @@ private fun FeedList(
     var fabWidth by remember { mutableStateOf(0.dp) }
 
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val dispatch = viewModel.getDispatcher(startWith = FeedIntent.Init)
 
     Scaffold(
@@ -282,51 +281,47 @@ private fun FeedList(
             }
         }
 
-        when (val event = uiEvent) {
-            is FeedEvent.AddFeedResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+        MviEventListener(viewModel.singleEvent) { event ->
+            when (event) {
+                is FeedEvent.AddFeedResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is FeedEvent.InitFeetListResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+                is FeedEvent.InitFeetListResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is FeedEvent.EditFeedResultEvent.Failed -> Toast(event, text = event.msg)
-            is FeedEvent.RemoveFeedResultEvent.Failed -> Toast(event, text = event.msg)
-            is FeedEvent.RefreshFeedResultEvent.Failed -> Toast(event, text = event.msg)
-            is FeedEvent.CreateGroupResultEvent.Failed -> Toast(event, text = event.msg)
-            is FeedEvent.MoveFeedsToGroupResultEvent.Failed -> Toast(event, text = event.msg)
-            is FeedEvent.DeleteGroupResultEvent.Failed -> Toast(event, text = event.msg)
-            is FeedEvent.EditGroupResultEvent.Failed -> Toast(event, text = event.msg)
-            is FeedEvent.ReadAllResultEvent.Failed -> Toast(event, text = event.msg)
+                is FeedEvent.EditFeedResultEvent.Failed -> event.msg.showToast()
+                is FeedEvent.RemoveFeedResultEvent.Failed -> event.msg.showToast()
+                is FeedEvent.RefreshFeedResultEvent.Failed -> event.msg.showToast()
+                is FeedEvent.CreateGroupResultEvent.Failed -> event.msg.showToast()
+                is FeedEvent.MoveFeedsToGroupResultEvent.Failed -> event.msg.showToast()
+                is FeedEvent.DeleteGroupResultEvent.Failed -> event.msg.showToast()
+                is FeedEvent.EditGroupResultEvent.Failed -> event.msg.showToast()
+                is FeedEvent.ReadAllResultEvent.Failed -> event.msg.showToast()
 
-            is FeedEvent.EditFeedResultEvent.Success -> LaunchedEffect(event) {
-                if (openEditFeedDialog != null) openEditFeedDialog = event.feed
-            }
+                is FeedEvent.EditFeedResultEvent.Success -> {
+                    if (openEditFeedDialog != null) openEditFeedDialog = event.feed
+                }
 
-            is FeedEvent.EditGroupResultEvent.Success -> LaunchedEffect(event) {
-                if (openEditGroupDialog != null) openEditGroupDialog = event.group
-            }
+                is FeedEvent.EditGroupResultEvent.Success -> {
+                    if (openEditGroupDialog != null) openEditGroupDialog = event.group
+                }
 
-            is FeedEvent.AddFeedResultEvent.Success -> LaunchedEffect(event) {
-                openEditFeedDialog = event.feed
-            }
+                is FeedEvent.AddFeedResultEvent.Success -> openEditFeedDialog = event.feed
 
-            is FeedEvent.ReadAllResultEvent.Success ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = pluralStringResource(
-                        id = R.plurals.feed_screen_read_all_result,
-                        count = event.count,
+                is FeedEvent.ReadAllResultEvent.Success -> snackbarHostState.showSnackbar(
+                    context.resources.getQuantityString(
+                        R.plurals.feed_screen_read_all_result,
+                        event.count,
                         event.count,
                     ),
-                    key1 = event,
                 )
 
-            FeedEvent.RemoveFeedResultEvent.Success,
-            is FeedEvent.RefreshFeedResultEvent.Success,
-            FeedEvent.CreateGroupResultEvent.Success,
-            FeedEvent.MoveFeedsToGroupResultEvent.Success,
-            FeedEvent.DeleteGroupResultEvent.Success,
-            null -> Unit
-
+                FeedEvent.RemoveFeedResultEvent.Success,
+                is FeedEvent.RefreshFeedResultEvent.Success,
+                FeedEvent.CreateGroupResultEvent.Success,
+                FeedEvent.MoveFeedsToGroupResultEvent.Success,
+                FeedEvent.DeleteGroupResultEvent.Success -> Unit
+            }
         }
 
         if (openAddDialog) {

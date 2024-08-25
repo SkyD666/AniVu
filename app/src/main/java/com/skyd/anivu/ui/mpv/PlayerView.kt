@@ -21,6 +21,7 @@ import androidx.core.view.doOnDetach
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.activity
@@ -157,7 +158,6 @@ fun PlayerView(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
     val dispatcher = viewModel.getDispatcher(startWith = null)
 
@@ -299,13 +299,14 @@ fun PlayerView(
         }
     }
 
-    when (val event = uiEvent) {
-        is PlayerEvent.TrySeekToLastResultEvent.Success -> LaunchedEffect(Unit) {
-            commandQueue.trySend(PlayerCommand.SeekTo((event.position / 1000).toInt().coerceAtLeast(0)))
-        }
+    MviEventListener(viewModel.singleEvent) { event ->
+        when (event) {
+            is PlayerEvent.TrySeekToLastResultEvent.Success -> commandQueue.trySend(
+                PlayerCommand.SeekTo((event.position / 1000).toInt().coerceAtLeast(0))
+            )
 
-        PlayerEvent.TrySeekToLastResultEvent.NoNeed,
-        null -> Unit
+            PlayerEvent.TrySeekToLastResultEvent.NoNeed -> Unit
+        }
     }
 
     val autoPip = LocalPlayerAutoPip.current

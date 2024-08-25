@@ -69,16 +69,13 @@ class ReadRepository @Inject constructor(
     fun shareImage(url: String): Flow<Unit> {
         return flow {
             val imageFile = getImageByCoil(url)
-            val tempImg = File(TEMP_PICTURES_DIR, imageFile.name)
+            val format = imageFile.inputStream().use { ImageFormatChecker.check(it) }
+            val tempImg = File(TEMP_PICTURES_DIR, imageFile.name + format.toString())
             imageFile.copyTo(tempImg, overwrite = true)
-
-            val nowTime = System.currentTimeMillis().milliseconds
 
             coroutineScope { deleteOldTempFiles(currentFile = imageFile) }
 
-            val format = tempImg.inputStream().use { ImageFormatChecker.check(it) }
             tempImg.toUri(appContext).share(appContext, mimeType = format.toMimeType())
-
             emit(Unit)
         }.flowOn(Dispatchers.IO)
     }
@@ -86,14 +83,13 @@ class ReadRepository @Inject constructor(
     fun copyImage(url: String): Flow<Unit> {
         return flow {
             val imageFile = getImageByCoil(url)
-            val tempImg = File(TEMP_PICTURES_DIR, imageFile.name)
+            val format = imageFile.inputStream().use { ImageFormatChecker.check(it) }
+            val tempImg = File(TEMP_PICTURES_DIR, imageFile.name + format.toString())
             imageFile.copyTo(tempImg, overwrite = true)
 
             coroutineScope { deleteOldTempFiles(currentFile = imageFile) }
 
-            val format = tempImg.inputStream().use { ImageFormatChecker.check(it) }
             tempImg.toUri(appContext).copyToClipboard(appContext, format.toMimeType())
-
             emit(Unit)
         }.flowOn(Dispatchers.IO)
     }

@@ -32,11 +32,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.safeLaunch
 import com.skyd.anivu.ext.showSnackbar
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
 import com.skyd.anivu.ui.component.AniVuExtendedFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -55,8 +55,6 @@ fun ExportOpmlScreen(viewModel: ExportOpmlViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
-
     val dispatch = viewModel.getDispatcher(startWith = ExportOpmlIntent.Init)
 
     val exportDir = LocalOpmlExportDir.current
@@ -122,16 +120,12 @@ fun ExportOpmlScreen(viewModel: ExportOpmlViewModel = hiltViewModel()) {
 
     WaitingDialog(visible = uiState.loadingDialog)
 
-    when (val event = uiEvent) {
-        is ExportOpmlEvent.ExportOpmlResultEvent.Failed ->
-            snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
-
-        is ExportOpmlEvent.ExportOpmlResultEvent.Success ->
-            snackbarHostState.showSnackbarWithLaunchedEffect(
-                message = stringResource(id = R.string.success_time_msg, event.time / 1000f),
-                key1 = event,
+    MviEventListener(viewModel.singleEvent) { event ->
+        when (event) {
+            is ExportOpmlEvent.ExportOpmlResultEvent.Failed -> snackbarHostState.showSnackbar(event.msg)
+            is ExportOpmlEvent.ExportOpmlResultEvent.Success -> snackbarHostState.showSnackbar(
+                context.getString(R.string.success_time_msg, event.time / 1000f),
             )
-
-        null -> Unit
+        }
     }
 }

@@ -35,8 +35,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
+import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
-import com.skyd.anivu.ext.showSnackbarWithLaunchedEffect
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -64,7 +64,6 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
     val context = LocalContext.current
 
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val uiEvent by viewModel.singleEvent.collectAsStateWithLifecycle(initialValue = null)
     val dispatch = viewModel.getDispatcher(startWith = DataIntent.Init)
 
     ListenToFilePicker { result ->
@@ -198,32 +197,31 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
 
         WaitingDialog(visible = uiState.loadingDialog)
 
-        when (val event = uiEvent) {
-            is DataEvent.ClearCacheResultEvent.Success ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+        MviEventListener(viewModel.singleEvent) { event ->
+            when (event) {
+                is DataEvent.ClearCacheResultEvent.Success ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is DataEvent.ClearCacheResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+                is DataEvent.ClearCacheResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is DataEvent.DeleteArticleBeforeResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+                is DataEvent.DeleteArticleBeforeResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is DataEvent.DeleteArticleBeforeResultEvent.Success ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+                is DataEvent.DeleteArticleBeforeResultEvent.Success ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is DataEvent.DeletePlayHistoryResultEvent.Failed ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(message = event.msg, key1 = event)
+                is DataEvent.DeletePlayHistoryResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
 
-            is DataEvent.DeletePlayHistoryResultEvent.Success ->
-                snackbarHostState.showSnackbarWithLaunchedEffect(
-                    message = stringResource(
-                        R.string.data_screen_clear_play_history_success,
-                        event.count
-                    ),
-                    key1 = event
-                )
-
-            null -> Unit
+                is DataEvent.DeletePlayHistoryResultEvent.Success ->
+                    snackbarHostState.showSnackbar(
+                        context.getString(
+                            R.string.data_screen_clear_play_history_success,
+                            event.count
+                        )
+                    )
+            }
         }
     }
 }
