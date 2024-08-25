@@ -2,7 +2,12 @@ package com.skyd.anivu.ui.mpv.controller.button
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CameraAlt
@@ -24,6 +29,7 @@ internal fun Screenshot(
 ) {
     Icon(
         modifier = modifier
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.End))
             .clip(RoundedCornerShape(6.dp))
             .background(color = ControllerLabelGray)
             .clickable(onClick = onClick)
