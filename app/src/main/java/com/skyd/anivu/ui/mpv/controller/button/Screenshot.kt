@@ -29,11 +29,7 @@ internal fun Screenshot(
 ) {
     Icon(
         modifier = modifier
-            .windowInsetsPadding(
-                WindowInsets.safeDrawing.only(
-                    WindowInsetsSides.Horizontal
-                )
-            )
+            .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Horizontal))
             .clip(RoundedCornerShape(6.dp))
             .background(color = ControllerLabelGray)
             .clickable(onClick = onClick)

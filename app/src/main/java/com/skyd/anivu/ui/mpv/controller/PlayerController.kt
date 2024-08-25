@@ -129,51 +129,6 @@ internal fun PlayerController(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .windowInsetsPadding(WindowInsets.safeGestures)
-                // detectControllerGestures should be called before detectPressGestures
-                // to avoid responding to swipes when long pressing
-                .detectControllerGestures(
-                    enabled = enabled,
-                    controllerWidth = { controllerWidth },
-                    controllerHeight = { controllerHeight },
-                    onShowBrightness = { showBrightnessPreview = it },
-                    onBrightnessRangeChanged = { brightnessRange = it },
-                    onBrightnessChanged = { brightnessValue = it },
-                    onShowVolume = { showVolumePreview = it },
-                    onVolumeRangeChanged = { volumeRange = it },
-                    onVolumeChanged = { volumeValue = it },
-                    playState = playState,
-                    playStateCallback = playStateCallback,
-                    onShowSeekTimePreview = { showSeekTimePreview = it },
-                    onTimePreviewChanged = { seekTimePreview = it },
-                    transformState = transformState,
-                    transformStateCallback = transformStateCallback,
-                    cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
-                    restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
-                )
-                .detectPressGestures(
-                    controllerWidth = { controllerWidth },
-                    playState = playState,
-                    playStateCallback = playStateCallback,
-                    showController = { showController },
-                    onShowControllerChanged = { showController = it },
-                    isLongPressing = { isLongPressing },
-                    isLongPressingChanged = { isLongPressing = it },
-                    onShowForwardRipple = {
-                        forwardRippleStartControllerOffset = it
-                        showForwardRipple = true
-                    },
-                    onShowBackwardRipple = {
-                        backwardRippleStartControllerOffset = it
-                        showBackwardRipple = true
-                    },
-                    cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
-                    restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
-                )
-        )
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
                 .onGloballyPositioned {
                     controllerWidth = it.size.width
                     controllerHeight = it.size.height
@@ -287,6 +242,51 @@ internal fun PlayerController(
                     WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
         }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .windowInsetsPadding(WindowInsets.safeGestures)
+                // detectControllerGestures should be called before detectPressGestures
+                // to avoid responding to swipes when long pressing
+                .detectControllerGestures(
+                    enabled = enabled,
+                    controllerWidth = { controllerWidth },
+                    controllerHeight = { controllerHeight },
+                    onShowBrightness = { showBrightnessPreview = it },
+                    onBrightnessRangeChanged = { brightnessRange = it },
+                    onBrightnessChanged = { brightnessValue = it },
+                    onShowVolume = { showVolumePreview = it },
+                    onVolumeRangeChanged = { volumeRange = it },
+                    onVolumeChanged = { volumeValue = it },
+                    playState = playState,
+                    playStateCallback = playStateCallback,
+                    onShowSeekTimePreview = { showSeekTimePreview = it },
+                    onTimePreviewChanged = { seekTimePreview = it },
+                    transformState = transformState,
+                    transformStateCallback = transformStateCallback,
+                    cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
+                    restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
+                )
+                .detectPressGestures(
+                    controllerWidth = { controllerWidth },
+                    playState = playState,
+                    playStateCallback = playStateCallback,
+                    showController = { showController },
+                    onShowControllerChanged = { showController = it },
+                    isLongPressing = { isLongPressing },
+                    isLongPressingChanged = { isLongPressing = it },
+                    onShowForwardRipple = {
+                        forwardRippleStartControllerOffset = it
+                        showForwardRipple = true
+                    },
+                    onShowBackwardRipple = {
+                        backwardRippleStartControllerOffset = it
+                        showBackwardRipple = true
+                    },
+                    cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
+                    restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
+                )
+        )
     }
 }
 
