@@ -10,8 +10,11 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeGestures
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FastForward
 import androidx.compose.material.icons.rounded.FastRewind
@@ -126,11 +129,7 @@ internal fun PlayerController(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .onGloballyPositioned {
-                    controllerWidth = it.size.width
-                    controllerHeight = it.size.height
-                    controllerLayoutCoordinates = it
-                }
+                .windowInsetsPadding(WindowInsets.safeGestures)
                 // detectControllerGestures should be called before detectPressGestures
                 // to avoid responding to swipes when long pressing
                 .detectControllerGestures(
@@ -171,6 +170,15 @@ internal fun PlayerController(
                     cancelAutoHideControllerRunnable = cancelAutoHideControllerRunnable,
                     restartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
                 )
+        )
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .onGloballyPositioned {
+                    controllerWidth = it.size.width
+                    controllerHeight = it.size.height
+                    controllerLayoutCoordinates = it
+                }
         ) {
             // Forward ripple
             AnimatedVisibility(
