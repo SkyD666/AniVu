@@ -125,12 +125,9 @@ android {
             useLegacyPackaging = true
         }
     }
-//    ndkVersion = "26.3.11579264"
 }
 
 composeCompiler {
-    enableStrongSkippingMode = true
-
     reportsDestination = layout.buildDirectory.dir("compose_compiler")
 //    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
 }
