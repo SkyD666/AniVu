@@ -34,9 +34,9 @@ internal sealed interface ArticlePartialStateChange {
                 Loading -> oldState.copy(
                     articleListState = oldState.articleListState.let {
                         when (it) {
-                            is ArticleListState.Failed -> it.copy(loading = false)
-                            is ArticleListState.Init -> it.copy(loading = false)
-                            is ArticleListState.Success -> it.copy(loading = false)
+                            is ArticleListState.Failed -> it.copy(loading = true)
+                            is ArticleListState.Init -> it.copy(loading = true)
+                            is ArticleListState.Success -> it.copy(loading = true)
                         }
                     },
                     loadingDialog = false,

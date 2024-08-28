@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.EventListener
 import coil.decode.VideoFrameDecoder
+import coil.request.CachePolicy
 import coil.request.ErrorResult
 import coil.request.ImageRequest
 import coil.request.videoFramePercent
@@ -123,6 +124,8 @@ fun Media1Item(
                         model = remember(data.file.path) {
                             ImageRequest.Builder(context)
                                 .lifecycle(lifecycleOwner)
+                                .diskCachePolicy(CachePolicy.ENABLED)
+                                .memoryCachePolicy(CachePolicy.ENABLED)
                                 .data(data.file.path)
                                 .videoFramePercent(0.5)
                                 .crossfade(true)

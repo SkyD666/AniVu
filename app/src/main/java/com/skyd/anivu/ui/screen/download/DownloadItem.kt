@@ -137,13 +137,16 @@ fun DownloadItem(
                 Spacer(modifier = Modifier.height(6.dp))
                 Row {
                     Text(
+                        modifier = Modifier.alignByBaseline(),
                         text = data.progress.toPercentage(),
                         style = MaterialTheme.typography.labelMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        modifier = Modifier.padding(start = 12.dp),
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .alignByBaseline(),
                         text = stringResource(
                             R.string.download_download_payload_rate,
                             data.downloadPayloadRate.toLong().fileSize(context) + "/s"
@@ -153,7 +156,9 @@ fun DownloadItem(
                         overflow = TextOverflow.Ellipsis,
                     )
                     Text(
-                        modifier = Modifier.padding(start = 12.dp),
+                        modifier = Modifier
+                            .padding(start = 12.dp)
+                            .alignByBaseline(),
                         text = stringResource(
                             R.string.download_upload_payload_rate,
                             data.uploadPayloadRate.toLong().fileSize(context) + "/s"
