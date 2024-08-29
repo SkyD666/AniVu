@@ -44,7 +44,7 @@
     <string name="player_reset_zoom">還原螢幕</string>
     <string name="player_long_press_playback_speed">倍速播放中…</string>
     <string name="about_screen_name">關於</string>
-    <string name="app_short_description">一個集 RSS 番劇訂閱與更新、位元洪流下載、影片播放為一體的工具。</string>
+    <string name="app_short_description">All-in-one Android app for RSS, BitTorrent dl &amp; play.</string>
     <string name="app_tech_stack_description">AniVu 使用 MVI 架構，完全採用 Material You 設計風格。使用 Android View 和 Compose 混合開發。</string>
     <string name="about_screen_visit_github">訪問 GitHub 倉庫</string>
     <string name="about_screen_join_telegram">加入 Telegram 群組</string>
