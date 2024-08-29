@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 22
-        versionName = "2.1-alpha24"
+        versionName = "2.1-alpha25"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -191,7 +191,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.2")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.8.1")
 
     implementation("com.github.aniyomiorg:aniyomi-mpv-lib:1.15.n")
@@ -201,7 +201,7 @@ dependencies {
     implementation("io.coil-kt:coil-gif:2.7.0")
     implementation("io.coil-kt:coil-svg:2.7.0")
     implementation("io.coil-kt:coil-video:2.7.0")
-    implementation("com.airbnb.android:lottie-compose:6.5.0")
+    implementation("com.airbnb.android:lottie-compose:6.5.1")
     implementation("com.rometools:rome:2.1.0")
     implementation("be.ceau:opml-parser:3.1.0") {
         exclude(group = "net.sf.kxml", module = "kxml2")

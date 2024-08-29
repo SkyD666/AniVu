@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.os.BundleCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.util.Consumer
 import androidx.navigation.NavController
@@ -60,6 +61,8 @@ import com.skyd.anivu.ui.screen.MAIN_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.MainScreen
 import com.skyd.anivu.ui.screen.about.ABOUT_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.about.AboutScreen
+import com.skyd.anivu.ui.screen.about.license.LICENSE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.about.license.LicenseScreen
 import com.skyd.anivu.ui.screen.about.update.UpdateDialog
 import com.skyd.anivu.ui.screen.article.ARTICLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.article.ArticleScreen
@@ -77,8 +80,6 @@ import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.filepicker.FilePickerScreen
 import com.skyd.anivu.ui.screen.filepicker.PATH_KEY
 import com.skyd.anivu.ui.screen.filepicker.PICK_FOLDER_KEY
-import com.skyd.anivu.ui.screen.about.license.LICENSE_SCREEN_ROUTE
-import com.skyd.anivu.ui.screen.about.license.LicenseScreen
 import com.skyd.anivu.ui.screen.media.sub.SUB_MEDIA_SCREEN_PATH_KEY
 import com.skyd.anivu.ui.screen.media.sub.SUB_MEDIA_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.media.sub.SubMediaScreenRoute
@@ -287,10 +288,10 @@ private fun MainNavHost() {
                 defaultValue = SearchDomain.Feed
             }),
         ) {
-            SearchScreen(
-                searchDomain = (it.arguments?.getSerializable(SEARCH_DOMAIN_KEY) as? SearchDomain)
-                    ?: SearchDomain.Feed
-            )
+            val searchDomain = it.arguments?.let { arguments ->
+                BundleCompat.getSerializable(arguments, SEARCH_DOMAIN_KEY, SearchDomain::class.java)
+            } ?: SearchDomain.Feed
+            SearchScreen(searchDomain = searchDomain)
         }
         composable(
             route = "$SUB_MEDIA_SCREEN_ROUTE/{$SUB_MEDIA_SCREEN_PATH_KEY}",
