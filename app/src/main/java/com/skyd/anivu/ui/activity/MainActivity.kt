@@ -98,6 +98,8 @@ import com.skyd.anivu.ui.screen.settings.appearance.article.ARTICLE_STYLE_SCREEN
 import com.skyd.anivu.ui.screen.settings.appearance.article.ArticleStyleScreen
 import com.skyd.anivu.ui.screen.settings.appearance.feed.FEED_STYLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.appearance.feed.FeedStyleScreen
+import com.skyd.anivu.ui.screen.settings.appearance.media.MEDIA_STYLE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.appearance.media.MediaStyleScreen
 import com.skyd.anivu.ui.screen.settings.appearance.search.SEARCH_STYLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.appearance.search.SearchStyleScreen
 import com.skyd.anivu.ui.screen.settings.behavior.BEHAVIOR_SCREEN_ROUTE
@@ -234,6 +236,7 @@ private fun MainNavHost() {
         composable(route = APPEARANCE_SCREEN_ROUTE) { AppearanceScreen() }
         composable(route = ARTICLE_STYLE_SCREEN_ROUTE) { ArticleStyleScreen() }
         composable(route = FEED_STYLE_SCREEN_ROUTE) { FeedStyleScreen() }
+        composable(route = MEDIA_STYLE_SCREEN_ROUTE) { MediaStyleScreen() }
         composable(route = REORDER_GROUP_SCREEN_ROUTE) { ReorderGroupScreen() }
         composable(route = SEARCH_STYLE_SCREEN_ROUTE) { SearchStyleScreen() }
         composable(route = BEHAVIOR_SCREEN_ROUTE) { BehaviorScreen() }

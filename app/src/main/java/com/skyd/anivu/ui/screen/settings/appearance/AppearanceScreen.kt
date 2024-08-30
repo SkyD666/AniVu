@@ -66,15 +66,16 @@ import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.CheckableListMenu
 import com.skyd.anivu.ui.component.SwitchSettingsItem
-import com.skyd.anivu.ui.screen.settings.appearance.article.ARTICLE_STYLE_SCREEN_ROUTE
-import com.skyd.anivu.ui.screen.settings.appearance.feed.FEED_STYLE_SCREEN_ROUTE
-import com.skyd.anivu.ui.screen.settings.appearance.search.SEARCH_STYLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalDateStyle
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 import com.skyd.anivu.ui.local.LocalTheme
+import com.skyd.anivu.ui.screen.settings.appearance.article.ARTICLE_STYLE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.appearance.feed.FEED_STYLE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.appearance.media.MEDIA_STYLE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.appearance.search.SEARCH_STYLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.theme.extractColors
 
 
@@ -231,6 +232,14 @@ fun AppearanceScreen() {
                     text = stringResource(id = R.string.search_style_screen_name),
                     description = null,
                     onClick = { navController.navigate(SEARCH_STYLE_SCREEN_ROUTE) },
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = null,
+                    text = stringResource(id = R.string.media_style_screen_name),
+                    description = null,
+                    onClick = { navController.navigate(MEDIA_STYLE_SCREEN_ROUTE) },
                 )
             }
         }

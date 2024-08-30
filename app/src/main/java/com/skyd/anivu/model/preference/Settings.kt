@@ -22,6 +22,7 @@ import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefre
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
@@ -76,6 +77,7 @@ import com.skyd.anivu.ui.local.LocalHardwareDecode
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import com.skyd.anivu.ui.local.LocalMediaLibLocation
+import com.skyd.anivu.ui.local.LocalMediaShowThumbnail
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalOpmlExportDir
 import com.skyd.anivu.ui.local.LocalParseLinkTagAsEnclosure
@@ -129,6 +131,7 @@ data class Settings(
     val showArticlePullRefresh: Boolean = ShowArticlePullRefreshPreference.default,
     val articleItemMinWidth: Float = ArticleItemMinWidthPreference.default,
     val searchItemMinWidth: Float = SearchItemMinWidthPreference.default,
+    val mediaShowThumbnail: Boolean = MediaShowThumbnailPreference.default,
     // Update
     val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
     // Behavior
@@ -197,6 +200,7 @@ fun SettingsProvider(
         LocalShowArticlePullRefresh provides settings.showArticlePullRefresh,
         LocalArticleItemMinWidth provides settings.articleItemMinWidth,
         LocalSearchItemMinWidth provides settings.searchItemMinWidth,
+        LocalMediaShowThumbnail provides settings.mediaShowThumbnail,
         // Update
         LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
         // Behavior

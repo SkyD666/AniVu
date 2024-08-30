@@ -332,6 +332,9 @@
     <string name="data_screen_clear_play_history_warning">Sure to delete playback history?</string>
     <string name="data_screen_clear_play_history_success">Deleted %d items</string>
     <string name="folder">Folder</string>
+    <string name="media_style_screen_name">Media screen</string>
+    <string name="media_style_screen_media_list_category">Media list</string>
+    <string name="media_style_screen_media_list_show_thumbnail">Show thumbnails</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>

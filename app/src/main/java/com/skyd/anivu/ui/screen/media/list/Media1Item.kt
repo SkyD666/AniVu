@@ -40,11 +40,9 @@ import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.EventListener
-import coil.decode.VideoFrameDecoder
 import coil.request.CachePolicy
 import coil.request.ErrorResult
 import coil.request.ImageRequest
-import coil.request.videoFramePercent
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.openWith
@@ -54,6 +52,7 @@ import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.VideoBean
 import com.skyd.anivu.ui.component.AniVuImage
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
+import com.skyd.anivu.ui.local.LocalMediaShowThumbnail
 import java.util.Locale
 
 @Composable
@@ -116,7 +115,7 @@ fun Media1Item(
                     contentDescription = null
                 )
             }
-            if (data.isMedia) {
+            if (data.isMedia && LocalMediaShowThumbnail.current) {
                 if (showThumbnail) {
                     val lifecycleOwner = LocalLifecycleOwner.current
                     AniVuImage(
@@ -127,7 +126,6 @@ fun Media1Item(
                                 .diskCachePolicy(CachePolicy.ENABLED)
                                 .memoryCachePolicy(CachePolicy.ENABLED)
                                 .data(data.file.path)
-                                .videoFramePercent(0.5)
                                 .crossfade(true)
                                 .build()
                         },

@@ -251,7 +251,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             // pseudo-track to allow disabling audio/subs
             list.add(Track(-1, context.getString(R.string.track_off)))
         }
-        val count = MPVLib.getPropertyInt("track-list/count")!!
+        val count = MPVLib.getPropertyInt("track-list/count") ?: 0
         // Note that because events are async, properties might disappear at any moment
         // so use ?: continue instead of !!
         for (i in 0 until count) {

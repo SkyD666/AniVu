@@ -17,6 +17,7 @@ import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefre
 import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
@@ -73,6 +74,7 @@ fun Preferences.toSettings(): Settings {
         showArticlePullRefresh = ShowArticlePullRefreshPreference.fromPreferences(this),
         articleItemMinWidth = ArticleItemMinWidthPreference.fromPreferences(this),
         searchItemMinWidth = SearchItemMinWidthPreference.fromPreferences(this),
+        mediaShowThumbnail = MediaShowThumbnailPreference.fromPreferences(this),
 
         // Update
         ignoreUpdateVersion = IgnoreUpdateVersionPreference.fromPreferences(this),
