@@ -326,6 +326,9 @@
     <string name="data_screen_clear_play_history_warning">Oynatma geçmişini silmek istediğinizden emin misiniz?</string>
     <string name="data_screen_clear_play_history_success">%d öğe silindi</string>
     <string name="folder">Klasör</string>
+    <string name="media_style_screen_name">Media screen</string>
+    <string name="media_style_screen_media_list_category">Media list</string>
+    <string name="media_style_screen_media_list_show_thumbnail">Show thumbnails</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">%d öğeyi okundu</item>
         <item quantity="other">%d öğe okundu</item>
