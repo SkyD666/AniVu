@@ -1,6 +1,6 @@
 package com.skyd.anivu.ui.screen.read
 
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 
 
 internal sealed interface ReadPartialStateChange {

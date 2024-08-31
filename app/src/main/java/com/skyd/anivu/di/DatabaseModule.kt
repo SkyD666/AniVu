@@ -9,6 +9,7 @@ import com.skyd.anivu.model.db.dao.EnclosureDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
 import com.skyd.anivu.model.db.dao.MediaPlayHistoryDao
+import com.skyd.anivu.model.db.dao.RssModuleDao
 import com.skyd.anivu.model.db.dao.SearchDomainDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
 import com.skyd.anivu.model.db.dao.TorrentFileDao
@@ -61,6 +62,10 @@ object DatabaseModule {
     @Singleton
     fun provideMediaPlayHistoryDao(database: AppDatabase): MediaPlayHistoryDao =
         database.mediaPlayHistoryDao()
+
+    @Provides
+    @Singleton
+    fun provideRssModuleDao(database: AppDatabase): RssModuleDao = database.rssModuleDao()
 
 
     @Provides

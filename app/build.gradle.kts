@@ -21,8 +21,8 @@ android {
         applicationId = "com.skyd.anivu"
         minSdk = 24
         targetSdk = 35
-        versionCode = 22
-        versionName = "2.1-alpha26"
+        versionCode = 23
+        versionName = "2.1-alpha27"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -113,6 +113,7 @@ android {
             "META-INF/jdom-info.xml",
             "kotlin-tooling-metadata.json",
             "okhttp3/internal/publicsuffix/NOTICE",
+            "rome-utils-*.jar",
         )
         jniLibs {
             excludes += mutableSetOf(
@@ -203,6 +204,7 @@ dependencies {
     implementation("io.coil-kt:coil-video:2.7.0")
     implementation("com.airbnb.android:lottie-compose:6.5.1")
     implementation("com.rometools:rome:2.1.0")
+    implementation("com.rometools:rome-modules:2.1.0")
     implementation("be.ceau:opml-parser:3.1.0") {
         exclude(group = "net.sf.kxml", module = "kxml2")
     }

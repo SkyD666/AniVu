@@ -11,7 +11,6 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
-import com.skyd.anivu.model.bean.ArticleBean
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FEED_VIEW_NAME
 import com.skyd.anivu.model.bean.FeedBean
@@ -19,6 +18,7 @@ import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.FeedWithArticleBean
 import com.skyd.anivu.model.bean.GROUP_TABLE_NAME
 import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.article.ArticleBean
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -52,7 +52,6 @@ interface FeedDao {
         val feedUrl = feedWithArticleBean.feed.url
         hiltEntryPoint.articleDao.insertListIfNotExist(
             feedWithArticleBean.articles.map { articleWithEnclosure ->
-                // Enclosure
                 val articleId = articleWithEnclosure.article.articleId
 
                 // Add ArticleWithEnclosure

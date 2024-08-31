@@ -7,10 +7,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.skyd.anivu.base.BaseRepository
-import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
-import com.skyd.anivu.model.bean.ArticleBean
-import com.skyd.anivu.model.bean.ArticleWithFeed
 import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.article.ARTICLE_TABLE_NAME
+import com.skyd.anivu.model.bean.article.ArticleBean
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import kotlinx.coroutines.Deferred

@@ -5,6 +5,8 @@ import androidx.room.ColumnInfo
 import androidx.room.DatabaseView
 import androidx.room.Embedded
 import com.skyd.anivu.base.BaseBean
+import com.skyd.anivu.model.bean.article.ARTICLE_TABLE_NAME
+import com.skyd.anivu.model.bean.article.ArticleBean
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 

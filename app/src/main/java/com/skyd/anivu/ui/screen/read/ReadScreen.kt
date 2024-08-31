@@ -1,14 +1,27 @@
 package com.skyd.anivu.ui.screen.read
 
+import android.net.Uri
+import android.text.format.DateUtils
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
@@ -17,6 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.Icon
@@ -25,6 +39,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -36,8 +51,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,20 +65,33 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
+import coil.EventListener
+import coil.decode.VideoFrameDecoder
+import coil.request.ErrorResult
+import coil.request.ImageRequest
 import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
+import com.skyd.anivu.ext.activity
+import com.skyd.anivu.ext.copy
 import com.skyd.anivu.ext.ifNullOfBlank
+import com.skyd.anivu.ext.isWifi
 import com.skyd.anivu.ext.openBrowser
-import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toEncodedUrl
+import com.skyd.anivu.model.bean.article.ArticleBean
+import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.EnclosureBean
+import com.skyd.anivu.model.bean.article.RssMediaBean
+import com.skyd.anivu.ui.activity.PlayActivity
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.AniVuImage
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.html.HtmlText
+import com.skyd.anivu.ui.component.rememberAniVuImageLoader
 import com.skyd.anivu.ui.screen.article.enclosure.EnclosureBottomSheet
 import com.skyd.anivu.ui.screen.article.enclosure.getEnclosuresList
 import com.skyd.anivu.util.ShareUtil
@@ -157,7 +189,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                 .fillMaxHeight()
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .verticalScroll(rememberScrollState())
-                .padding(paddingValues + 16.dp)
+                .padding(paddingValues)
                 .padding(bottom = fabHeight),
         ) {
             when (val articleState = uiState.articleState) {
@@ -215,6 +247,22 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
 }
 
 @Composable
+private fun CategoryArea(categories: ArticleBean.Categories) {
+    val context = LocalContext.current
+    FlowRow(
+        modifier = Modifier.padding(vertical = 16.dp, horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        categories.categories.forEach { category ->
+            SuggestionChip(
+                onClick = { category.copy(context) },
+                label = { Text(text = category) },
+            )
+        }
+    }
+}
+
+@Composable
 private fun Content(
     articleState: ArticleState.Success,
     downloadImage: (url: String) -> Unit,
@@ -226,7 +274,7 @@ private fun Content(
     var openImageSheet by rememberSaveable { mutableStateOf<String?>(null) }
 
     SelectionContainer {
-        Column {
+        Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             var expandTitle by rememberSaveable { mutableStateOf(false) }
             article.article.title?.let { title ->
                 Text(
@@ -269,12 +317,19 @@ private fun Content(
             }
         }
     }
+    MediaRow(articleWithEnclosureBean = article, onPlay = { url ->
+        PlayActivity.play(context.activity, Uri.parse(url))
+    })
     HtmlText(
+        modifier = Modifier.padding(horizontal = 16.dp),
         text = article.article.content.ifNullOfBlank {
             article.article.description.orEmpty()
         },
         onImageClick = { imageUrl -> openImageSheet = imageUrl }
     )
+    article.article.catrgories?.let { catrgories ->
+        CategoryArea(catrgories)
+    }
 
     if (openImageSheet != null) {
         ImageBottomSheet(
@@ -284,6 +339,150 @@ private fun Content(
             copyImage = copyImage,
             downloadImage = downloadImage,
         )
+    }
+}
+
+@Composable
+private fun RssMediaEpisode(modifier: Modifier = Modifier, rssMedia: RssMediaBean) {
+    val episode = rssMedia.episode
+    if (episode != null) {
+        Text(
+            modifier = modifier,
+            text = stringResource(id = R.string.read_screen_episode, episode),
+            color = Color.White,
+        )
+    }
+}
+
+@Composable
+private fun RssMediaDuration(modifier: Modifier = Modifier, rssMedia: RssMediaBean) {
+    val duration = rssMedia.duration
+    if (duration != null) {
+        Text(
+            modifier = modifier,
+            text = DateUtils.formatElapsedTime(duration / 1000),
+            color = Color.White,
+        )
+    }
+}
+
+@Composable
+private fun MediaRow(articleWithEnclosureBean: ArticleWithEnclosureBean, onPlay: (String) -> Unit) {
+    val enclosures = articleWithEnclosureBean.enclosures.filter { it.isMedia }
+    val cover = articleWithEnclosureBean.media?.image
+    if (enclosures.size > 1) {
+        Spacer(modifier = Modifier.height(6.dp))
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+        ) {
+            items(enclosures) { item ->
+                MediaCover(
+                    modifier = Modifier
+                        .height(160.dp)
+                        .widthIn(min = 200.dp),
+                    cover = cover,
+                    enclosure = item,
+                    onClick = { onPlay(item.url) },
+                )
+            }
+        }
+        articleWithEnclosureBean.media?.let { media ->
+            Spacer(modifier = Modifier.height(12.dp))
+            Row {
+                RssMediaEpisode(rssMedia = media)
+                Spacer(modifier = Modifier.width(12.dp))
+                RssMediaDuration(rssMedia = media)
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+    } else if (enclosures.size == 1) {
+        val item = enclosures.first()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 6.dp, bottom = 16.dp)
+                .padding(horizontal = 16.dp)
+        ) {
+            MediaCover(
+                modifier = Modifier
+                    .height(200.dp)
+                    .widthIn(max = 350.dp)
+                    .align(Alignment.Center),
+                cover = cover,
+                enclosure = item,
+                onClick = { onPlay(item.url) },
+            ) {
+                articleWithEnclosureBean.media?.let { media ->
+                    RssMediaEpisode(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(end = 15.dp, top = 10.dp),
+                        rssMedia = media,
+                    )
+                    RssMediaDuration(
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(end = 15.dp, bottom = 10.dp),
+                        rssMedia = media,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MediaCover(
+    modifier: Modifier = Modifier,
+    cover: String?,
+    enclosure: EnclosureBean,
+    onClick: () -> Unit,
+    content: @Composable (BoxScope.() -> Unit) = {},
+) {
+    val context = LocalContext.current
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.Black.copy(alpha = 0.5f)),
+    ) {
+        Box(
+            modifier = Modifier
+                .clickable(onClick = onClick)
+                .align(Alignment.Center),
+            contentAlignment = Alignment.Center,
+        ) {
+            var realImage by rememberSaveable(enclosure) {
+                mutableStateOf(if (context.isWifi() && enclosure.isVideo) enclosure.url else cover)
+            }
+            AniVuImage(
+                modifier = Modifier.fillMaxHeight(),
+                imageLoader = rememberAniVuImageLoader(
+                    listener = object : EventListener {
+                        override fun onError(request: ImageRequest, result: ErrorResult) {
+                            if (cover != null && realImage != cover) {
+                                realImage = cover
+                            }
+                        }
+                    },
+                    components = { add(VideoFrameDecoder.Factory()) },
+                ),
+                model = realImage,
+                contentScale = ContentScale.FillHeight,
+                colorFilter = ColorFilter.tint(
+                    Color.Black.copy(alpha = 0.5f),
+                    blendMode = BlendMode.Darken,
+                ),
+            )
+            Icon(
+                modifier = Modifier.size(50.dp),
+                imageVector = Icons.Outlined.PlayCircleOutline,
+                contentDescription = stringResource(id = R.string.play),
+                tint = Color.White,
+            )
+            content()
+        }
     }
 }
 

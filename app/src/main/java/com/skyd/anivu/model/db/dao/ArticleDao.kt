@@ -11,13 +11,13 @@ import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
-import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
-import com.skyd.anivu.model.bean.ArticleBean
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
-import com.skyd.anivu.model.bean.ArticleWithFeed
-import com.skyd.anivu.model.bean.EnclosureBean
+import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.article.ARTICLE_TABLE_NAME
+import com.skyd.anivu.model.bean.article.ArticleBean
+import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -30,6 +30,7 @@ interface ArticleDao {
     @InstallIn(SingletonComponent::class)
     interface ArticleDaoEntryPoint {
         val enclosureDao: EnclosureDao
+        val rssModuleDao: RssModuleDao
     }
 
     // null always compares false in '='
@@ -70,33 +71,42 @@ interface ArticleDao {
     suspend fun insertListIfNotExist(articleWithEnclosureList: List<ArticleWithEnclosureBean>) {
         val hiltEntryPoint =
             EntryPointAccessors.fromApplication(appContext, ArticleDaoEntryPoint::class.java)
-        articleWithEnclosureList.forEach {
+        articleWithEnclosureList.forEach { articleWithEnclosure ->
+            val article = articleWithEnclosure.article
             // Duplicate article by guid or link
-            val guid = it.article.guid
-            val link = it.article.link
+            val guid = article.guid
+            val link = article.link
             var newArticle: ArticleBean? = null
             if (guid != null) {
                 newArticle = queryArticleByGuid(
                     guid = guid,
-                    feedUrl = it.article.feedUrl,
+                    feedUrl = article.feedUrl,
                 )
             } else if (link != null) {
                 newArticle = queryArticleByLink(
                     link = link,
-                    feedUrl = it.article.feedUrl,
+                    feedUrl = article.feedUrl,
                 )
             }
             if (newArticle == null) {
-                innerUpdateArticle(it.article)
-                newArticle = it.article
+                innerUpdateArticle(article)
+                newArticle = article
             } else {
                 // Update all fields except articleId
-                newArticle = it.article.copy(articleId = newArticle.articleId)
+                newArticle = article.copy(articleId = newArticle.articleId)
                 innerUpdateArticle(newArticle)
             }
 
+            // Update modules
+            val media = articleWithEnclosure.media
+            if (media != null) {
+                hiltEntryPoint.rssModuleDao.insertIfNotExistITunesRssBean(media)
+            }
+
             hiltEntryPoint.enclosureDao.insertListIfNotExist(
-                it.enclosures.map { enclosure -> enclosure.copy(articleId = newArticle.articleId) }
+                articleWithEnclosure.enclosures.map { enclosure ->
+                    enclosure.copy(articleId = newArticle.articleId)
+                }
             )
         }
     }

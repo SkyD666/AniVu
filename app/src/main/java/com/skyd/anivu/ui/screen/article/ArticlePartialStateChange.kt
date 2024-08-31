@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.screen.article
 
 import androidx.paging.PagingData
-import com.skyd.anivu.model.bean.ArticleWithFeed
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.repository.ArticleSort
 import kotlinx.coroutines.flow.Flow
 

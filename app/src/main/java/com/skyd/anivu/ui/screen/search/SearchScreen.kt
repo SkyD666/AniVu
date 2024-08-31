@@ -68,7 +68,7 @@ import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.model.bean.ArticleWithFeed
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton

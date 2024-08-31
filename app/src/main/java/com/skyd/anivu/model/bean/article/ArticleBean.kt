@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.bean
+package com.skyd.anivu.model.bean.article
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.skyd.anivu.base.BaseBean
+import com.skyd.anivu.model.bean.FeedBean
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -57,7 +58,14 @@ data class ArticleBean(
     var isRead: Boolean = false,
     @ColumnInfo(name = IS_FAVORITE_COLUMN)
     var isFavorite: Boolean = false,
+    @ColumnInfo(name = CATEGORIES_COLUMN)
+    var catrgories: Categories? = null,
 ) : BaseBean, Parcelable {
+
+    @Parcelize
+    @Serializable
+    data class Categories(val categories: List<String>) : BaseBean, Parcelable
+
     companion object {
         const val ARTICLE_ID_COLUMN = "articleId"
         const val FEED_URL_COLUMN = "feedUrl"
@@ -72,5 +80,6 @@ data class ArticleBean(
         const val UPDATE_AT_COLUMN = "updateAt"
         const val IS_READ_COLUMN = "isRead"
         const val IS_FAVORITE_COLUMN = "isFavorite"
+        const val CATEGORIES_COLUMN = "catrgories"
     }
 }

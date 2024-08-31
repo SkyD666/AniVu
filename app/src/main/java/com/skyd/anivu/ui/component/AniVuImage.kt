@@ -3,14 +3,18 @@ package com.skyd.anivu.ui.component
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import coil.ComponentRegistry
 import coil.EventListener
 import coil.ImageLoader
 import coil.compose.AsyncImage
+import coil.request.CachePolicy
 import coil.request.ImageRequest
+import coil.util.DebugLogger
 import com.skyd.anivu.ext.imageLoaderBuilder
 
 
@@ -22,6 +26,7 @@ fun AniVuImage(
     imageLoader: ImageLoader = rememberAniVuImageLoader(),
     contentScale: ContentScale = ContentScale.FillWidth,
     alpha: Float = DefaultAlpha,
+    colorFilter: ColorFilter? = null,
 ) {
     AsyncImage(
         model = if (model is ImageRequest) {
@@ -32,6 +37,8 @@ fun AniVuImage(
             remember(model) {
                 ImageRequest.Builder(context)
                     .lifecycle(lifecycleOwner)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
                     .data(model)
                     .crossfade(true)
                     .build()
@@ -42,15 +49,21 @@ fun AniVuImage(
         contentScale = contentScale,
         imageLoader = imageLoader,
         alpha = alpha,
+        colorFilter = colorFilter,
     )
 }
 
 @Composable
-fun rememberAniVuImageLoader(listener: EventListener? = null): ImageLoader {
+fun rememberAniVuImageLoader(
+    listener: EventListener? = null,
+    components: ComponentRegistry.Builder.() -> Unit = {},
+): ImageLoader {
     val context = LocalContext.current
     return remember(context) {
         context.imageLoaderBuilder()
+            .components(components)
             .run { if (listener != null) eventListener(listener) else this }
+            .logger(DebugLogger())
             .build()
     }
 }

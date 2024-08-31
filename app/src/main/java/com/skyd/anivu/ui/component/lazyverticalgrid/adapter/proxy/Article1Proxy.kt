@@ -68,9 +68,9 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.ext.toDateTimeString
-import com.skyd.anivu.model.bean.ArticleBean
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
-import com.skyd.anivu.model.bean.ArticleWithFeed
+import com.skyd.anivu.model.bean.article.ArticleBean
+import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference

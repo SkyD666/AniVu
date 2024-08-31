@@ -7,6 +7,8 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Point
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.view.Window
@@ -17,6 +19,8 @@ import coil.decode.GifDecoder
 import coil.decode.ImageDecoderDecoder
 import coil.decode.SvgDecoder
 import coil.decode.VideoFrameDecoder
+import okhttp3.Interceptor
+import okhttp3.OkHttpClient
 
 val Context.activity: Activity
     get() {
@@ -113,6 +117,13 @@ fun Context.inDarkMode(): Boolean {
             Configuration.UI_MODE_NIGHT_YES
 }
 
+fun Context.isWifi(): Boolean {
+    val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val networkCapabilities =
+        connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+    return networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true
+}
+
 fun Context.imageLoaderBuilder(): ImageLoader.Builder {
     return ImageLoader.Builder(this)
         .components {
@@ -123,5 +134,14 @@ fun Context.imageLoaderBuilder(): ImageLoader.Builder {
             }
             add(SvgDecoder.Factory())
             add(VideoFrameDecoder.Factory())
+        }
+        .okHttpClient {
+            OkHttpClient.Builder()
+                .addNetworkInterceptor(Interceptor { chain ->
+                    chain.proceed(chain.request()).newBuilder()
+                        .header("Cache-Control", "max-age=31536000,public")
+                        .build()
+                })
+                .build()
         }
 }

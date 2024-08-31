@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.bean
+package com.skyd.anivu.model.bean.article
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
@@ -40,15 +40,24 @@ data class EnclosureBean(
         const val LENGTH_COLUMN = "length"
         const val TYPE_COLUMN = "type"
 
-        val mediaExtensions = listOf(
-            ".m3u8", ".ogg", ".mp3", ".flac", ".m4v", ".mov", ".avi", ".webm",
-            ".mp4", ".mkv", ".m4a",
+        val videoExtensions = listOf(
+            ".m3u8", ".m4v", ".mov", ".avi", ".webm",
+            ".mp4", ".mkv",
+        )
+        val audioExtensions = listOf(
+            ".ogg", ".mp3", ".flac", ".m4a",
         )
     }
 
     val isMedia: Boolean
-        get() = type?.startsWith("audio/") == true ||
-                type?.startsWith("video/") == true ||
+        get() = isVideo || isAudio
+
+    val isVideo: Boolean
+        get() = type?.startsWith("video/") == true ||
                 type == "application/vnd.apple.mpegurl" ||
-                mediaExtensions.any { url.endsWith(it) }
+                videoExtensions.any { url.endsWith(it) }
+
+    val isAudio: Boolean
+        get() = type?.startsWith("audio/") == true ||
+                audioExtensions.any { url.endsWith(it) }
 }

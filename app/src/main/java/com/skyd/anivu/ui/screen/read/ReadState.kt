@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.screen.read
 
 import com.skyd.anivu.base.mvi.MviViewState
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 
 data class ReadState(
     val articleState: ArticleState,

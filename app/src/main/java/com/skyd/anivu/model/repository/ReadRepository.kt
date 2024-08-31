@@ -14,7 +14,7 @@ import com.skyd.anivu.ext.savePictureToMediaStore
 import com.skyd.anivu.ext.share
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.ext.validateFileName
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.util.image.ImageFormatChecker
 import kotlinx.coroutines.Dispatchers

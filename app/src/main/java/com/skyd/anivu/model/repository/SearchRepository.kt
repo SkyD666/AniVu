@@ -10,9 +10,9 @@ import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.config.allSearchDomain
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
-import com.skyd.anivu.model.bean.ARTICLE_TABLE_NAME
-import com.skyd.anivu.model.bean.ArticleBean
-import com.skyd.anivu.model.bean.ArticleWithFeed
+import com.skyd.anivu.model.bean.article.ARTICLE_TABLE_NAME
+import com.skyd.anivu.model.bean.article.ArticleBean
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.FEED_VIEW_NAME
 import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.db.dao.ArticleDao

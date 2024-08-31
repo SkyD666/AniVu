@@ -1,15 +1,20 @@
 package com.skyd.anivu.model.repository
 
 import android.util.Log
+import com.rometools.modules.itunes.EntryInformationImpl
+import com.rometools.modules.mediarss.MediaEntryModuleImpl
+import com.rometools.modules.mediarss.types.Rating
+import com.rometools.rome.feed.module.Module
 import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import com.skyd.anivu.ext.toEncodedUrl
-import com.skyd.anivu.model.bean.ArticleBean
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
-import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedWithArticleBean
+import com.skyd.anivu.model.bean.article.ArticleBean
+import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.EnclosureBean
+import com.skyd.anivu.model.bean.article.RssMediaBean
 import com.skyd.anivu.util.favicon.FaviconExtractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -104,6 +109,7 @@ class RssHelper @Inject constructor(
                     "content: ${content}\n"
         )
         val articleId = UUID.randomUUID().toString()
+        val rssMedia = getRssMedia(articleId = articleId, modules = syndEntry.modules)
         return ArticleWithEnclosureBean(
             article = ArticleBean(
                 articleId = articleId,
@@ -117,6 +123,9 @@ class RssHelper @Inject constructor(
                 link = syndEntry.link,
                 guid = syndEntry.uri,
                 updateAt = Date().time,
+                catrgories = ArticleBean.Categories(
+                    categories = syndEntry.categories.map { it.name }.filter { it.isNotBlank() }
+                )
             ),
             enclosures = syndEntry.enclosures.map {
                 EnclosureBean(
@@ -125,8 +134,40 @@ class RssHelper @Inject constructor(
                     length = it.length,
                     type = it.type,
                 )
-            }
+            },
+            media = rssMedia,
         )
+    }
+
+    private fun getRssMedia(articleId: String, modules: List<Module>): RssMediaBean? {
+        modules.forEach { module ->
+            val media = when (module) {
+                is EntryInformationImpl -> {
+                    RssMediaBean(
+                        articleId = articleId,
+                        duration = module.duration?.milliseconds,
+                        adult = module.explicit,
+                        image = module.image?.toString(),
+                        episode = module.episode?.toString(),
+                    )
+                }
+
+                is MediaEntryModuleImpl -> {
+                    val content = module.mediaContents.firstOrNull()
+                    RssMediaBean(
+                        articleId = articleId,
+                        duration = content?.duration,
+                        adult = content?.metadata?.ratings?.any { it == Rating.ADULT } ?: false,
+                        image = content?.metadata?.thumbnail?.firstOrNull()?.url?.toString(),
+                        episode = null,
+                    )
+                }
+
+                else -> null
+            }
+            if (media != null) return media
+        }
+        return null
     }
 
     fun getRssIcon(url: String): String? {

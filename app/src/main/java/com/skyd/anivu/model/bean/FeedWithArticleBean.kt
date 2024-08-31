@@ -2,6 +2,8 @@ package com.skyd.anivu.model.bean
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.skyd.anivu.model.bean.article.ArticleBean
+import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 
 /**
  * A [feed] contains many [articles].

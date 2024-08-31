@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -34,9 +35,9 @@ import com.skyd.anivu.ext.copy
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.getOrDefault
-import com.skyd.anivu.model.bean.ArticleWithEnclosureBean
-import com.skyd.anivu.model.bean.EnclosureBean
 import com.skyd.anivu.model.bean.LinkEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
@@ -87,7 +88,10 @@ fun EnclosureBottomSheet(
         onDismissRequest = onDismissRequest,
         sheetState = sheetState
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             Text(
                 text = stringResource(id = R.string.bottom_sheet_enclosure_title),
                 style = MaterialTheme.typography.titleLarge,

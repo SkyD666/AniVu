@@ -6,8 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.skyd.anivu.model.bean.ENCLOSURE_TABLE_NAME
-import com.skyd.anivu.model.bean.EnclosureBean
+import com.skyd.anivu.model.bean.article.ENCLOSURE_TABLE_NAME
+import com.skyd.anivu.model.bean.article.EnclosureBean
 import kotlinx.coroutines.flow.Flow
 
 @Dao
