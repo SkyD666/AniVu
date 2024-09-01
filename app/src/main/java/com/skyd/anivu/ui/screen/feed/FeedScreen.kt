@@ -283,9 +283,7 @@ private fun FeedList(
 
         MviEventListener(viewModel.singleEvent) { event ->
             when (event) {
-                is FeedEvent.AddFeedResultEvent.Failed ->
-                    snackbarHostState.showSnackbar(event.msg)
-
+                is FeedEvent.AddFeedResultEvent.Failed -> snackbarHostState.showSnackbar(event.msg)
                 is FeedEvent.InitFeetListResultEvent.Failed ->
                     snackbarHostState.showSnackbar(event.msg)
 
@@ -297,6 +295,8 @@ private fun FeedList(
                 is FeedEvent.DeleteGroupResultEvent.Failed -> event.msg.showToast()
                 is FeedEvent.EditGroupResultEvent.Failed -> event.msg.showToast()
                 is FeedEvent.ReadAllResultEvent.Failed -> event.msg.showToast()
+                is FeedEvent.ClearFeedArticlesResultEvent.Failed -> event.msg.showToast()
+                is FeedEvent.ClearGroupArticlesResultEvent.Failed -> event.msg.showToast()
 
                 is FeedEvent.EditFeedResultEvent.Success -> {
                     if (openEditFeedDialog != null) openEditFeedDialog = event.feed
@@ -320,6 +320,8 @@ private fun FeedList(
                 is FeedEvent.RefreshFeedResultEvent.Success,
                 FeedEvent.CreateGroupResultEvent.Success,
                 FeedEvent.MoveFeedsToGroupResultEvent.Success,
+                FeedEvent.ClearFeedArticlesResultEvent.Success,
+                FeedEvent.ClearGroupArticlesResultEvent.Success,
                 FeedEvent.DeleteGroupResultEvent.Success -> Unit
             }
         }
@@ -353,6 +355,7 @@ private fun FeedList(
                 groups = groups,
                 onReadAll = { dispatch(FeedIntent.ReadAllInFeed(it)) },
                 onRefresh = { dispatch(FeedIntent.RefreshFeed(it)) },
+                onClear = { dispatch(FeedIntent.ClearFeedArticles(it)) },
                 onDelete = { dispatch(FeedIntent.RemoveFeed(it)) },
                 onUrlChange = {
                     dispatch(FeedIntent.EditFeedUrl(oldUrl = openEditFeedDialog!!.url, newUrl = it))
@@ -412,6 +415,7 @@ private fun FeedList(
                 groups = groups,
                 onReadAll = { dispatch(FeedIntent.ReadAllInGroup(it)) },
                 onRefresh = { dispatch(FeedIntent.RefreshGroupFeed(it)) },
+                onClear = { dispatch(FeedIntent.ClearGroupArticles(it)) },
                 onDelete = { dispatch(FeedIntent.DeleteGroup(it)) },
                 onNameChange = {
                     dispatch(

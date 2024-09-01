@@ -35,6 +35,7 @@ fun EditGroupSheet(
     groups: List<GroupVo>,
     onReadAll: (String) -> Unit,
     onRefresh: (String) -> Unit,
+    onClear: (String) -> Unit,
     onDelete: (String) -> Unit,
     onNameChange: (String) -> Unit,
     onMoveTo: (GroupVo) -> Unit,
@@ -70,6 +71,7 @@ fun EditGroupSheet(
                 ),
                 onReadAll = { onReadAll(group.groupId) },
                 onRefresh = { onRefresh(group.groupId) },
+                onClear = { onClear(group.groupId) },
                 onDelete = {
                     onDelete(group.groupId)
                     onDismissRequest()

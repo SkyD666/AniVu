@@ -24,6 +24,11 @@ sealed interface FeedEvent : MviSingleEvent {
         data class Failed(val msg: String) : RemoveFeedResultEvent
     }
 
+    sealed interface ClearFeedArticlesResultEvent : FeedEvent {
+        data object Success : ClearFeedArticlesResultEvent
+        data class Failed(val msg: String) : ClearFeedArticlesResultEvent
+    }
+
     sealed interface RefreshFeedResultEvent : FeedEvent {
         data object Success : RefreshFeedResultEvent
         data class Failed(val msg: String) : RefreshFeedResultEvent
@@ -37,6 +42,11 @@ sealed interface FeedEvent : MviSingleEvent {
     sealed interface DeleteGroupResultEvent : FeedEvent {
         data object Success : DeleteGroupResultEvent
         data class Failed(val msg: String) : DeleteGroupResultEvent
+    }
+
+    sealed interface ClearGroupArticlesResultEvent : FeedEvent {
+        data object Success : ClearGroupArticlesResultEvent
+        data class Failed(val msg: String) : ClearGroupArticlesResultEvent
     }
 
     sealed interface MoveFeedsToGroupResultEvent : FeedEvent {

@@ -19,6 +19,7 @@ import com.skyd.anivu.util.favicon.FaviconExtractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.executeAsync
@@ -57,7 +58,15 @@ class RssHelper @Inject constructor(
     ): FeedWithArticleBean? = withContext(Dispatchers.IO) {
         runCatching {
             val iconAsync = async { getRssIcon(feed.url) }
-            inputStream(okHttpClient, feed.url).use { inputStream ->
+            val currentOkHttpClient = okHttpClient.newBuilder().addNetworkInterceptor(
+                Interceptor { chain ->
+                    val authorized = chain.request().newBuilder().apply {
+                        feed.requestHeaders?.headers?.forEach { (t, u) -> addHeader(t, u) }
+                    }.build()
+                    chain.proceed(authorized)
+                }
+            ).build()
+            inputStream(currentOkHttpClient, feed.url).use { inputStream ->
                 SyndFeedInput().apply { isPreserveWireFeed = true }
                     .build(XmlReader(inputStream))
                     .let { syndFeed ->

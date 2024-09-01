@@ -5,8 +5,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
 
-class Migration7To8 : Migration(7, 8) {
+class Migration12To13 : Migration(12, 13) {
     override fun migrate(db: SupportSQLiteDatabase) {
-        db.execSQL("ALTER TABLE $FEED_TABLE_NAME ADD ${FeedBean.SORT_XML_ARTICLES_ON_UPDATE_COLUMN} INTEGER NOT NULL DEFAULT 0")
+        db.execSQL("ALTER TABLE $FEED_TABLE_NAME ADD ${FeedBean.REQUEST_HEADERS_COLUMN} TEXT")
     }
 }

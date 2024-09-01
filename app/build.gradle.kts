@@ -21,8 +21,8 @@ android {
         applicationId = "com.skyd.anivu"
         minSdk = 24
         targetSdk = 35
-        versionCode = 23
-        versionName = "2.1-alpha27"
+        versionCode = 24
+        versionName = "2.1-alpha28"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -125,6 +125,10 @@ android {
         dex {
             useLegacyPackaging = true
         }
+    }
+    androidResources {
+        @Suppress("UnstableApiUsage")
+        generateLocaleConfig = true
     }
 }
 

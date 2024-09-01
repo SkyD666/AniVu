@@ -21,12 +21,14 @@ sealed interface FeedIntent : MviIntent {
     data class EditFeedCustomIcon(val url: String, val customIcon: Uri?) : FeedIntent
     data class EditFeedSortXmlArticlesOnUpdate(val url: String, val sort: Boolean) : FeedIntent
 
+    data class ClearFeedArticles(val url: String) : FeedIntent
     data class RemoveFeed(val url: String) : FeedIntent
     data class ReadAllInFeed(val feedUrl: String) : FeedIntent
     data class ReadAllInGroup(val groupId: String?) : FeedIntent
     data class RefreshFeed(val url: String) : FeedIntent
     data class RefreshGroupFeed(val groupId: String?) : FeedIntent
     data class CreateGroup(val group: GroupVo) : FeedIntent
+    data class ClearGroupArticles(val groupId: String) : FeedIntent
     data class DeleteGroup(val groupId: String) : FeedIntent
     data class RenameGroup(val groupId: String, val name: String) : FeedIntent
     data class MoveFeedsToGroup(val fromGroupId: String, val toGroupId: String) : FeedIntent

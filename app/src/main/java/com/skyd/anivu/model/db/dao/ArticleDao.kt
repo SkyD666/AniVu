@@ -11,13 +11,13 @@ import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
-import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.bean.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.article.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
+import com.skyd.anivu.model.bean.article.EnclosureBean
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -117,7 +117,17 @@ interface ArticleDao {
 
     @Transaction
     @Query("DELETE FROM $ARTICLE_TABLE_NAME WHERE ${ArticleBean.FEED_URL_COLUMN} LIKE :feedUrl")
-    suspend fun deleteArticle(feedUrl: String): Int
+    suspend fun deleteArticleInFeed(feedUrl: String): Int
+
+    @Transaction
+    @Query(
+        "DELETE FROM $ARTICLE_TABLE_NAME WHERE ${ArticleBean.FEED_URL_COLUMN} IN (" +
+                "SELECT ${FeedBean.URL_COLUMN} FROM $FEED_TABLE_NAME " +
+                "WHERE ${FeedBean.GROUP_ID_COLUMN} IS NULL AND :groupId IS NULL OR " +
+                "${FeedBean.GROUP_ID_COLUMN} = :groupId" +
+                ")"
+    )
+    suspend fun deleteArticlesInGroup(groupId: String?): Int
 
     @Transaction
     @Query(

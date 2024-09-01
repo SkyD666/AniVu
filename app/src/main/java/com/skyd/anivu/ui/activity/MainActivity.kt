@@ -74,6 +74,9 @@ import com.skyd.anivu.ui.screen.download.DownloadScreen
 import com.skyd.anivu.ui.screen.download.openDownloadScreen
 import com.skyd.anivu.ui.screen.feed.reorder.REORDER_GROUP_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.feed.reorder.ReorderGroupScreen
+import com.skyd.anivu.ui.screen.feed.requestheaders.FEED_URL_KEY
+import com.skyd.anivu.ui.screen.feed.requestheaders.REQUEST_HEADERS_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.feed.requestheaders.RequestHeadersScreen
 import com.skyd.anivu.ui.screen.filepicker.EXTENSION_NAME_KEY
 import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_ID_KEY
 import com.skyd.anivu.ui.screen.filepicker.FILE_PICKER_SCREEN_ROUTE
@@ -250,6 +253,17 @@ private fun MainNavHost() {
         composable(route = RSS_CONFIG_SCREEN_ROUTE) { RssConfigScreen() }
         composable(route = PROXY_SCREEN_ROUTE) { ProxyScreen() }
         composable(route = TRANSMISSION_SCREEN_ROUTE) { TransmissionScreen() }
+        composable(
+            route = "$REQUEST_HEADERS_SCREEN_ROUTE/{$FEED_URL_KEY}",
+            arguments = listOf(
+                navArgument(FEED_URL_KEY) { type = NavType.StringType },
+            ),
+        ) {
+            val arguments = it.arguments
+            if (arguments != null) {
+                RequestHeadersScreen(feedUrl = arguments.getString(FEED_URL_KEY)!!.toDecodedUrl())
+            }
+        }
         composable(
             route = "$FILE_PICKER_SCREEN_ROUTE/{$PATH_KEY}/{$PICK_FOLDER_KEY}",
             arguments = listOf(

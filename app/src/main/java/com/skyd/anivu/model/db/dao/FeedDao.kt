@@ -23,6 +23,7 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FeedDao {
@@ -108,7 +109,26 @@ interface FeedDao {
     @Query(
         """
         UPDATE $FEED_TABLE_NAME
-        SET ${FeedBean.SORT_XML_ARTICLES_ON_UPDATE} = :sort
+        SET ${FeedBean.REQUEST_HEADERS_COLUMN} = :headers
+        WHERE ${FeedBean.URL_COLUMN} = :feedUrl
+        """
+    )
+    suspend fun updateFeedHeaders(feedUrl: String, headers: FeedBean.RequestHeaders?)
+
+    @Transaction
+    @Query(
+        """
+        SELECT ${FeedBean.REQUEST_HEADERS_COLUMN} FROM $FEED_TABLE_NAME
+        WHERE ${FeedBean.URL_COLUMN} = :feedUrl
+        """
+    )
+    fun getFeedHeaders(feedUrl: String): Flow<FeedBean.RequestHeaders?>
+
+    @Transaction
+    @Query(
+        """
+        UPDATE $FEED_TABLE_NAME
+        SET ${FeedBean.SORT_XML_ARTICLES_ON_UPDATE_COLUMN} = :sort
         WHERE ${FeedBean.URL_COLUMN} = :feedUrl
         """
     )

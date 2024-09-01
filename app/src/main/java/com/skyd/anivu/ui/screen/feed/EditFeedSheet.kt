@@ -29,9 +29,11 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ToggleOn
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.ClearAll
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DoneAll
 import androidx.compose.material.icons.outlined.History
+import androidx.compose.material.icons.outlined.Http
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.Link
 import androidx.compose.material.icons.outlined.PhoneAndroid
@@ -73,6 +75,8 @@ import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.FeedIcon
 import com.skyd.anivu.ui.component.showToast
+import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.screen.feed.requestheaders.openRequestHeadersScreen
 import com.skyd.anivu.util.launchImagePicker
 import com.skyd.anivu.util.rememberImagePicker
 
@@ -83,6 +87,7 @@ fun EditFeedSheet(
     groups: List<GroupVo>,
     onReadAll: (String) -> Unit,
     onRefresh: (String) -> Unit,
+    onClear: (String) -> Unit,
     onDelete: (String) -> Unit,
     onUrlChange: (String) -> Unit,
     onNicknameChange: (String?) -> Unit,
@@ -92,6 +97,7 @@ fun EditFeedSheet(
     onGroupChange: (GroupVo) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
+    val navController = LocalNavController.current
     var openUrlDialog by rememberSaveable { mutableStateOf(false) }
     var url by rememberSaveable(feed.url) { mutableStateOf(feed.url) }
     var openNicknameDialog by rememberSaveable { mutableStateOf(false) }
@@ -126,11 +132,15 @@ fun EditFeedSheet(
                 sortXmlArticlesOnUpdate = feed.sortXmlArticlesOnUpdate,
                 onReadAll = { onReadAll(feed.url) },
                 onRefresh = { onRefresh(feed.url) },
+                onClear = { onClear(feed.url) },
                 onDelete = {
                     onDelete(feed.url)
                     onDismissRequest()
                 },
                 onSortXmlArticlesOnUpdateChanged = onSortXmlArticlesOnUpdateChanged,
+                onEditRequestHeaders = {
+                    openRequestHeadersScreen(navController = navController, feedUrl = feed.url)
+                },
             )
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -350,10 +360,13 @@ internal fun OptionArea(
     sortXmlArticlesOnUpdate: Boolean? = null,
     onReadAll: () -> Unit,
     onRefresh: () -> Unit,
+    onClear: () -> Unit,
     onDelete: () -> Unit,
     onSortXmlArticlesOnUpdateChanged: ((Boolean) -> Unit)? = null,
+    onEditRequestHeaders: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
+    var openClearWarningDialog by rememberSaveable { mutableStateOf(false) }
     var openDeleteWarningDialog by rememberSaveable { mutableStateOf(false) }
 
     Text(
@@ -376,6 +389,11 @@ internal fun OptionArea(
             icon = Icons.Outlined.Refresh,
             text = stringResource(id = R.string.refresh),
             onClick = onRefresh,
+        )
+        SheetChip(
+            icon = Icons.Outlined.ClearAll,
+            text = stringResource(id = R.string.clear),
+            onClick = { openClearWarningDialog = true },
         )
         if (deleteEnabled) {
             SheetChip(
@@ -400,7 +418,22 @@ internal fun OptionArea(
                 },
             )
         }
+        if (onEditRequestHeaders != null) {
+            SheetChip(
+                icon = Icons.Outlined.Http,
+                text = stringResource(id = R.string.request_headers_screen_name),
+                onClick = onEditRequestHeaders,
+            )
+        }
     }
+
+    DeleteWarningDialog(
+        visible = openClearWarningDialog,
+        text = stringResource(id = R.string.feed_screen_clear_articles_warning),
+        onDismissRequest = { openClearWarningDialog = false },
+        onDismiss = { openClearWarningDialog = false },
+        onConfirm = onClear,
+    )
 
     DeleteWarningDialog(
         visible = openDeleteWarningDialog,

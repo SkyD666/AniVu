@@ -49,6 +49,13 @@ class FeedRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
+    suspend fun clearGroupArticles(groupId: String): Flow<Int> {
+        return flow {
+            val realGroupId = if (groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
+            emit(articleDao.deleteArticlesInGroup(realGroupId))
+        }
+    }
+
     suspend fun deleteGroup(groupId: String): Flow<Int> {
         return if (groupId == GroupVo.DEFAULT_GROUP_ID) flowOf(0)
         else flowOf(groupDao.removeGroupWithFeed(groupId)).flowOn(Dispatchers.IO)
@@ -182,6 +189,12 @@ class FeedRepository @Inject constructor(
         return flow {
             feedDao.getFeed(url).customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
             emit(feedDao.removeFeed(url))
+        }.flowOn(Dispatchers.IO)
+    }
+
+    suspend fun clearFeedArticles(url: String): Flow<Int> {
+        return flow {
+            emit(articleDao.deleteArticleInFeed(url))
         }.flowOn(Dispatchers.IO)
     }
 

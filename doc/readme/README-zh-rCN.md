@@ -55,9 +55,9 @@
 
 ## 🤩应用截图
 
-<img src="../image/zh-rCN/ic_rss_screen.jpg" alt="ic_rss_screen" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_media_screen.jpg" alt="ic_media_screen" style="zoom:80%;" />
+<img src="../image/zh-rCN/ic_rss_screen.jpg" alt="ic_rss_screen" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_rss_screen_edit.jpg" alt="ic_rss_screen_edit" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_article_screen.jpg" alt="ic_article_screen" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_read_screen.jpg" alt="ic_read_screen" style="zoom:80%;" />
-<img src="../image/zh-rCN/ic_read_screen_enclosure.jpg" alt="ic_read_screen_enclosure" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_download_screen.jpg" alt="ic_download_screen" style="zoom:80%;" />
+<img src="../image/zh-rCN/ic_media_screen.jpg" alt="ic_media_screen" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_download_screen.jpg" alt="ic_download_screen" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_setting_screen.jpg" alt="ic_setting_screen" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_appearance_screen.jpg" alt="ic_appearance_screen" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_rss_config_screen.jpg" alt="ic_rss_config_screen" style="zoom:80%;" /> <img src="../image/zh-rCN/ic_about_screen.jpg" alt="ic_about_screen" style="zoom:80%;" />
 <img src="../image/zh-rCN/ic_player_activity.jpg" alt="ic_player_activity" style="zoom:80%;" />

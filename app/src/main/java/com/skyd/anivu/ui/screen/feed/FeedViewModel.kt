@@ -65,6 +65,12 @@ class FeedViewModel @Inject constructor(
                 is FeedPartialStateChange.EditFeed.Failed ->
                     FeedEvent.EditFeedResultEvent.Failed(change.msg)
 
+                is FeedPartialStateChange.ClearFeedArticles.Success ->
+                    FeedEvent.ClearFeedArticlesResultEvent.Success
+
+                is FeedPartialStateChange.ClearFeedArticles.Failed ->
+                    FeedEvent.ClearFeedArticlesResultEvent.Failed(change.msg)
+
                 is FeedPartialStateChange.RemoveFeed.Success ->
                     FeedEvent.RemoveFeedResultEvent.Success
 
@@ -85,6 +91,12 @@ class FeedViewModel @Inject constructor(
 
                 is FeedPartialStateChange.CreateGroup.Failed ->
                     FeedEvent.CreateGroupResultEvent.Failed(change.msg)
+
+                is FeedPartialStateChange.ClearGroupArticles.Success ->
+                    FeedEvent.ClearGroupArticlesResultEvent.Success
+
+                is FeedPartialStateChange.ClearGroupArticles.Failed ->
+                    FeedEvent.ClearGroupArticlesResultEvent.Failed(change.msg)
 
                 is FeedPartialStateChange.DeleteGroup.Success ->
                     FeedEvent.DeleteGroupResultEvent.Success
@@ -159,6 +171,12 @@ class FeedViewModel @Inject constructor(
                     .startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
             },
+            filterIsInstance<FeedIntent.ClearFeedArticles>().flatMapConcat { intent ->
+                feedRepo.clearFeedArticles(intent.url).map {
+                    FeedPartialStateChange.ClearFeedArticles.Success
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.ClearFeedArticles.Failed(it.message.toString()) }
+            },
             filterIsInstance<FeedIntent.RemoveFeed>().flatMapConcat { intent ->
                 feedRepo.removeFeed(intent.url).map {
                     if (it > 0) FeedPartialStateChange.RemoveFeed.Success
@@ -190,6 +208,12 @@ class FeedViewModel @Inject constructor(
                     FeedPartialStateChange.CreateGroup.Success
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.CreateGroup.Failed(it.message.toString()) }
+            },
+            filterIsInstance<FeedIntent.ClearGroupArticles>().flatMapConcat { intent ->
+                feedRepo.clearGroupArticles(intent.groupId).map {
+                    FeedPartialStateChange.ClearGroupArticles.Success
+                }.startWith(FeedPartialStateChange.LoadingDialog.Show)
+                    .catchMap { FeedPartialStateChange.ClearGroupArticles.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.DeleteGroup>().flatMapConcat { intent ->
                 feedRepo.deleteGroup(intent.groupId).map {

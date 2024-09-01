@@ -47,6 +47,23 @@ internal sealed interface FeedPartialStateChange {
         data class Failed(val msg: String) : EditFeed
     }
 
+    sealed interface ClearFeedArticles : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : ClearFeedArticles
+        data class Failed(val msg: String) : ClearFeedArticles
+    }
+
     sealed interface RemoveFeed : FeedPartialStateChange {
         override fun reduce(oldState: FeedState): FeedState {
             return when (this) {
@@ -113,6 +130,23 @@ internal sealed interface FeedPartialStateChange {
 
         data object Success : CreateGroup
         data class Failed(val msg: String) : CreateGroup
+    }
+
+    sealed interface ClearGroupArticles : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState {
+            return when (this) {
+                is Success -> oldState.copy(
+                    loadingDialog = false,
+                )
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : ClearGroupArticles
+        data class Failed(val msg: String) : ClearGroupArticles
     }
 
     sealed interface DeleteGroup : FeedPartialStateChange {
