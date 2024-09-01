@@ -330,6 +330,10 @@
     <string name="media_style_screen_media_list_category">Media list</string>
     <string name="media_style_screen_media_list_show_thumbnail">Show thumbnails</string>
     <string name="read_screen_episode">Episode %s</string>
+    <string name="feed_screen_clear_articles_warning">This will delete all articles, but not feeds, sure?</string>
+    <string name="request_headers_screen_name">Request headers</string>
+    <string name="request_headers_screen_key">Key</string>
+    <string name="request_headers_screen_value">Value</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">%d öğeyi okundu</item>
         <item quantity="other">%d öğe okundu</item>
