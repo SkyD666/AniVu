@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.PictureInPictureAlt
 import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.Timelapse
 import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -44,6 +45,7 @@ import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerSeekOptionPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
+import com.skyd.anivu.model.preference.player.PlayerShowProgressIndicatorPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -60,6 +62,7 @@ import com.skyd.anivu.ui.local.LocalPlayerMaxBackCacheSize
 import com.skyd.anivu.ui.local.LocalPlayerMaxCacheSize
 import com.skyd.anivu.ui.local.LocalPlayerSeekOption
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
+import com.skyd.anivu.ui.local.LocalPlayerShowProgressIndicator
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.screen.settings.playerconfig.advanced.PLAYER_CONFIG_ADVANCED_SCREEN_ROUTE
 
@@ -169,6 +172,20 @@ fun PlayerConfigScreen() {
                     checked = LocalPlayerShowScreenshotButton.current,
                     onCheckedChange = {
                         PlayerShowScreenshotButtonPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.Timelapse,
+                    text = stringResource(id = R.string.player_config_screen_show_progress_indicator),
+                    checked = LocalPlayerShowProgressIndicator.current,
+                    onCheckedChange = {
+                        PlayerShowProgressIndicatorPreference.put(
                             context = context,
                             scope = scope,
                             value = it,

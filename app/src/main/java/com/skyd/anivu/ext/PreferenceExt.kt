@@ -39,6 +39,7 @@ import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerSeekOptionPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
+import com.skyd.anivu.model.preference.player.PlayerShowProgressIndicatorPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
 import com.skyd.anivu.model.preference.proxy.ProxyModePreference
@@ -100,6 +101,7 @@ fun Preferences.toSettings(): Settings {
         playerDoubleTap = PlayerDoubleTapPreference.fromPreferences(this),
         playerShow85sButton = PlayerShow85sButtonPreference.fromPreferences(this),
         playerShowScreenshotButton = PlayerShowScreenshotButtonPreference.fromPreferences(this),
+        playerShowProgressIndicator = PlayerShowProgressIndicatorPreference.fromPreferences(this),
         hardwareDecode = HardwareDecodePreference.fromPreferences(this),
         playerAutoPip = PlayerAutoPipPreference.fromPreferences(this),
         playerMaxCacheSize = PlayerMaxCacheSizePreference.fromPreferences(this),

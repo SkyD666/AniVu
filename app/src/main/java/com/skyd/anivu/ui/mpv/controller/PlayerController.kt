@@ -4,18 +4,14 @@ import android.content.Context
 import android.os.Build
 import android.os.Vibrator
 import android.os.VibratorManager
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeGestures
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.FastForward
 import androidx.compose.material.icons.rounded.FastRewind
@@ -44,6 +40,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.skyd.anivu.ext.tickVibrate
 import com.skyd.anivu.ui.component.rememberSystemUiController
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
+import com.skyd.anivu.ui.local.LocalPlayerShowProgressIndicator
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.mpv.controller.bar.BottomBar
 import com.skyd.anivu.ui.mpv.controller.bar.BottomBarCallback
@@ -222,6 +219,13 @@ internal fun PlayerController(
                 onScreenshot = onScreenshot,
                 onRestartAutoHideControllerRunnable = restartAutoHideControllerRunnable,
             )
+
+            if (LocalPlayerShowProgressIndicator.current && !showController) {
+                ProgressIndicator(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    playState = playState,
+                )
+            }
 
             // Seek time preview
             if (showSeekTimePreview) {

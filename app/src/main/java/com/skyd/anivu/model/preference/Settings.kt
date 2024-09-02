@@ -44,6 +44,7 @@ import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerSeekOptionPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
+import com.skyd.anivu.model.preference.player.PlayerShowProgressIndicatorPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
 import com.skyd.anivu.model.preference.proxy.ProxyModePreference
@@ -88,6 +89,7 @@ import com.skyd.anivu.ui.local.LocalPlayerMaxBackCacheSize
 import com.skyd.anivu.ui.local.LocalPlayerMaxCacheSize
 import com.skyd.anivu.ui.local.LocalPlayerSeekOption
 import com.skyd.anivu.ui.local.LocalPlayerShow85sButton
+import com.skyd.anivu.ui.local.LocalPlayerShowProgressIndicator
 import com.skyd.anivu.ui.local.LocalPlayerShowScreenshotButton
 import com.skyd.anivu.ui.local.LocalProxyHostname
 import com.skyd.anivu.ui.local.LocalProxyMode
@@ -151,6 +153,7 @@ data class Settings(
     val playerDoubleTap: String = PlayerDoubleTapPreference.default,
     val playerShow85sButton: Boolean = PlayerShow85sButtonPreference.default,
     val playerShowScreenshotButton: Boolean = PlayerShowScreenshotButtonPreference.default,
+    val playerShowProgressIndicator: Boolean = PlayerShowProgressIndicatorPreference.default,
     val hardwareDecode: Boolean = HardwareDecodePreference.default,
     val playerAutoPip: Boolean = PlayerAutoPipPreference.default,
     val playerMaxCacheSize: Long = PlayerMaxCacheSizePreference.default,
@@ -220,6 +223,7 @@ fun SettingsProvider(
         LocalPlayerDoubleTap provides settings.playerDoubleTap,
         LocalPlayerShow85sButton provides settings.playerShow85sButton,
         LocalPlayerShowScreenshotButton provides settings.playerShowScreenshotButton,
+        LocalPlayerShowProgressIndicator provides settings.playerShowProgressIndicator,
         LocalHardwareDecode provides settings.hardwareDecode,
         LocalPlayerAutoPip provides settings.playerAutoPip,
         LocalPlayerMaxCacheSize provides settings.playerMaxCacheSize,

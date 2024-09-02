@@ -40,6 +40,7 @@ import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerMaxCacheSizePreference
 import com.skyd.anivu.model.preference.player.PlayerSeekOptionPreference
 import com.skyd.anivu.model.preference.player.PlayerShow85sButtonPreference
+import com.skyd.anivu.model.preference.player.PlayerShowProgressIndicatorPreference
 import com.skyd.anivu.model.preference.player.PlayerShowScreenshotButtonPreference
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
 import com.skyd.anivu.model.preference.proxy.ProxyModePreference
@@ -115,6 +116,8 @@ val LocalPlayerDoubleTap = compositionLocalOf { PlayerDoubleTapPreference.defaul
 val LocalPlayerShow85sButton = compositionLocalOf { PlayerShow85sButtonPreference.default }
 val LocalPlayerShowScreenshotButton =
     compositionLocalOf { PlayerShowScreenshotButtonPreference.default }
+val LocalPlayerShowProgressIndicator =
+    compositionLocalOf { PlayerShowProgressIndicatorPreference.default }
 val LocalHardwareDecode = compositionLocalOf { HardwareDecodePreference.default }
 val LocalPlayerAutoPip = compositionLocalOf { PlayerAutoPipPreference.default }
 val LocalPlayerMaxCacheSize = compositionLocalOf { PlayerMaxCacheSizePreference.default }
