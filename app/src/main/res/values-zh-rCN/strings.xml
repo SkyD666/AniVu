@@ -333,6 +333,7 @@
     <string name="request_headers_screen_name">请求头</string>
     <string name="request_headers_screen_key">键</string>
     <string name="request_headers_screen_value">值</string>
+    <string name="player_config_screen_show_progress_indicator">进度指示</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>
