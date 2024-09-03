@@ -335,6 +335,7 @@
     <string name="request_headers_screen_key">Key</string>
     <string name="request_headers_screen_value">Value</string>
     <string name="player_config_screen_show_progress_indicator">Progress indicator</string>
+    <string name="read_screen_text_size">Text size</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">%d öğeyi okundu</item>
         <item quantity="other">%d öğe okundu</item>
