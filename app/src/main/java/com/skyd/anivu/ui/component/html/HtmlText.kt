@@ -2,6 +2,7 @@ package com.skyd.anivu.ui.component.html
 
 import android.text.Html
 import android.text.method.LinkMovementMethod
+import android.util.TypedValue
 import android.widget.TextView
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
@@ -13,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_LEGACY
 import androidx.core.text.parseAsHtml
@@ -23,11 +26,13 @@ fun HtmlText(
     modifier: Modifier = Modifier,
     htmlFlags: Int = FROM_HTML_MODE_LEGACY,
     text: String,
+    fontSize: TextUnit = TextUnit.Unspecified,
     onImageClick: ((String) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val textColor = LocalContentColor.current
+    val textSize = with(LocalDensity.current) { fontSize.toPx() }
     var componentWidth by remember { mutableIntStateOf(0) }
     AndroidView(
         modifier = modifier.onGloballyPositioned {
@@ -43,6 +48,7 @@ fun HtmlText(
             }
         },
         update = { textView ->
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
             textView.text = text.parseAsHtml(
                 htmlFlags,
                 imageGetter = ImageGetter(

@@ -23,6 +23,7 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
+import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
@@ -97,6 +98,7 @@ import com.skyd.anivu.ui.local.LocalProxyPassword
 import com.skyd.anivu.ui.local.LocalProxyPort
 import com.skyd.anivu.ui.local.LocalProxyType
 import com.skyd.anivu.ui.local.LocalProxyUsername
+import com.skyd.anivu.ui.local.LocalReadTextSize
 import com.skyd.anivu.ui.local.LocalRssSyncBatteryNotLowConstraint
 import com.skyd.anivu.ui.local.LocalRssSyncChargingConstraint
 import com.skyd.anivu.ui.local.LocalRssSyncFrequency
@@ -134,6 +136,7 @@ data class Settings(
     val articleItemMinWidth: Float = ArticleItemMinWidthPreference.default,
     val searchItemMinWidth: Float = SearchItemMinWidthPreference.default,
     val mediaShowThumbnail: Boolean = MediaShowThumbnailPreference.default,
+    val readTextSize: Float = ReadTextSizePreference.default,
     // Update
     val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
     // Behavior
@@ -204,6 +207,7 @@ fun SettingsProvider(
         LocalArticleItemMinWidth provides settings.articleItemMinWidth,
         LocalSearchItemMinWidth provides settings.searchItemMinWidth,
         LocalMediaShowThumbnail provides settings.mediaShowThumbnail,
+        LocalReadTextSize provides settings.readTextSize,
         // Update
         LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
         // Behavior

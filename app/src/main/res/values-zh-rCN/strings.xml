@@ -334,6 +334,7 @@
     <string name="request_headers_screen_key">键</string>
     <string name="request_headers_screen_value">值</string>
     <string name="player_config_screen_show_progress_indicator">进度指示</string>
+    <string name="read_screen_text_size">文字大小</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>

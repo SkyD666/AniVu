@@ -59,7 +59,7 @@ data class ArticleBean(
     @ColumnInfo(name = IS_FAVORITE_COLUMN)
     var isFavorite: Boolean = false,
     @ColumnInfo(name = CATEGORIES_COLUMN)
-    var catrgories: Categories? = null,
+    var categories: Categories? = null,
 ) : BaseBean, Parcelable {
 
     @Parcelize

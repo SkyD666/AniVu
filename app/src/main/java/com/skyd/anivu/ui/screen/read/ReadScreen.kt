@@ -30,22 +30,29 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.FormatSize
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PlayCircleOutline
 import androidx.compose.material.icons.outlined.Public
 import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -61,6 +68,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -83,6 +91,7 @@ import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.bean.article.RssMediaBean
+import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
 import com.skyd.anivu.ui.activity.PlayActivity
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
@@ -92,9 +101,11 @@ import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.html.HtmlText
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
+import com.skyd.anivu.ui.local.LocalReadTextSize
 import com.skyd.anivu.ui.screen.article.enclosure.EnclosureBottomSheet
 import com.skyd.anivu.ui.screen.article.enclosure.getEnclosuresList
 import com.skyd.anivu.util.ShareUtil
+import java.util.Locale
 
 
 const val READ_SCREEN_ROUTE = "readScreen"
@@ -117,7 +128,9 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
     val context = LocalContext.current
 
     val snackbarHostState = remember { SnackbarHostState() }
+    var openMoreMenu by rememberSaveable { mutableStateOf(false) }
     var openEnclosureBottomSheet by rememberSaveable { mutableStateOf<List<Any>?>(null) }
+    var openReadTextSizeSliderDialog by rememberSaveable { mutableStateOf(false) }
 
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
     val dispatcher = viewModel.getDispatcher(startWith = ReadIntent.Init(articleId))
@@ -128,7 +141,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             AniVuTopBar(
-                style = AniVuTopBarStyle.CenterAligned,
+                style = AniVuTopBarStyle.Small,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.read_screen_name)) },
                 actions = {
@@ -163,6 +176,16 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                         },
                         imageVector = Icons.Outlined.Share,
                         contentDescription = stringResource(R.string.share),
+                    )
+                    AniVuIconButton(
+                        onClick = { openMoreMenu = true },
+                        imageVector = Icons.Outlined.MoreVert,
+                        contentDescription = stringResource(R.string.more),
+                    )
+                    MoreMenu(
+                        expanded = openMoreMenu,
+                        onDismissRequest = { openMoreMenu = false },
+                        onReadTextSizeClick = { openReadTextSizeSliderDialog = true },
                     )
                 }
             )
@@ -241,6 +264,12 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             EnclosureBottomSheet(
                 onDismissRequest = { openEnclosureBottomSheet = null },
                 dataList = openEnclosureBottomSheet.orEmpty()
+            )
+        }
+
+        if (openReadTextSizeSliderDialog) {
+            ReadTextSizeSliderDialog(
+                onDismissRequest = { openReadTextSizeSliderDialog = false },
             )
         }
     }
@@ -325,10 +354,11 @@ private fun Content(
         text = article.article.content.ifNullOfBlank {
             article.article.description.orEmpty()
         },
+        fontSize = LocalReadTextSize.current.sp,
         onImageClick = { imageUrl -> openImageSheet = imageUrl }
     )
-    article.article.catrgories?.let { catrgories ->
-        CategoryArea(catrgories)
+    article.article.categories?.let { categories ->
+        CategoryArea(categories)
     }
 
     if (openImageSheet != null) {
@@ -339,6 +369,63 @@ private fun Content(
             copyImage = copyImage,
             downloadImage = downloadImage,
         )
+    }
+}
+
+@Composable
+private fun MoreMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+    onReadTextSizeClick: () -> Unit,
+) {
+    DropdownMenu(expanded = expanded, onDismissRequest = onDismissRequest) {
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.read_screen_text_size)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.FormatSize,
+                    contentDescription = null,
+                )
+            },
+            onClick = {
+                onDismissRequest()
+                onReadTextSizeClick()
+            },
+        )
+    }
+}
+
+@Composable
+private fun ReadTextSizeSliderDialog(
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit,
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismissRequest,
+        sheetState = rememberModalBottomSheetState()
+    ) {
+        Column(
+            modifier = modifier.padding(bottom = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            val context = LocalContext.current
+            val scope = rememberCoroutineScope()
+            val textSize = LocalReadTextSize.current
+            Text(
+                modifier = Modifier.padding(start = 16.dp),
+                text = String.format(Locale.getDefault(), "%.2f Sp", textSize),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Slider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                valueRange = 12f..50f,
+                value = textSize,
+                onValueChange = {
+                    ReadTextSizePreference.put(context = context, scope = scope, value = it)
+                },
+            )
+        }
     }
 }
 

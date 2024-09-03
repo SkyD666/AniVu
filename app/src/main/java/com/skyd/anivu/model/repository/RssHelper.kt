@@ -132,7 +132,7 @@ class RssHelper @Inject constructor(
                 link = syndEntry.link,
                 guid = syndEntry.uri,
                 updateAt = Date().time,
-                catrgories = ArticleBean.Categories(
+                categories = ArticleBean.Categories(
                     categories = syndEntry.categories.map { it.name }.filter { it.isNotBlank() }
                 )
             ),
