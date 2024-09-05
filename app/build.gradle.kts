@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 24
-        versionName = "2.1-alpha30"
+        versionName = "2.1-alpha31"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -161,18 +161,18 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.activity:activity-ktx:1.9.1")
-    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-alpha14")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.4")
-    implementation("androidx.compose.ui:ui:1.7.0-rc01")
-    implementation("androidx.compose.material:material:1.7.0-rc01")
-    implementation("androidx.compose.material3:material3:1.3.0-rc01")
-    implementation("androidx.compose.material3:material3-window-size-class:1.3.0-rc01")
-    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-rc01")
-    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-rc01")
-    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-rc01")
-    implementation("androidx.compose.material:material-icons-extended:1.6.8")
+    implementation("androidx.activity:activity-ktx:1.9.2")
+    implementation("androidx.constraintlayout:constraintlayout-compose:1.1.0-beta01")
+    implementation("androidx.navigation:navigation-compose:2.8.0")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.5")
+    implementation("androidx.compose.ui:ui:1.7.0")
+    implementation("androidx.compose.material:material:1.7.0")
+    implementation("androidx.compose.material3:material3:1.3.0")
+    implementation("androidx.compose.material3:material3-window-size-class:1.3.0")
+    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0")
+    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0")
+    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0")
+    implementation("androidx.compose.material:material-icons-extended:1.7.0")
     implementation("com.materialkolor:material-kolor:1.7.0")
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
@@ -184,7 +184,7 @@ dependencies {
     implementation("androidx.paging:paging-compose:3.3.2")
 
     implementation("com.google.android.material:material:1.12.0")
-    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    implementation("com.google.accompanist:accompanist-permissions:0.36.0")
 
     implementation("com.google.dagger:hilt-android:2.52")
     ksp("com.google.dagger:hilt-android-compiler:2.52")
@@ -206,14 +206,14 @@ dependencies {
     implementation("io.coil-kt:coil-gif:2.7.0")
     implementation("io.coil-kt:coil-svg:2.7.0")
     implementation("io.coil-kt:coil-video:2.7.0")
-    implementation("com.airbnb.android:lottie-compose:6.5.1")
+    implementation("com.airbnb.android:lottie-compose:6.5.2")
     implementation("com.rometools:rome:2.1.0")
     implementation("com.rometools:rome-modules:2.1.0")
     implementation("be.ceau:opml-parser:3.1.0") {
         exclude(group = "net.sf.kxml", module = "kxml2")
     }
     implementation("net.dankito.readability4j:readability4j:1.0.8")
-    implementation("sh.calvin.reorderable:reorderable:2.3.1")
+    implementation("sh.calvin.reorderable:reorderable:2.3.2")
 
     implementation("org.libtorrent4j:libtorrent4j-android-arm64:2.1.0-31")
     implementation("org.libtorrent4j:libtorrent4j-android-arm:2.1.0-31")
