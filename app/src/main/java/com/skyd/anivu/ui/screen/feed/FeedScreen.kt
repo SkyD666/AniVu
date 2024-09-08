@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.screen.feed
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -11,6 +12,8 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.Article
 import androidx.compose.material.icons.automirrored.outlined.Sort
@@ -41,9 +44,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -66,17 +67,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
-import com.skyd.anivu.ext.dataStore
-import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.snapshotStateMapSaver
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedBean.Companion.isDefaultGroup
 import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.model.bean.GroupVo.Companion.isDefaultGroup
-import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -85,13 +82,8 @@ import com.skyd.anivu.ui.component.ClipboardTextField
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
-import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.DefaultGroup1Proxy
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Feed1Proxy
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Group1Proxy
 import com.skyd.anivu.ui.component.showToast
-import com.skyd.anivu.ui.local.LocalFeedGroupExpand
+import com.skyd.anivu.ui.local.LocalFeedDefaultGroupExpand
 import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
 import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
@@ -99,6 +91,8 @@ import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import com.skyd.anivu.ui.screen.article.ArticleScreen
 import com.skyd.anivu.ui.screen.article.openArticleScreen
+import com.skyd.anivu.ui.screen.feed.item.Feed1Item
+import com.skyd.anivu.ui.screen.feed.item.Group1Item
 import com.skyd.anivu.ui.screen.feed.reorder.REORDER_GROUP_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.search.SearchDomain
 import com.skyd.anivu.ui.screen.search.openSearchScreen
@@ -275,6 +269,9 @@ private fun FeedList(
                     contentPadding = innerPadding + PaddingValues(bottom = fabHeight + 16.dp),
                     selectedFeedUrls = listPaneSelectedFeedUrls,
                     onShowArticleList = { feedUrls -> onShowArticleList(feedUrls) },
+                    onExpandChanged = { group, expanded ->
+                        dispatch(FeedIntent.ChangeGroupExpanded(group, expanded))
+                    },
                     onEditFeed = { feed -> openEditFeedDialog = feed },
                     onEditGroup = { group -> openEditGroupDialog = group },
                 )
@@ -549,83 +546,67 @@ private fun FeedList(
     contentPadding: PaddingValues = PaddingValues(),
     selectedFeedUrls: List<String>? = null,
     onShowArticleList: (List<String>) -> Unit,
+    onExpandChanged: (GroupVo, Boolean) -> Unit,
     onEditFeed: (FeedBean) -> Unit,
     onEditGroup: (GroupVo) -> Unit,
 ) {
-    val context = LocalContext.current
     val hideEmptyDefault = LocalHideEmptyDefault.current
-    val feedGroupExpand = LocalFeedGroupExpand.current
-    val groups by remember { derivedStateOf { result.filterIsInstance<GroupVo>() } }
-    val feedVisible = rememberSaveable(saver = snapshotStateMapSaver()) {
-        mutableStateMapOf(
-            GroupVo.DEFAULT_GROUP_ID to feedGroupExpand,
-            *(groups
-                .map { it.groupId to feedGroupExpand }
-                .toTypedArray())
-        )
-    }
-    // Update feedVisible when groups change
-    LaunchedEffect(groups) {
-        feedVisible.forEach { (t, u) ->
-            if (groups.find { it.groupId == t } == null) {
-                feedVisible.remove(t)
-            } else {
-                feedVisible[t] = u
-            }
-        }
-        val defaultExpand = context.dataStore.getOrDefault(FeedGroupExpandPreference)
-        groups.forEach {
-            feedVisible[it.groupId] = feedVisible[it.groupId] ?: defaultExpand
-        }
-    }
+    val groups = remember(result) { result.filterIsInstance<GroupVo>() }
+    val idToGroup = remember(groups) { groups.associateBy { it.groupId } }
 
-    val adapter = remember(result, hideEmptyDefault, selectedFeedUrls) {
-        val group1Proxy = Group1Proxy(
-            isExpand = { feedVisible[it.groupId] ?: false },
-            onExpandChange = { data, expand -> feedVisible[data.groupId] = expand },
-            isEmpty = { it == result.lastIndex || result[it + 1] is GroupVo },
-            onShowAllArticles = { group ->
-                val feedUrls = result
-                    .filterIsInstance<FeedViewBean>()
-                    .filter { it.feed.groupId == group.groupId || group.isDefaultGroup() && it.feed.isDefaultGroup() }
-                    .map { it.feed.url }
-                onShowArticleList(feedUrls)
-            },
-            onEdit = onEditGroup,
-        )
-        LazyGridAdapter(
-            mutableListOf(
-                DefaultGroup1Proxy(
-                    group1Proxy = group1Proxy,
-                    hide = { hideEmptyDefault && result.getOrNull(it + 1) !is FeedViewBean },
-                ),
-                group1Proxy,
-                Feed1Proxy(
-                    visible = { feedVisible[it] ?: false },
-                    selected = { selectedFeedUrls != null && it.url in selectedFeedUrls },
-                    inGroup = { true },
-                    onClick = { onShowArticleList(listOf(it.url)) },
-                    isEnded = { it == result.lastIndex || result[it + 1] is GroupVo },
-                    onEdit = onEditFeed
-                )
-            )
-        )
+    val defaultGroupShouldHide: (Int) -> Boolean = { index ->
+        hideEmptyDefault && result.getOrNull(index + 1) !is FeedViewBean
     }
-    AniVuLazyVerticalGrid(
+    LazyVerticalGrid(
         modifier = modifier.fillMaxSize(),
         columns = GridCells.Fixed(1),
-        dataList = result,
-        adapter = adapter,
         contentPadding = contentPadding + PaddingValues(horizontal = 16.dp),
-        key = { _, item ->
+    ) {
+        itemsIndexed(
+            items = result,
+            key = { _, item ->
+                when (item) {
+                    is GroupVo.DefaultGroup -> item.groupId
+                    is GroupVo -> item.groupId
+                    is FeedViewBean -> item.feed.url
+                    else -> item
+                }
+            },
+        ) { index, item ->
             when (item) {
-                is GroupVo.DefaultGroup -> item.groupId
-                is GroupVo -> item.groupId
-                is FeedViewBean -> item.feed.url
-                else -> item
+                is GroupVo -> if (!(item.isDefaultGroup() && defaultGroupShouldHide(index))) {
+                    Group1Item(
+                        index = index,
+                        data = item,
+                        onExpandChange = onExpandChanged,
+                        isEmpty = { it == result.lastIndex || result[it + 1] is GroupVo },
+                        onShowAllArticles = { group ->
+                            val feedUrls = result
+                                .filterIsInstance<FeedViewBean>()
+                                .filter { it.feed.groupId == group.groupId || group.isDefaultGroup() && it.feed.isDefaultGroup() }
+                                .map { it.feed.url }
+                            onShowArticleList(feedUrls)
+                        },
+                        onEdit = onEditGroup,
+                    )
+                }
+
+                is FeedViewBean -> Feed1Item(
+                    data = item,
+                    visible = if (item.feed.groupId == null) {
+                        LocalFeedDefaultGroupExpand.current
+                    } else {
+                        idToGroup[item.feed.groupId]?.isExpanded ?: false
+                    },
+                    selected = selectedFeedUrls != null && item.feed.url in selectedFeedUrls,
+                    inGroup = true,
+                    isEnd = index == result.lastIndex || result[index + 1] is GroupVo,
+                    onClick = { onShowArticleList(listOf(it.url)) },
+                    onEdit = onEditFeed,
+                )
             }
-        },
-    )
+        }
+    }
 }
 
 @Composable

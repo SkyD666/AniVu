@@ -6,7 +6,7 @@ import com.skyd.anivu.appContext
 import com.skyd.anivu.base.BaseBean
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
-import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPreference
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 
@@ -25,11 +25,13 @@ open class GroupVo(
         GroupVo(
             DEFAULT_GROUP_ID,
             appContext.getString(R.string.default_feed_group),
-            appContext.dataStore.getOrDefault(FeedGroupExpandPreference),
+            appContext.dataStore.getOrDefault(FeedDefaultGroupExpandPreference),
         ) {
         private fun readResolve(): Any = DefaultGroup
         override val name: String
             get() = appContext.getString(R.string.default_feed_group)
+        override val isExpanded: Boolean
+            get() = appContext.dataStore.getOrDefault(FeedDefaultGroupExpandPreference)
     }
 
     companion object {

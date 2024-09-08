@@ -3,9 +3,7 @@ package com.skyd.anivu.ui.screen.download
 import android.os.Bundle
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Download
@@ -40,6 +38,7 @@ import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
+import com.skyd.anivu.model.worker.download.DownloadTorrentWorker.Companion.rememberDownloadWorkStarter
 import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -81,7 +80,7 @@ fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = 
     var fabHeight by remember { mutableStateOf(0.dp) }
 
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val dispatch = viewModel.getDispatcher(startWith = DownloadIntent.Init)
+    viewModel.getDispatcher(startWith = DownloadIntent.Init)
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -115,6 +114,7 @@ fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = 
         }
     }
 
+    val downloadWorkStarter = rememberDownloadWorkStarter()
     TextFieldDialog(
         visible = openLinkDialog != null,
         icon = { Icon(imageVector = Icons.Outlined.Download, contentDescription = null) },
@@ -127,8 +127,8 @@ fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = 
             openLinkDialog = null
             doIfMagnetOrTorrentLink(
                 link = text,
-                onMagnet = { dispatch(DownloadIntent.AddDownload(it)) },
-                onTorrent = { dispatch(DownloadIntent.AddDownload(it)) },
+                onMagnet = { downloadWorkStarter.start(torrentLink = it, requestId = null) },
+                onTorrent = { downloadWorkStarter.start(torrentLink = it, requestId = null) },
                 onUnsupported = {
                     snackbarHostState.showSnackbar(
                         scope = scope,
@@ -148,6 +148,7 @@ private fun DownloadList(
 ) {
     if (downloadInfoBeanList.isNotEmpty()) {
         val context = LocalContext.current
+        val downloadWorkStarter = rememberDownloadWorkStarter()
         LazyColumn(
             modifier = Modifier.nestedScroll(nestedScrollConnection),
             contentPadding = contentPadding,
@@ -167,8 +168,7 @@ private fun DownloadList(
                         )
                     },
                     onResume = { video ->
-                        DownloadTorrentWorker.startWorker(
-                            context = context,
+                        downloadWorkStarter.start(
                             torrentLink = video.link,
                             requestId = video.downloadRequestId,
                         )

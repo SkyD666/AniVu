@@ -58,17 +58,6 @@ class DownloadViewModel @Inject constructor(
                 }.startWith(DownloadPartialStateChange.DownloadListResult.Loading)
                     .catchMap { DownloadPartialStateChange.DownloadListResult.Failed(it.message.toString()) }
             },
-            filterIsInstance<DownloadIntent.AddDownload>().flatMapConcat { intent ->
-                flow<Unit> {
-                    DownloadTorrentWorker.startWorker(
-                        context = appContext,
-                        torrentLink = intent.link,
-                    )
-                }.map {
-                    DownloadPartialStateChange.AddDownloadResult.Success
-                }.startWith(DownloadPartialStateChange.LoadingDialog.Show)
-                    .catchMap { DownloadPartialStateChange.AddDownloadResult.Failed(it.message.toString()) }
-            },
         )
     }
 }

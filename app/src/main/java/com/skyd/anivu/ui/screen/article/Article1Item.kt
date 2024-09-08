@@ -1,4 +1,4 @@
-package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
+package com.skyd.anivu.ui.screen.article
 
 import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
@@ -68,36 +68,26 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.ext.toDateTimeString
+import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
-import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeRightActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
 import com.skyd.anivu.ui.component.AniVuImage
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
-import com.skyd.anivu.ui.screen.article.enclosure.EnclosureBottomSheet
-import com.skyd.anivu.ui.screen.article.enclosure.getEnclosuresList
-import com.skyd.anivu.ui.screen.read.openReadScreen
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleSwipeRightAction
 import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.screen.article.enclosure.EnclosureBottomSheet
+import com.skyd.anivu.ui.screen.article.enclosure.getEnclosuresList
+import com.skyd.anivu.ui.screen.read.openReadScreen
 
-class Article1Proxy(
-    private val onFavorite: (ArticleWithFeed, Boolean) -> Unit,
-    private val onRead: (ArticleWithFeed, Boolean) -> Unit,
-) : LazyGridAdapter.Proxy<ArticleWithFeed>() {
-    @Composable
-    override fun Draw(index: Int, data: ArticleWithFeed) {
-        Article1Item(data = data, onFavorite = onFavorite, onRead = onRead)
-    }
-}
 
 @Composable
 fun Article1Item(

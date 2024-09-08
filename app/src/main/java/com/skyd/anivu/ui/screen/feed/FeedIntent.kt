@@ -28,6 +28,7 @@ sealed interface FeedIntent : MviIntent {
     data class RefreshFeed(val url: String) : FeedIntent
     data class RefreshGroupFeed(val groupId: String?) : FeedIntent
     data class CreateGroup(val group: GroupVo) : FeedIntent
+    data class ChangeGroupExpanded(val group: GroupVo, val expanded: Boolean) : FeedIntent
     data class ClearGroupArticles(val groupId: String) : FeedIntent
     data class DeleteGroup(val groupId: String) : FeedIntent
     data class RenameGroup(val groupId: String, val name: String) : FeedIntent

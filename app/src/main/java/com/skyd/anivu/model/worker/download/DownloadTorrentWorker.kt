@@ -1,15 +1,25 @@
 package com.skyd.anivu.model.worker.download
 
+import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
@@ -20,6 +30,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.google.accompanist.permissions.rememberPermissionState
 import com.skyd.anivu.BuildConfig
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
@@ -39,9 +50,12 @@ import com.skyd.anivu.model.bean.download.PeerInfoBean
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
 import com.skyd.anivu.model.repository.download.DownloadManager
+import com.skyd.anivu.model.repository.download.DownloadManagerIntent
 import com.skyd.anivu.model.repository.download.DownloadRepository
 import com.skyd.anivu.model.service.HttpService
+import com.skyd.anivu.model.worker.download.DownloadTorrentWorker.Companion.DownloadWorkStarter
 import com.skyd.anivu.ui.activity.MainActivity
+import com.skyd.anivu.ui.component.showToast
 import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK
 import com.skyd.anivu.util.uniqueInt
 import dagger.hilt.EntryPoint
@@ -109,7 +123,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun initData(): Boolean = runBlocking {
         torrentLinkUuid = inputData.getString(TORRENT_LINK_UUID) ?: return@runBlocking false
-        hiltEntryPoint.downloadManager.apply {
+        DownloadManager.apply {
             torrentLink = getDownloadLinkByUuid(torrentLinkUuid) ?: return@runBlocking false
             name = getDownloadName(link = torrentLink)
             progress = getDownloadProgress(link = torrentLink) ?: 0f
@@ -141,7 +155,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         removeWorkerFromFlow(id.toString())
         return Result.success(
             workDataOf(
-                STATE to (hiltEntryPoint.downloadManager.getDownloadState(link = torrentLink)
+                STATE to (DownloadManager.getDownloadState(link = torrentLink)
                     ?.ordinal ?: 0),
                 TORRENT_LINK_UUID to torrentLinkUuid,
             )
@@ -183,7 +197,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun howToDownload(saveDir: File) = runBlocking {
         sessionManager.apply {
-            val lastSessionParams = hiltEntryPoint.downloadManager
+            val lastSessionParams = DownloadManager
                 .getSessionParams(link = torrentLink)
             val sessionParams = if (lastSessionParams == null) SessionParams()
             else SessionParams(lastSessionParams.data)
@@ -199,14 +213,16 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             start(sessionParams)
             startDht()
 
-            if (hiltEntryPoint.downloadManager.containsDownloadInfo(link = torrentLink)) {
-                hiltEntryPoint.downloadManager.updateDownloadInfoRequestId(
-                    link = torrentLink,
-                    downloadRequestId = id.toString(),
+            if (DownloadManager.containsDownloadInfo(link = torrentLink)) {
+                DownloadManager.sendIntent(
+                    DownloadManagerIntent.UpdateDownloadInfoRequestId(
+                        link = torrentLink,
+                        downloadRequestId = id.toString(),
+                    )
                 )
             }
             var newDownloadState: DownloadInfoBean.DownloadState? = null
-            when (hiltEntryPoint.downloadManager.getDownloadState(link = torrentLink)) {
+            when (DownloadManager.getDownloadState(link = torrentLink)) {
                 null,
                     // 重新下载
                 DownloadInfoBean.DownloadState.Seeding,
@@ -295,7 +311,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 applicationContext,
                 MainActivity::class.java
             ),
-            PendingIntent.FLAG_UPDATE_CURRENT
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
         )
 
         // Create a Notification channel if necessary
@@ -398,7 +414,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 name = handle.name
                 handle.saveResumeData()
                 updateNotificationAsync()     // update Notification
-                moveFromDownloadingDirToVideoDir(handle = handle)
                 updateDownloadStateAndSessionParams(
                     link = torrentLink,
                     sessionStateData = sessionManager.saveState() ?: byteArrayOf(),
@@ -490,7 +505,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
     private fun pauseWorker(
         handle: TorrentHandle?,
         state: DownloadInfoBean.DownloadState = getWhatPausedState(
-            runBlocking { hiltEntryPoint.downloadManager.getDownloadState(link = torrentLink) }
+            runBlocking { DownloadManager.getDownloadState(link = torrentLink) }
         )
     ) {
         if (!sessionManager.isRunning || sessionIsStopping) {
@@ -512,14 +527,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         sessionManager.stop()
 
         removeWorkerFromFlow(id.toString())
-    }
-
-    private fun moveFromDownloadingDirToVideoDir(handle: TorrentHandle) {
-//        if (handle.savePath() != Const.VIDEO_DIR.path) {
-//            handle.moveStorage(Const.VIDEO_DIR.path, MoveFlags.ALWAYS_REPLACE_FILES)
-//        } else {
-//            Log.w(TAG, "handle.savePath() != Const.VIDEO_DIR.path: ${handle.savePath()}")
-//        }
     }
 
     companion object {
@@ -558,7 +565,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         @InstallIn(SingletonComponent::class)
         interface WorkerEntryPoint {
             val retrofit: Retrofit
-            val downloadManager: DownloadManager
             val downloadRepository: DownloadRepository
         }
 
@@ -566,13 +572,59 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             appContext, WorkerEntryPoint::class.java
         )
 
+        fun interface DownloadWorkStarter {
+            fun start(torrentLink: String, requestId: String?)
+        }
+
+        @Composable
+        fun rememberDownloadWorkStarter(): DownloadWorkStarter {
+            val context = LocalContext.current
+            var currentTorrentLink: String? by rememberSaveable { mutableStateOf(null) }
+            var currentRequestId: String? by rememberSaveable { mutableStateOf(null) }
+            val starter = { startWorker(context, currentTorrentLink!!, currentRequestId) }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val storagePermissionState = rememberPermissionState(
+                    Manifest.permission.POST_NOTIFICATIONS
+                ) {
+                    if (it) {
+                        starter()
+                    } else {
+                        context.getString(R.string.download_no_notification_permission_tip)
+                            .showToast()
+                    }
+                }
+                return remember {
+                    DownloadWorkStarter { torrentLink, requestId ->
+                        currentTorrentLink = torrentLink
+                        currentRequestId = requestId
+                        storagePermissionState.launchPermissionRequest()
+                    }
+                }
+            } else {
+                return remember {
+                    DownloadWorkStarter { torrentLink, requestId ->
+                        startWorker(context, torrentLink, requestId)
+                    }
+                }
+            }
+        }
+
         fun startWorker(context: Context, torrentLink: String, requestId: String? = null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                if (ContextCompat.checkSelfPermission(
+                        context, Manifest.permission.POST_NOTIFICATIONS
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    context.getString(R.string.download_no_notification_permission_tip).showToast()
+                    return
+                }
+            }
             coroutineScope.launch {
                 var torrentLinkUuid =
-                    hiltEntryPoint.downloadManager.getDownloadUuidByLink(torrentLink)
+                    DownloadManager.getDownloadUuidByLink(torrentLink)
                 if (torrentLinkUuid == null) {
                     torrentLinkUuid = UUID.randomUUID().toString()
-                    hiltEntryPoint.downloadManager.setDownloadLinkUuidMap(
+                    DownloadManager.setDownloadLinkUuidMap(
                         DownloadLinkUuidMapBean(
                             link = torrentLink,
                             uuid = torrentLinkUuid,
@@ -623,7 +675,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 val workerState = getWorkInfoById(requestUuid).get()?.state
                 if (workerState == null || workerState.isFinished) {
                     coroutineScope.launch {
-                        val state = hiltEntryPoint.downloadManager.getDownloadState(link)
+                        val state = DownloadManager.getDownloadState(link)
                         updateDownloadState(
                             link = link,
                             downloadState = getWhatPausedState(state),

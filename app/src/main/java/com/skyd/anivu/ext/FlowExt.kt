@@ -12,12 +12,16 @@ import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.produceIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -82,3 +86,7 @@ fun <T> Flow<T>.collectIn(
 ): Job = lifecycleOwner.lifecycleScope.launch {
     flowWithLifecycle(lifecycleOwner.lifecycle, minActiveState).collect(action)
 }
+
+fun <T> Flow<T>.debounceWithoutFirst(timeoutMillis: Long) = merge(
+    take(1), drop(1).debounce(timeoutMillis)
+)

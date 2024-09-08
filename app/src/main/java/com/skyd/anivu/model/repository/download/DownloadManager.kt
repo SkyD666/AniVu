@@ -2,6 +2,7 @@ package com.skyd.anivu.model.repository.download
 
 import androidx.work.WorkManager
 import com.skyd.anivu.appContext
+import com.skyd.anivu.ext.debounceWithoutFirst
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.bean.download.DownloadInfoBean.DownloadState
 import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
@@ -10,21 +11,158 @@ import com.skyd.anivu.model.bean.download.TorrentFileBean
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.SessionParamsDao
 import com.skyd.anivu.model.db.dao.TorrentFileDao
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.UUID
-import javax.inject.Inject
 
-class DownloadManager @Inject constructor(
-    private val downloadInfoDao: DownloadInfoDao,
-    private val sessionParamsDao: SessionParamsDao,
-    private val torrentFileDao: TorrentFileDao,
-) {
+object DownloadManager {
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface DownloadManagerPoint {
+        val downloadInfoDao: DownloadInfoDao
+        val sessionParamsDao: SessionParamsDao
+        val torrentFileDao: TorrentFileDao
+    }
+
+    private val hiltEntryPoint = EntryPointAccessors.fromApplication(
+        appContext, DownloadManagerPoint::class.java
+    )
+
+    private val downloadInfoDao = hiltEntryPoint.downloadInfoDao
+    private val sessionParamsDao = hiltEntryPoint.sessionParamsDao
+    private val torrentFileDao = hiltEntryPoint.torrentFileDao
+    private val scope = CoroutineScope(Dispatchers.IO)
+    private val intentFlow = MutableSharedFlow<DownloadManagerIntent>()
     private lateinit var downloadInfoMap: LinkedHashMap<String, DownloadInfoBean>
     private lateinit var downloadInfoListFlow: MutableStateFlow<List<DownloadInfoBean>>
+
+    init {
+        intentFlow
+            .onEachIntent()
+            .launchIn(scope)
+    }
+
+    private fun Flow<DownloadManagerIntent>.onEachIntent(): Flow<DownloadManagerIntent> {
+        return merge(
+            filterIsInstance<DownloadManagerIntent.UpdateDownloadInfo>()
+                .debounceWithoutFirst(100)
+                .onEach { intent ->
+                    downloadInfoDao.updateDownloadInfo(intent.downloadInfoBean)
+                    putDownloadInfoToMap(
+                        link = intent.downloadInfoBean.link,
+                        newInfo = intent.downloadInfoBean,
+                    )
+                }.catch { it.printStackTrace() },
+
+            filterIsInstance<DownloadManagerIntent.UpdateSessionParams>()
+                .onEach { intent ->
+                    sessionParamsDao.updateSessionParams(
+                        SessionParamsBean(
+                            link = intent.link,
+                            data = intent.sessionStateData,
+                        )
+                    )
+                }.catch { it.printStackTrace() },
+
+            filterIsInstance<DownloadManagerIntent.UpdateDownloadProgress>()
+                .debounceWithoutFirst(1000)
+                .onEach { intent ->
+                    val result = downloadInfoDao.updateDownloadProgress(
+                        link = intent.link,
+                        progress = intent.progress,
+                    )
+                    if (result > 0) {
+                        updateDownloadInfoMap(intent.link) { copy(progress = intent.progress) }
+                    }
+                }.catch { it.printStackTrace() },
+
+            filterIsInstance<DownloadManagerIntent.UpdateDownloadState>()
+                .onEach { intent ->
+                    val result = downloadInfoDao.updateDownloadState(
+                        link = intent.link,
+                        downloadState = intent.downloadState,
+                    )
+                    if (result > 0) {
+                        updateDownloadInfoMap(intent.link) { copy(downloadState = intent.downloadState) }
+                    }
+                }.catch { it.printStackTrace() },
+
+            filterIsInstance<DownloadManagerIntent.UpdateDownloadSize>()
+                .debounceWithoutFirst(1000)
+                .onEach { intent ->
+                    val result = downloadInfoDao.updateDownloadSize(
+                        link = intent.link, size = intent.size,
+                    )
+                    if (result > 0) {
+                        updateDownloadInfoMap(intent.link) { copy(size = intent.size) }
+                    }
+                }.catch { it.printStackTrace() },
+
+            filterIsInstance<DownloadManagerIntent.UpdateDownloadName>()
+                .debounceWithoutFirst(200)
+                .onEach { intent ->
+                    if (intent.name.isNullOrBlank()) return@onEach
+                    val result = downloadInfoDao.updateDownloadName(
+                        link = intent.link,
+                        name = intent.name,
+                    )
+                    if (result > 0) {
+                        updateDownloadInfoMap(intent.link) { copy(name = intent.name) }
+                    }
+                }.catch { it.printStackTrace() },
+
+            filterIsInstance<DownloadManagerIntent.UpdateDownloadInfoRequestId>()
+                .onEach { intent ->
+                    val result = downloadInfoDao.updateDownloadInfoRequestId(
+                        link = intent.link,
+                        downloadRequestId = intent.downloadRequestId,
+                    )
+                    if (result > 0) {
+                        updateDownloadInfoMap(intent.link) {
+                            copy(downloadRequestId = intent.downloadRequestId)
+                        }
+                    }
+                }.catch { it.printStackTrace() },
+
+            filterIsInstance<DownloadManagerIntent.UpdateTorrentFiles>()
+                .onEach { intent -> torrentFileDao.updateTorrentFiles(intent.files) }
+                .catch { it.printStackTrace() },
+
+            filterIsInstance<DownloadManagerIntent.UpdateDownloadDescription>()
+                .debounceWithoutFirst(500)
+                .onEach { intent ->
+                    val result = downloadInfoDao.updateDownloadDescription(
+                        link = intent.link,
+                        description = intent.description,
+                    )
+                    if (result > 0) {
+                        updateDownloadInfoMap(intent.link) { copy(description = intent.description) }
+                    }
+                }
+                .catch { it.printStackTrace() },
+        )
+    }
+
+    fun sendIntent(intent: DownloadManagerIntent) = scope.launch {
+        intentFlow.emit(intent)
+    }
 
     suspend fun getDownloadInfoList(): Flow<List<DownloadInfoBean>> {
         checkDownloadInfoMapInitialized()
@@ -168,98 +306,5 @@ class DownloadManager @Inject constructor(
         checkDownloadInfoMapInitialized()
         downloadInfoMap.remove(link)
         updateFlow()
-    }
-
-    suspend fun updateDownloadInfo(downloadInfoBean: DownloadInfoBean) {
-        downloadInfoDao.updateDownloadInfo(downloadInfoBean)
-        putDownloadInfoToMap(link = downloadInfoBean.link, newInfo = downloadInfoBean)
-    }
-
-    suspend fun updateDownloadState(
-        link: String,
-        downloadState: DownloadState,
-    ): Int {
-        val result = downloadInfoDao.updateDownloadState(
-            link = link,
-            downloadState = downloadState,
-        )
-        if (result > 0) {
-            updateDownloadInfoMap(link) { copy(downloadState = downloadState) }
-        }
-        return result
-    }
-
-    suspend fun updateDownloadStateAndSessionParams(
-        link: String,
-        sessionStateData: ByteArray,
-        downloadState: DownloadState,
-    ) {
-        updateDownloadState(link, downloadState)
-        sessionParamsDao.updateSessionParams(
-            SessionParamsBean(
-                link = link,
-                data = sessionStateData,
-            )
-        )
-    }
-
-    suspend fun updateDownloadDescription(link: String, description: String): Int {
-        val result = downloadInfoDao.updateDownloadDescription(
-            link = link,
-            description = description,
-        )
-        if (result > 0) {
-            updateDownloadInfoMap(link) { copy(description = description) }
-        }
-        return result
-    }
-
-    fun updateTorrentFiles(files: List<TorrentFileBean>) {
-        torrentFileDao.updateTorrentFiles(files)
-    }
-
-    suspend fun updateDownloadName(link: String, name: String?): Int {
-        if (name.isNullOrBlank()) return 0
-        val result = downloadInfoDao.updateDownloadName(
-            link = link,
-            name = name,
-        )
-        if (result > 0) {
-            updateDownloadInfoMap(link) { copy(name = name) }
-        }
-        return result
-    }
-
-    suspend fun updateDownloadProgress(link: String, progress: Float): Int {
-        val result = downloadInfoDao.updateDownloadProgress(
-            link = link,
-            progress = progress,
-        )
-        if (result > 0) {
-            updateDownloadInfoMap(link) { copy(progress = progress) }
-        }
-        return result
-    }
-
-    suspend fun updateDownloadSize(link: String, size: Long): Int {
-        val result = downloadInfoDao.updateDownloadSize(
-            link = link,
-            size = size,
-        )
-        if (result > 0) {
-            updateDownloadInfoMap(link) { copy(size = size) }
-        }
-        return result
-    }
-
-    suspend fun updateDownloadInfoRequestId(link: String, downloadRequestId: String): Int {
-        val result = downloadInfoDao.updateDownloadInfoRequestId(
-            link = link,
-            downloadRequestId = downloadRequestId,
-        )
-        if (result > 0) {
-            updateDownloadInfoMap(link) { copy(downloadRequestId = downloadRequestId) }
-        }
-        return result
     }
 }

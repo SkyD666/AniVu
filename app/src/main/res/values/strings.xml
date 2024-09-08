@@ -184,7 +184,6 @@
     <string name="feed_screen_delete_feed_warning">Delete the feed and articles it contains</string>
     <string name="feed_screen_rss_title">Title</string>
     <string name="feed_style_screen_name">Feed screen</string>
-    <string name="feed_style_screen_group_expand">Always expand</string>
     <string name="feed_style_screen_group_list_category">Group list</string>
     <string name="appearance_screen_style_category">Common style</string>
     <string name="appearance_screen_screen_style_category">Screen style</string>
@@ -342,6 +341,7 @@
     <string name="request_headers_screen_value">Value</string>
     <string name="player_config_screen_show_progress_indicator">Progress indicator</string>
     <string name="read_screen_text_size">Text size</string>
+    <string name="download_no_notification_permission_tip">Notification permission has not been granted so the download cannot work</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>

@@ -19,7 +19,7 @@ import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevat
 import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefreshPreference
 import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
-import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
@@ -72,7 +72,7 @@ import com.skyd.anivu.ui.local.LocalAutoDeleteArticleFrequency
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalDateStyle
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
-import com.skyd.anivu.ui.local.LocalFeedGroupExpand
+import com.skyd.anivu.ui.local.LocalFeedDefaultGroupExpand
 import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
 import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalHardwareDecode
@@ -120,7 +120,7 @@ data class Settings(
     // Appearance
     val theme: String = ThemePreference.default,
     val darkMode: Int = DarkModePreference.default,
-    val feedGroupExpand: Boolean = FeedGroupExpandPreference.default,
+    val feedDefaultGroupExpand: Boolean = FeedDefaultGroupExpandPreference.default,
     val textFieldStyle: String = TextFieldStylePreference.default,
     val dateStyle: String = DateStylePreference.default,
     val navigationBarLabel: String = NavigationBarLabelPreference.default,
@@ -191,7 +191,7 @@ fun SettingsProvider(
         // Appearance
         LocalTheme provides settings.theme,
         LocalDarkMode provides settings.darkMode,
-        LocalFeedGroupExpand provides settings.feedGroupExpand,
+        LocalFeedDefaultGroupExpand provides settings.feedDefaultGroupExpand,
         LocalTextFieldStyle provides settings.textFieldStyle,
         LocalDateStyle provides settings.dateStyle,
         LocalNavigationBarLabel provides settings.navigationBarLabel,

@@ -1,8 +1,9 @@
-package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
+package com.skyd.anivu.ui.screen.feed.item
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -13,38 +14,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.GroupVo.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
+import com.skyd.anivu.ui.local.LocalFeedDefaultGroupExpand
 
-open class Group1Proxy(
-    val isExpand: (GroupVo) -> Boolean = { false },
-    val onExpandChange: (GroupVo, Boolean) -> Unit = { _, _ -> },
-    val isEmpty: (index: Int) -> Boolean,
-    val onShowAllArticles: (GroupVo) -> Unit = { },
-    val onEdit: ((GroupVo) -> Unit)? = null,
-) : LazyGridAdapter.Proxy<GroupVo>() {
-    @Composable
-    override fun Draw(index: Int, data: GroupVo) {
-        Group1Item(
-            index = index,
-            data = data,
-            initExpand = isExpand,
-            onExpandChange = onExpandChange,
-            isEmpty = isEmpty,
-            onShowAllArticles = onShowAllArticles,
-            onEdit = onEdit,
-        )
-    }
-}
 
 val SHAPE_CORNER_DP = 26.dp
 
@@ -52,39 +31,39 @@ val SHAPE_CORNER_DP = 26.dp
 fun Group1Item(
     index: Int,
     data: GroupVo,
-    initExpand: (GroupVo) -> Boolean = { false },
     onExpandChange: (GroupVo, Boolean) -> Unit,
     isEmpty: (index: Int) -> Boolean,
     onShowAllArticles: (GroupVo) -> Unit,
     onEdit: ((GroupVo) -> Unit)? = null,
 ) {
-    var expand by remember(data) { mutableStateOf(initExpand(data)) }
-
+    val isExpanded =
+        if (data.isDefaultGroup()) LocalFeedDefaultGroupExpand.current else data.isExpanded
     val backgroundShapeCorner: Dp by animateDpAsState(
-        targetValue = if (expand && !isEmpty(index)) 0.dp else SHAPE_CORNER_DP,
+        targetValue = if (isExpanded && !isEmpty(index)) 0.dp else SHAPE_CORNER_DP,
         label = "background shape corner",
+    )
+    val shape = RoundedCornerShape(
+        SHAPE_CORNER_DP,
+        SHAPE_CORNER_DP,
+        backgroundShapeCorner,
+        backgroundShapeCorner,
     )
 
     Row(
         modifier = Modifier
             .padding(top = 16.dp)
-            .clip(
-                RoundedCornerShape(
-                    SHAPE_CORNER_DP,
-                    SHAPE_CORNER_DP,
-                    backgroundShapeCorner,
-                    backgroundShapeCorner,
-                )
+            .background(
+                shape = shape,
+                color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
             )
-            .background(color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f))
+            .clip(shape)
             .combinedClickable(
                 onLongClick = if (onEdit == null) null else {
                     { onEdit(data) }
                 },
                 onClick = { onShowAllArticles(data) },
             )
-            .padding(start = 20.dp, end = 8.dp)
-            .padding(vertical = 2.dp),
+            .padding(start = 20.dp, end = 8.dp, top = 2.dp, bottom = 2.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -94,15 +73,12 @@ fun Group1Item(
         )
 
         val expandIconRotate by animateFloatAsState(
-            targetValue = if (expand) 0f else 180f,
+            targetValue = if (isExpanded) 0f else 180f,
             label = "expand icon rotate",
         )
 
         AniVuIconButton(
-            onClick = {
-                expand = !expand
-                onExpandChange(data, expand)
-            },
+            onClick = { onExpandChange(data, !isExpanded) },
             imageVector = Icons.Outlined.KeyboardArrowUp,
             contentDescription = null,
             rotate = expandIconRotate,

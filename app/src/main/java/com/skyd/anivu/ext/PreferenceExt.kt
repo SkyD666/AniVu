@@ -14,7 +14,7 @@ import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevat
 import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefreshPreference
 import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
-import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
@@ -61,7 +61,7 @@ fun Preferences.toSettings(): Settings {
         // Appearance
         theme = ThemePreference.fromPreferences(this),
         darkMode = DarkModePreference.fromPreferences(this),
-        feedGroupExpand = FeedGroupExpandPreference.fromPreferences(this),
+        feedDefaultGroupExpand = FeedDefaultGroupExpandPreference.fromPreferences(this),
         textFieldStyle = TextFieldStylePreference.fromPreferences(this),
         dateStyle = DateStylePreference.fromPreferences(this),
         navigationBarLabel = NavigationBarLabelPreference.fromPreferences(this),

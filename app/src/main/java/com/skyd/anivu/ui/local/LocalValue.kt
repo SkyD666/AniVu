@@ -15,7 +15,7 @@ import com.skyd.anivu.model.preference.appearance.article.ArticleListTonalElevat
 import com.skyd.anivu.model.preference.appearance.article.ArticleTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefreshPreference
 import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
-import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
@@ -68,7 +68,7 @@ val LocalWindowSizeClass = compositionLocalOf<WindowSizeClass> {
 // Appearance
 val LocalTheme = compositionLocalOf { ThemePreference.default }
 val LocalDarkMode = compositionLocalOf { DarkModePreference.default }
-val LocalFeedGroupExpand = compositionLocalOf { FeedGroupExpandPreference.default }
+val LocalFeedDefaultGroupExpand = compositionLocalOf { FeedDefaultGroupExpandPreference.default }
 val LocalTextFieldStyle = compositionLocalOf { TextFieldStylePreference.default }
 val LocalDateStyle = compositionLocalOf { DateStylePreference.default }
 val LocalNavigationBarLabel = compositionLocalOf { NavigationBarLabelPreference.default }

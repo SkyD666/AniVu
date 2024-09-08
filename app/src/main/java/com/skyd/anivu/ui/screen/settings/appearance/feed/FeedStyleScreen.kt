@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Expand
 import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material.icons.outlined.Tonality
 import androidx.compose.material3.Icon
@@ -29,7 +28,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.skyd.anivu.R
-import com.skyd.anivu.model.preference.appearance.feed.FeedGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.TonalElevationPreferenceUtil
@@ -38,9 +36,7 @@ import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
-import com.skyd.anivu.ui.component.SwitchSettingsItem
 import com.skyd.anivu.ui.component.dialog.SliderDialog
-import com.skyd.anivu.ui.local.LocalFeedGroupExpand
 import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
 import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 
@@ -86,21 +82,6 @@ fun FeedStyleScreen() {
             }
             item {
                 CategorySettingsItem(text = stringResource(id = R.string.feed_style_screen_group_list_category))
-            }
-            item {
-                val feedGroupExpand = LocalFeedGroupExpand.current
-                SwitchSettingsItem(
-                    imageVector = Icons.Outlined.Expand,
-                    text = stringResource(id = R.string.feed_style_screen_group_expand),
-                    checked = feedGroupExpand,
-                    onCheckedChange = {
-                        FeedGroupExpandPreference.put(
-                            context = context,
-                            scope = scope,
-                            value = it,
-                        )
-                    }
-                )
             }
             item {
                 BaseSettingsItem(

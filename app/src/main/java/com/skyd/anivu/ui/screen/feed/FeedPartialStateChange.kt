@@ -132,6 +132,13 @@ internal sealed interface FeedPartialStateChange {
         data class Failed(val msg: String) : CreateGroup
     }
 
+    sealed interface GroupExpandedChanged : FeedPartialStateChange {
+        override fun reduce(oldState: FeedState): FeedState = oldState
+
+        data object Success : GroupExpandedChanged
+        data class Failed(val msg: String) : GroupExpandedChanged
+    }
+
     sealed interface ClearGroupArticles : FeedPartialStateChange {
         override fun reduce(oldState: FeedState): FeedState {
             return when (this) {

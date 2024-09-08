@@ -209,6 +209,13 @@ class FeedViewModel @Inject constructor(
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.CreateGroup.Failed(it.message.toString()) }
             },
+            filterIsInstance<FeedIntent.ChangeGroupExpanded>().flatMapConcat { intent ->
+                feedRepo.changeGroupExpanded(intent.group, intent.expanded).map {
+                    FeedPartialStateChange.GroupExpandedChanged.Success
+                }.catchMap<FeedPartialStateChange.GroupExpandedChanged> {
+                    FeedPartialStateChange.GroupExpandedChanged.Failed(it.message.toString())
+                }
+            },
             filterIsInstance<FeedIntent.ClearGroupArticles>().flatMapConcat { intent ->
                 feedRepo.clearGroupArticles(intent.groupId).map {
                     FeedPartialStateChange.ClearGroupArticles.Success

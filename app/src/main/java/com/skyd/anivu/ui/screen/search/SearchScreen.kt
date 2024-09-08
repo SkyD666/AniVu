@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -68,21 +69,19 @@ import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.FeedViewBean
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.BackIcon
 import com.skyd.anivu.ui.component.CircularProgressPlaceholder
 import com.skyd.anivu.ui.component.EmptyPlaceholder
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
-import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Article1Proxy
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Feed1Proxy
 import com.skyd.anivu.ui.local.LocalSearchItemMinWidth
 import com.skyd.anivu.ui.local.LocalSearchListTonalElevation
 import com.skyd.anivu.ui.local.LocalSearchTopBarTonalElevation
+import com.skyd.anivu.ui.screen.article.Article1Item
+import com.skyd.anivu.ui.screen.feed.item.Feed1Item
 import kotlinx.coroutines.launch
 import java.io.Serializable
 
@@ -265,31 +264,31 @@ private fun SearchResultList(
     onRead: (ArticleWithFeed, Boolean) -> Unit,
     contentPadding: PaddingValues,
 ) {
-    val adapter = remember {
-        LazyGridAdapter(
-            mutableListOf(
-                Feed1Proxy(),
-                Article1Proxy(onFavorite = onFavorite, onRead = onRead),
-            )
-        )
-    }
-    AniVuLazyVerticalGrid(
+    LazyVerticalGrid(
         modifier = modifier,
         columns = GridCells.Adaptive(LocalSearchItemMinWidth.current.dp),
-        dataList = result,
-        listState = listState,
-        adapter = adapter,
+        state = listState,
         contentPadding = contentPadding + PaddingValues(horizontal = 12.dp, vertical = 6.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        key = { _, item ->
-            when (item) {
-                is ArticleWithFeed -> item.articleWithEnclosure.article.articleId
-                is FeedViewBean -> item.feed.url
-                else -> item.hashCode()
+    ) {
+        items(
+            count = result.itemCount,
+            key = { index ->
+                when (val item = result[index]) {
+                    is ArticleWithFeed -> item.articleWithEnclosure.article.articleId
+                    is FeedViewBean -> item.feed.url
+                    else -> item.hashCode()
+                }
+            },
+        ) { index ->
+            when (val item = result[index]) {
+                is FeedViewBean -> Feed1Item(item)
+                is ArticleWithFeed -> Article1Item(item, onFavorite = onFavorite, onRead = onRead)
+                else -> Unit
             }
-        },
-    )
+        }
+    }
 }
 
 @Composable

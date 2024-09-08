@@ -172,6 +172,13 @@ interface GroupDao {
     }
 
     @Transaction
+    @Query(
+        "UPDATE `$GROUP_TABLE_NAME` SET ${GroupBean.IS_EXPANDED_COLUMN} = :expanded " +
+                "WHERE ${GroupBean.GROUP_ID_COLUMN} = :groupId"
+    )
+    suspend fun changeGroupExpanded(groupId: String, expanded: Boolean): Int
+
+    @Transaction
     @Query("SELECT * FROM `$GROUP_TABLE_NAME`")
     fun getGroupWithFeeds(): Flow<List<GroupWithFeedBean>>
 

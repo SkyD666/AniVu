@@ -10,11 +10,11 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-object FeedGroupExpandPreference : BasePreference<Boolean> {
-    private const val FEED_GROUP_EXPAND = "feedGroupExpand"
+object FeedDefaultGroupExpandPreference : BasePreference<Boolean> {
+    private const val FEED_DEFAULT_GROUP_EXPAND = "feedDefaultGroupExpand"
     override val default = true
 
-    val key = booleanPreferencesKey(FEED_GROUP_EXPAND)
+    val key = booleanPreferencesKey(FEED_DEFAULT_GROUP_EXPAND)
 
     fun put(context: Context, scope: CoroutineScope, value: Boolean) {
         scope.launch(Dispatchers.IO) {

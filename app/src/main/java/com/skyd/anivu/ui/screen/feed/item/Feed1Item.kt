@@ -1,4 +1,4 @@
-package com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy
+package com.skyd.anivu.ui.screen.feed.item
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -27,58 +27,32 @@ import androidx.compose.ui.unit.dp
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.model.bean.FeedBean
 import com.skyd.anivu.model.bean.FeedViewBean
-import com.skyd.anivu.model.bean.GroupVo
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
 import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.screen.article.FeedIcon
 import com.skyd.anivu.ui.screen.article.openArticleScreen
-
-class Feed1Proxy(
-    private val visible: (groupId: String) -> Boolean = { true },
-    private val selected: (FeedBean) -> Boolean = { false },
-    private val isEnded: (index: Int) -> Boolean = { false },
-    private val inGroup: () -> Boolean = { false },
-    private val onClick: ((FeedBean) -> Unit)? = null,
-    private val onEdit: ((FeedBean) -> Unit)? = null,
-) : LazyGridAdapter.Proxy<FeedViewBean>() {
-    @Composable
-    override fun Draw(index: Int, data: FeedViewBean) {
-        Feed1Item(
-            index = index,
-            data = data,
-            visible = visible,
-            selected = selected,
-            isEnded = isEnded,
-            inGroup = inGroup,
-            onClick = onClick,
-            onEdit = onEdit,
-        )
-    }
-}
 
 @Composable
 fun Feed1Item(
-    index: Int,
     data: FeedViewBean,
-    visible: (groupId: String) -> Boolean,
-    selected: (FeedBean) -> Boolean,
-    inGroup: () -> Boolean,
+    visible: Boolean = true,
+    selected: Boolean = false,
+    inGroup: Boolean = false,
+    isEnd: Boolean = false,
     onClick: ((FeedBean) -> Unit)? = null,
-    isEnded: (index: Int) -> Boolean,
     onEdit: ((FeedBean) -> Unit)? = null,
 ) {
     val navController = LocalNavController.current
     val feed = data.feed
 
     AnimatedVisibility(
-        visible = visible(feed.groupId ?: GroupVo.DEFAULT_GROUP_ID),
+        visible = visible,
         enter = fadeIn() + expandVertically(),
         exit = fadeOut() + shrinkVertically(),
     ) {
-        val isEnd = isEnded(index)
         Row(
             modifier = Modifier
                 .clip(
-                    if (inGroup()) {
+                    if (inGroup) {
                         if (isEnd) RoundedCornerShape(0.dp, 0.dp, SHAPE_CORNER_DP, SHAPE_CORNER_DP)
                         else RectangleShape
                     } else {
@@ -87,7 +61,7 @@ fun Feed1Item(
                 )
                 .background(
                     MaterialTheme.colorScheme.secondary.copy(
-                        alpha = if (selected(feed)) 0.15f else 0.1f
+                        alpha = if (selected) 0.15f else 0.1f
                     )
                 )
                 .combinedClickable(
@@ -104,7 +78,7 @@ fun Feed1Item(
                     },
                 )
                 .padding(horizontal = 20.dp, vertical = 10.dp)
-                .padding(bottom = if (inGroup() && isEnd) 6.dp else 0.dp)
+                .padding(bottom = if (inGroup && isEnd) 6.dp else 0.dp)
         ) {
             FeedIcon(modifier = Modifier.padding(vertical = 3.dp), data = feed, size = 36.dp)
             Spacer(modifier = Modifier.width(12.dp))

@@ -39,7 +39,7 @@ import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
-import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
+import com.skyd.anivu.model.worker.download.DownloadTorrentWorker.Companion.rememberDownloadWorkStarter
 import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
 import com.skyd.anivu.model.worker.download.isTorrentMimetype
 import com.skyd.anivu.ui.activity.PlayActivity
@@ -68,7 +68,7 @@ fun EnclosureBottomSheet(
     sheetState: SheetState = rememberModalBottomSheetState(),
     dataList: List<Any>,
 ) {
-    val context = LocalContext.current
+    val downloadWorkStarter = rememberDownloadWorkStarter()
     val onDownload: (Any) -> Unit = remember {
         {
             val url = when (it) {
@@ -77,9 +77,7 @@ fun EnclosureBottomSheet(
                 else -> null
             }
             if (!url.isNullOrBlank()) {
-                DownloadTorrentWorker.startWorker(
-                    context = context, torrentLink = url
-                )
+                downloadWorkStarter.start(torrentLink = url, requestId = null)
             }
         }
     }

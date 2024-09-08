@@ -73,7 +73,7 @@ import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.FeedIcon
+import com.skyd.anivu.ui.screen.article.FeedIcon
 import com.skyd.anivu.ui.component.showToast
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.screen.feed.requestheaders.openRequestHeadersScreen

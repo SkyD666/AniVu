@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -78,9 +79,6 @@ import com.skyd.anivu.ui.component.CircularProgressPlaceholder
 import com.skyd.anivu.ui.component.EmptyPlaceholder
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
-import com.skyd.anivu.ui.component.lazyverticalgrid.AniVuLazyVerticalGrid
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.LazyGridAdapter
-import com.skyd.anivu.ui.component.lazyverticalgrid.adapter.proxy.Article1Proxy
 import com.skyd.anivu.ui.local.LocalArticleItemMinWidth
 import com.skyd.anivu.ui.local.LocalArticleListTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleTopBarTonalElevation
@@ -366,20 +364,27 @@ private fun ArticleList(
     contentPadding: PaddingValues,
 ) {
     if (articles.itemCount > 0) {
-        val adapter = remember {
-            LazyGridAdapter(mutableListOf(Article1Proxy(onFavorite = onFavorite, onRead = onRead)))
-        }
-        AniVuLazyVerticalGrid(
+        LazyVerticalGrid(
             modifier = modifier.fillMaxSize(),
             columns = GridCells.Adaptive(LocalArticleItemMinWidth.current.dp),
-            dataList = articles,
-            listState = listState,
-            adapter = adapter,
+            state = listState,
             contentPadding = contentPadding + PaddingValues(horizontal = 12.dp, vertical = 6.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            key = { _, item -> (item as ArticleWithFeed).articleWithEnclosure.article.articleId },
-        )
+        ) {
+            items(
+                count = articles.itemCount,
+                key = { index -> (articles[index] as ArticleWithFeed).articleWithEnclosure.article.articleId },
+            ) { index ->
+                when (val item = articles[index]) {
+                    is ArticleWithFeed -> Article1Item(
+                        data = item,
+                        onFavorite = onFavorite,
+                        onRead = onRead,
+                    )
+                }
+            }
+        }
     } else {
         EmptyPlaceholder(
             modifier = Modifier.verticalScroll(rememberScrollState()),
