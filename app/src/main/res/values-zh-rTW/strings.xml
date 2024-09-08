@@ -44,7 +44,7 @@
     <string name="player_reset_zoom">還原螢幕</string>
     <string name="player_long_press_playback_speed">倍速播放中…</string>
     <string name="about_screen_name">關於</string>
-    <string name="app_short_description">All-in-one Android app for RSS, BitTorrent dl &amp; play.</string>
+    <string name="app_short_description">一個集 RSS 番劇訂閱與更新、位元洪流下載、影片播放為一體的工具。</string>
     <string name="app_tech_stack_description">AniVu 使用 MVI 架構，完全採用 Material You 設計風格。使用 Android View 和 Compose 混合開發。</string>
     <string name="about_screen_visit_github">訪問 GitHub 倉庫</string>
     <string name="about_screen_join_telegram">加入 Telegram 群組</string>
@@ -177,7 +177,6 @@
     <string name="feed_screen_delete_feed_warning">刪除訂閱和其包含的文章</string>
     <string name="feed_screen_rss_title">標題</string>
     <string name="feed_style_screen_name">訂閱頁面</string>
-    <string name="feed_style_screen_group_expand">總是展開</string>
     <string name="feed_style_screen_group_list_category">分組列表</string>
     <string name="appearance_screen_style_category">樣式</string>
     <string name="appearance_screen_screen_style_category">畫面風格</string>
@@ -335,6 +334,7 @@
     <string name="request_headers_screen_value">Value</string>
     <string name="player_config_screen_show_progress_indicator">Progress indicator</string>
     <string name="read_screen_text_size">Text size</string>
+    <string name="download_no_notification_permission_tip">Notification permission has not been granted so the download cannot work</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已讀 %d 項</item>
     </plurals>
