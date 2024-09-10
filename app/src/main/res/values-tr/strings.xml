@@ -336,6 +336,9 @@
     <string name="player_config_screen_show_progress_indicator">Progress indicator</string>
     <string name="read_screen_text_size">Text size</string>
     <string name="download_no_notification_permission_tip">Notification permission has not been granted so the download cannot work</string>
+    <string name="read_style_screen_name">Read screen</string>
+    <string name="read_style_screen_top_bar_category">Top bar</string>
+    <string name="read_style_screen_content_category">Content</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">%d öğeyi okundu</item>
         <item quantity="other">%d öğe okundu</item>
