@@ -24,6 +24,8 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPre
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
+import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.read.ReadTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
@@ -99,6 +101,8 @@ import com.skyd.anivu.ui.local.LocalProxyPort
 import com.skyd.anivu.ui.local.LocalProxyType
 import com.skyd.anivu.ui.local.LocalProxyUsername
 import com.skyd.anivu.ui.local.LocalReadTextSize
+import com.skyd.anivu.ui.local.LocalReadContentTonalElevation
+import com.skyd.anivu.ui.local.LocalReadTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalRssSyncBatteryNotLowConstraint
 import com.skyd.anivu.ui.local.LocalRssSyncChargingConstraint
 import com.skyd.anivu.ui.local.LocalRssSyncFrequency
@@ -137,6 +141,8 @@ data class Settings(
     val searchItemMinWidth: Float = SearchItemMinWidthPreference.default,
     val mediaShowThumbnail: Boolean = MediaShowThumbnailPreference.default,
     val readTextSize: Float = ReadTextSizePreference.default,
+    val readContentTonalElevation: Float = ReadContentTonalElevationPreference.default,
+    val readTopBarTonalElevation: Float = ReadTopBarTonalElevationPreference.default,
     // Update
     val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
     // Behavior
@@ -208,6 +214,8 @@ fun SettingsProvider(
         LocalSearchItemMinWidth provides settings.searchItemMinWidth,
         LocalMediaShowThumbnail provides settings.mediaShowThumbnail,
         LocalReadTextSize provides settings.readTextSize,
+        LocalReadContentTonalElevation provides settings.readContentTonalElevation,
+        LocalReadTopBarTonalElevation provides settings.readTopBarTonalElevation,
         // Update
         LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
         // Behavior

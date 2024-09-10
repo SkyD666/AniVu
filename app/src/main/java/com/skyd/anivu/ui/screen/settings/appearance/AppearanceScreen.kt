@@ -75,6 +75,7 @@ import com.skyd.anivu.ui.local.LocalTheme
 import com.skyd.anivu.ui.screen.settings.appearance.article.ARTICLE_STYLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.appearance.feed.FEED_STYLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.appearance.media.MEDIA_STYLE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.appearance.read.READ_STYLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.appearance.search.SEARCH_STYLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.theme.extractColors
 
@@ -213,6 +214,14 @@ fun AppearanceScreen() {
             item {
                 BaseSettingsItem(
                     icon = null,
+                    text = stringResource(id = R.string.feed_style_screen_name),
+                    description = null,
+                    onClick = { navController.navigate(FEED_STYLE_SCREEN_ROUTE) },
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = null,
                     text = stringResource(id = R.string.article_style_screen_name),
                     description = null,
                     onClick = { navController.navigate(ARTICLE_STYLE_SCREEN_ROUTE) },
@@ -221,9 +230,9 @@ fun AppearanceScreen() {
             item {
                 BaseSettingsItem(
                     icon = null,
-                    text = stringResource(id = R.string.feed_style_screen_name),
+                    text = stringResource(id = R.string.read_style_screen_name),
                     description = null,
-                    onClick = { navController.navigate(FEED_STYLE_SCREEN_ROUTE) },
+                    onClick = { navController.navigate(READ_STYLE_SCREEN_ROUTE) },
                 )
             }
             item {

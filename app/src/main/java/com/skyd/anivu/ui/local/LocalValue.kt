@@ -20,6 +20,8 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPre
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
+import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.read.ReadTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
@@ -92,6 +94,8 @@ val LocalArticleItemMinWidth = compositionLocalOf { ArticleItemMinWidthPreferenc
 val LocalSearchItemMinWidth = compositionLocalOf { SearchItemMinWidthPreference.default }
 val LocalMediaShowThumbnail = compositionLocalOf { MediaShowThumbnailPreference.default }
 val LocalReadTextSize = compositionLocalOf { ReadTextSizePreference.default }
+val LocalReadContentTonalElevation = compositionLocalOf { ReadContentTonalElevationPreference.default }
+val LocalReadTopBarTonalElevation = compositionLocalOf { ReadTopBarTonalElevationPreference.default }
 
 // Update
 val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreference.default }

@@ -19,6 +19,8 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPre
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
+import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.read.ReadTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
@@ -78,6 +80,8 @@ fun Preferences.toSettings(): Settings {
         searchItemMinWidth = SearchItemMinWidthPreference.fromPreferences(this),
         mediaShowThumbnail = MediaShowThumbnailPreference.fromPreferences(this),
         readTextSize = ReadTextSizePreference.fromPreferences(this),
+        readContentTonalElevation = ReadContentTonalElevationPreference.fromPreferences(this),
+        readTopBarTonalElevation = ReadTopBarTonalElevationPreference.fromPreferences(this),
 
         // Update
         ignoreUpdateVersion = IgnoreUpdateVersionPreference.fromPreferences(this),

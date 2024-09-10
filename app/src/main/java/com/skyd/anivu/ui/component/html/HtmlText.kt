@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
@@ -26,12 +27,12 @@ fun HtmlText(
     modifier: Modifier = Modifier,
     htmlFlags: Int = FROM_HTML_MODE_LEGACY,
     text: String,
+    color: Color = LocalContentColor.current,
     fontSize: TextUnit = TextUnit.Unspecified,
     onImageClick: ((String) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
-    val textColor = LocalContentColor.current
     val textSize = with(LocalDensity.current) { fontSize.toPx() }
     var componentWidth by remember { mutableIntStateOf(0) }
     AndroidView(
@@ -44,7 +45,7 @@ fun HtmlText(
                 // otherwise movementMethod is invalid.
                 setTextIsSelectable(true)
                 movementMethod = LinkMovementMethod.getInstance()
-                setTextColor(textColor.toArgb())
+                setTextColor(color.toArgb())
             }
         },
         update = { textView ->

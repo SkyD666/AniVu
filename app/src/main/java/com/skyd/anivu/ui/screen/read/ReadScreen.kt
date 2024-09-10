@@ -38,6 +38,7 @@ import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalAbsoluteTonalElevation
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -48,6 +49,7 @@ import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -101,7 +103,9 @@ import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.html.HtmlText
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
+import com.skyd.anivu.ui.local.LocalReadContentTonalElevation
 import com.skyd.anivu.ui.local.LocalReadTextSize
+import com.skyd.anivu.ui.local.LocalReadTopBarTonalElevation
 import com.skyd.anivu.ui.screen.article.enclosure.EnclosureBottomSheet
 import com.skyd.anivu.ui.screen.article.enclosure.getEnclosuresList
 import com.skyd.anivu.util.ShareUtil
@@ -144,6 +148,14 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                 style = AniVuTopBarStyle.Small,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.read_screen_name)) },
+                colors = TopAppBarDefaults.topAppBarColors().copy(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                        LocalReadTopBarTonalElevation.current.dp
+                    ),
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                        LocalReadTopBarTonalElevation.current.dp + 4.dp
+                    ),
+                ),
                 actions = {
                     AniVuIconButton(
                         enabled = uiState.articleState is ArticleState.Success,
@@ -205,7 +217,11 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                     contentDescription = stringResource(R.string.bottom_sheet_enclosure_title),
                 )
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+            LocalAbsoluteTonalElevation.current +
+                    LocalReadContentTonalElevation.current.dp
+        ),
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -308,6 +324,7 @@ private fun Content(
             article.article.title?.let { title ->
                 Text(
                     modifier = Modifier
+                        .padding(top = 12.dp)
                         .clip(RoundedCornerShape(6.dp))
                         .animateContentSize()
                         .clickable { expandTitle = !expandTitle },
@@ -315,6 +332,7 @@ private fun Content(
                     style = MaterialTheme.typography.titleLarge,
                     maxLines = if (expandTitle) Int.MAX_VALUE else 3,
                     overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
             }
             val date = article.article.date
@@ -354,6 +372,7 @@ private fun Content(
         text = article.article.content.ifNullOfBlank {
             article.article.description.orEmpty()
         },
+        color = MaterialTheme.colorScheme.onSurface,
         fontSize = LocalReadTextSize.current.sp,
         onImageClick = { imageUrl -> openImageSheet = imageUrl }
     )

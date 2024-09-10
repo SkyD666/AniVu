@@ -335,6 +335,9 @@
     <string name="player_config_screen_show_progress_indicator">进度指示</string>
     <string name="read_screen_text_size">文字大小</string>
     <string name="download_no_notification_permission_tip">未授权通知权限，无法下载</string>
+    <string name="read_style_screen_name">阅读页面</string>
+    <string name="read_style_screen_top_bar_category">标题栏</string>
+    <string name="read_style_screen_content_category">文章内容</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>
