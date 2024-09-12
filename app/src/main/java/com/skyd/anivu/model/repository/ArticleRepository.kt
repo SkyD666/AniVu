@@ -13,6 +13,7 @@ import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
+import com.skyd.anivu.ui.component.showToast
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -96,12 +97,17 @@ class ArticleRepository @Inject constructor(
                 feedUrls.forEach { feedUrl ->
                     requests += async {
                         val articleBeanListAsync = async {
-                            rssHelper.queryRssXml(
-                                feed = feedDao.getFeed(feedUrl),
-                                latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link,
-                            )?.also { feedWithArticle ->
-                                feedDao.updateFeed(feedWithArticle.feed)
-                            }?.articles
+                            runCatching {
+                                rssHelper.queryRssXml(
+                                    feed = feedDao.getFeed(feedUrl),
+                                    latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link,
+                                )?.also { feedWithArticle ->
+                                    feedDao.updateFeed(feedWithArticle.feed)
+                                }?.articles
+                            }.onFailure { e ->
+                                e.printStackTrace()
+                                (feedUrl + "\n" + e.message).showToast()
+                            }.getOrNull()
                         }
                         val articleBeanList = articleBeanListAsync.await() ?: return@async
 
