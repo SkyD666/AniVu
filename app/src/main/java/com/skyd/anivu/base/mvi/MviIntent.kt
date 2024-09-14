@@ -6,9 +6,7 @@ import androidx.compose.runtime.remember
 import com.skyd.anivu.ext.startWith
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.withContext
 
 /**

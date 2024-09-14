@@ -1,7 +1,6 @@
 package com.skyd.anivu.ui.screen.feed.requestheaders
 
 import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.ui.screen.feed.reorder.ReorderGroupPartialStateChange.GroupList.Success
 
 
 internal sealed interface RequestHeadersPartialStateChange {

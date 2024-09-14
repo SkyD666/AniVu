@@ -2,7 +2,7 @@ package com.skyd.anivu.model.repository.download
 
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.config.Const
-import com.skyd.anivu.ext.debounceWithoutFirst
+import com.skyd.anivu.ext.sampleWithoutFirst
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +18,8 @@ class DownloadRepository @Inject constructor() : BaseRepository() {
     suspend fun requestDownloadingVideos(): Flow<List<DownloadInfoBean>> {
         return combine(
             DownloadManager.getDownloadInfoList().distinctUntilChanged(),
-            DownloadTorrentWorker.peerInfoMapFlow.debounceWithoutFirst(1000),
-            DownloadTorrentWorker.torrentStatusMapFlow.debounceWithoutFirst(1000),
+            DownloadTorrentWorker.peerInfoMapFlow.sampleWithoutFirst(1000),
+            DownloadTorrentWorker.torrentStatusMapFlow.sampleWithoutFirst(1000),
         ) { list, peerInfoMap, uploadPayloadRateMap ->
             list.map { downloadInfoBean ->
                 downloadInfoBean.copy().apply {

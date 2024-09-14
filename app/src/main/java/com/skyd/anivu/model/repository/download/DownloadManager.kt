@@ -2,7 +2,7 @@ package com.skyd.anivu.model.repository.download
 
 import androidx.work.WorkManager
 import com.skyd.anivu.appContext
-import com.skyd.anivu.ext.debounceWithoutFirst
+import com.skyd.anivu.ext.sampleWithoutFirst
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.bean.download.DownloadInfoBean.DownloadState
 import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
@@ -21,8 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.consumeAsFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -62,7 +60,7 @@ object DownloadManager {
     private fun Flow<DownloadManagerIntent>.onEachIntent(): Flow<DownloadManagerIntent> {
         return merge(
             filterIsInstance<DownloadManagerIntent.UpdateDownloadInfo>()
-                .debounceWithoutFirst(100)
+                .sampleWithoutFirst(100)
                 .onEach { intent ->
                     downloadInfoDao.updateDownloadInfo(intent.downloadInfoBean)
                     putDownloadInfoToMap(
@@ -82,7 +80,7 @@ object DownloadManager {
                 }.catch { it.printStackTrace() },
 
             filterIsInstance<DownloadManagerIntent.UpdateDownloadProgress>()
-                .debounceWithoutFirst(1000)
+                .sampleWithoutFirst(1000)
                 .onEach { intent ->
                     val result = downloadInfoDao.updateDownloadProgress(
                         link = intent.link,
@@ -105,7 +103,7 @@ object DownloadManager {
                 }.catch { it.printStackTrace() },
 
             filterIsInstance<DownloadManagerIntent.UpdateDownloadSize>()
-                .debounceWithoutFirst(1000)
+                .sampleWithoutFirst(1000)
                 .onEach { intent ->
                     val result = downloadInfoDao.updateDownloadSize(
                         link = intent.link, size = intent.size,
@@ -116,7 +114,7 @@ object DownloadManager {
                 }.catch { it.printStackTrace() },
 
             filterIsInstance<DownloadManagerIntent.UpdateDownloadName>()
-                .debounceWithoutFirst(200)
+                .sampleWithoutFirst(200)
                 .onEach { intent ->
                     if (intent.name.isNullOrBlank()) return@onEach
                     val result = downloadInfoDao.updateDownloadName(
@@ -146,7 +144,7 @@ object DownloadManager {
                 .catch { it.printStackTrace() },
 
             filterIsInstance<DownloadManagerIntent.UpdateDownloadDescription>()
-                .debounceWithoutFirst(500)
+                .sampleWithoutFirst(500)
                 .onEach { intent ->
                     val result = downloadInfoDao.updateDownloadDescription(
                         link = intent.link,

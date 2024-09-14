@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @Parcelize
 sealed class ArticleSort(open val asc: Boolean) : Parcelable {
@@ -105,8 +106,10 @@ class ArticleRepository @Inject constructor(
                                     feedDao.updateFeed(feedWithArticle.feed)
                                 }?.articles
                             }.onFailure { e ->
-                                e.printStackTrace()
-                                (feedUrl + "\n" + e.message).showToast()
+                                if (e !is CancellationException) {
+                                    e.printStackTrace()
+                                    (feedUrl + "\n" + e.message).showToast()
+                                }
                             }.getOrNull()
                         }
                         val articleBeanList = articleBeanListAsync.await() ?: return@async
