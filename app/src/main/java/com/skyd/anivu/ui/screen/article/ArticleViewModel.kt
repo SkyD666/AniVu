@@ -8,8 +8,6 @@ import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.model.repository.ArticleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
@@ -20,7 +18,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,20 +31,15 @@ class ArticleViewModel @Inject constructor(
         val initialVS = ArticleState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<ArticleIntent.Init>().distinctUntilChanged(),
-            intentSharedFlow.filterNot { it is ArticleIntent.Init }
+            intentFlow.filterIsInstance<ArticleIntent.Init>().distinctUntilChanged(),
+            intentFlow.filterNot { it is ArticleIntent.Init }
         )
-            .shareWhileSubscribed()
             .toArticlePartialStateChangeFlow()
             .debugLog("ArticlePartialStateChange")
             .sendSingleEvent()
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
     private fun Flow<ArticlePartialStateChange>.sendSingleEvent(): Flow<ArticlePartialStateChange> {
@@ -75,7 +67,7 @@ class ArticleViewModel @Inject constructor(
         }
     }
 
-    private fun SharedFlow<ArticleIntent>.toArticlePartialStateChangeFlow(): Flow<ArticlePartialStateChange> {
+    private fun Flow<ArticleIntent>.toArticlePartialStateChangeFlow(): Flow<ArticlePartialStateChange> {
         return merge(
             filterIsInstance<ArticleIntent.Init>().flatMapConcat { intent ->
                 flowOf(articleRepo.requestArticleList(intent.urls).cachedIn(viewModelScope)).map {

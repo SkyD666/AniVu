@@ -182,5 +182,10 @@ private fun getLicenseList(): List<LicenseBean> {
             license = "Apache-2.0",
             link = "https://github.com/Calvin-LL/Reorderable",
         ),
+        LicenseBean(
+            name = "OPML Parser",
+            license = "Apache-2.0",
+            link = "https://github.com/mdewilde/opml-parser",
+        ),
     ).sortedBy { it.name }
 }

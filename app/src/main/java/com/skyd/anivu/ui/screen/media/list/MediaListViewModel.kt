@@ -1,14 +1,11 @@
 package com.skyd.anivu.ui.screen.media.list
 
-import androidx.lifecycle.viewModelScope
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.model.repository.MediaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -19,7 +16,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
@@ -33,20 +29,15 @@ class MediaListViewModel @Inject constructor(
         val initialVS = MediaListState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<MediaListIntent.Init>().distinctUntilChanged(),
-            intentSharedFlow.filterNot { it is MediaListIntent.Init }
+            intentFlow.filterIsInstance<MediaListIntent.Init>().distinctUntilChanged(),
+            intentFlow.filterNot { it is MediaListIntent.Init }
         )
-            .shareWhileSubscribed()
             .toMediaListPartialStateChangeFlow()
             .debugLog("MediaListPartialStateChange")
             .sendSingleEvent()
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
     private fun Flow<MediaListPartialStateChange>.sendSingleEvent(): Flow<MediaListPartialStateChange> {
@@ -64,7 +55,7 @@ class MediaListViewModel @Inject constructor(
         }
     }
 
-    private fun SharedFlow<MediaListIntent>.toMediaListPartialStateChangeFlow(): Flow<MediaListPartialStateChange> {
+    private fun Flow<MediaListIntent>.toMediaListPartialStateChangeFlow(): Flow<MediaListPartialStateChange> {
         return merge(
             merge(
                 filterIsInstance<MediaListIntent.Init>().filterNot { it.path.isNullOrBlank() },

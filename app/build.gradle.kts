@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 24
-        versionName = "2.1-beta03"
+        versionName = "2.1-beta04"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -211,7 +211,7 @@ dependencies {
 
     implementation(libs.rome)
     implementation(libs.rome.modules)
-    implementation("be.ceau:opml-parser:3.1.0") {
+    implementation(libs.ceau.opmlparser) {
         exclude(group = "net.sf.kxml", module = "kxml2")
     }
 

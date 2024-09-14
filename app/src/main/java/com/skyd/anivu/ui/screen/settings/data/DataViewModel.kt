@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.screen.settings.data
 
-import androidx.lifecycle.viewModelScope
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
@@ -10,8 +9,6 @@ import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.model.repository.DataRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
@@ -20,7 +17,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
@@ -35,20 +31,15 @@ class DataViewModel @Inject constructor(
         val initialVS = DataState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<DataIntent.Init>().take(1),
-            intentSharedFlow.filterNot { it is DataIntent.Init }
+            intentFlow.filterIsInstance<DataIntent.Init>().take(1),
+            intentFlow.filterNot { it is DataIntent.Init }
         )
-            .shareWhileSubscribed()
             .toDataPartialStateChangeFlow()
             .debugLog("DataPartialStateChange")
             .sendSingleEvent()
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
     private fun Flow<DataPartialStateChange>.sendSingleEvent(): Flow<DataPartialStateChange> {
@@ -95,7 +86,7 @@ class DataViewModel @Inject constructor(
         }
     }
 
-    private fun SharedFlow<DataIntent>.toDataPartialStateChangeFlow(): Flow<DataPartialStateChange> {
+    private fun Flow<DataIntent>.toDataPartialStateChangeFlow(): Flow<DataPartialStateChange> {
         return merge(
             filterIsInstance<DataIntent.Init>().map { DataPartialStateChange.Init },
 

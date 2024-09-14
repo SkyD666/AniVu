@@ -37,8 +37,7 @@ fun <I : MviIntent, S : MviViewState, E : MviSingleEvent>
             intentChannel
                 .consumeAsFlow()
                 .run { if (startWith == null) this else startWith(startWith) }
-                .onEach(this@getDispatcher::processIntent)
-                .collect()
+                .collect(this@getDispatcher::processIntent)
         }
     }
     return remember(*keys, intentChannel) {

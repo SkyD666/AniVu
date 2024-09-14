@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.screen.read
 
-import androidx.lifecycle.viewModelScope
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
@@ -10,8 +9,6 @@ import com.skyd.anivu.model.repository.ArticleRepository
 import com.skyd.anivu.model.repository.ReadRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
@@ -20,7 +17,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
@@ -36,20 +32,15 @@ class ReadViewModel @Inject constructor(
         val initialVS = ReadState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<ReadIntent.Init>().take(1),
-            intentSharedFlow.filterNot { it is ReadIntent.Init }
+            intentFlow.filterIsInstance<ReadIntent.Init>().take(1),
+            intentFlow.filterNot { it is ReadIntent.Init }
         )
-            .shareWhileSubscribed()
             .toReadPartialStateChangeFlow()
             .debugLog("ReadPartialStateChange")
             .sendSingleEvent()
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
     private fun Flow<ReadPartialStateChange>.sendSingleEvent(): Flow<ReadPartialStateChange> {
@@ -82,7 +73,7 @@ class ReadViewModel @Inject constructor(
         }
     }
 
-    private fun SharedFlow<ReadIntent>.toReadPartialStateChangeFlow(): Flow<ReadPartialStateChange> {
+    private fun Flow<ReadIntent>.toReadPartialStateChangeFlow(): Flow<ReadPartialStateChange> {
         return merge(
             filterIsInstance<ReadIntent.Init>().flatMapConcat { intent ->
                 articleRepo.readArticle(intent.articleId, read = true).flatMapConcat {

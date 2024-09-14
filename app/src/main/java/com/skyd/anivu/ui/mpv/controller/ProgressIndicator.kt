@@ -13,7 +13,9 @@ import com.skyd.anivu.ui.mpv.controller.state.PlayState
 @Composable
 fun ProgressIndicator(modifier: Modifier = Modifier, playState: () -> PlayState) {
     val animatedProgress by animateFloatAsState(
-        targetValue = playState().run { currentPosition.toFloat() / duration },
+        targetValue = playState().run {
+            if (duration == 0) 0f else currentPosition.toFloat() / duration
+        },
         animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
         label = "playerProgressIndicatorAnimate"
     )

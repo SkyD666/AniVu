@@ -1,14 +1,11 @@
 package com.skyd.anivu.ui.screen.feed.requestheaders
 
-import androidx.lifecycle.viewModelScope
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.model.repository.feed.RequestHeadersRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
@@ -17,7 +14,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
@@ -32,20 +28,15 @@ class RequestHeadersViewModel @Inject constructor(
         val initialVS = RequestHeadersState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<RequestHeadersIntent.Init>().take(1),
-            intentSharedFlow.filterNot { it is RequestHeadersIntent.Init }
+            intentFlow.filterIsInstance<RequestHeadersIntent.Init>().take(1),
+            intentFlow.filterNot { it is RequestHeadersIntent.Init }
         )
-            .shareWhileSubscribed()
             .toRequestHeadersPartialStateChangeFlow()
             .debugLog("RequestHeadersPartialStateChange")
             .sendSingleEvent()
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
     private fun Flow<RequestHeadersPartialStateChange>.sendSingleEvent(): Flow<RequestHeadersPartialStateChange> {
@@ -63,7 +54,7 @@ class RequestHeadersViewModel @Inject constructor(
         }
     }
 
-    private fun SharedFlow<RequestHeadersIntent>.toRequestHeadersPartialStateChangeFlow(): Flow<RequestHeadersPartialStateChange> {
+    private fun Flow<RequestHeadersIntent>.toRequestHeadersPartialStateChangeFlow(): Flow<RequestHeadersPartialStateChange> {
         return merge(
             filterIsInstance<RequestHeadersIntent.Init>().flatMapConcat { intent ->
                 requestHeadersRepo.getFeedHeaders(intent.feedUrl).map {

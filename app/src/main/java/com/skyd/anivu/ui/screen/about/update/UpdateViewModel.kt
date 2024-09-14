@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.screen.about.update
 
-import androidx.lifecycle.viewModelScope
 import com.skyd.anivu.appContext
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.config.Const
@@ -12,8 +11,6 @@ import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.model.repository.UpdateRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
@@ -23,7 +20,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import okhttp3.internal.toLongOrDefault
 import java.text.SimpleDateFormat
@@ -41,21 +37,16 @@ class UpdateViewModel @Inject constructor(private var updateRepo: UpdateReposito
         val initialVS = UpdateState.initial()
 
         viewState = merge(
-            intentSharedFlow.filter { it is UpdateIntent.CheckUpdate && !it.isRetry }.take(1),
-            intentSharedFlow.filter { it is UpdateIntent.CheckUpdate && it.isRetry },
-            intentSharedFlow.filterNot { it is UpdateIntent.CheckUpdate }
+            intentFlow.filter { it is UpdateIntent.CheckUpdate && !it.isRetry }.take(1),
+            intentFlow.filter { it is UpdateIntent.CheckUpdate && it.isRetry },
+            intentFlow.filterNot { it is UpdateIntent.CheckUpdate }
         )
-            .shareWhileSubscribed()
             .toUpdatePartialStateChangeFlow()
             .debugLog("UpdatePartialStateChange")
             .sendSingleEvent()
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
     private fun Flow<UpdatePartialStateChange>.sendSingleEvent(): Flow<UpdatePartialStateChange> {
@@ -71,7 +62,7 @@ class UpdateViewModel @Inject constructor(private var updateRepo: UpdateReposito
         }
     }
 
-    private fun SharedFlow<UpdateIntent>.toUpdatePartialStateChangeFlow(): Flow<UpdatePartialStateChange> {
+    private fun Flow<UpdateIntent>.toUpdatePartialStateChangeFlow(): Flow<UpdatePartialStateChange> {
         return merge(
             filterIsInstance<UpdateIntent.CheckUpdate>().flatMapConcat {
                 updateRepo.checkUpdate().map { data ->

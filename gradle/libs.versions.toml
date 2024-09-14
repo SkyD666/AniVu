@@ -50,7 +50,7 @@ okhttp3-logging = { module = "com.squareup.okhttp3:logging-interceptor", version
 retrofit2 = { module = "com.squareup.retrofit2:retrofit", version = "2.11.0" }
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version = "1.0.0" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.7.2" }
-kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version = "1.8.1" }
+kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version = "1.9.0" }
 
 aniyomi-mpv-lib = { module = "com.github.aniyomiorg:aniyomi-mpv-lib", version = "1.15.n" }
 ffmpeg-kit = { module = "com.github.jmir1:ffmpeg-kit", version = "1.15" }
@@ -64,10 +64,11 @@ lottie-compose = { module = "com.airbnb.android:lottie-compose", version = "6.5.
 
 rome = { module = "com.rometools:rome", version.ref = "rome" }
 rome-modules = { module = "com.rometools:rome-modules", version.ref = "rome" }
+ceau-opmlparser = { module = "be.ceau:opml-parser", version = "3.1.0" }
 
 readability4j = { module = "net.dankito.readability4j:readability4j", version = "1.0.8" }
 
-reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.3.2" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.3.3" }
 
 libtorrent4j-arm64 = { module = "org.libtorrent4j:libtorrent4j-android-arm64", version.ref = "libtorrent4j" }
 libtorrent4j-arm = { module = "org.libtorrent4j:libtorrent4j-android-arm", version.ref = "libtorrent4j" }

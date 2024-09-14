@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.mpv.mvi
 
-import androidx.lifecycle.viewModelScope
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.model.bean.MediaPlayHistoryBean
@@ -9,8 +8,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterIsInstance
@@ -20,7 +17,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -46,20 +42,15 @@ class PlayerViewModel @Inject constructor(
         val initialVS = PlayerState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<PlayerIntent.TrySeekToLast>().take(1),
-            intentSharedFlow.filterNot { it is PlayerIntent.TrySeekToLast }
+            intentFlow.filterIsInstance<PlayerIntent.TrySeekToLast>().take(1),
+            intentFlow.filterNot { it is PlayerIntent.TrySeekToLast }
         )
-            .shareWhileSubscribed()
             .toPlayerPartialStateChangeFlow()
             .debugLog("PlayerPartialStateChange")
             .sendSingleEvent()
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
     private fun Flow<PlayerPartialStateChange>.sendSingleEvent(): Flow<PlayerPartialStateChange> {
@@ -79,7 +70,7 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
-    private fun SharedFlow<PlayerIntent>.toPlayerPartialStateChangeFlow(): Flow<PlayerPartialStateChange> {
+    private fun Flow<PlayerIntent>.toPlayerPartialStateChangeFlow(): Flow<PlayerPartialStateChange> {
         return merge(
             filterIsInstance<PlayerIntent.TrySeekToLast>().flatMapConcat { intent ->
                 playerRepo.requestLastPlayPosition(intent.path).map {

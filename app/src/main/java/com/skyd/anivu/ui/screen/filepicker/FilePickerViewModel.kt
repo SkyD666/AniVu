@@ -1,14 +1,11 @@
 package com.skyd.anivu.ui.screen.filepicker
 
-import androidx.lifecycle.viewModelScope
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.model.repository.FilePickerRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapConcat
@@ -16,7 +13,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @HiltViewModel
@@ -29,17 +25,13 @@ class FilePickerViewModel @Inject constructor(
     init {
         val initialVS = FilePickerState.initial()
 
-        viewState = intentSharedFlow
+        viewState = intentFlow
             .toFilePickerPartialStateChangeFlow()
             .debugLog("FilePickerPartialStateChange")
             .sendSingleEvent()
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
     private fun Flow<FilePickerPartialStateChange>.sendSingleEvent(): Flow<FilePickerPartialStateChange> {
@@ -54,7 +46,7 @@ class FilePickerViewModel @Inject constructor(
         }
     }
 
-    private fun SharedFlow<FilePickerIntent>.toFilePickerPartialStateChangeFlow(): Flow<FilePickerPartialStateChange> {
+    private fun Flow<FilePickerIntent>.toFilePickerPartialStateChangeFlow(): Flow<FilePickerPartialStateChange> {
         return merge(
             merge(
                 filterIsInstance<FilePickerIntent.NewLocation>()

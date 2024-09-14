@@ -10,8 +10,6 @@ import com.skyd.anivu.model.repository.ArticleRepository
 import com.skyd.anivu.model.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
@@ -21,7 +19,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
@@ -37,23 +34,18 @@ class SearchViewModel @Inject constructor(
         val initialVS = SearchState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<SearchIntent.ListenSearchFeed>().take(1),
-            intentSharedFlow.filterIsInstance<SearchIntent.ListenSearchArticle>().take(1),
-            intentSharedFlow.filterNot {
+            intentFlow.filterIsInstance<SearchIntent.ListenSearchFeed>().take(1),
+            intentFlow.filterIsInstance<SearchIntent.ListenSearchArticle>().take(1),
+            intentFlow.filterNot {
                 it is SearchIntent.ListenSearchFeed || it is SearchIntent.ListenSearchArticle
             }
         )
-            .shareWhileSubscribed()
             .toSearchPartialStateChangeFlow()
             .debugLog("SearchPartialStateChange")
             .sendSingleEvent()
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
     private fun Flow<SearchPartialStateChange>.sendSingleEvent(): Flow<SearchPartialStateChange> {
@@ -73,7 +65,7 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    private fun SharedFlow<SearchIntent>.toSearchPartialStateChangeFlow(): Flow<SearchPartialStateChange> {
+    private fun Flow<SearchIntent>.toSearchPartialStateChangeFlow(): Flow<SearchPartialStateChange> {
         return merge(
             filterIsInstance<SearchIntent.ListenSearchFeed>().flatMapConcat {
                 flowOf(searchRepo.listenSearchFeed().cachedIn(viewModelScope)).map {

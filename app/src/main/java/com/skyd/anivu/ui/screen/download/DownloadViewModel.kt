@@ -1,26 +1,19 @@
 package com.skyd.anivu.ui.screen.download
 
-import androidx.lifecycle.viewModelScope
-import com.skyd.anivu.appContext
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.base.mvi.MviSingleEvent
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
 import com.skyd.anivu.model.repository.download.DownloadRepository
-import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.scan
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import javax.inject.Inject
 
@@ -35,22 +28,17 @@ class DownloadViewModel @Inject constructor(
         val initialVS = DownloadState.initial()
 
         viewState = merge(
-            intentSharedFlow.filterIsInstance<DownloadIntent.Init>().take(1),
-            intentSharedFlow.filterNot { it is DownloadIntent.Init }
+            intentFlow.filterIsInstance<DownloadIntent.Init>().take(1),
+            intentFlow.filterNot { it is DownloadIntent.Init }
         )
-            .shareWhileSubscribed()
             .toReadPartialStateChangeFlow()
             .debugLog("DownloadPartialStateChange")
             .scan(initialVS) { vs, change -> change.reduce(vs) }
             .debugLog("ViewState")
-            .stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                initialVS
-            )
+            .toState(initialVS)
     }
 
-    private fun SharedFlow<DownloadIntent>.toReadPartialStateChangeFlow(): Flow<DownloadPartialStateChange> {
+    private fun Flow<DownloadIntent>.toReadPartialStateChangeFlow(): Flow<DownloadPartialStateChange> {
         return merge(
             filterIsInstance<DownloadIntent.Init>().flatMapConcat {
                 downloadRepo.requestDownloadingVideos().map {
