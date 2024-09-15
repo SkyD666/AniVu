@@ -24,6 +24,9 @@ jobs:
         distribution: 'adopt'
         java-version: '17'
 
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+
     - name: Checkout Secret
       uses: actions/checkout@v4
       with:
@@ -80,7 +83,7 @@ jobs:
         path: |
           app/build/outputs/apk/GitHub/release/*x86*.apk
           !app/build/outputs/apk/GitHub/release/*x86_64*.apk
-          compression-level: 9
+        compression-level: 9
 
     # Upload apk (universal)
     - name: Upload Pre-Release Apk (universal)
