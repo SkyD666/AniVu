@@ -178,7 +178,9 @@ fun PlayerView(
     }
     LaunchedEffect(mediaLoaded) {
         if (uiState.needLoadLastPlayPosition && mediaLoaded && playState.duration > 0) {
-            dispatcher(PlayerIntent.TrySeekToLast(uri.toString(), playState.duration * 1000L))
+            uri.resolveUri(context)?.let { mediaId ->
+                dispatcher(PlayerIntent.TrySeekToLast(mediaId, playState.duration * 1000L))
+            }
         }
     }
     val dialogState by remember {
@@ -455,10 +457,11 @@ fun PlayerView(
             }
 
             Lifecycle.Event.ON_DESTROY -> {
-                viewModel.updatePlayHistory(
-                    uri.toString(),
-                    playState.currentPosition * 1000L,
-                )
+                uri.resolveUri(context)?.let { mediaId ->
+                    viewModel.updatePlayHistory(
+                        mediaId, playState.currentPosition * 1000L,
+                    )
+                }
             }
 
             else -> Unit
