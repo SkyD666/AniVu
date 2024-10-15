@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AutoDelete
+import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.outlined.MarkEmailUnread
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +33,8 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequencyPreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepFavoritePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepUnreadPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
@@ -40,6 +44,8 @@ import com.skyd.anivu.ui.component.SwitchSettingsItem
 import com.skyd.anivu.ui.component.dialog.SliderDialog
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleBefore
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleFrequency
+import com.skyd.anivu.ui.local.LocalAutoDeleteArticleKeepFavorite
+import com.skyd.anivu.ui.local.LocalAutoDeleteArticleKeepUnread
 import com.skyd.anivu.ui.local.LocalUseAutoDelete
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
@@ -111,6 +117,32 @@ fun AutoDeleteScreen() {
                     ),
                     onClick = { openAutoDeleteBeforeDialog = true },
                     enabled = useAutoDelete,
+                )
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.MarkEmailUnread,
+                    text = stringResource(id = R.string.auto_delete_article_screen_keep_unread),
+                    description = stringResource(id = R.string.auto_delete_article_screen_keep_unread_description),
+                    checked = LocalAutoDeleteArticleKeepUnread.current,
+                    onCheckedChange = {
+                        AutoDeleteArticleKeepUnreadPreference.put(
+                            context = context, scope = scope, value = it,
+                        )
+                    }
+                )
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.FavoriteBorder,
+                    text = stringResource(id = R.string.auto_delete_article_screen_keep_favorite),
+                    description = stringResource(id = R.string.auto_delete_article_screen_keep_favorite_description),
+                    checked = LocalAutoDeleteArticleKeepFavorite.current,
+                    onCheckedChange = {
+                        AutoDeleteArticleKeepFavoritePreference.put(
+                            context = context, scope = scope, value = it,
+                        )
+                    }
                 )
             }
         }

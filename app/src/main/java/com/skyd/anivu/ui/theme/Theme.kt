@@ -62,8 +62,9 @@ fun extractAllColors(darkTheme: Boolean): Map<String, ColorScheme> {
 fun extractColors(darkTheme: Boolean): Map<String, ColorScheme> {
     return ThemePreference.values.associateWith {
         rememberDynamicColorScheme(
-            seedColor = ThemePreference.toSeedColor(LocalContext.current, it),
+            primary = ThemePreference.toSeedColor(LocalContext.current, it),
             isDark = darkTheme,
+            isAmoled = false,
         )
     }.toMutableMap()
 }
@@ -81,7 +82,11 @@ fun extractDynamicColor(darkTheme: Boolean): Map<String, ColorScheme> {
             preset[ThemePreference.DYNAMIC] = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 rememberSystemDynamicColorScheme(isDark = darkTheme)
             } else {
-                rememberDynamicColorScheme(seedColor = Color(primary), isDark = darkTheme)
+                rememberDynamicColorScheme(
+                    primary = Color(primary),
+                    isDark = darkTheme,
+                    isAmoled = false,
+                )
             }
         }
     }

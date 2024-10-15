@@ -133,11 +133,17 @@ interface ArticleDao {
     @Query(
         """
         DELETE FROM $ARTICLE_TABLE_NAME
-        WHERE ${ArticleBean.UPDATE_AT_COLUMN} IS NULL
-        OR ${ArticleBean.UPDATE_AT_COLUMN} <= :timestamp
+        WHERE (${ArticleBean.UPDATE_AT_COLUMN} IS NULL
+        OR ${ArticleBean.UPDATE_AT_COLUMN} <= :timestamp)
+        AND (:keepUnread = 0 OR ${ArticleBean.IS_READ_COLUMN} = 1)
+        AND (:keepFavorite = 0 OR ${ArticleBean.IS_FAVORITE_COLUMN} = 0)
         """
     )
-    suspend fun deleteArticleBefore(timestamp: Long): Int
+    suspend fun deleteArticleBefore(
+        timestamp: Long,
+        keepUnread: Boolean = true,
+        keepFavorite: Boolean = true,
+    ): Int
 
     @Transaction
     @RawQuery(observedEntities = [FeedBean::class, ArticleBean::class, EnclosureBean::class])

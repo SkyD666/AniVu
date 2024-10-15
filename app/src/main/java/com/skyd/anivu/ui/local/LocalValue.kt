@@ -19,8 +19,8 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPre
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
-import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
 import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
 import com.skyd.anivu.model.preference.appearance.read.ReadTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
@@ -34,6 +34,8 @@ import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequencyPreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepFavoritePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepUnreadPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
@@ -94,8 +96,10 @@ val LocalArticleItemMinWidth = compositionLocalOf { ArticleItemMinWidthPreferenc
 val LocalSearchItemMinWidth = compositionLocalOf { SearchItemMinWidthPreference.default }
 val LocalMediaShowThumbnail = compositionLocalOf { MediaShowThumbnailPreference.default }
 val LocalReadTextSize = compositionLocalOf { ReadTextSizePreference.default }
-val LocalReadContentTonalElevation = compositionLocalOf { ReadContentTonalElevationPreference.default }
-val LocalReadTopBarTonalElevation = compositionLocalOf { ReadTopBarTonalElevationPreference.default }
+val LocalReadContentTonalElevation =
+    compositionLocalOf { ReadContentTonalElevationPreference.default }
+val LocalReadTopBarTonalElevation =
+    compositionLocalOf { ReadTopBarTonalElevationPreference.default }
 
 // Update
 val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreference.default }
@@ -135,6 +139,10 @@ val LocalUseAutoDelete = compositionLocalOf { UseAutoDeletePreference.default }
 val LocalAutoDeleteArticleFrequency =
     compositionLocalOf { AutoDeleteArticleFrequencyPreference.default }
 val LocalAutoDeleteArticleBefore = compositionLocalOf { AutoDeleteArticleBeforePreference.default }
+val LocalAutoDeleteArticleKeepUnread =
+    compositionLocalOf { AutoDeleteArticleKeepUnreadPreference.default }
+val LocalAutoDeleteArticleKeepFavorite =
+    compositionLocalOf { AutoDeleteArticleKeepFavoritePreference.default }
 val LocalOpmlExportDir = compositionLocalOf { OpmlExportDirPreference.default }
 val LocalMediaLibLocation = compositionLocalOf { MediaLibLocationPreference.default }
 

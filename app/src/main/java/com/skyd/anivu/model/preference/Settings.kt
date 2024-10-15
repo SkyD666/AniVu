@@ -23,8 +23,8 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPre
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
-import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
 import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
 import com.skyd.anivu.model.preference.appearance.read.ReadTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
@@ -38,6 +38,8 @@ import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequencyPreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepFavoritePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepUnreadPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
@@ -71,6 +73,8 @@ import com.skyd.anivu.ui.local.LocalArticleTapAction
 import com.skyd.anivu.ui.local.LocalArticleTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleBefore
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleFrequency
+import com.skyd.anivu.ui.local.LocalAutoDeleteArticleKeepFavorite
+import com.skyd.anivu.ui.local.LocalAutoDeleteArticleKeepUnread
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalDateStyle
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
@@ -100,8 +104,8 @@ import com.skyd.anivu.ui.local.LocalProxyPassword
 import com.skyd.anivu.ui.local.LocalProxyPort
 import com.skyd.anivu.ui.local.LocalProxyType
 import com.skyd.anivu.ui.local.LocalProxyUsername
-import com.skyd.anivu.ui.local.LocalReadTextSize
 import com.skyd.anivu.ui.local.LocalReadContentTonalElevation
+import com.skyd.anivu.ui.local.LocalReadTextSize
 import com.skyd.anivu.ui.local.LocalReadTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalRssSyncBatteryNotLowConstraint
 import com.skyd.anivu.ui.local.LocalRssSyncChargingConstraint
@@ -172,6 +176,8 @@ data class Settings(
     val useAutoDelete: Boolean = UseAutoDeletePreference.default,
     val autoDeleteArticleFrequency: Long = AutoDeleteArticleFrequencyPreference.default,
     val autoDeleteArticleBefore: Long = AutoDeleteArticleBeforePreference.default,
+    val autoDeleteArticleKeepUnread: Boolean = AutoDeleteArticleKeepUnreadPreference.default,
+    val autoDeleteArticleKeepFavorite: Boolean = AutoDeleteArticleKeepFavoritePreference.default,
     val opmlExportDir: String = OpmlExportDirPreference.default,
     val mediaLibLocation: String = MediaLibLocationPreference.default,
     // Transmission
@@ -245,6 +251,8 @@ fun SettingsProvider(
         LocalUseAutoDelete provides settings.useAutoDelete,
         LocalAutoDeleteArticleFrequency provides settings.autoDeleteArticleFrequency,
         LocalAutoDeleteArticleBefore provides settings.autoDeleteArticleBefore,
+        LocalAutoDeleteArticleKeepUnread provides settings.autoDeleteArticleKeepUnread,
+        LocalAutoDeleteArticleKeepFavorite provides settings.autoDeleteArticleKeepFavorite,
         LocalOpmlExportDir provides settings.opmlExportDir,
         LocalMediaLibLocation provides settings.mediaLibLocation,
         // Transmission

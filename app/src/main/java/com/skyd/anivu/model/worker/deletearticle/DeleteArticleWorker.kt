@@ -7,6 +7,8 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepFavoritePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepUnreadPreference
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -28,8 +30,15 @@ class DeleteArticleWorker(context: Context, parameters: WorkerParameters) :
     override suspend fun doWork(): Result {
         runCatching {
             hiltEntryPoint.articleDao.deleteArticleBefore(
-                System.currentTimeMillis() -
-                        applicationContext.dataStore.getOrDefault(AutoDeleteArticleBeforePreference)
+                timestamp = System.currentTimeMillis() - applicationContext.dataStore.getOrDefault(
+                    AutoDeleteArticleBeforePreference
+                ),
+                keepUnread = applicationContext.dataStore.getOrDefault(
+                    AutoDeleteArticleKeepUnreadPreference
+                ),
+                keepFavorite = applicationContext.dataStore.getOrDefault(
+                    AutoDeleteArticleKeepFavoritePreference
+                ),
             )
         }.onFailure { return Result.failure() }
         return Result.success()

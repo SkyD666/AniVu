@@ -3,6 +3,7 @@
         <img src="doc/image/AniVu.svg" style="height: 210px"/>
     </div>
     <h1>🥰 AniVu</h1>
+    <p>(<b>A</b> <b>N</b>ew <b>I</b>ntegration <b>View</b>)</p>
     <p>
         <a href="https://github.com/SkyD666/AniVu/actions" style="text-decoration:none">
             <img src="https://img.shields.io/github/actions/workflow/status/SkyD666/AniVu/pre_release.yml?branch=master&style=for-the-badge" alt="GitHub Workflow Status"  />
@@ -30,15 +31,16 @@
         </a>
     </p>
     <p>
-        <b>AniVu</b>, an <b>all-in-one tool</b> for <b>RSS subscription and updates</b>, <b>bit torrent downloads</b>, and <b>video playback</b>.
+        An <b>all-in-one tool</b> for <b>RSS subscription and updates</b>, <b>bit torrent downloads</b>, and <b>video playback</b>.
     </p>
     <p>
         AniVu utilizes the <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> architecture and fully adopts the <b><a href="https://m3.material.io/">Material You</a></b> design style. All pages are developed using <b>Jetpack Compose</b>.
     </p>
     <p>
-        <b><a href="doc/readme/README-zh-rCN.md">中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="doc/readme/README-zh-rTW.md">正體中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">Help us translate</a></b>
+        <b><a href="doc/readme/README-zh-rCN.md">简体中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="doc/readme/README-zh-rTW.md">正體中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">Help us translate</a></b>
     </p>
 </div>
+
 
 <a href="https://f-droid.org/packages/com.skyd.anivu"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>
 

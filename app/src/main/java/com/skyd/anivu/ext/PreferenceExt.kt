@@ -33,6 +33,8 @@ import com.skyd.anivu.model.preference.behavior.feed.HideEmptyDefaultPreference
 import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleBeforePreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequencyPreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepFavoritePreference
+import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepUnreadPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
@@ -118,6 +120,8 @@ fun Preferences.toSettings(): Settings {
         useAutoDelete = UseAutoDeletePreference.fromPreferences(this),
         autoDeleteArticleFrequency = AutoDeleteArticleFrequencyPreference.fromPreferences(this),
         autoDeleteArticleBefore = AutoDeleteArticleBeforePreference.fromPreferences(this),
+        autoDeleteArticleKeepUnread = AutoDeleteArticleKeepUnreadPreference.fromPreferences(this),
+        autoDeleteArticleKeepFavorite = AutoDeleteArticleKeepFavoritePreference.fromPreferences(this),
         opmlExportDir = OpmlExportDirPreference.fromPreferences(this),
         mediaLibLocation = MediaLibLocationPreference.fromPreferences(this),
 
