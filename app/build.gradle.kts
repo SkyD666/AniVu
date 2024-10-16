@@ -153,6 +153,7 @@ tasks.withType(KotlinCompile::class.java).configureEach {
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
             "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
+            "-opt-in=kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi"
         )
     }
 }
