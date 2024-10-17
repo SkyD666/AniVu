@@ -343,6 +343,7 @@
     <string name="auto_delete_article_screen_keep_favorite">Preserve favorite</string>
     <string name="auto_delete_article_screen_keep_unread_description">Unread articles won\'t be deleted</string>
     <string name="auto_delete_article_screen_keep_favorite_description">Favorite articles won\'t be deleted</string>
+    <string name="appearance_screen_amoled_dark">Amoled dark</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">%d öğeyi okundu</item>
         <item quantity="other">%d öğe okundu</item>
