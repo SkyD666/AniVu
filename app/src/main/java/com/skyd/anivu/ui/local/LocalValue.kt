@@ -4,6 +4,7 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.compositionLocalOf
 import androidx.navigation.NavHostController
 import com.skyd.anivu.model.preference.IgnoreUpdateVersionPreference
+import com.skyd.anivu.model.preference.appearance.AmoledDarkModePreference
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
@@ -72,6 +73,7 @@ val LocalWindowSizeClass = compositionLocalOf<WindowSizeClass> {
 // Appearance
 val LocalTheme = compositionLocalOf { ThemePreference.default }
 val LocalDarkMode = compositionLocalOf { DarkModePreference.default }
+val LocalAmoledDarkMode = compositionLocalOf { AmoledDarkModePreference.default }
 val LocalFeedDefaultGroupExpand = compositionLocalOf { FeedDefaultGroupExpandPreference.default }
 val LocalTextFieldStyle = compositionLocalOf { TextFieldStylePreference.default }
 val LocalDateStyle = compositionLocalOf { DateStylePreference.default }

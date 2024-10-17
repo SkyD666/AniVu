@@ -13,6 +13,7 @@ import com.materialkolor.dynamicColorScheme
 import com.materialkolor.rememberDynamicColorScheme
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.ThemePreference
+import com.skyd.anivu.ui.local.LocalAmoledDarkMode
 import com.skyd.anivu.ui.local.LocalTheme
 
 @Composable
@@ -34,9 +35,10 @@ fun AniVuTheme(
 ) {
     val themeName = LocalTheme.current
     val context = LocalContext.current
+    val isAmoled = LocalAmoledDarkMode.current
 
     MaterialTheme(
-        colorScheme = remember(themeName) {
+        colorScheme = remember(themeName, isAmoled) {
             colors.getOrElse(themeName) {
                 dynamicColorScheme(
                     seedColor = ThemePreference.toSeedColor(
@@ -44,7 +46,7 @@ fun AniVuTheme(
                         value = ThemePreference.values[0],
                     ),
                     isDark = darkTheme,
-                    isAmoled = false,
+                    isAmoled = isAmoled,
                 )
             }
         },
@@ -64,7 +66,7 @@ fun extractColors(darkTheme: Boolean): Map<String, ColorScheme> {
         rememberDynamicColorScheme(
             primary = ThemePreference.toSeedColor(LocalContext.current, it),
             isDark = darkTheme,
-            isAmoled = false,
+            isAmoled = LocalAmoledDarkMode.current,
         )
     }.toMutableMap()
 }
@@ -85,7 +87,7 @@ fun extractDynamicColor(darkTheme: Boolean): Map<String, ColorScheme> {
                 rememberDynamicColorScheme(
                     primary = Color(primary),
                     isDark = darkTheme,
-                    isAmoled = false,
+                    isAmoled = LocalAmoledDarkMode.current,
                 )
             }
         }

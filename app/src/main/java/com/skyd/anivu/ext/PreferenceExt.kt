@@ -3,6 +3,7 @@ package com.skyd.anivu.ext
 import androidx.datastore.preferences.core.Preferences
 import com.skyd.anivu.model.preference.IgnoreUpdateVersionPreference
 import com.skyd.anivu.model.preference.Settings
+import com.skyd.anivu.model.preference.appearance.AmoledDarkModePreference
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
@@ -18,8 +19,8 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPre
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
-import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
 import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
 import com.skyd.anivu.model.preference.appearance.read.ReadTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
@@ -65,6 +66,7 @@ fun Preferences.toSettings(): Settings {
         // Appearance
         theme = ThemePreference.fromPreferences(this),
         darkMode = DarkModePreference.fromPreferences(this),
+        amoledDarkMode = AmoledDarkModePreference.fromPreferences(this),
         feedDefaultGroupExpand = FeedDefaultGroupExpandPreference.fromPreferences(this),
         textFieldStyle = TextFieldStylePreference.fromPreferences(this),
         dateStyle = DateStylePreference.fromPreferences(this),

@@ -8,6 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.toSettings
+import com.skyd.anivu.model.preference.appearance.AmoledDarkModePreference
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
@@ -64,6 +65,7 @@ import com.skyd.anivu.model.preference.rss.RssSyncChargingConstraintPreference
 import com.skyd.anivu.model.preference.rss.RssSyncFrequencyPreference
 import com.skyd.anivu.model.preference.rss.RssSyncWifiConstraintPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
+import com.skyd.anivu.ui.local.LocalAmoledDarkMode
 import com.skyd.anivu.ui.local.LocalArticleItemMinWidth
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleListTonalElevation
@@ -128,6 +130,7 @@ data class Settings(
     // Appearance
     val theme: String = ThemePreference.default,
     val darkMode: Int = DarkModePreference.default,
+    val amoledDarkMode: Boolean = AmoledDarkModePreference.default,
     val feedDefaultGroupExpand: Boolean = FeedDefaultGroupExpandPreference.default,
     val textFieldStyle: String = TextFieldStylePreference.default,
     val dateStyle: String = DateStylePreference.default,
@@ -203,6 +206,7 @@ fun SettingsProvider(
         // Appearance
         LocalTheme provides settings.theme,
         LocalDarkMode provides settings.darkMode,
+        LocalAmoledDarkMode provides settings.amoledDarkMode,
         LocalFeedDefaultGroupExpand provides settings.feedDefaultGroupExpand,
         LocalTextFieldStyle provides settings.textFieldStyle,
         LocalDateStyle provides settings.dateStyle,

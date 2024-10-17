@@ -55,6 +55,7 @@ import com.materialkolor.ktx.from
 import com.materialkolor.palettes.TonalPalette
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.activity
+import com.skyd.anivu.model.preference.appearance.AmoledDarkModePreference
 import com.skyd.anivu.model.preference.appearance.DarkModePreference
 import com.skyd.anivu.model.preference.appearance.DateStylePreference
 import com.skyd.anivu.model.preference.appearance.NavigationBarLabelPreference
@@ -66,6 +67,7 @@ import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.CheckableListMenu
 import com.skyd.anivu.ui.component.SwitchSettingsItem
+import com.skyd.anivu.ui.local.LocalAmoledDarkMode
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalDateStyle
 import com.skyd.anivu.ui.local.LocalNavController
@@ -156,6 +158,20 @@ fun AppearanceScreen() {
                         }
                     )
                 }
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = null,
+                    text = stringResource(id = R.string.appearance_screen_amoled_dark),
+                    checked = LocalAmoledDarkMode.current,
+                    onCheckedChange = {
+                        AmoledDarkModePreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
             }
             item {
                 CategorySettingsItem(text = stringResource(id = R.string.appearance_screen_style_category))
