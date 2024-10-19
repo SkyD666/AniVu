@@ -11,12 +11,12 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -78,13 +78,16 @@ internal fun MediaList(
                 version = groupInfo?.version,
             )
         )
-        val state = rememberPullRefreshState(
-            refreshing = uiState.listState.loading,
-            onRefresh = {
-                dispatch(MediaListIntent.Refresh(path = path, group = groupInfo?.group))
-            },
-        )
-        Box(modifier = Modifier.pullRefresh(state)) {
+        val state = rememberPullToRefreshState()
+        Box(
+            modifier = Modifier.pullToRefresh(
+                isRefreshing = uiState.listState.loading,
+                onRefresh = {
+                    dispatch(MediaListIntent.Refresh(path = path, group = groupInfo?.group))
+                },
+                state = state
+            )
+        ) {
             when (val listState = uiState.listState) {
                 is ListState.Failed -> Unit
                 is ListState.Init -> CircularProgressPlaceholder(contentPadding = innerPadding + contentPadding)
@@ -120,12 +123,12 @@ internal fun MediaList(
                 }
             }
 
-            PullRefreshIndicator(
-                refreshing = uiState.listState.loading,
-                state = state,
+            Indicator(
                 modifier = Modifier
                     .padding(contentPadding + fabPadding)
                     .align(Alignment.TopCenter),
+                isRefreshing = uiState.listState.loading,
+                state = state
             )
         }
 

@@ -27,9 +27,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowUpward
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalAbsoluteTonalElevation
@@ -40,6 +37,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -298,14 +298,16 @@ private fun Content(
     onRead: (ArticleWithFeed, Boolean) -> Unit,
     contentPadding: PaddingValues,
 ) {
-    val state = rememberPullRefreshState(
-        refreshing = uiState.articleListState.loading,
-        onRefresh = onRefresh,
-    )
+    val state = rememberPullToRefreshState()
     Box(
         modifier = Modifier
-            .pullRefresh(state = state, enabled = LocalShowArticlePullRefresh.current)
-            .padding(top = contentPadding.calculateTopPadding()),
+            .pullToRefresh(
+                state = state,
+                enabled = LocalShowArticlePullRefresh.current,
+                onRefresh = onRefresh,
+                isRefreshing = uiState.articleListState.loading
+            )
+            .padding(top = contentPadding.calculateTopPadding())
     ) {
         Column {
             AnimatedVisibility(visible = showFilterBar) {
@@ -345,8 +347,8 @@ private fun Content(
         }
 
         if (LocalShowArticlePullRefresh.current) {
-            PullRefreshIndicator(
-                refreshing = uiState.articleListState.loading,
+            Indicator(
+                isRefreshing = uiState.articleListState.loading,
                 state = state,
                 modifier = Modifier.align(Alignment.TopCenter),
             )

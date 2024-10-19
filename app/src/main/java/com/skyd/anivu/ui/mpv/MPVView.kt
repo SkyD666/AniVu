@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.mpv
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.util.Log
 import android.view.KeyCharacterMap
@@ -91,8 +92,12 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         voInUse = vo
 
         // vo: set display fps as reported by android
-        val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-        val disp = wm.defaultDisplay
+        val disp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            context.display
+        } else {
+            @Suppress("DEPRECATION")
+            (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+        }
         val refreshRate = disp.mode.refreshRate
 
         val dataStore = context.dataStore
