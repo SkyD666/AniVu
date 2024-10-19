@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.parcelize)
-    alias(libs.plugins.kotlin.plugin.compose)
-    alias(libs.plugins.kotlin.plugin.serialization)
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
 }
@@ -137,23 +137,23 @@ composeCompiler {
 //    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
 }
 
-tasks.withType(KotlinCompile::class.java).configureEach {
+tasks.withType(KotlinCompile::class).configureEach {
     compilerOptions {
         freeCompilerArgs.addAll(
             "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
             "-opt-in=androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi",
+            "-opt-in=androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi",
             "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
             "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
             "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-            "-opt-in=coil.annotation.ExperimentalCoilApi",
-            "-opt-in=androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi",
             "-opt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi",
             "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+            "-opt-in=coil.annotation.ExperimentalCoilApi",
             "-opt-in=kotlinx.coroutines.FlowPreview",
-            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
             "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
-            "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi",
-            "-opt-in=kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi"
+            "-opt-in=kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi",
+            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+            "-opt-in=com.google.accompanist.permissions.ExperimentalPermissionsApi"
         )
     }
 }
