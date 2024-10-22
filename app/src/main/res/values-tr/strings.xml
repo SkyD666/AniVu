@@ -344,6 +344,13 @@
     <string name="auto_delete_article_screen_keep_unread_description">Unread articles won\'t be deleted</string>
     <string name="auto_delete_article_screen_keep_favorite_description">Favorite articles won\'t be deleted</string>
     <string name="appearance_screen_amoled_dark">Amoled dark</string>
+    <string name="article_notification_new_articles">New articles</string>
+    <string name="article_notification_content_text">Your concerns %s have been updated!</string>
+    <string name="rss_config_screen_notification_category">Notification</string>
+    <string name="update_notification_screen_name">Update notification</string>
+    <string name="rss_config_screen_update_notification_description">Configure article update notification rules</string>
+    <string name="article_notification_channel_name">Article notification</string>
+    <string name="update_notification_rule_name">Name</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">%d öğeyi okundu</item>
         <item quantity="other">%d öğe okundu</item>
