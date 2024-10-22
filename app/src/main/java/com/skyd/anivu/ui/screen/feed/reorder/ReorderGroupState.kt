@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.screen.feed.reorder
 
 import com.skyd.anivu.base.mvi.MviViewState
-import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.group.GroupVo
 
 data class ReorderGroupState(
     val groupListState: GroupListState,

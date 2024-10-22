@@ -11,13 +11,14 @@ import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
-import com.skyd.anivu.model.bean.FEED_TABLE_NAME
-import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.feed.FEED_TABLE_NAME
+import com.skyd.anivu.model.bean.feed.FeedBean
 import com.skyd.anivu.model.bean.article.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.article.EnclosureBean
+import com.skyd.anivu.ui.notification.ArticleNotificationManager
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -95,12 +96,13 @@ interface ArticleDao {
                 // Update all fields except articleId
                 newArticle = article.copy(articleId = newArticle.articleId)
                 innerUpdateArticle(newArticle)
+                articleWithEnclosure.article = newArticle
             }
 
             // Update modules
             val media = articleWithEnclosure.media
             if (media != null) {
-                hiltEntryPoint.rssModuleDao.insertIfNotExistITunesRssBean(media)
+                hiltEntryPoint.rssModuleDao.insertIfNotExistRssMediaBean(media)
             }
 
             hiltEntryPoint.enclosureDao.insertListIfNotExist(
@@ -109,6 +111,7 @@ interface ArticleDao {
                 }
             )
         }
+        ArticleNotificationManager.onNewData(articleWithEnclosureList)
     }
 
     @Transaction

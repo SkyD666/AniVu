@@ -18,8 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.skyd.anivu.model.bean.GroupVo
-import com.skyd.anivu.model.bean.GroupVo.Companion.isDefaultGroup
+import com.skyd.anivu.model.bean.group.GroupVo
+import com.skyd.anivu.model.bean.group.GroupVo.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.local.LocalFeedDefaultGroupExpand
 

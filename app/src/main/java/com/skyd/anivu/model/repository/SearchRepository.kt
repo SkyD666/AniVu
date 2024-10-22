@@ -13,8 +13,8 @@ import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.bean.article.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
-import com.skyd.anivu.model.bean.FEED_VIEW_NAME
-import com.skyd.anivu.model.bean.FeedViewBean
+import com.skyd.anivu.model.bean.feed.FEED_VIEW_NAME
+import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.SearchDomainDao
@@ -59,16 +59,32 @@ class SearchRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    fun listenSearchArticle(feedUrls: List<String>): Flow<PagingData<ArticleWithFeed>> {
+    fun listenSearchArticle(
+        feedUrls: List<String>,
+        articleIds: List<String>,
+    ): Flow<PagingData<ArticleWithFeed>> {
         return searchQuery.flatMapLatest { query ->
             Pager(pagingConfig) {
                 articleDao.getArticlePagingSource(genSql(
                     tableName = ARTICLE_TABLE_NAME,
                     k = query,
-                    leadingFilter = if (feedUrls.isEmpty()) "1"
-                    else "${ArticleBean.FEED_URL_COLUMN} IN (${
-                        feedUrls.joinToString(", ") { DatabaseUtils.sqlEscapeString(it) }
-                    })",
+                    leadingFilter = buildString {
+                        if (feedUrls.isEmpty()) {
+                            append("(0 ")
+                        } else {
+                            val feedUrlsStr = feedUrls.joinToString(", ") {
+                                DatabaseUtils.sqlEscapeString(it)
+                            }
+                            append("(`${ArticleBean.FEED_URL_COLUMN}` IN ($feedUrlsStr) ")
+                        }
+                        if (articleIds.isNotEmpty()) {
+                            val articleIdsStr = articleIds.joinToString(", ") {
+                                DatabaseUtils.sqlEscapeString(it)
+                            }
+                            append("OR `${ArticleBean.ARTICLE_ID_COLUMN}` IN ($articleIdsStr) ")
+                        }
+                        append(")")
+                    },
                     orderBy = {
                         ArticleBean.DATE_COLUMN to if (searchSortDateDesc.value) "DESC" else "ASC"
                     }

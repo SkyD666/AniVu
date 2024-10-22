@@ -1,6 +1,6 @@
 package com.skyd.anivu.ui.screen.feed.reorder
 
-import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.group.GroupVo
 
 
 internal sealed interface ReorderGroupPartialStateChange {

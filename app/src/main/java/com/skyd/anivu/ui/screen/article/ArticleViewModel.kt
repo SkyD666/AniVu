@@ -70,7 +70,10 @@ class ArticleViewModel @Inject constructor(
     private fun Flow<ArticleIntent>.toArticlePartialStateChangeFlow(): Flow<ArticlePartialStateChange> {
         return merge(
             filterIsInstance<ArticleIntent.Init>().flatMapConcat { intent ->
-                flowOf(articleRepo.requestArticleList(intent.urls).cachedIn(viewModelScope)).map {
+                flowOf(
+                    articleRepo.requestArticleList(intent.urls, intent.articleIds)
+                        .cachedIn(viewModelScope)
+                ).map {
                     ArticlePartialStateChange.ArticleList.Success(articlePagingDataFlow = it)
                 }.startWith(ArticlePartialStateChange.ArticleList.Loading).catchMap {
                     ArticlePartialStateChange.ArticleList.Failed(it.message.toString())

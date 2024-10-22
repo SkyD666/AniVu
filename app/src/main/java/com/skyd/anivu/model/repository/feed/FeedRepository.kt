@@ -10,9 +10,9 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.isLocal
 import com.skyd.anivu.ext.isNetwork
 import com.skyd.anivu.ext.put
-import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.GroupVo
-import com.skyd.anivu.model.bean.GroupVo.Companion.isDefaultGroup
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.group.GroupVo
+import com.skyd.anivu.model.bean.group.GroupVo.Companion.isDefaultGroup
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao

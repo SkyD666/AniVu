@@ -2,9 +2,9 @@ package com.skyd.anivu.model.repository.feed
 
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.ext.calculateHashMapInitialCapacity
-import com.skyd.anivu.model.bean.GroupBean
-import com.skyd.anivu.model.bean.GroupVo
-import com.skyd.anivu.model.bean.GroupWithFeedBean
+import com.skyd.anivu.model.bean.group.GroupBean
+import com.skyd.anivu.model.bean.group.GroupVo
+import com.skyd.anivu.model.bean.group.GroupWithFeedBean
 import com.skyd.anivu.model.db.dao.GroupDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

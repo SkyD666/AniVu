@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.screen.feed
 
-import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.group.GroupVo
 
 
 internal sealed interface FeedPartialStateChange {

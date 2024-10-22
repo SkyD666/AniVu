@@ -25,8 +25,8 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.ext.readable
-import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.FeedViewBean
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.screen.article.FeedIcon
 import com.skyd.anivu.ui.screen.article.openArticleScreen

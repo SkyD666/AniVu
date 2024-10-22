@@ -4,6 +4,7 @@ import android.content.Context
 import com.skyd.anivu.model.db.AppDatabase
 import com.skyd.anivu.model.db.SearchDomainDatabase
 import com.skyd.anivu.model.db.dao.ArticleDao
+import com.skyd.anivu.model.db.dao.ArticleNotificationRuleDao
 import com.skyd.anivu.model.db.dao.DownloadInfoDao
 import com.skyd.anivu.model.db.dao.EnclosureDao
 import com.skyd.anivu.model.db.dao.FeedDao
@@ -67,6 +68,10 @@ object DatabaseModule {
     @Singleton
     fun provideRssModuleDao(database: AppDatabase): RssModuleDao = database.rssModuleDao()
 
+    @Provides
+    @Singleton
+    fun provideArticleNotificationRuleDao(database: AppDatabase): ArticleNotificationRuleDao =
+        database.articleNotificationRuleDao()
 
     @Provides
     @Singleton

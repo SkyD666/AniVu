@@ -3,7 +3,7 @@ package com.skyd.anivu.model.repository.importexport
 import android.os.Parcelable
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
-import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.group.GroupVo
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
 import kotlinx.parcelize.Parcelize

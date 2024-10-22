@@ -3,7 +3,7 @@ package com.skyd.anivu.model.bean.article
 import android.os.Parcelable
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedBean
 import kotlinx.parcelize.Parcelize
 import java.io.Serializable
 

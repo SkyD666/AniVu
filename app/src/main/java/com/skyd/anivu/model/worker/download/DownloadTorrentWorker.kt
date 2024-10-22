@@ -56,7 +56,7 @@ import com.skyd.anivu.model.service.HttpService
 import com.skyd.anivu.model.worker.download.DownloadTorrentWorker.Companion.DownloadWorkStarter
 import com.skyd.anivu.ui.activity.MainActivity
 import com.skyd.anivu.ui.component.showToast
-import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK
+import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK_DATA
 import com.skyd.anivu.util.uniqueInt
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
@@ -307,7 +307,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             0,
             Intent(
                 Intent.ACTION_VIEW,
-                DOWNLOAD_SCREEN_DEEP_LINK.deepLink.toUri(),
+                DOWNLOAD_SCREEN_DEEP_LINK_DATA.deepLink.toUri(),
                 applicationContext,
                 MainActivity::class.java
             ),

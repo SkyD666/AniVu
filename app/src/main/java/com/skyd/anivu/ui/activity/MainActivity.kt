@@ -64,11 +64,15 @@ import com.skyd.anivu.ui.screen.about.AboutScreen
 import com.skyd.anivu.ui.screen.about.license.LICENSE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.about.license.LicenseScreen
 import com.skyd.anivu.ui.screen.about.update.UpdateDialog
+import com.skyd.anivu.ui.screen.article.ARTICLE_IDS_JSON_KEY
+import com.skyd.anivu.ui.screen.article.ARTICLE_IDS_KEY
+import com.skyd.anivu.ui.screen.article.ARTICLE_SCREEN_DEEP_LINK
 import com.skyd.anivu.ui.screen.article.ARTICLE_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.article.ArticleScreen
+import com.skyd.anivu.ui.screen.article.FEED_URLS_JSON_KEY
 import com.skyd.anivu.ui.screen.article.FEED_URLS_KEY
 import com.skyd.anivu.ui.screen.download.DOWNLOAD_LINK_KEY
-import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK
+import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK_DATA
 import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.download.DownloadScreen
 import com.skyd.anivu.ui.screen.download.openDownloadScreen
@@ -125,13 +129,14 @@ import com.skyd.anivu.ui.screen.settings.playerconfig.advanced.PLAYER_CONFIG_ADV
 import com.skyd.anivu.ui.screen.settings.playerconfig.advanced.PlayerConfigAdvancedScreen
 import com.skyd.anivu.ui.screen.settings.rssconfig.RSS_CONFIG_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.rssconfig.RssConfigScreen
+import com.skyd.anivu.ui.screen.settings.rssconfig.updatenotification.UPDATE_NOTIFICATION_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.settings.rssconfig.updatenotification.UpdateNotificationScreen
 import com.skyd.anivu.ui.screen.settings.transmission.TRANSMISSION_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.transmission.TransmissionScreen
 import com.skyd.anivu.ui.screen.settings.transmission.proxy.PROXY_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.transmission.proxy.ProxyScreen
 import dagger.hilt.android.AndroidEntryPoint
-
-private val deepLinks = listOf(DOWNLOAD_SCREEN_DEEP_LINK)
+import kotlinx.serialization.json.Json
 
 @AndroidEntryPoint
 class MainActivity : BaseComposeActivity() {
@@ -176,15 +181,6 @@ class MainActivity : BaseComposeActivity() {
             val scheme = data.scheme
             var url: String? = null
             when (scheme) {
-                "anivu" -> {
-                    navController.navigate(
-                        data,
-                        deepLinks.firstOrNull {
-                            data.toString().startsWith(it.deepLink)
-                        }?.navOptions
-                    )
-                }
-
                 "magnet" -> url = data.toString()
                 "http", "https" -> {
                     val path = data.path
@@ -232,8 +228,36 @@ private fun MainNavHost() {
         },
     ) {
         composable(route = MAIN_SCREEN_ROUTE) { MainScreen() }
-        composable(route = ARTICLE_SCREEN_ROUTE) {
-            ArticleScreen(feedUrls = it.arguments?.getStringArrayList(FEED_URLS_KEY).orEmpty())
+        composable(
+            route = "$ARTICLE_SCREEN_ROUTE?" +
+                    "$FEED_URLS_JSON_KEY={$FEED_URLS_JSON_KEY}&" +
+                    "$ARTICLE_IDS_JSON_KEY={$ARTICLE_IDS_JSON_KEY}",
+            arguments = listOf(
+                navArgument(FEED_URLS_JSON_KEY) { nullable = true },
+                navArgument(ARTICLE_IDS_JSON_KEY) { nullable = true },
+            ),
+            deepLinks = listOf(navDeepLink {
+                uriPattern = "$ARTICLE_SCREEN_DEEP_LINK?" +
+                        "$FEED_URLS_JSON_KEY={$FEED_URLS_JSON_KEY}&" +
+                        "$ARTICLE_IDS_JSON_KEY={$ARTICLE_IDS_JSON_KEY}"
+            }),
+        ) {
+            val feedUrls: List<String> = it.arguments?.getStringArrayList(FEED_URLS_KEY)
+                ?: runCatching {
+                    Json.decodeFromString<List<String>>(
+                        it.arguments?.getString(FEED_URLS_JSON_KEY)?.toDecodedUrl().orEmpty()
+                    )
+                }.getOrDefault(emptyList())
+            val articleIds: List<String> = it.arguments?.getStringArrayList(ARTICLE_IDS_KEY)
+                ?: runCatching {
+                    Json.decodeFromString<List<String>>(
+                        it.arguments?.getString(ARTICLE_IDS_JSON_KEY)?.toDecodedUrl().orEmpty()
+                    )
+                }.getOrDefault(emptyList())
+            ArticleScreen(
+                feedUrls = feedUrls,
+                articleIds = articleIds,
+            )
         }
         composable(route = LICENSE_SCREEN_ROUTE) { LicenseScreen() }
         composable(route = ABOUT_SCREEN_ROUTE) { AboutScreen() }
@@ -256,6 +280,7 @@ private fun MainNavHost() {
         composable(route = RSS_CONFIG_SCREEN_ROUTE) { RssConfigScreen() }
         composable(route = PROXY_SCREEN_ROUTE) { ProxyScreen() }
         composable(route = TRANSMISSION_SCREEN_ROUTE) { TransmissionScreen() }
+        composable(route = UPDATE_NOTIFICATION_SCREEN_ROUTE) { UpdateNotificationScreen() }
         composable(
             route = "$REQUEST_HEADERS_SCREEN_ROUTE/{$FEED_URL_KEY}",
             arguments = listOf(
@@ -289,7 +314,9 @@ private fun MainNavHost() {
         composable(
             route = DOWNLOAD_SCREEN_ROUTE,
             arguments = listOf(navArgument(DOWNLOAD_LINK_KEY) { nullable = true }),
-            deepLinks = listOf(navDeepLink { uriPattern = DOWNLOAD_SCREEN_DEEP_LINK.deepLink }),
+            deepLinks = listOf(navDeepLink {
+                uriPattern = DOWNLOAD_SCREEN_DEEP_LINK_DATA.deepLink
+            }),
         ) {
             DownloadScreen(downloadLink = it.arguments?.getString(DOWNLOAD_LINK_KEY))
         }

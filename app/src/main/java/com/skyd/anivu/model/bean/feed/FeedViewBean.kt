@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.bean
+package com.skyd.anivu.model.bean.feed
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo

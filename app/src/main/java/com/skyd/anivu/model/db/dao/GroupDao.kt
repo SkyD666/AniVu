@@ -6,9 +6,9 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.skyd.anivu.appContext
-import com.skyd.anivu.model.bean.GROUP_TABLE_NAME
-import com.skyd.anivu.model.bean.GroupBean
-import com.skyd.anivu.model.bean.GroupWithFeedBean
+import com.skyd.anivu.model.bean.group.GROUP_TABLE_NAME
+import com.skyd.anivu.model.bean.group.GroupBean
+import com.skyd.anivu.model.bean.group.GroupWithFeedBean
 import com.skyd.anivu.model.repository.feed.tryDeleteFeedIconFile
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn

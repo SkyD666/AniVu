@@ -1,4 +1,4 @@
-package com.skyd.anivu.ui.screen.feed.requestheaders
+package com.skyd.anivu.ui.screen.settings.rssconfig.updatenotification
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,10 +11,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Http
+import androidx.compose.material.icons.outlined.Pattern
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -35,47 +36,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.ext.toEncodedUrl
-import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.ArticleNotificationRuleBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.ClipboardTextField
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
-import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 
 
-const val REQUEST_HEADERS_SCREEN_ROUTE = "requestHeadersScreen"
-const val FEED_URL_KEY = "feedUrl"
-
-fun openRequestHeadersScreen(
-    navController: NavController,
-    feedUrl: String,
-) {
-    navController.navigate(
-        "$REQUEST_HEADERS_SCREEN_ROUTE/${feedUrl.toEncodedUrl(allow = null)}",
-    )
-}
+const val UPDATE_NOTIFICATION_SCREEN_ROUTE = "updateNotificationScreen"
 
 @Composable
-fun RequestHeadersScreen(feedUrl: String, viewModel: RequestHeadersViewModel = hiltViewModel()) {
+fun UpdateNotificationScreen(viewModel: UpdateNotificationViewModel = hiltViewModel()) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
-    val dispatcher =
-        viewModel.getDispatcher(feedUrl, startWith = RequestHeadersIntent.Init(feedUrl))
+    val dispatcher = viewModel.getDispatcher(startWith = UpdateNotificationIntent.Init)
 
     var fabHeight by remember { mutableStateOf(0.dp) }
     var openAddDialog by rememberSaveable { mutableStateOf(false) }
@@ -86,7 +74,7 @@ fun RequestHeadersScreen(feedUrl: String, viewModel: RequestHeadersViewModel = h
             AniVuTopBar(
                 style = AniVuTopBarStyle.Small,
                 scrollBehavior = scrollBehavior,
-                title = { Text(text = stringResource(R.string.request_headers_screen_name)) },
+                title = { Text(text = stringResource(R.string.update_notification_screen_name)) },
             )
         },
         floatingActionButton = {
@@ -99,31 +87,20 @@ fun RequestHeadersScreen(feedUrl: String, viewModel: RequestHeadersViewModel = h
             }
         }
     ) { paddingValues ->
-        when (val headersState = uiState.headersState) {
-            is HeadersState.Failed,
-            HeadersState.Init -> Unit
+        when (val ruleListState = uiState.ruleListState) {
+            is RuleListState.Failed,
+            RuleListState.Init -> Unit
 
-            is HeadersState.Success -> {
-                HeadersMap(
-                    feedUrl = feedUrl,
+            is RuleListState.Success -> {
+                RuleList(
                     contentPadding = paddingValues + PaddingValues(bottom = fabHeight),
-                    headersState = headersState,
+                    ruleListState = ruleListState,
                     dispatcher = dispatcher,
                 )
                 if (openAddDialog) {
-                    AddHeaderDialog(
+                    AddRuleDialog(
                         onDismissRequest = { openAddDialog = false },
-                        onAdd = { k, v ->
-                            dispatcher(
-                                RequestHeadersIntent.UpdateHeaders(
-                                    feedUrl = feedUrl,
-                                    headers = FeedBean.RequestHeaders(
-                                        headersState.headers.headers
-                                            .toMutableMap().apply { set(k, v) }
-                                    )
-                                )
-                            )
-                        }
+                        onAdd = { rule -> dispatcher(UpdateNotificationIntent.Add(rule = rule)) }
                     )
                 }
             }
@@ -131,10 +108,13 @@ fun RequestHeadersScreen(feedUrl: String, viewModel: RequestHeadersViewModel = h
 
         MviEventListener(viewModel.singleEvent) { event ->
             when (event) {
-                is RequestHeadersEvent.HeadersResultEvent.Failed ->
+                is UpdateNotificationEvent.RuleListResultEvent.Failed ->
                     snackbarHostState.showSnackbar(event.msg)
 
-                is RequestHeadersEvent.UpdateHeadersResultEvent.Failed ->
+                is UpdateNotificationEvent.AddResultEvent.Failed ->
+                    snackbarHostState.showSnackbar(event.msg)
+
+                is UpdateNotificationEvent.RemoveResultEvent.Failed ->
                     snackbarHostState.showSnackbar(event.msg)
 
             }
@@ -145,46 +125,47 @@ fun RequestHeadersScreen(feedUrl: String, viewModel: RequestHeadersViewModel = h
 }
 
 @Composable
-private fun AddHeaderDialog(
+private fun AddRuleDialog(
     onDismissRequest: () -> Unit,
-    onAdd: (String, String) -> Unit,
+    onAdd: (ArticleNotificationRuleBean) -> Unit,
 ) {
     val focusManager = LocalFocusManager.current
-    var key by rememberSaveable { mutableStateOf("") }
-    var value by rememberSaveable { mutableStateOf("") }
+    var name by rememberSaveable { mutableStateOf("") }
+    var regex by rememberSaveable { mutableStateOf("") }
 
     AniVuDialog(
         onDismissRequest = onDismissRequest,
-        icon = { Icon(imageVector = Icons.Outlined.Http, contentDescription = null) },
+        icon = { Icon(imageVector = Icons.Outlined.Pattern, contentDescription = null) },
         title = { Text(text = stringResource(id = R.string.add)) },
         text = {
             Column {
                 ClipboardTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = key,
-                    onValueChange = { key = it },
+                    value = name,
+                    onValueChange = { name = it },
                     maxLines = 1,
-                    placeholder = stringResource(id = R.string.request_headers_screen_key),
+                    placeholder = stringResource(id = R.string.update_notification_rule_name),
                     focusManager = focusManager,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 ClipboardTextField(
                     modifier = Modifier.fillMaxWidth(),
-                    value = value,
-                    onValueChange = { value = it },
+                    value = regex,
+                    onValueChange = { regex = it },
                     placeholder = stringResource(id = R.string.request_headers_screen_value),
                     autoRequestFocus = false,
                     focusManager = focusManager,
+                    imeAction = ImeAction.None,
                 )
             }
         },
         confirmButton = {
-            val confirmButtonEnabled = key.isNotBlank() && value.isNotBlank()
+            val confirmButtonEnabled = name.isNotBlank() && regex.isNotBlank()
             TextButton(
                 enabled = confirmButtonEnabled,
                 onClick = {
                     focusManager.clearFocus()
-                    onAdd(key, value)
+                    onAdd(ArticleNotificationRuleBean(name = name, regex = regex))
                     onDismissRequest()
                 }
             ) {
@@ -207,14 +188,12 @@ private fun AddHeaderDialog(
 }
 
 @Composable
-private fun HeadersMap(
-    feedUrl: String,
+private fun RuleList(
     contentPadding: PaddingValues,
-    headersState: HeadersState.Success,
-    dispatcher: (RequestHeadersIntent) -> Unit,
+    ruleListState: RuleListState.Success,
+    dispatcher: (UpdateNotificationIntent) -> Unit,
 ) {
-    val headersMap = headersState.headers.headers
-    val headersList = headersMap.toList()
+    val rules = ruleListState.rules
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -222,49 +201,25 @@ private fun HeadersMap(
         contentPadding = contentPadding + PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        items(headersList.size, key = { headersList[it].first }) { index ->
-            val (key, value) = headersList[index]
-            HeaderItem(
-                key = key,
-                value = value,
-                onRemove = {
-                    dispatcher(
-                        RequestHeadersIntent.UpdateHeaders(
-                            feedUrl = feedUrl,
-                            headers = FeedBean.RequestHeaders(
-                                headersMap.toMutableMap().apply { remove(it) }
-                            )
-                        )
-                    )
-                },
-                onEdit = { k, v ->
-                    dispatcher(
-                        RequestHeadersIntent.UpdateHeaders(
-                            feedUrl = feedUrl,
-                            headers = FeedBean.RequestHeaders(
-                                headersMap.toMutableMap().apply { set(k, v) }
-                            )
-                        )
-                    )
-                },
+        items(rules.size) { index ->
+            val rule = rules[index]
+            RuleItem(
+                rule = rule,
+                onRemove = { id -> dispatcher(UpdateNotificationIntent.Remove(ruleId = id)) },
             )
         }
     }
 }
 
 @Composable
-private fun HeaderItem(
-    key: String,
-    value: String,
-    onRemove: (String) -> Unit,
-    onEdit: (String, String) -> Unit,
+private fun RuleItem(
+    rule: ArticleNotificationRuleBean,
+    onRemove: (Int) -> Unit,
 ) {
-    var openEditDialog by rememberSaveable { mutableStateOf<String?>(null) }
-
-    Card(onClick = { openEditDialog = value }) {
+    Card(onClick = { }) {
         Row(
             modifier = Modifier
-                .padding(top = 6.dp)
+                .padding(top = 4.dp)
                 .padding(horizontal = 6.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -272,37 +227,27 @@ private fun HeaderItem(
                 modifier = Modifier
                     .padding(horizontal = 10.dp)
                     .weight(1f),
-                text = key,
+                text = rule.name,
                 style = MaterialTheme.typography.titleLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
             AniVuIconButton(
-                onClick = { onRemove(key) },
+                onClick = { onRemove(rule.id) },
                 imageVector = Icons.Outlined.Close,
                 contentDescription = stringResource(id = R.string.remove),
             )
         }
-        Text(
-            modifier = Modifier
-                .padding(horizontal = 16.dp)
-                .padding(top = 3.dp, bottom = 12.dp),
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 10,
-        )
-    }
 
-    if (openEditDialog != null) {
-        TextFieldDialog(
-            titleText = key,
-            value = openEditDialog!!,
-            onValueChange = { openEditDialog = it },
-            onConfirm = {
-                onEdit(key, openEditDialog!!)
-                openEditDialog = null
-            },
-            onDismissRequest = { openEditDialog = null },
-        )
+        SelectionContainer {
+            Text(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 12.dp),
+                text = rule.regex,
+                maxLines = 10,
+                style = MaterialTheme.typography.bodyLarge,
+            )
+        }
     }
 }

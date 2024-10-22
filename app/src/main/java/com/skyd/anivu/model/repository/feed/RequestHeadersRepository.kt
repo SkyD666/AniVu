@@ -1,7 +1,7 @@
 package com.skyd.anivu.model.repository.feed
 
 import com.skyd.anivu.base.BaseRepository
-import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedBean
 import com.skyd.anivu.model.db.dao.FeedDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

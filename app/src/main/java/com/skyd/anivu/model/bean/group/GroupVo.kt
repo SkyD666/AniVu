@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.bean
+package com.skyd.anivu.model.bean.group
 
 import android.os.Parcelable
 import com.skyd.anivu.R

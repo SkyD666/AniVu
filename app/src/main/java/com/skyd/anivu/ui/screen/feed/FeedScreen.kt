@@ -68,11 +68,11 @@ import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.FeedBean.Companion.isDefaultGroup
-import com.skyd.anivu.model.bean.FeedViewBean
-import com.skyd.anivu.model.bean.GroupVo
-import com.skyd.anivu.model.bean.GroupVo.Companion.isDefaultGroup
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedBean.Companion.isDefaultGroup
+import com.skyd.anivu.model.bean.feed.FeedViewBean
+import com.skyd.anivu.model.bean.group.GroupVo
+import com.skyd.anivu.model.bean.group.GroupVo.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuTopBar
@@ -154,7 +154,11 @@ fun FeedScreen() {
             AnimatedPane {
                 navigator.currentDestination?.content?.let {
                     listPaneSelectedFeedUrls = it
-                    ArticleScreen(feedUrls = it, onBackClick = onNavigatorBack)
+                    ArticleScreen(
+                        feedUrls = it,
+                        articleIds = emptyList(),
+                        onBackClick = onNavigatorBack,
+                    )
                 }
             }
         },

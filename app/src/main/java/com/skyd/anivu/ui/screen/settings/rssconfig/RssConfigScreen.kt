@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.BatteryFull
 import androidx.compose.material.icons.outlined.Bolt
 import androidx.compose.material.icons.outlined.Link
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Timer
 import androidx.compose.material.icons.outlined.Wifi
 import androidx.compose.material3.Scaffold
@@ -34,11 +35,13 @@ import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.CheckableListMenu
 import com.skyd.anivu.ui.component.SwitchSettingsItem
+import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalParseLinkTagAsEnclosure
 import com.skyd.anivu.ui.local.LocalRssSyncBatteryNotLowConstraint
 import com.skyd.anivu.ui.local.LocalRssSyncChargingConstraint
 import com.skyd.anivu.ui.local.LocalRssSyncFrequency
 import com.skyd.anivu.ui.local.LocalRssSyncWifiConstraint
+import com.skyd.anivu.ui.screen.settings.rssconfig.updatenotification.UPDATE_NOTIFICATION_SCREEN_ROUTE
 
 
 const val RSS_CONFIG_SCREEN_ROUTE = "rssConfigScreen"
@@ -47,6 +50,7 @@ const val RSS_CONFIG_SCREEN_ROUTE = "rssConfigScreen"
 fun RssConfigScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val context = LocalContext.current
+    val navController = LocalNavController.current
     val scope = rememberCoroutineScope()
     var expandRssSyncFrequencyMenu by rememberSaveable { mutableStateOf(false) }
 
@@ -124,6 +128,17 @@ fun RssConfigScreen() {
                             value = it,
                         )
                     }
+                )
+            }
+            item {
+                CategorySettingsItem(text = stringResource(id = R.string.rss_config_screen_notification_category))
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(image = Icons.Outlined.Notifications),
+                    text = stringResource(id = R.string.update_notification_screen_name),
+                    descriptionText = stringResource(id = R.string.rss_config_screen_update_notification_description),
+                    onClick = { navController.navigate(UPDATE_NOTIFICATION_SCREEN_ROUTE) },
                 )
             }
             item {

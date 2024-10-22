@@ -2,8 +2,8 @@ package com.skyd.anivu.model.db.migration
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.skyd.anivu.model.bean.GROUP_TABLE_NAME
-import com.skyd.anivu.model.bean.GroupBean
+import com.skyd.anivu.model.bean.group.GROUP_TABLE_NAME
+import com.skyd.anivu.model.bean.group.GroupBean
 
 class Migration9To10 : Migration(9, 10) {
     override fun migrate(db: SupportSQLiteDatabase) {

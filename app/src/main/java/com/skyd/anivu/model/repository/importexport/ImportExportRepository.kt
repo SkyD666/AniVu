@@ -13,10 +13,10 @@ import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.ext.getAppName
 import com.skyd.anivu.ext.toAbsoluteDateTimeString
 import com.skyd.anivu.ext.validateFileName
-import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.FeedViewBean
-import com.skyd.anivu.model.bean.GroupVo
-import com.skyd.anivu.model.bean.GroupWithFeedBean
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedViewBean
+import com.skyd.anivu.model.bean.group.GroupVo
+import com.skyd.anivu.model.bean.group.GroupWithFeedBean
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
 import kotlinx.coroutines.Dispatchers

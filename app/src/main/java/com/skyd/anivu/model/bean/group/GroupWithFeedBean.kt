@@ -1,7 +1,9 @@
-package com.skyd.anivu.model.bean
+package com.skyd.anivu.model.bean.group
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedViewBean
 
 /**
  * A [group] contains many [feeds].

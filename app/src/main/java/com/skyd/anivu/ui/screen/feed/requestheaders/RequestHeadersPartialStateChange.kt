@@ -1,6 +1,6 @@
 package com.skyd.anivu.ui.screen.feed.requestheaders
 
-import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedBean
 
 
 internal sealed interface RequestHeadersPartialStateChange {

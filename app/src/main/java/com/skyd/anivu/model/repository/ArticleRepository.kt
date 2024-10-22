@@ -7,10 +7,10 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.skyd.anivu.base.BaseRepository
-import com.skyd.anivu.model.bean.GroupVo
 import com.skyd.anivu.model.bean.article.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
+import com.skyd.anivu.model.bean.group.GroupVo
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.ui.component.showToast
@@ -61,7 +61,10 @@ class ArticleRepository @Inject constructor(
         articleSortDateDesc.value = articleSort
     }
 
-    fun requestArticleList(feedUrls: List<String>): Flow<PagingData<ArticleWithFeed>> {
+    fun requestArticleList(
+        feedUrls: List<String>,
+        articleIds: List<String>
+    ): Flow<PagingData<ArticleWithFeed>> {
         return combine(
             filterFavorite,
             filterRead,
@@ -73,6 +76,7 @@ class ArticleRepository @Inject constructor(
                 articleDao.getArticlePagingSource(
                     genSql(
                         feedUrls = feedUrls,
+                        articleIds = articleIds,
                         isFavorite = favorite as Boolean?,
                         isRead = read as Boolean?,
                         orderBy = sortDateDesc as ArticleSort,
@@ -87,7 +91,7 @@ class ArticleRepository @Inject constructor(
             val realGroupId = if (groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
             emit(feedDao.getFeedsByGroupId(realGroupId).map { it.feed.url })
         }.flatMapConcat {
-            refreshArticleList(it)
+            refreshArticleList(feedUrls = it)
         }.flowOn(Dispatchers.IO)
     }
 
@@ -145,22 +149,34 @@ class ArticleRepository @Inject constructor(
     companion object {
         fun genSql(
             feedUrls: List<String>,
+            articleIds: List<String>,
             isFavorite: Boolean?,
             isRead: Boolean?,
             orderBy: ArticleSort,
         ): SimpleSQLiteQuery {
             val sql = buildString {
-                val feedUrlsStr = feedUrls.joinToString(", ") { DatabaseUtils.sqlEscapeString(it) }
-                append(
-                    "SELECT * FROM `$ARTICLE_TABLE_NAME` WHERE " +
-                            "`${ArticleBean.FEED_URL_COLUMN}` IN ($feedUrlsStr) "
-                )
+                append("SELECT DISTINCT * FROM `$ARTICLE_TABLE_NAME` WHERE 1 ")
                 if (isFavorite != null) {
                     append("AND `${ArticleBean.IS_FAVORITE_COLUMN}` = ${if (isFavorite) 1 else 0} ")
                 }
                 if (isRead != null) {
                     append("AND `${ArticleBean.IS_READ_COLUMN}` = ${if (isRead) 1 else 0} ")
                 }
+                if (feedUrls.isEmpty()) {
+                    append("AND (0 ")
+                } else {
+                    val feedUrlsStr = feedUrls.joinToString(", ") {
+                        DatabaseUtils.sqlEscapeString(it)
+                    }
+                    append("AND (`${ArticleBean.FEED_URL_COLUMN}` IN ($feedUrlsStr) ")
+                }
+                if (articleIds.isNotEmpty()) {
+                    val articleIdsStr = articleIds.joinToString(", ") {
+                        DatabaseUtils.sqlEscapeString(it)
+                    }
+                    append("OR `${ArticleBean.ARTICLE_ID_COLUMN}` IN ($articleIdsStr) ")
+                }
+                append(") ")
                 val ascOrDesc = if (orderBy.asc) "ASC" else "DESC"
                 val orderField = when (orderBy) {
                     is ArticleSort.Date -> ArticleBean.DATE_COLUMN

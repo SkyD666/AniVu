@@ -67,8 +67,8 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ext.copy
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.readable
-import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.group.GroupVo
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog

@@ -12,7 +12,7 @@ import com.skyd.anivu.model.bean.article.RssMediaBean
 interface RssModuleDao {
     @Transaction
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertIfNotExistITunesRssBean(rssMediaBean: RssMediaBean)
+    fun insertIfNotExistRssMediaBean(rssMediaBean: RssMediaBean)
 
     @Transaction
     @Query(

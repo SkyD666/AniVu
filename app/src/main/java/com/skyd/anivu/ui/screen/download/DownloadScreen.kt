@@ -50,7 +50,7 @@ import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 
 
 const val DOWNLOAD_SCREEN_ROUTE = "downloadScreen"
-val DOWNLOAD_SCREEN_DEEP_LINK = DeepLinkData(
+val DOWNLOAD_SCREEN_DEEP_LINK_DATA = DeepLinkData(
     deepLink = "anivu://download.screen",
     navOptions = navOptions { launchSingleTop = true },
 )

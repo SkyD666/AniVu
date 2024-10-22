@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.screen.article
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.LinearEasing
@@ -69,6 +70,7 @@ import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.popBackStackWithLifecycle
+import com.skyd.anivu.ext.toEncodedUrl
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.repository.ArticleSort
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
@@ -88,20 +90,44 @@ import com.skyd.anivu.ui.local.LocalShowArticleTopBarRefresh
 import com.skyd.anivu.ui.screen.search.SearchDomain
 import com.skyd.anivu.ui.screen.search.openSearchScreen
 import kotlinx.coroutines.launch
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
 const val ARTICLE_SCREEN_ROUTE = "articleScreen"
 const val FEED_URLS_KEY = "feedUrls"
+const val ARTICLE_IDS_KEY = "articleIds"
+const val ARTICLE_SCREEN_DEEP_LINK = "anivu://article.screen"
+const val FEED_URLS_JSON_KEY = "feedUrlsJson"
+const val ARTICLE_IDS_JSON_KEY = "articleIdsJson"
+
+fun getArticleScreenDeepLink(
+    feedUrls: List<String>,
+    articleIds: List<String> = emptyList(),
+): Uri {
+    return Uri.parse(ARTICLE_SCREEN_DEEP_LINK).buildUpon()
+        .appendQueryParameter(
+            FEED_URLS_JSON_KEY,
+            Json.encodeToString(feedUrls).toEncodedUrl(allow = null)
+        )
+        .appendQueryParameter(
+            ARTICLE_IDS_JSON_KEY,
+            Json.encodeToString(articleIds).toEncodedUrl(allow = null)
+        )
+        .build()
+}
 
 fun openArticleScreen(
     navController: NavController,
     feedUrls: List<String>,
+    articleIds: List<String> = emptyList(),
     navOptions: NavOptions? = null,
 ) {
     navController.navigate(
         ARTICLE_SCREEN_ROUTE,
         Bundle().apply {
             putStringArrayList(FEED_URLS_KEY, ArrayList(feedUrls))
+            putStringArrayList(ARTICLE_IDS_KEY, ArrayList(articleIds))
         },
         navOptions = navOptions,
     )
@@ -112,10 +138,11 @@ private val DefaultBackClick = { }
 @Composable
 fun ArticleScreen(
     feedUrls: List<String>,
+    articleIds: List<String>,
     onBackClick: () -> Unit = DefaultBackClick,
 ) {
     val navController = LocalNavController.current
-    if (feedUrls.isEmpty()) {
+    if (feedUrls.isEmpty() && articleIds.isEmpty()) {
         AniVuDialog(
             visible = true,
             text = { Text(text = stringResource(id = R.string.article_screen_feed_url_illegal)) },
@@ -128,6 +155,7 @@ fun ArticleScreen(
     } else {
         ArticleContentScreen(
             feedUrls = feedUrls,
+            articleIds = articleIds,
             onBackClick = onBackClick,
         )
     }
@@ -136,6 +164,7 @@ fun ArticleScreen(
 @Composable
 private fun ArticleContentScreen(
     feedUrls: List<String>,
+    articleIds: List<String>,
     onBackClick: () -> Unit = DefaultBackClick,
     viewModel: ArticleViewModel = hiltViewModel(),
 ) {
@@ -148,7 +177,9 @@ private fun ArticleContentScreen(
     var fabHeight by remember { mutableStateOf(0.dp) }
     var showFilterBar by rememberSaveable { mutableStateOf(false) }
 
-    val dispatch = viewModel.getDispatcher(feedUrls, startWith = ArticleIntent.Init(feedUrls))
+    val dispatch = viewModel.getDispatcher(
+        feedUrls, startWith = ArticleIntent.Init(feedUrls, articleIds)
+    )
     val uiState by viewModel.viewState.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -202,7 +233,10 @@ private fun ArticleContentScreen(
                         onClick = {
                             openSearchScreen(
                                 navController = navController,
-                                searchDomain = SearchDomain.Article(feedUrls),
+                                searchDomain = SearchDomain.Article(
+                                    feedUrls = feedUrls,
+                                    articleIds = articleIds,
+                                ),
                             )
                         },
                         imageVector = Icons.Outlined.Search,

@@ -24,8 +24,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
-import com.skyd.anivu.model.bean.GroupVo
-import com.skyd.anivu.model.bean.GroupVo.Companion.isDefaultGroup
+import com.skyd.anivu.model.bean.group.GroupVo
+import com.skyd.anivu.model.bean.group.GroupVo.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 
 @Composable

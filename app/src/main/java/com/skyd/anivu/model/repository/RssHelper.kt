@@ -9,8 +9,8 @@ import com.rometools.rome.feed.synd.SyndEntry
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import com.skyd.anivu.ext.toEncodedUrl
-import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.FeedWithArticleBean
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedWithArticleBean
 import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.article.EnclosureBean

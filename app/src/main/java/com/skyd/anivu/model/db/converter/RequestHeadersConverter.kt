@@ -1,7 +1,7 @@
 package com.skyd.anivu.model.db.converter
 
 import androidx.room.TypeConverter
-import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedBean
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 

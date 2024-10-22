@@ -7,7 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.skyd.anivu.base.BaseBean
-import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedBean
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 

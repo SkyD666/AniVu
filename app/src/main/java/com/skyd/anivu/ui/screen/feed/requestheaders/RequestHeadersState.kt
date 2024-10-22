@@ -1,7 +1,7 @@
 package com.skyd.anivu.ui.screen.feed.requestheaders
 
 import com.skyd.anivu.base.mvi.MviViewState
-import com.skyd.anivu.model.bean.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedBean
 
 data class RequestHeadersState(
     val headersState: HeadersState,

@@ -76,7 +76,8 @@ class SearchViewModel @Inject constructor(
             },
             filterIsInstance<SearchIntent.ListenSearchArticle>().flatMapConcat { intent ->
                 flowOf(
-                    searchRepo.listenSearchArticle(intent.feedUrls).cachedIn(viewModelScope)
+                    searchRepo.listenSearchArticle(intent.feedUrls, intent.articleIds)
+                        .cachedIn(viewModelScope)
                 ).map {
                     @Suppress("UNCHECKED_CAST")
                     SearchPartialStateChange.SearchResult.Success(result = it as Flow<PagingData<Any>>)

@@ -69,8 +69,8 @@ import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.model.bean.FeedViewBean
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
+import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.BackIcon
@@ -109,7 +109,7 @@ sealed interface SearchDomain : Serializable {
         private fun readResolve(): Any = Feed
     }
 
-    data class Article(val feedUrls: List<String>) : SearchDomain
+    data class Article(val feedUrls: List<String>, val articleIds: List<String>) : SearchDomain
 }
 
 @Composable
@@ -133,8 +133,10 @@ fun SearchScreen(
     val dispatch = viewModel.getDispatcher(
         startWith = when (searchDomain) {
             SearchDomain.Feed -> SearchIntent.ListenSearchFeed
-            is SearchDomain.Article ->
-                SearchIntent.ListenSearchArticle(feedUrls = searchDomain.feedUrls)
+            is SearchDomain.Article -> SearchIntent.ListenSearchArticle(
+                feedUrls = searchDomain.feedUrls,
+                articleIds = searchDomain.articleIds,
+            )
         }
     )
 

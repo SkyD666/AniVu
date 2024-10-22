@@ -1,8 +1,8 @@
 package com.skyd.anivu.ui.screen.feed
 
 import com.skyd.anivu.base.mvi.MviSingleEvent
-import com.skyd.anivu.model.bean.FeedBean
-import com.skyd.anivu.model.bean.GroupVo
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.group.GroupVo
 
 sealed interface FeedEvent : MviSingleEvent {
     sealed interface InitFeetListResultEvent : FeedEvent {
