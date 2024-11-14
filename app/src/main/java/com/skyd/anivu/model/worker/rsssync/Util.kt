@@ -35,7 +35,7 @@ private data class RssSyncConfiguration(
     val requireBatteryNotLow: Boolean,
 )
 
-fun listenerRssSyncFrequency(context: Context) {
+fun listenerRssSyncConfig(context: Context) {
     coroutineScope.launch {
         context.dataStore.data.map {
             RssSyncConfiguration(
@@ -60,7 +60,7 @@ fun listenerRssSyncFrequency(context: Context) {
             val requireBatteryNotLow = rssSyncConfiguration.requireBatteryNotLow
 
             if (rssSyncFrequency == RssSyncFrequencyPreference.MANUAL) {
-                if (workInfo == null || !workInfo.state.isFinished) {
+                if (workInfo != null && !workInfo.state.isFinished) {
                     stopRssSyncWorker(context)
                 }
             } else {
@@ -95,7 +95,7 @@ fun listenerRssSyncFrequency(context: Context) {
     }
 }
 
-fun updateRssSyncWorker(
+private fun updateRssSyncWorker(
     context: Context,
     rssSyncFrequency: Long,
     requireWifi: Boolean,
@@ -128,7 +128,7 @@ fun updateRssSyncWorker(
     )
 }
 
-fun startRssSyncWorker(
+private fun startRssSyncWorker(
     context: Context,
     rssSyncFrequency: Long,
     requireWifi: Boolean,
@@ -147,11 +147,11 @@ fun startRssSyncWorker(
     )
 }
 
-fun stopRssSyncWorker(context: Context) {
+private fun stopRssSyncWorker(context: Context) {
     WorkManager.getInstance(context).cancelUniqueWork(RssSyncWorker.UNIQUE_WORK_NAME)
 }
 
-fun getRssSyncWorkRequest(
+private fun getRssSyncWorkRequest(
     rssSyncFrequency: Long,
     requireWifi: Boolean,
     requireCharging: Boolean,

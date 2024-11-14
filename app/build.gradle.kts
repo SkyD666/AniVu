@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 24
-        versionName = "2.1-beta08"
+        versionName = "2.1-beta09"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -204,6 +204,7 @@ dependencies {
     implementation(libs.ffmpeg.kit)
 
     implementation(libs.coil.compose)
+    implementation(libs.coil.network)
     implementation(libs.coil.gif)
     implementation(libs.coil.svg)
     implementation(libs.coil.video)

@@ -14,7 +14,7 @@ import javax.inject.Inject
 open class IconTagExtractor @Inject constructor(
     private val retrofit: Retrofit,
 ) : Extractor {
-    override fun intercept(url: String): List<Extractor.IconData> = runBlocking {
+    override fun extract(url: String): List<Extractor.IconData> = runBlocking {
         try {
             val html = retrofit.create(HttpService::class.java).body(url).run {
                 source().use { source ->

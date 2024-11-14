@@ -8,13 +8,15 @@ import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import coil.ComponentRegistry
-import coil.EventListener
-import coil.ImageLoader
-import coil.compose.AsyncImage
-import coil.request.CachePolicy
-import coil.request.ImageRequest
-import coil.util.DebugLogger
+import coil3.ComponentRegistry
+import coil3.EventListener
+import coil3.ImageLoader
+import coil3.compose.AsyncImage
+import coil3.request.CachePolicy
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.request.lifecycle
+import coil3.util.DebugLogger
 import com.skyd.anivu.ext.imageLoaderBuilder
 
 

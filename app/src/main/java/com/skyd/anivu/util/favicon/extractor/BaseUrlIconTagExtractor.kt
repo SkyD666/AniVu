@@ -7,9 +7,9 @@ import javax.inject.Inject
 class BaseUrlIconTagExtractor @Inject constructor(
     retrofit: Retrofit,
 ) : IconTagExtractor(retrofit) {
-    override fun intercept(url: String): List<Extractor.IconData> = runBlocking {
+    override fun extract(url: String): List<Extractor.IconData> = runBlocking {
         baseUrl(url)
-            ?.let { base -> super.intercept(base) }
+            ?.let { base -> super.extract(base) }
             .orEmpty()
     }
 }

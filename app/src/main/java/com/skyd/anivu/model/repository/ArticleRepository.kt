@@ -101,24 +101,21 @@ class ArticleRepository @Inject constructor(
                 val requests = mutableListOf<Deferred<Unit>>()
                 feedUrls.forEach { feedUrl ->
                     requests += async {
-                        val articleBeanListAsync = async {
-                            runCatching {
-                                rssHelper.queryRssXml(
-                                    feed = feedDao.getFeed(feedUrl),
-                                    latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link,
-                                )?.also { feedWithArticle ->
-                                    feedDao.updateFeed(feedWithArticle.feed)
-                                }?.articles
-                            }.onFailure { e ->
-                                if (e !is CancellationException) {
-                                    e.printStackTrace()
-                                    (feedUrl + "\n" + e.message).showToast()
-                                }
-                            }.getOrNull()
-                        }
-                        val articleBeanList = articleBeanListAsync.await() ?: return@async
+                        val articleBeanList = runCatching {
+                            rssHelper.queryRssXml(
+                                feed = feedDao.getFeed(feedUrl),
+                                latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link,
+                            )?.also { feedWithArticle ->
+                                feedDao.updateFeed(feedWithArticle.feed)
+                            }?.articles
+                        }.onFailure { e ->
+                            if (e !is CancellationException) {
+                                e.printStackTrace()
+                                (feedUrl + "\n" + e.message).showToast()
+                            }
+                        }.getOrNull()
 
-                        if (articleBeanList.isEmpty()) return@async
+                        if (articleBeanList.isNullOrEmpty()) return@async
 
                         articleDao.insertListIfNotExist(articleBeanList.map { articleWithEnclosure ->
                             if (articleWithEnclosure.article.feedUrl != feedUrl) {

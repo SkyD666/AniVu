@@ -14,11 +14,12 @@ import android.os.Build.VERSION.SDK_INT
 import android.view.Window
 import androidx.core.content.ContextCompat
 import androidx.core.content.pm.PackageInfoCompat
-import coil.ImageLoader
-import coil.decode.GifDecoder
-import coil.decode.ImageDecoderDecoder
-import coil.decode.SvgDecoder
-import coil.decode.VideoFrameDecoder
+import coil3.ImageLoader
+import coil3.gif.AnimatedImageDecoder
+import coil3.gif.GifDecoder
+import coil3.network.okhttp.OkHttpNetworkFetcherFactory
+import coil3.svg.SvgDecoder
+import coil3.video.VideoFrameDecoder
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 
@@ -128,20 +129,20 @@ fun Context.imageLoaderBuilder(): ImageLoader.Builder {
     return ImageLoader.Builder(this)
         .components {
             if (SDK_INT >= 28) {
-                add(ImageDecoderDecoder.Factory())
+                add(AnimatedImageDecoder.Factory())
             } else {
                 add(GifDecoder.Factory())
             }
             add(SvgDecoder.Factory())
             add(VideoFrameDecoder.Factory())
         }
-        .okHttpClient {
-            OkHttpClient.Builder()
-                .addNetworkInterceptor(Interceptor { chain ->
+        .components {
+            add(OkHttpNetworkFetcherFactory(callFactory = {
+                OkHttpClient.Builder().addNetworkInterceptor(Interceptor { chain ->
                     chain.proceed(chain.request()).newBuilder()
                         .header("Cache-Control", "max-age=31536000,public")
                         .build()
-                })
-                .build()
+                }).build()
+            }))
         }
 }

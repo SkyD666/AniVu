@@ -20,7 +20,7 @@ class FaviconExtractor @Inject constructor(
 
     fun extractFavicon(url: String): String? = runBlocking {
         extractors
-            .map { async { it.intercept(url) } }
+            .map { async { it.extract(url) } }
             .map { it.await() }
             .flatten()
             .fastMaxBy {

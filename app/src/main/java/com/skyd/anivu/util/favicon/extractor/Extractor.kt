@@ -10,7 +10,7 @@ interface Extractor {
     fun <T> Response<T>.isSvg() =
         headers()["Content-Type"]?.contains("svg", ignoreCase = true) == true
 
-    fun intercept(url: String): List<IconData>
+    fun extract(url: String): List<IconData>
 
     data class IconData(
         val url: String,

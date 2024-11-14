@@ -1,9 +1,9 @@
 package com.skyd.anivu.model.repository
 
-import coil.request.CachePolicy
-import coil.request.ErrorResult
-import coil.request.ImageRequest
-import coil.request.SuccessResult
+import coil3.request.CachePolicy
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
+import coil3.request.SuccessResult
 import com.skyd.anivu.appContext
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.config.Const.TEMP_PICTURES_DIR

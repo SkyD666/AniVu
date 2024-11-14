@@ -93,7 +93,7 @@ fun AniVuFloatingActionButton(
     } else {
         TooltipBox(
             modifier = modifier,
-            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
             tooltip = {
                 PlainTooltip {
                     Text(contentDescription)
@@ -143,11 +143,9 @@ fun AniVuExtendedFloatingActionButton(
     } else {
         TooltipBox(
             modifier = modifier,
-            positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider(),
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(),
             tooltip = {
-                PlainTooltip {
-                    Text(contentDescription)
-                }
+                PlainTooltip { Text(contentDescription) }
             },
             state = rememberTooltipState()
         ) {

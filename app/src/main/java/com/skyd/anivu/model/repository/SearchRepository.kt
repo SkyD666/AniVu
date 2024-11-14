@@ -27,6 +27,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
@@ -63,7 +64,7 @@ class SearchRepository @Inject constructor(
         feedUrls: List<String>,
         articleIds: List<String>,
     ): Flow<PagingData<ArticleWithFeed>> {
-        return searchQuery.flatMapLatest { query ->
+        return searchQuery.debounce(70).flatMapLatest { query ->
             Pager(pagingConfig) {
                 articleDao.getArticlePagingSource(genSql(
                     tableName = ARTICLE_TABLE_NAME,

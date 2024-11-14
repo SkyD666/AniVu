@@ -32,16 +32,33 @@ fun EmptyPlaceholder(
 }
 
 @Composable
+fun ErrorPlaceholder(
+    modifier: Modifier = Modifier,
+    text: String,
+    contentPadding: PaddingValues = PaddingValues(),
+) {
+    AnimatedPlaceholder(
+        modifier = modifier,
+        contentPadding = contentPadding,
+        resId = R.raw.lottie_error_1,
+        tip = text,
+        maxLines = 4,
+    )
+}
+
+@Composable
 fun AnimatedPlaceholder(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     @androidx.annotation.RawRes resId: Int,
     tip: String,
+    maxLines: Int = Int.MAX_VALUE,
 ) {
     WithTextPlaceholder(
         modifier = modifier,
         contentPadding = contentPadding,
         text = tip,
+        maxLines = maxLines,
     ) {
         AniVuLottieAnimation(resId = resId)
     }
@@ -52,6 +69,7 @@ fun WithTextPlaceholder(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
     text: String,
+    maxLines: Int = Int.MAX_VALUE,
     content: @Composable BoxScope.() -> Unit,
 ) {
     BasePlaceholder(
@@ -71,6 +89,7 @@ fun WithTextPlaceholder(
                 modifier = Modifier.padding(top = 10.dp),
                 text = text,
                 textAlign = TextAlign.Center,
+                maxLines = maxLines,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground,
             )

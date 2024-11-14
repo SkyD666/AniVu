@@ -16,7 +16,7 @@ class HardCodedExtractor @Inject constructor(
         "/apple-touch-icon-precomposed.png",
     )
 
-    override fun intercept(url: String): List<Extractor.IconData> = runBlocking {
+    override fun extract(url: String): List<Extractor.IconData> = runBlocking {
         try {
             val baseUrl = baseUrl(url) ?: return@runBlocking emptyList()
             val request = mutableListOf<Deferred<Extractor.IconData?>>()

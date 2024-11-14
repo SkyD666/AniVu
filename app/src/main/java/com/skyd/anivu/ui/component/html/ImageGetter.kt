@@ -9,10 +9,13 @@ import android.text.Html
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import coil.drawable.ScaleDrawable
-import coil.request.ErrorResult
-import coil.request.ImageRequest
-import coil.request.SuccessResult
+import coil3.asDrawable
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
+import coil3.request.SuccessResult
+import coil3.request.error
+import coil3.request.placeholder
+import coil3.size.ScaleDrawable
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.imageLoaderBuilder
 
@@ -59,13 +62,15 @@ class ImageGetter(
             .error(R.drawable.ic_error_24)
             .listener(
                 onSuccess = { request, result ->
-                    preProcessDrawable(result.drawable)
-                    setAndResizeDrawable(result.drawable)
+                    val resultDrawable = result.image.asDrawable(context.resources)
+                    preProcessDrawable(resultDrawable)
+                    setAndResizeDrawable(resultDrawable)
                     onSuccess(request, result)
                 },
                 onError = { request, result ->
-                    if (result.drawable != null) {
-                        setAndResizeDrawable(result.drawable!!)
+                    val resultDrawable = result.image?.asDrawable(context.resources)
+                    if (resultDrawable != null) {
+                        setAndResizeDrawable(resultDrawable)
                     }
                     onError(request, result)
                 },

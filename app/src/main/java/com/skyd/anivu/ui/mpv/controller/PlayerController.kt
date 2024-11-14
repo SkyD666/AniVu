@@ -131,7 +131,8 @@ internal fun PlayerController(
                     controllerWidth = it.size.width
                     controllerHeight = it.size.height
                     controllerLayoutCoordinates = it
-                }// detectControllerGestures should be called before detectPressGestures
+                }
+                // detectControllerGestures should be called before detectPressGestures
                 // to avoid responding to swipes when long pressing
                 .detectControllerGestures(
                     enabled = enabled,

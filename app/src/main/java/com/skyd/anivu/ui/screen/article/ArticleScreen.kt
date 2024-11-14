@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -79,6 +80,7 @@ import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.BackIcon
 import com.skyd.anivu.ui.component.CircularProgressPlaceholder
 import com.skyd.anivu.ui.component.EmptyPlaceholder
+import com.skyd.anivu.ui.component.ErrorPlaceholder
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.local.LocalArticleItemMinWidth
@@ -367,8 +369,16 @@ private fun Content(
                 bottom = contentPadding.calculateBottomPadding(),
             ) + PaddingValues(vertical = 4.dp)
             when (val articleListState = uiState.articleListState) {
-                is ArticleListState.Failed -> Unit
-                is ArticleListState.Init -> CircularProgressPlaceholder(contentPadding = currentContentPadding)
+                is ArticleListState.Init -> CircularProgressPlaceholder(
+                    contentPadding = currentContentPadding,
+                )
+
+                is ArticleListState.Failed -> ErrorPlaceholder(
+                    modifier = Modifier.sizeIn(maxHeight = 200.dp),
+                    text = articleListState.msg,
+                    contentPadding = currentContentPadding,
+                )
+
                 is ArticleListState.Success -> ArticleList(
                     modifier = Modifier.nestedScroll(nestedScrollConnection),
                     articles = articleListState.articlePagingDataFlow.collectAsLazyPagingItems(),

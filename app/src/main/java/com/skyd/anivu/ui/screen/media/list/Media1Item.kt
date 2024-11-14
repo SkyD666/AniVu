@@ -39,10 +39,12 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import coil.EventListener
-import coil.request.CachePolicy
-import coil.request.ErrorResult
-import coil.request.ImageRequest
+import coil3.EventListener
+import coil3.request.CachePolicy
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import coil3.request.lifecycle
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.openWith
@@ -129,7 +131,7 @@ fun Media1Item(
                                 .crossfade(true)
                                 .build()
                         },
-                        imageLoader = rememberAniVuImageLoader(listener = object : EventListener {
+                        imageLoader = rememberAniVuImageLoader(listener = object : EventListener() {
                             override fun onError(request: ImageRequest, result: ErrorResult) {
                                 showThumbnail = false
                             }

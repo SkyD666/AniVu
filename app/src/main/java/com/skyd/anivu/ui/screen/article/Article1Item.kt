@@ -60,18 +60,18 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.EventListener
-import coil.request.ErrorResult
-import coil.request.ImageRequest
+import coil3.EventListener
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.ext.toDateTimeString
-import com.skyd.anivu.model.bean.feed.FeedBean
 import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
+import com.skyd.anivu.model.bean.feed.FeedBean
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeRightActionPreference
@@ -503,7 +503,7 @@ fun FeedIcon(modifier: Modifier = Modifier, data: FeedBean, size: Dp = 22.dp) {
                 .size(size)
                 .clip(CircleShape),
             model = icon,
-            imageLoader = rememberAniVuImageLoader(listener = object : EventListener {
+            imageLoader = rememberAniVuImageLoader(listener = object : EventListener() {
                 override fun onError(request: ImageRequest, result: ErrorResult) {
                     if (icon == data.customIcon) {
                         icon = data.icon

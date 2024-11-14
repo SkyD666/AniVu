@@ -64,7 +64,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.skyd.anivu.R
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.getAppVersionName
@@ -73,16 +72,17 @@ import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.model.bean.OtherWorksBean
 import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.AniVuImage
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.shape.CloverShape
 import com.skyd.anivu.ui.component.shape.CurlyCornerShape
 import com.skyd.anivu.ui.component.shape.SquircleShape
-import com.skyd.anivu.ui.screen.about.update.UpdateDialog
-import com.skyd.anivu.ui.screen.about.license.LICENSE_SCREEN_ROUTE
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
+import com.skyd.anivu.ui.screen.about.license.LICENSE_SCREEN_ROUTE
+import com.skyd.anivu.ui.screen.about.update.UpdateDialog
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
@@ -458,7 +458,7 @@ private fun OtherWorksItem(
                 .padding(15.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AsyncImage(
+                AniVuImage(
                     modifier = Modifier
                         .size(30.dp)
                         .aspectRatio(1f),

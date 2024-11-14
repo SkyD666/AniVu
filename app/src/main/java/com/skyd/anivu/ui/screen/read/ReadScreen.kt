@@ -75,10 +75,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
-import coil.EventListener
-import coil.decode.VideoFrameDecoder
-import coil.request.ErrorResult
-import coil.request.ImageRequest
+import coil3.EventListener
+import coil3.request.ErrorResult
+import coil3.request.ImageRequest
+import coil3.video.VideoFrameDecoder
 import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
@@ -565,7 +565,7 @@ private fun MediaCover(
             AniVuImage(
                 modifier = Modifier.fillMaxHeight(),
                 imageLoader = rememberAniVuImageLoader(
-                    listener = object : EventListener {
+                    listener = object : EventListener() {
                         override fun onError(request: ImageRequest, result: ErrorResult) {
                             if (cover != null && realImage != cover) {
                                 realImage = cover
