@@ -38,13 +38,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.EventListener
 import coil3.request.CachePolicy
 import coil3.request.ErrorResult
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import coil3.request.lifecycle
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.openWith
@@ -119,12 +117,10 @@ fun Media1Item(
             }
             if (data.isMedia && LocalMediaShowThumbnail.current) {
                 if (showThumbnail) {
-                    val lifecycleOwner = LocalLifecycleOwner.current
                     AniVuImage(
                         modifier = Modifier.fillMaxSize(),
                         model = remember(data.file.path) {
                             ImageRequest.Builder(context)
-                                .lifecycle(lifecycleOwner)
                                 .diskCachePolicy(CachePolicy.ENABLED)
                                 .memoryCachePolicy(CachePolicy.ENABLED)
                                 .data(data.file.path)

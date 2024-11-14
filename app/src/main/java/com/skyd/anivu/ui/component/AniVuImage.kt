@@ -15,7 +15,6 @@ import coil3.compose.AsyncImage
 import coil3.request.CachePolicy
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import coil3.request.lifecycle
 import coil3.util.DebugLogger
 import com.skyd.anivu.ext.imageLoaderBuilder
 
@@ -35,10 +34,8 @@ fun AniVuImage(
             model
         } else {
             val context = LocalContext.current
-            val lifecycleOwner = LocalLifecycleOwner.current
             remember(model) {
                 ImageRequest.Builder(context)
-                    .lifecycle(lifecycleOwner)
                     .diskCachePolicy(CachePolicy.ENABLED)
                     .memoryCachePolicy(CachePolicy.ENABLED)
                     .data(model)

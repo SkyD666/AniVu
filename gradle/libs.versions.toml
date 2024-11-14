@@ -16,7 +16,7 @@ kotlin = "2.0.21"
 androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.15.0" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.0" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.9.3" }
-androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version = "1.1.0-rc01" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version = "1.1.0" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version = "2.8.4" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version = "2.8.7" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "composeMaterial" }
@@ -31,10 +31,10 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version = "2.9.1" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version = "2.10.0" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version = "1.1.1" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1" }
-androidx-paging-compose = { module = "androidx.paging:paging-compose", version = "3.3.2" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version = "3.3.4" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version = "1.2.0" }
 androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version = "1.4.1" }
 
