@@ -36,7 +36,7 @@ import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.MediaGroupBean
-import com.skyd.anivu.model.bean.VideoBean
+import com.skyd.anivu.model.bean.MediaBean
 import com.skyd.anivu.ui.activity.PlayActivity
 import com.skyd.anivu.ui.component.CircularProgressPlaceholder
 import com.skyd.anivu.ui.component.EmptyPlaceholder
@@ -48,7 +48,7 @@ class GroupInfo(
     val group: MediaGroupBean,
     val version: Long,   // For update, if version changed, MediaList will refresh media list
     val onCreateGroup: (MediaGroupBean) -> Unit,
-    val onMoveFileToGroup: (VideoBean, MediaGroupBean) -> Unit,
+    val onMoveFileToGroup: (MediaBean, MediaGroupBean) -> Unit,
 )
 
 @Composable
@@ -147,16 +147,16 @@ internal fun MediaList(
 @Composable
 private fun MediaList(
     modifier: Modifier = Modifier,
-    list: List<VideoBean>,
+    list: List<MediaBean>,
     groups: List<MediaGroupBean>,
     groupInfo: GroupInfo?,
-    onPlay: (VideoBean) -> Unit,
-    onOpenDir: (VideoBean) -> Unit,
-    onRemove: (VideoBean) -> Unit,
+    onPlay: (MediaBean) -> Unit,
+    onOpenDir: (MediaBean) -> Unit,
+    onRemove: (MediaBean) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
     var openEditMediaDialog by rememberSaveable {
-        mutableStateOf<VideoBean?>(null, policy = referentialEqualityPolicy())
+        mutableStateOf<MediaBean?>(null, policy = referentialEqualityPolicy())
     }
     var openCreateGroupDialog by rememberSaveable { mutableStateOf(false) }
     var createGroupDialogGroup by rememberSaveable { mutableStateOf("") }

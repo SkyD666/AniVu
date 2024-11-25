@@ -4,7 +4,7 @@ import androidx.compose.ui.util.fastFirstOrNull
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.MediaGroupBean.Companion.isDefaultGroup
-import com.skyd.anivu.model.bean.VideoBean
+import com.skyd.anivu.model.bean.MediaBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -37,7 +37,7 @@ class MediaRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    fun requestFiles(uriPath: String, group: MediaGroupBean?): Flow<List<VideoBean>> {
+    fun requestFiles(uriPath: String, group: MediaGroupBean?): Flow<List<MediaBean>> {
         return flow {
             val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
             val mediaGroupJson = parseGroupJson(groupJsonFile)
@@ -46,7 +46,7 @@ class MediaRepository @Inject constructor(
                 File(uriPath).listFiles().orEmpty().toMutableList().filter { it.exists() }
             val videoList = if (group == null) {
                 allFiles.map {
-                    VideoBean(
+                    MediaBean(
                         displayName = null,     // TODO
                         file = it,
                     )
@@ -56,7 +56,7 @@ class MediaRepository @Inject constructor(
                     allFiles.filter { file ->
                         filesInGroup.fastFirstOrNull { it.fileName == file.name } == null
                     }.map { file ->
-                        VideoBean(
+                        MediaBean(
                             displayName = null,     // TODO
                             file = file,
                         )
@@ -65,7 +65,7 @@ class MediaRepository @Inject constructor(
                     filesInGroup.filter { it.groupName == group.name }.mapNotNull {
                         val file = File(uriPath, it.fileName)
                         if (file.exists()) {
-                            VideoBean(
+                            MediaBean(
                                 displayName = null,     // TODO
                                 file = file,
                             )
@@ -81,13 +81,13 @@ class MediaRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    fun requestDelete(file: File): Flow<Boolean> {
+    fun deleteFile(file: File): Flow<Boolean> {
         return flow {
             emit(file.deleteRecursively())
         }.flowOn(Dispatchers.IO)
     }
 
-    fun requestCreateGroup(uriPath: String, group: MediaGroupBean): Flow<Unit> = flow {
+    fun createGroup(uriPath: String, group: MediaGroupBean): Flow<Unit> = flow {
         if (group.isDefaultGroup()) {
             emit(Unit)
             return@flow
@@ -103,7 +103,7 @@ class MediaRepository @Inject constructor(
         emit(Unit)
     }.flowOn(Dispatchers.IO)
 
-    fun requestDeleteGroup(uriPath: String, group: MediaGroupBean): Flow<Int> = flow {
+    fun deleteGroup(uriPath: String, group: MediaGroupBean): Flow<Int> = flow {
         if (group.isDefaultGroup()) {
             emit(0)
             return@flow
@@ -128,7 +128,7 @@ class MediaRepository @Inject constructor(
         emit(newFileToGroups.count() - fileToGroups.count())
     }.flowOn(Dispatchers.IO)
 
-    fun requestRenameGroup(
+    fun renameGroup(
         uriPath: String,
         group: MediaGroupBean,
         newName: String,
@@ -162,15 +162,15 @@ class MediaRepository @Inject constructor(
         emit(MediaGroupBean(name = newName))
     }.flowOn(Dispatchers.IO)
 
-    fun requestChangeMediaGroup(
+    fun changeMediaGroup(
         uriPath: String,
-        videoBean: VideoBean,
+        mediaBean: MediaBean,
         group: MediaGroupBean,
     ): Flow<Unit> = flow {
         val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
         val mediaGroupJson = parseGroupJson(groupJsonFile)!!
         val fileToGroups = mediaGroupJson.files.toSet()
-        val file = fileToGroups.firstOrNull { it.fileName == videoBean.file.name }
+        val file = fileToGroups.firstOrNull { it.fileName == mediaBean.file.name }
 
         val newFileToGroups = (if (file != null) fileToGroups - file else fileToGroups)
             .toMutableList()
@@ -178,9 +178,9 @@ class MediaRepository @Inject constructor(
                 if (!group.isDefaultGroup()) {
                     add(
                         FileToGroup(
-                            fileName = videoBean.file.name,
+                            fileName = mediaBean.file.name,
                             groupName = group.name,
-                            isFile = videoBean.file.isFile,
+                            isFile = mediaBean.file.isFile,
                         )
                     )
                 }
@@ -190,7 +190,7 @@ class MediaRepository @Inject constructor(
         emit(Unit)
     }.flowOn(Dispatchers.IO)
 
-    fun requestMoveFilesToGroup(
+    fun moveFilesToGroup(
         path: String,
         from: MediaGroupBean,
         to: MediaGroupBean

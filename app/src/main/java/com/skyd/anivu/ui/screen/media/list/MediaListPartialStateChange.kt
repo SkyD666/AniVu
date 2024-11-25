@@ -2,7 +2,7 @@ package com.skyd.anivu.ui.screen.media.list
 
 import androidx.compose.ui.util.fastFirstOrNull
 import com.skyd.anivu.model.bean.MediaGroupBean
-import com.skyd.anivu.model.bean.VideoBean
+import com.skyd.anivu.model.bean.MediaBean
 import java.io.File
 
 
@@ -42,7 +42,7 @@ internal sealed interface MediaListPartialStateChange {
             }
         }
 
-        data class Success(val list: List<VideoBean>, val groups: List<MediaGroupBean>) :
+        data class Success(val list: List<MediaBean>, val groups: List<MediaGroupBean>) :
             MediaListResult
 
         data class Failed(val msg: String) : MediaListResult

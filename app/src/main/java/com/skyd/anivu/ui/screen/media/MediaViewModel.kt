@@ -94,7 +94,7 @@ class MediaViewModel @Inject constructor(
             filterIsInstance<MediaIntent.ChangeMediaGroup>().filterNot {
                 it.path.isNullOrBlank()
             }.flatMapConcat { intent ->
-                mediaRepo.requestChangeMediaGroup(intent.path!!, intent.videoBean, intent.group)
+                mediaRepo.changeMediaGroup(intent.path!!, intent.mediaBean, intent.group)
                     .map {
                         MediaPartialStateChange.ChangeMediaGroup.Success
                     }.startWith(MediaPartialStateChange.LoadingDialog.Show)
@@ -103,7 +103,7 @@ class MediaViewModel @Inject constructor(
             filterIsInstance<MediaIntent.DeleteGroup>().filterNot {
                 it.path.isNullOrBlank()
             }.flatMapConcat { intent ->
-                mediaRepo.requestDeleteGroup(intent.path!!, intent.group).map {
+                mediaRepo.deleteGroup(intent.path!!, intent.group).map {
                     MediaPartialStateChange.DeleteGroup.Success(intent.group)
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.DeleteGroup.Failed(it.message.toString()) }
@@ -111,7 +111,7 @@ class MediaViewModel @Inject constructor(
             filterIsInstance<MediaIntent.CreateGroup>().filterNot {
                 it.path.isNullOrBlank()
             }.flatMapConcat { intent ->
-                mediaRepo.requestCreateGroup(intent.path!!, intent.group).map {
+                mediaRepo.createGroup(intent.path!!, intent.group).map {
                     MediaPartialStateChange.CreateGroup.Success
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.CreateGroup.Failed(it.message.toString()) }
@@ -119,7 +119,7 @@ class MediaViewModel @Inject constructor(
             filterIsInstance<MediaIntent.MoveFilesToGroup>().filterNot {
                 it.path.isNullOrBlank()
             }.flatMapConcat { intent ->
-                mediaRepo.requestMoveFilesToGroup(intent.path!!, intent.from, intent.to).map {
+                mediaRepo.moveFilesToGroup(intent.path!!, intent.from, intent.to).map {
                     MediaPartialStateChange.MoveFilesToGroup.Success
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.MoveFilesToGroup.Failed(it.message.toString()) }
@@ -127,7 +127,7 @@ class MediaViewModel @Inject constructor(
             filterIsInstance<MediaIntent.RenameGroup>().filterNot {
                 it.path.isNullOrBlank()
             }.flatMapConcat { intent ->
-                mediaRepo.requestRenameGroup(intent.path!!, intent.group, intent.newName).map {
+                mediaRepo.renameGroup(intent.path!!, intent.group, intent.newName).map {
                     MediaPartialStateChange.EditGroup.Success(it)
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.EditGroup.Failed(it.message.toString()) }

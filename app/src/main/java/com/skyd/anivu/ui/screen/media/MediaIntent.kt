@@ -2,14 +2,14 @@ package com.skyd.anivu.ui.screen.media
 
 import com.skyd.anivu.base.mvi.MviIntent
 import com.skyd.anivu.model.bean.MediaGroupBean
-import com.skyd.anivu.model.bean.VideoBean
+import com.skyd.anivu.model.bean.MediaBean
 
 sealed interface MediaIntent : MviIntent {
     data class Init(val path: String?) : MediaIntent
     data class Refresh(val path: String?) : MediaIntent
     data class ChangeMediaGroup(
         val path: String?,
-        val videoBean: VideoBean,
+        val mediaBean: MediaBean,
         val group: MediaGroupBean
     ) : MediaIntent
 

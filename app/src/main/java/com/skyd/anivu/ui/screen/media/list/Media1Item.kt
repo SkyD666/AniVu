@@ -49,7 +49,7 @@ import com.skyd.anivu.ext.openWith
 import com.skyd.anivu.ext.share
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toUri
-import com.skyd.anivu.model.bean.VideoBean
+import com.skyd.anivu.model.bean.MediaBean
 import com.skyd.anivu.ui.component.AniVuImage
 import com.skyd.anivu.ui.component.rememberAniVuImageLoader
 import com.skyd.anivu.ui.local.LocalMediaShowThumbnail
@@ -57,11 +57,11 @@ import java.util.Locale
 
 @Composable
 fun Media1Item(
-    data: VideoBean,
-    onPlay: (VideoBean) -> Unit,
-    onOpenDir: (VideoBean) -> Unit,
-    onRemove: (VideoBean) -> Unit,
-    onLongClick: ((VideoBean) -> Unit)? = null,
+    data: MediaBean,
+    onPlay: (MediaBean) -> Unit,
+    onOpenDir: (MediaBean) -> Unit,
+    onRemove: (MediaBean) -> Unit,
+    onLongClick: ((MediaBean) -> Unit)? = null,
 ) {
     val context = LocalContext.current
     var expandMenu by rememberSaveable { mutableStateOf(false) }

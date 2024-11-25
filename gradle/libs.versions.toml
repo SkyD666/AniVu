@@ -1,8 +1,8 @@
 [versions]
 adaptive = "1.0.0"
-coil = "3.0.2"
+coil = "3.0.3"
 hilt = "2.52"
-libtorrent4j = "2.1.0-31"
+libtorrent4j = "2.1.0-35"
 composeMaterial = "1.7.5"
 composeMaterial3 = "1.4.0-alpha04"
 okhttp3 = "4.12.0"
@@ -70,7 +70,7 @@ ceau-opmlparser = { module = "be.ceau:opml-parser", version = "3.1.0" }
 
 readability4j = { module = "net.dankito.readability4j:readability4j", version = "1.0.8" }
 
-reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.3.3" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.4.0" }
 
 libtorrent4j-arm64 = { module = "org.libtorrent4j:libtorrent4j-android-arm64", version.ref = "libtorrent4j" }
 libtorrent4j-arm = { module = "org.libtorrent4j:libtorrent4j-android-arm", version.ref = "libtorrent4j" }

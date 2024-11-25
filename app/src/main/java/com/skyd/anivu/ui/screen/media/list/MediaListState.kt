@@ -2,7 +2,7 @@ package com.skyd.anivu.ui.screen.media.list
 
 import com.skyd.anivu.base.mvi.MviViewState
 import com.skyd.anivu.model.bean.MediaGroupBean
-import com.skyd.anivu.model.bean.VideoBean
+import com.skyd.anivu.model.bean.MediaBean
 
 data class MediaListState(
     val listState: ListState,
@@ -19,7 +19,7 @@ data class MediaListState(
 }
 
 sealed class ListState(open val loading: Boolean) {
-    data class Success(val list: List<VideoBean>, override val loading: Boolean = false) :
+    data class Success(val list: List<MediaBean>, override val loading: Boolean = false) :
         ListState(loading)
 
     data class Init(override val loading: Boolean = false) : ListState(loading)

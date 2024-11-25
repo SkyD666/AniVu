@@ -5,7 +5,7 @@ import com.skyd.anivu.ext.getMimeType
 import com.skyd.anivu.util.fileicon.getFileIcon
 import java.io.File
 
-data class VideoBean(
+data class MediaBean(
     val displayName: String? = null,
     val file: File,
 ) : BaseBean {

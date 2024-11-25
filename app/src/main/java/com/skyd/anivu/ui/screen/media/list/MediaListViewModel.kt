@@ -77,7 +77,7 @@ class MediaListViewModel @Inject constructor(
                     .catchMap { MediaListPartialStateChange.MediaListResult.Failed(it.message.toString()) }
             },
             filterIsInstance<MediaListIntent.DeleteFile>().flatMapConcat { intent ->
-                mediaRepo.requestDelete(intent.file).map {
+                mediaRepo.deleteFile(intent.file).map {
                     MediaListPartialStateChange.DeleteFileResult.Success(file = intent.file)
                 }.startWith(MediaListPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaListPartialStateChange.DeleteFileResult.Failed(it.message.toString()) }

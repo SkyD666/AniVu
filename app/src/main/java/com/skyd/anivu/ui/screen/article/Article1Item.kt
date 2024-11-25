@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,9 +53,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -301,8 +302,17 @@ private fun Article1ItemContent(
                         AniVuImage(
                             modifier = Modifier
                                 .width(100.dp)
-                                .fillMaxHeight()
-                                .heightIn(min = 70.dp, max = 120.dp),
+                                .heightIn(min = 70.dp, max = 120.dp)
+                                .layout { measurable, constraints ->
+                                    if (constraints.maxHeight == Constraints.Infinity) {
+                                        layout(0, 0) {}
+                                    } else {
+                                        val placeable = measurable.measure(constraints)
+                                        layout(placeable.width, placeable.height) {
+                                            placeable.place(0, 0)
+                                        }
+                                    }
+                                },
                             model = article.image,
                             contentScale = ContentScale.Crop,
                         )
