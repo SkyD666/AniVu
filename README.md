@@ -48,7 +48,7 @@
 
 1. **Subscribe to RSS**, Update RSS, **Read** RSS
 2. **Automatically update RSS** subscriptions
-3. **Download enclosures** (enclosure tags) of **torrent or magnet** links in RSS articles
+3. **Download** enclosures (enclosure tags) in RSS articles, also supports **torrent or magnet links**
 4. **Seeding** downloaded files
 5. **Play media enclosures or downloaded videos**
 6. Support variable playback **speed**, setup **audio track**, **subtitle track**, etc
@@ -57,9 +57,10 @@
 9. **Searching** existing **RSS subscription content**
 10. **Play other videos on the phone**
 11. Support **custom MPV player**
-12. Support **import and export** subscriptions via **OPML**
-13. Support **dark mode**
-14. ......
+12. Support Android **Picture in Picture**
+13. Support **import and export** subscriptions via **OPML**
+14. Support **dark mode**
+15. ......
 
 ## 🤩 Screenshots
 

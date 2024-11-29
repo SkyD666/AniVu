@@ -1,8 +1,8 @@
 package com.skyd.anivu.ui.screen.media.list
 
 import androidx.compose.ui.util.fastFirstOrNull
-import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.MediaBean
+import com.skyd.anivu.model.bean.MediaGroupBean
 import java.io.File
 
 
@@ -74,5 +74,37 @@ internal sealed interface MediaListPartialStateChange {
 
         data class Success(val file: File) : DeleteFileResult
         data class Failed(val msg: String) : DeleteFileResult
+    }
+
+    sealed interface RenameFileResult : MediaListPartialStateChange {
+        override fun reduce(oldState: MediaListState): MediaListState {
+            return when (this) {
+                is Success -> {
+                    val listState = oldState.listState
+                    oldState.copy(
+                        listState = if (listState is ListState.Success) {
+                            ListState.Success(listState.list.toMutableList().apply {
+                                val oldIndex = indexOfFirst { it.file == oldFile }
+                                if (oldIndex in indices) {
+                                    val old = get(oldIndex)
+                                    removeAt(oldIndex)
+                                    add(oldIndex, old.copy(file = newFile))
+                                }
+                            })
+                        } else {
+                            listState
+                        },
+                        loadingDialog = false,
+                    )
+                }
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val oldFile: File, val newFile: File) : RenameFileResult
+        data class Failed(val msg: String) : RenameFileResult
     }
 }

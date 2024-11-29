@@ -8,7 +8,6 @@ composeMaterial3 = "1.4.0-alpha04"
 okhttp3 = "4.12.0"
 rome = "2.1.0"
 room = "2.6.1"
-
 kotlin = "2.0.21"
 
 [libraries]
@@ -84,8 +83,9 @@ androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", vers
 [plugins]
 android-application = { id = "com.android.application", version = "8.7.2" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize",  version.ref = "kotlin"  }
+kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version = "2.51.1" }
 ksp = { id = "com.google.devtools.ksp", version = "2.0.21-1.0.25" }
+android-library = { id = "com.android.library", version = "8.7.2" }

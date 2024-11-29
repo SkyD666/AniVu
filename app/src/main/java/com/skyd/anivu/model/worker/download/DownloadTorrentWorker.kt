@@ -7,7 +7,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
@@ -44,16 +44,16 @@ import com.skyd.anivu.ext.saveTo
 import com.skyd.anivu.ext.toDecodedUrl
 import com.skyd.anivu.ext.toPercentage
 import com.skyd.anivu.ext.validateFileName
-import com.skyd.anivu.model.bean.download.DownloadInfoBean
-import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
-import com.skyd.anivu.model.bean.download.PeerInfoBean
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean
+import com.skyd.anivu.model.bean.download.bt.DownloadLinkUuidMapBean
+import com.skyd.anivu.model.bean.download.bt.PeerInfoBean
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
-import com.skyd.anivu.model.repository.download.DownloadManager
-import com.skyd.anivu.model.repository.download.DownloadManagerIntent
 import com.skyd.anivu.model.repository.download.DownloadRepository
+import com.skyd.anivu.model.repository.download.bt.BtDownloadManager
+import com.skyd.anivu.model.repository.download.bt.BtDownloadManagerIntent
 import com.skyd.anivu.model.service.HttpService
-import com.skyd.anivu.model.worker.download.DownloadTorrentWorker.Companion.DownloadWorkStarter
+import com.skyd.anivu.model.worker.download.DownloadTorrentWorker.Companion.BtDownloadWorkStarter
 import com.skyd.anivu.ui.activity.MainActivity
 import com.skyd.anivu.ui.component.showToast
 import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK_DATA
@@ -123,7 +123,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun initData(): Boolean = runBlocking {
         torrentLinkUuid = inputData.getString(TORRENT_LINK_UUID) ?: return@runBlocking false
-        DownloadManager.apply {
+        BtDownloadManager.apply {
             torrentLink = getDownloadLinkByUuid(torrentLinkUuid) ?: return@runBlocking false
             name = getDownloadName(link = torrentLink)
             progress = getDownloadProgress(link = torrentLink) ?: 0f
@@ -155,7 +155,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         removeWorkerFromFlow(id.toString())
         return Result.success(
             workDataOf(
-                STATE to (DownloadManager.getDownloadState(link = torrentLink)
+                STATE to (BtDownloadManager.getDownloadState(link = torrentLink)
                     ?.ordinal ?: 0),
                 TORRENT_LINK_UUID to torrentLinkUuid,
             )
@@ -190,14 +190,14 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             howToDownload(saveDir = saveDir)
         }.onFailure {
             it.printStackTrace()
-            pauseWorker(handle = null, state = DownloadInfoBean.DownloadState.ErrorPaused)
+            pauseWorker(handle = null, state = BtDownloadInfoBean.DownloadState.ErrorPaused)
             continuation.resumeWithException(it)
         }
     }
 
     private fun howToDownload(saveDir: File) = runBlocking {
         sessionManager.apply {
-            val lastSessionParams = DownloadManager
+            val lastSessionParams = BtDownloadManager
                 .getSessionParams(link = torrentLink)
             val sessionParams = if (lastSessionParams == null) SessionParams()
             else SessionParams(lastSessionParams.data)
@@ -213,39 +213,39 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             start(sessionParams)
             startDht()
 
-            if (DownloadManager.containsDownloadInfo(link = torrentLink)) {
-                DownloadManager.sendIntent(
-                    DownloadManagerIntent.UpdateDownloadInfoRequestId(
+            if (BtDownloadManager.containsDownloadInfo(link = torrentLink)) {
+                BtDownloadManager.sendIntent(
+                    BtDownloadManagerIntent.UpdateDownloadInfoRequestId(
                         link = torrentLink,
                         downloadRequestId = id.toString(),
                     )
                 )
             }
-            var newDownloadState: DownloadInfoBean.DownloadState? = null
-            when (DownloadManager.getDownloadState(link = torrentLink)) {
+            var newDownloadState: BtDownloadInfoBean.DownloadState? = null
+            when (BtDownloadManager.getDownloadState(link = torrentLink)) {
                 null,
                     // 重新下载
-                DownloadInfoBean.DownloadState.Seeding,
-                DownloadInfoBean.DownloadState.SeedingPaused,
-                DownloadInfoBean.DownloadState.Completed -> {
+                BtDownloadInfoBean.DownloadState.Seeding,
+                BtDownloadInfoBean.DownloadState.SeedingPaused,
+                BtDownloadInfoBean.DownloadState.Completed -> {
                     val resumeData = readResumeData(id.toString())
                     if (resumeData != null) {
                         swig().async_add_torrent(resumeData)
                     }
-                    newDownloadState = DownloadInfoBean.DownloadState.Seeding
+                    newDownloadState = BtDownloadInfoBean.DownloadState.Seeding
                 }
 
-                DownloadInfoBean.DownloadState.Init -> {
+                BtDownloadInfoBean.DownloadState.Init -> {
                     downloadByMagnetOrTorrent(torrentLink, saveDir)
-                    newDownloadState = DownloadInfoBean.DownloadState.Downloading
+                    newDownloadState = BtDownloadInfoBean.DownloadState.Downloading
                 }
 
-                DownloadInfoBean.DownloadState.Downloading,
-                DownloadInfoBean.DownloadState.ErrorPaused,
-                DownloadInfoBean.DownloadState.StorageMovedFailed,
-                DownloadInfoBean.DownloadState.Paused -> {
+                BtDownloadInfoBean.DownloadState.Downloading,
+                BtDownloadInfoBean.DownloadState.ErrorPaused,
+                BtDownloadInfoBean.DownloadState.StorageMovedFailed,
+                BtDownloadInfoBean.DownloadState.Paused -> {
                     downloadByMagnetOrTorrent(torrentLink, saveDir)
-                    newDownloadState = DownloadInfoBean.DownloadState.Downloading
+                    newDownloadState = BtDownloadInfoBean.DownloadState.Downloading
                 }
             }
             updateDownloadState(
@@ -339,7 +339,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             ForegroundInfo(
                 notificationId,
                 notification,
-                FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+                FOREGROUND_SERVICE_TYPE_DATA_SYNC
             )
         } else {
             ForegroundInfo(notificationId, notification)
@@ -366,7 +366,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 // Download error
                 pauseWorker(
                     handle = alert.handle(),
-                    state = DownloadInfoBean.DownloadState.ErrorPaused,
+                    state = BtDownloadInfoBean.DownloadState.ErrorPaused,
                 )
                 continuation.resumeWithException(RuntimeException(alert.message()))
             }
@@ -376,7 +376,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 // 文件错误，例如存储空间已满
                 pauseWorker(
                     handle = alert.handle(),
-                    state = DownloadInfoBean.DownloadState.ErrorPaused,
+                    state = BtDownloadInfoBean.DownloadState.ErrorPaused,
                 )
                 continuation.resumeWithException(RuntimeException(alert.message()))
             }
@@ -387,7 +387,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 updateDownloadStateAndSessionParams(
                     link = torrentLink,
                     sessionStateData = sessionManager.saveState() ?: byteArrayOf(),
-                    downloadState = DownloadInfoBean.DownloadState.Seeding,
+                    downloadState = BtDownloadInfoBean.DownloadState.Seeding,
                 )
             }
 
@@ -403,7 +403,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 alert.handle().saveResumeData()
                 pauseWorker(
                     handle = alert.handle(),
-                    state = DownloadInfoBean.DownloadState.StorageMovedFailed,
+                    state = BtDownloadInfoBean.DownloadState.StorageMovedFailed,
                 )
             }
 
@@ -417,7 +417,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 updateDownloadStateAndSessionParams(
                     link = torrentLink,
                     sessionStateData = sessionManager.saveState() ?: byteArrayOf(),
-                    downloadState = DownloadInfoBean.DownloadState.Completed,
+                    downloadState = BtDownloadInfoBean.DownloadState.Completed,
                 )
                 // Do not seeding when complete
                 if (!applicationContext.dataStore.getOrDefault(SeedingWhenCompletePreference)) {
@@ -458,7 +458,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     updateDownloadStateAndSessionParams(
                         link = torrentLink,
                         sessionStateData = sessionManager.saveState() ?: byteArrayOf(),
-                        downloadState = DownloadInfoBean.DownloadState.Seeding,
+                        downloadState = BtDownloadInfoBean.DownloadState.Seeding,
                     )
                 }
                 description = alert.state.toDisplayString(context = applicationContext)
@@ -504,8 +504,8 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
 
     private fun pauseWorker(
         handle: TorrentHandle?,
-        state: DownloadInfoBean.DownloadState = getWhatPausedState(
-            runBlocking { DownloadManager.getDownloadState(link = torrentLink) }
+        state: BtDownloadInfoBean.DownloadState = getWhatPausedState(
+            runBlocking { BtDownloadManager.getDownloadState(link = torrentLink) }
         )
     ) {
         if (!sessionManager.isRunning || sessionIsStopping) {
@@ -572,12 +572,12 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             appContext, WorkerEntryPoint::class.java
         )
 
-        fun interface DownloadWorkStarter {
+        fun interface BtDownloadWorkStarter {
             fun start(torrentLink: String, requestId: String?)
         }
 
         @Composable
-        fun rememberDownloadWorkStarter(): DownloadWorkStarter {
+        fun rememberBtDownloadWorkStarter(): BtDownloadWorkStarter {
             val context = LocalContext.current
             var currentTorrentLink: String? by rememberSaveable { mutableStateOf(null) }
             var currentRequestId: String? by rememberSaveable { mutableStateOf(null) }
@@ -594,7 +594,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     }
                 }
                 return remember {
-                    DownloadWorkStarter { torrentLink, requestId ->
+                    BtDownloadWorkStarter { torrentLink, requestId ->
                         currentTorrentLink = torrentLink
                         currentRequestId = requestId
                         storagePermissionState.launchPermissionRequest()
@@ -602,7 +602,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 }
             } else {
                 return remember {
-                    DownloadWorkStarter { torrentLink, requestId ->
+                    BtDownloadWorkStarter { torrentLink, requestId ->
                         startWorker(context, torrentLink, requestId)
                     }
                 }
@@ -621,10 +621,10 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             }
             coroutineScope.launch {
                 var torrentLinkUuid =
-                    DownloadManager.getDownloadUuidByLink(torrentLink)
+                    BtDownloadManager.getDownloadUuidByLink(torrentLink)
                 if (torrentLinkUuid == null) {
                     torrentLinkUuid = UUID.randomUUID().toString()
-                    DownloadManager.setDownloadLinkUuidMap(
+                    BtDownloadManager.setDownloadLinkUuidMap(
                         DownloadLinkUuidMapBean(
                             link = torrentLink,
                             uuid = torrentLinkUuid,
@@ -675,7 +675,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 val workerState = getWorkInfoById(requestUuid).get()?.state
                 if (workerState == null || workerState.isFinished) {
                     coroutineScope.launch {
-                        val state = DownloadManager.getDownloadState(link)
+                        val state = BtDownloadManager.getDownloadState(link)
                         updateDownloadState(
                             link = link,
                             downloadState = getWhatPausedState(state),

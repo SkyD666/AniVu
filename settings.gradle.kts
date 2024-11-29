@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AniVu"
 include(":app")
- 
+include(":downloader")

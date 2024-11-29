@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.screen.download
 
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean
 
 
 internal sealed interface DownloadPartialStateChange {
@@ -17,7 +18,10 @@ internal sealed interface DownloadPartialStateChange {
         override fun reduce(oldState: DownloadState): DownloadState {
             return when (this) {
                 is Success -> oldState.copy(
-                    downloadListState = DownloadListState.Success(downloadInfoBeanList = downloadInfoBeanList),
+                    downloadListState = DownloadListState.Success(
+                        downloadInfoBeanList = downloadInfoBeanList,
+                        btDownloadInfoBeanList = btDownloadInfoBeanList,
+                    ),
                     loadingDialog = false,
                 )
 
@@ -33,7 +37,11 @@ internal sealed interface DownloadPartialStateChange {
             }
         }
 
-        data class Success(val downloadInfoBeanList: List<DownloadInfoBean>) : DownloadListResult
+        data class Success(
+            val downloadInfoBeanList: List<DownloadInfoBean>,
+            val btDownloadInfoBeanList: List<BtDownloadInfoBean>,
+        ) : DownloadListResult
+
         data class Failed(val msg: String) : DownloadListResult
         data object Loading : DownloadListResult
     }

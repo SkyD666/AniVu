@@ -10,4 +10,5 @@ sealed interface MediaListIntent : MviIntent {
 
     data class Refresh(val path: String?, val group: MediaGroupBean?) : MediaListIntent
     data class DeleteFile(val file: File) : MediaListIntent
+    data class RenameFile(val file: File, val newName: String) : MediaListIntent
 }

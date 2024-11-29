@@ -135,6 +135,7 @@ import com.skyd.anivu.ui.screen.settings.transmission.TRANSMISSION_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.transmission.TransmissionScreen
 import com.skyd.anivu.ui.screen.settings.transmission.proxy.PROXY_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.transmission.proxy.ProxyScreen
+import com.skyd.downloader.notification.NotificationConst
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.json.Json
 
@@ -177,7 +178,9 @@ class MainActivity : BaseComposeActivity() {
     private fun handleIntent(intent: Intent?, navController: NavController) {
         intent ?: return
         val data = intent.data
-        if (Intent.ACTION_VIEW == intent.action && data != null) {
+        if (intent.extras?.containsKey(NotificationConst.KEY_DOWNLOAD_REQUEST_ID) == true) {
+            openDownloadScreen(navController = navController)
+        } else if (Intent.ACTION_VIEW == intent.action && data != null) {
             val scheme = data.scheme
             var url: String? = null
             when (scheme) {

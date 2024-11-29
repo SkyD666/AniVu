@@ -2,15 +2,15 @@ package com.skyd.anivu.model.db.migration
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.skyd.anivu.model.bean.download.DOWNLOAD_INFO_TABLE_NAME
-import com.skyd.anivu.model.bean.download.DownloadInfoBean.Companion.DESCRIPTION_COLUMN
-import com.skyd.anivu.model.bean.download.DownloadInfoBean.Companion.DOWNLOAD_DATE_COLUMN
-import com.skyd.anivu.model.bean.download.DownloadInfoBean.Companion.DOWNLOAD_REQUEST_ID_COLUMN
-import com.skyd.anivu.model.bean.download.DownloadInfoBean.Companion.DOWNLOAD_STATE_COLUMN
-import com.skyd.anivu.model.bean.download.DownloadInfoBean.Companion.LINK_COLUMN
-import com.skyd.anivu.model.bean.download.DownloadInfoBean.Companion.NAME_COLUMN
-import com.skyd.anivu.model.bean.download.DownloadInfoBean.Companion.PROGRESS_COLUMN
-import com.skyd.anivu.model.bean.download.DownloadInfoBean.Companion.SIZE_COLUMN
+import com.skyd.anivu.model.bean.download.bt.DOWNLOAD_INFO_TABLE_NAME
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean.Companion.DESCRIPTION_COLUMN
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean.Companion.DOWNLOAD_DATE_COLUMN
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean.Companion.DOWNLOAD_REQUEST_ID_COLUMN
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean.Companion.DOWNLOAD_STATE_COLUMN
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean.Companion.LINK_COLUMN
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean.Companion.NAME_COLUMN
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean.Companion.PROGRESS_COLUMN
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean.Companion.SIZE_COLUMN
 
 class Migration8To9 : Migration(8, 9) {
     override fun migrate(db: SupportSQLiteDatabase) {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -302,6 +303,7 @@ private fun Article1ItemContent(
                         AniVuImage(
                             modifier = Modifier
                                 .width(100.dp)
+                                .fillMaxHeight()
                                 .heightIn(min = 70.dp, max = 120.dp)
                                 .layout { measurable, constraints ->
                                     if (constraints.maxHeight == Constraints.Infinity) {

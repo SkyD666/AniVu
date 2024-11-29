@@ -2,9 +2,10 @@ package com.skyd.anivu.model.repository
 
 import androidx.compose.ui.util.fastFirstOrNull
 import com.skyd.anivu.base.BaseRepository
+import com.skyd.anivu.ext.validateFileName
+import com.skyd.anivu.model.bean.MediaBean
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.MediaGroupBean.Companion.isDefaultGroup
-import com.skyd.anivu.model.bean.MediaBean
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -84,6 +85,13 @@ class MediaRepository @Inject constructor(
     fun deleteFile(file: File): Flow<Boolean> {
         return flow {
             emit(file.deleteRecursively())
+        }.flowOn(Dispatchers.IO)
+    }
+
+    fun renameFile(file: File, newName: String): Flow<File?> {
+        return flow {
+            val newFile = File(file.parentFile, newName.validateFileName())
+            emit(if (file.renameTo(newFile)) newFile else null)
         }.flowOn(Dispatchers.IO)
     }
 

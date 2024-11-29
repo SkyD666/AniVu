@@ -36,7 +36,7 @@ class FeedRepository @Inject constructor(
     private val reorderGroupRepository: ReorderGroupRepository,
     private val rssHelper: RssHelper,
 ) : BaseRepository() {
-    suspend fun requestGroupAnyList(): Flow<List<Any>> {
+    fun requestGroupAnyList(): Flow<List<Any>> {
         return combine(
             groupDao.getGroupWithFeeds(),
             groupDao.getGroupIds(),

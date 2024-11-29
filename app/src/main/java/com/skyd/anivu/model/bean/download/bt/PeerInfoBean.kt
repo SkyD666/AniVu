@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.bean.download
+package com.skyd.anivu.model.bean.download.bt
 
 import android.os.Parcelable
 import com.skyd.anivu.base.BaseBean

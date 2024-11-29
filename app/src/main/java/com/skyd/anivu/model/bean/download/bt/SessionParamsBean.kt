@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.bean.download
+package com.skyd.anivu.model.bean.download.bt
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
@@ -16,12 +16,12 @@ const val SESSION_PARAMS_TABLE_NAME = "SessionParams"
 @Entity(
     tableName = SESSION_PARAMS_TABLE_NAME,
     primaryKeys = [
-        DownloadInfoBean.LINK_COLUMN
+        BtDownloadInfoBean.LINK_COLUMN
     ],
     foreignKeys = [
         ForeignKey(
-            entity = DownloadInfoBean::class,
-            parentColumns = [DownloadInfoBean.LINK_COLUMN],
+            entity = BtDownloadInfoBean::class,
+            parentColumns = [BtDownloadInfoBean.LINK_COLUMN],
             childColumns = [SessionParamsBean.LINK_COLUMN],
             onDelete = ForeignKey.CASCADE
         )

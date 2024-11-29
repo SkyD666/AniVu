@@ -35,8 +35,8 @@ import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.activity
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.toUri
-import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.MediaBean
+import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.ui.activity.PlayActivity
 import com.skyd.anivu.ui.component.CircularProgressPlaceholder
 import com.skyd.anivu.ui.component.EmptyPlaceholder
@@ -116,6 +116,9 @@ internal fun MediaList(
                                     path = it.file.path
                                 )
                             },
+                            onRename = { oldMedia, newName ->
+                                dispatch(MediaListIntent.RenameFile(oldMedia.file, newName))
+                            },
                             onRemove = { dispatch(MediaListIntent.DeleteFile(it.file)) },
                             contentPadding = innerPadding + contentPadding + fabPadding,
                         )
@@ -152,6 +155,7 @@ private fun MediaList(
     groupInfo: GroupInfo?,
     onPlay: (MediaBean) -> Unit,
     onOpenDir: (MediaBean) -> Unit,
+    onRename: (MediaBean, String) -> Unit,
     onRemove: (MediaBean) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
@@ -184,11 +188,12 @@ private fun MediaList(
         val videoBean = openEditMediaDialog!!
         EditMediaSheet(
             onDismissRequest = { openEditMediaDialog = null },
-            file = videoBean.file,
+            mediaBean = videoBean,
             currentGroup = groupInfo!!.group,
             groups = groups,
+            onRename = onRename,
             onDelete = {
-                onRemove(videoBean)
+                onRemove(it)
                 openEditMediaDialog = null
             },
             onGroupChange = {

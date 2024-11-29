@@ -82,6 +82,14 @@ class MediaListViewModel @Inject constructor(
                 }.startWith(MediaListPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaListPartialStateChange.DeleteFileResult.Failed(it.message.toString()) }
             },
+            filterIsInstance<MediaListIntent.RenameFile>().flatMapConcat { intent ->
+                mediaRepo.renameFile(intent.file, intent.newName).map { newFile ->
+                    MediaListPartialStateChange.RenameFileResult.Success(
+                        oldFile = intent.file, newFile = newFile!!
+                    )
+                }.startWith(MediaListPartialStateChange.LoadingDialog.Show)
+                    .catchMap { MediaListPartialStateChange.RenameFileResult.Failed(it.message.toString()) }
+            },
         )
     }
 }

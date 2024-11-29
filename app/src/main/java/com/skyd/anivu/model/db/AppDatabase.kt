@@ -10,10 +10,10 @@ import com.skyd.anivu.model.bean.MediaPlayHistoryBean
 import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.bean.article.RssMediaBean
-import com.skyd.anivu.model.bean.download.DownloadInfoBean
-import com.skyd.anivu.model.bean.download.DownloadLinkUuidMapBean
-import com.skyd.anivu.model.bean.download.SessionParamsBean
-import com.skyd.anivu.model.bean.download.TorrentFileBean
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean
+import com.skyd.anivu.model.bean.download.bt.DownloadLinkUuidMapBean
+import com.skyd.anivu.model.bean.download.bt.SessionParamsBean
+import com.skyd.anivu.model.bean.download.bt.TorrentFileBean
 import com.skyd.anivu.model.bean.feed.FeedBean
 import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.bean.group.GroupBean
@@ -50,7 +50,7 @@ const val APP_DATA_BASE_FILE_NAME = "app.db"
         FeedBean::class,
         ArticleBean::class,
         EnclosureBean::class,
-        DownloadInfoBean::class,
+        BtDownloadInfoBean::class,
         DownloadLinkUuidMapBean::class,
         SessionParamsBean::class,
         TorrentFileBean::class,

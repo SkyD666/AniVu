@@ -11,8 +11,8 @@ import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.ifNullOfBlank
 import com.skyd.anivu.ext.toDecodedUrl
 import com.skyd.anivu.ext.validateFileName
-import com.skyd.anivu.model.bean.download.DownloadInfoBean
-import com.skyd.anivu.model.bean.download.TorrentFileBean
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean
+import com.skyd.anivu.model.bean.download.bt.TorrentFileBean
 import com.skyd.anivu.model.preference.proxy.ProxyHostnamePreference
 import com.skyd.anivu.model.preference.proxy.ProxyModePreference
 import com.skyd.anivu.model.preference.proxy.ProxyPasswordPreference
@@ -20,8 +20,8 @@ import com.skyd.anivu.model.preference.proxy.ProxyPortPreference
 import com.skyd.anivu.model.preference.proxy.ProxyTypePreference
 import com.skyd.anivu.model.preference.proxy.ProxyUsernamePreference
 import com.skyd.anivu.model.preference.proxy.UseProxyPreference
-import com.skyd.anivu.model.repository.download.DownloadManager
-import com.skyd.anivu.model.repository.download.DownloadManagerIntent
+import com.skyd.anivu.model.repository.download.bt.BtDownloadManager
+import com.skyd.anivu.model.repository.download.bt.BtDownloadManagerIntent
 import kotlinx.coroutines.runBlocking
 import org.libtorrent4j.FileStorage
 import org.libtorrent4j.SettingsPack
@@ -161,25 +161,25 @@ internal fun toSettingsPackProxyType(proxyType: String): settings_pack.proxy_typ
     }
 }
 
-internal fun getWhatPausedState(oldState: DownloadInfoBean.DownloadState?) =
+internal fun getWhatPausedState(oldState: BtDownloadInfoBean.DownloadState?) =
     when (oldState) {
-        DownloadInfoBean.DownloadState.Seeding,
-        DownloadInfoBean.DownloadState.Completed,
-        DownloadInfoBean.DownloadState.SeedingPaused -> {
-            DownloadInfoBean.DownloadState.SeedingPaused
+        BtDownloadInfoBean.DownloadState.Seeding,
+        BtDownloadInfoBean.DownloadState.Completed,
+        BtDownloadInfoBean.DownloadState.SeedingPaused -> {
+            BtDownloadInfoBean.DownloadState.SeedingPaused
         }
 
         else -> {
-            DownloadInfoBean.DownloadState.Paused
+            BtDownloadInfoBean.DownloadState.Paused
         }
     }
 
 internal fun updateDownloadState(
     link: String,
-    downloadState: DownloadInfoBean.DownloadState,
+    downloadState: BtDownloadInfoBean.DownloadState,
 ) {
-    DownloadManager.sendIntent(
-        DownloadManagerIntent.UpdateDownloadState(
+    BtDownloadManager.sendIntent(
+        BtDownloadManagerIntent.UpdateDownloadState(
             link = link,
             downloadState = downloadState,
         )
@@ -189,23 +189,23 @@ internal fun updateDownloadState(
 internal fun updateDownloadStateAndSessionParams(
     link: String,
     sessionStateData: ByteArray,
-    downloadState: DownloadInfoBean.DownloadState,
+    downloadState: BtDownloadInfoBean.DownloadState,
 ) {
-    DownloadManager.sendIntent(
-        DownloadManagerIntent.UpdateDownloadState(
+    BtDownloadManager.sendIntent(
+        BtDownloadManagerIntent.UpdateDownloadState(
             link = link, downloadState = downloadState,
         )
     )
-    DownloadManager.sendIntent(
-        DownloadManagerIntent.UpdateSessionParams(
+    BtDownloadManager.sendIntent(
+        BtDownloadManagerIntent.UpdateSessionParams(
             link = link, sessionStateData = sessionStateData,
         )
     )
 }
 
 internal fun updateDescriptionInfoToDb(link: String, description: String) {
-    DownloadManager.sendIntent(
-        DownloadManagerIntent.UpdateDownloadDescription(
+    BtDownloadManager.sendIntent(
+        BtDownloadManagerIntent.UpdateDownloadDescription(
             link = link,
             description = description,
         )
@@ -229,13 +229,13 @@ internal fun updateTorrentFilesToDb(
             )
         }
     }.onFailure { it.printStackTrace() }
-    DownloadManager.sendIntent(DownloadManagerIntent.UpdateTorrentFiles(list))
+    BtDownloadManager.sendIntent(BtDownloadManagerIntent.UpdateTorrentFiles(list))
 }
 
 internal fun updateNameInfoToDb(link: String, name: String?) {
     if (name.isNullOrBlank()) return
-    DownloadManager.sendIntent(
-        DownloadManagerIntent.UpdateDownloadName(
+    BtDownloadManager.sendIntent(
+        BtDownloadManagerIntent.UpdateDownloadName(
             link = link,
             name = name,
         )
@@ -243,8 +243,8 @@ internal fun updateNameInfoToDb(link: String, name: String?) {
 }
 
 internal fun updateProgressInfoToDb(link: String, progress: Float) {
-    DownloadManager.sendIntent(
-        DownloadManagerIntent.UpdateDownloadProgress(
+    BtDownloadManager.sendIntent(
+        BtDownloadManagerIntent.UpdateDownloadProgress(
             link = link,
             progress = progress,
         )
@@ -252,8 +252,8 @@ internal fun updateProgressInfoToDb(link: String, progress: Float) {
 }
 
 internal fun updateSizeInfoToDb(link: String, size: Long) {
-    DownloadManager.sendIntent(
-        DownloadManagerIntent.UpdateDownloadSize(
+    BtDownloadManager.sendIntent(
+        BtDownloadManagerIntent.UpdateDownloadSize(
             link = link,
             size = size,
         )
@@ -272,12 +272,12 @@ internal fun addNewDownloadInfoToDbIfNotExists(
     downloadRequestId: String,
 ) = runBlocking {
     if (!forceAdd) {
-        val video = DownloadManager.getDownloadInfo(link = link)
+        val video = BtDownloadManager.getDownloadInfo(link = link)
         if (video != null) return@runBlocking
     }
-    DownloadManager.sendIntent(
-        DownloadManagerIntent.UpdateDownloadInfo(
-            DownloadInfoBean(
+    BtDownloadManager.sendIntent(
+        BtDownloadManagerIntent.UpdateDownloadInfo(
+            BtDownloadInfoBean(
                 link = link,
                 name = name.ifNullOfBlank {
                     link.substringAfterLast('/')

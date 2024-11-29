@@ -186,7 +186,7 @@
     <string name="crash_screen_copy_crash_log">複製日誌</string>
     <string name="feed_screen_all_articles">所有文章</string>
     <string name="download_screen_add_download">新增</string>
-    <string name="download_screen_add_download_hint">磁力 / 種子連結</string>
+    <string name="download_screen_add_download_hint">下載連結</string>
     <string name="download_screen_unsupported_link">不支援的連結</string>
     <string name="date_style_relative">相對</string>
     <string name="date_style_full">完整</string>

@@ -1,4 +1,4 @@
-package com.skyd.anivu.model.bean.download
+package com.skyd.anivu.model.bean.download.bt
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
@@ -20,8 +20,8 @@ const val TORRENT_FILE_TABLE_NAME = "TorrentFile"
     ],
     foreignKeys = [
         ForeignKey(
-            entity = DownloadInfoBean::class,
-            parentColumns = [DownloadInfoBean.LINK_COLUMN],
+            entity = BtDownloadInfoBean::class,
+            parentColumns = [BtDownloadInfoBean.LINK_COLUMN],
             childColumns = [TorrentFileBean.LINK_COLUMN],
             onDelete = ForeignKey.CASCADE
         )

@@ -39,9 +39,8 @@ import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
-import com.skyd.anivu.model.worker.download.DownloadTorrentWorker.Companion.rememberDownloadWorkStarter
+import com.skyd.anivu.model.repository.download.DownloadStarter
 import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
-import com.skyd.anivu.model.worker.download.isTorrentMimetype
 import com.skyd.anivu.ui.activity.PlayActivity
 import com.skyd.anivu.ui.component.AniVuIconButton
 
@@ -68,7 +67,7 @@ fun EnclosureBottomSheet(
     sheetState: SheetState = rememberModalBottomSheetState(),
     dataList: List<Any>,
 ) {
-    val downloadWorkStarter = rememberDownloadWorkStarter()
+    val context = LocalContext.current
     val onDownload: (Any) -> Unit = remember {
         {
             val url = when (it) {
@@ -77,7 +76,11 @@ fun EnclosureBottomSheet(
                 else -> null
             }
             if (!url.isNullOrBlank()) {
-                downloadWorkStarter.start(torrentLink = url, requestId = null)
+                DownloadStarter.download(
+                    context = context,
+                    url = url,
+                    type = (it as? EnclosureBean)?.type,
+                )
             }
         }
     }
@@ -117,10 +120,7 @@ private fun EnclosureItem(
     onDownload: (EnclosureBean) -> Unit,
 ) {
     val context = LocalContext.current
-    val isMagnetOrTorrent = rememberSaveable {
-        data.url.startsWith("magnet:") || isTorrentMimetype(data.type) ||
-                Regex("^(http|https)://.*\\.torrent$").matches(data.url)
-    }
+
     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
@@ -159,13 +159,11 @@ private fun EnclosureItem(
                 contentDescription = stringResource(id = R.string.play),
             )
         }
-        if (isMagnetOrTorrent) {
-            AniVuIconButton(
-                onClick = { onDownload(data) },
-                imageVector = Icons.Outlined.Download,
-                contentDescription = stringResource(id = R.string.download),
-            )
-        }
+        AniVuIconButton(
+            onClick = { onDownload(data) },
+            imageVector = Icons.Outlined.Download,
+            contentDescription = stringResource(id = R.string.download),
+        )
     }
 }
 

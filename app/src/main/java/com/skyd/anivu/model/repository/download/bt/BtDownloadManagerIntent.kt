@@ -1,16 +1,17 @@
-package com.skyd.anivu.model.repository.download
+package com.skyd.anivu.model.repository.download.bt
 
 import com.skyd.anivu.base.mvi.MviIntent
-import com.skyd.anivu.model.bean.download.DownloadInfoBean
-import com.skyd.anivu.model.bean.download.DownloadInfoBean.DownloadState
-import com.skyd.anivu.model.bean.download.TorrentFileBean
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean
+import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean.DownloadState
+import com.skyd.anivu.model.bean.download.bt.TorrentFileBean
 
-sealed interface DownloadManagerIntent : MviIntent {
-    data class UpdateDownloadInfo(val downloadInfoBean: DownloadInfoBean) : DownloadManagerIntent
+sealed interface BtDownloadManagerIntent : MviIntent {
+    data class UpdateDownloadInfo(val btDownloadInfoBean: BtDownloadInfoBean) :
+        BtDownloadManagerIntent
     data class UpdateSessionParams(
         val link: String,
         val sessionStateData: ByteArray,
-    ) : DownloadManagerIntent {
+    ) : BtDownloadManagerIntent {
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
             if (javaClass != other?.javaClass) return false
@@ -30,18 +31,19 @@ sealed interface DownloadManagerIntent : MviIntent {
         }
     }
 
-    data class UpdateDownloadProgress(val link: String, val progress: Float) : DownloadManagerIntent
+    data class UpdateDownloadProgress(val link: String, val progress: Float) :
+        BtDownloadManagerIntent
     data class UpdateDownloadState(
         val link: String,
         val downloadState: DownloadState,
-    ) : DownloadManagerIntent
+    ) : BtDownloadManagerIntent
 
-    data class UpdateDownloadSize(val link: String, val size: Long) : DownloadManagerIntent
-    data class UpdateDownloadName(val link: String, val name: String?) : DownloadManagerIntent
+    data class UpdateDownloadSize(val link: String, val size: Long) : BtDownloadManagerIntent
+    data class UpdateDownloadName(val link: String, val name: String?) : BtDownloadManagerIntent
     data class UpdateDownloadInfoRequestId(val link: String, val downloadRequestId: String) :
-        DownloadManagerIntent
+        BtDownloadManagerIntent
 
-    data class UpdateTorrentFiles(val files: List<TorrentFileBean>) : DownloadManagerIntent
+    data class UpdateTorrentFiles(val files: List<TorrentFileBean>) : BtDownloadManagerIntent
     data class UpdateDownloadDescription(val link: String, val description: String) :
-        DownloadManagerIntent
+        BtDownloadManagerIntent
 }

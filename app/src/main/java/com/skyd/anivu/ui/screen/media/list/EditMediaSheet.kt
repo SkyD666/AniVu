@@ -21,6 +21,7 @@ import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.DriveFileRenameOutline
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -34,44 +35,51 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.openWith
 import com.skyd.anivu.ext.toUri
+import com.skyd.anivu.model.bean.MediaBean
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.MediaGroupBean.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
+import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.screen.feed.SheetChip
 import java.io.File
 
 @Composable
 fun EditMediaSheet(
     onDismissRequest: () -> Unit,
-    file: File,
+    mediaBean: MediaBean,
     currentGroup: MediaGroupBean,
     groups: List<MediaGroupBean>,
-    onDelete: (File) -> Unit,
+    onRename: (MediaBean, String) -> Unit,
+    onDelete: (MediaBean) -> Unit,
     onGroupChange: (MediaGroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
 ) {
     val context = LocalContext.current
 
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
+        var openRenameInputDialog by rememberSaveable { mutableStateOf<String?>(null) }
+
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp)
         ) {
-            InfoArea(file = file)
+            InfoArea(file = mediaBean.file)
             Spacer(modifier = Modifier.height(20.dp))
 
             // Options
             OptionArea(
-                onOpenWith = { file.toUri(context).openWith(context) },
+                onOpenWith = { mediaBean.file.toUri(context).openWith(context) },
+                onRenameClicked = { openRenameInputDialog = mediaBean.file.name },
                 onDelete = {
-                    onDelete(file)
+                    onDelete(mediaBean)
                     onDismissRequest()
                 },
             )
@@ -85,6 +93,22 @@ fun EditMediaSheet(
                 openCreateGroupDialog = openCreateGroupDialog,
             )
             Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        if (openRenameInputDialog != null) {
+            TextFieldDialog(
+                titleText = stringResource(R.string.rename),
+                value = openRenameInputDialog.orEmpty(),
+                onValueChange = { openRenameInputDialog = it },
+                singleLine = false,
+                onConfirm = {
+                    onRename(mediaBean, it.replace(Regex("[\\n\\r]"), ""))
+                    openRenameInputDialog = null
+                    onDismissRequest()
+                },
+                imeAction = ImeAction.Done,
+                onDismissRequest = { openRenameInputDialog = null }
+            )
         }
     }
 }
@@ -124,6 +148,7 @@ private fun InfoArea(file: File) {
 internal fun OptionArea(
     deleteWarningText: String = stringResource(id = R.string.media_screen_delete_file_warning),
     onOpenWith: (() -> Unit)? = null,
+    onRenameClicked: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
 ) {
     var openDeleteWarningDialog by rememberSaveable { mutableStateOf(false) }
@@ -145,6 +170,13 @@ internal fun OptionArea(
                     icon = Icons.AutoMirrored.Outlined.OpenInNew,
                     text = stringResource(id = R.string.open_with),
                     onClick = onOpenWith,
+                )
+            }
+            if (onRenameClicked != null) {
+                SheetChip(
+                    icon = Icons.Outlined.DriveFileRenameOutline,
+                    text = stringResource(id = R.string.rename),
+                    onClick = onRenameClicked,
                 )
             }
             if (onDelete != null) {

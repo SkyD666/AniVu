@@ -8,10 +8,10 @@ import com.skyd.anivu.model.repository.download.DownloadRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.take
@@ -41,8 +41,14 @@ class DownloadViewModel @Inject constructor(
     private fun Flow<DownloadIntent>.toReadPartialStateChangeFlow(): Flow<DownloadPartialStateChange> {
         return merge(
             filterIsInstance<DownloadIntent.Init>().flatMapConcat {
-                downloadRepo.requestDownloadingVideos().map {
-                    DownloadPartialStateChange.DownloadListResult.Success(downloadInfoBeanList = it)
+                combine(
+                    downloadRepo.requestDownloadTasksList(),
+                    downloadRepo.requestBtDownloadTasksList(),
+                ) { downloadTasks, btDownloadTasks ->
+                    DownloadPartialStateChange.DownloadListResult.Success(
+                        downloadInfoBeanList = downloadTasks,
+                        btDownloadInfoBeanList = btDownloadTasks,
+                    )
                 }.startWith(DownloadPartialStateChange.DownloadListResult.Loading)
                     .catchMap { DownloadPartialStateChange.DownloadListResult.Failed(it.message.toString()) }
             },

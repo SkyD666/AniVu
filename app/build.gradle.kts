@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 24
-        versionName = "2.1-beta10"
+        versionName = "2.1-beta11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -225,6 +225,8 @@ dependencies {
     implementation(libs.libtorrent4j.arm)
     implementation(libs.libtorrent4j.x86)
     implementation(libs.libtorrent4j.x8664)
+
+    implementation(project(":downloader"))
 
 //    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.13")
     testImplementation(libs.junit)

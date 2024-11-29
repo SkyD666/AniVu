@@ -194,7 +194,7 @@
     <string name="crash_screen_copy_crash_log">Copy log</string>
     <string name="feed_screen_all_articles">All articles</string>
     <string name="download_screen_add_download">Add</string>
-    <string name="download_screen_add_download_hint">Magnet / Torrent link</string>
+    <string name="download_screen_add_download_hint">Download link</string>
     <string name="download_screen_unsupported_link">Unsupported link</string>
     <string name="date_style_relative">Relative</string>
     <string name="date_style_full">Full</string>
@@ -319,7 +319,9 @@
     <string name="player_config_screen_cache_category">Cache</string>
     <string name="player_config_screen_max_cache_size">Max cache size</string>
     <string name="player_config_screen_max_back_cache_size">Max back cache size</string>
-    <string name="torrent_download_channel_name">Download task</string>
+    <string name="torrent_download_channel_name">BT download task</string>
+    <string name="download_channel_name">Download task</string>
+    <string name="download_channel_description">AniVu download task notification</string>
     <string name="player_seek_fast">Fast, but not precise</string>
     <string name="player_seek_exact">Precise, but slow</string>
     <string name="player_config_screen_seek_option">Seek option</string>
@@ -357,6 +359,11 @@
     <string name="rss_config_screen_update_notification_description">Configure article update notification rules</string>
     <string name="article_notification_channel_name">Article notification</string>
     <string name="update_notification_rule_name">Name</string>
+    <string name="rename">Rename</string>
+    <string name="download_screen_download_tasks">Download Tasks</string>
+    <string name="download_screen_bt_tasks">BT Tasks</string>
+    <string name="download_resume">Resume</string>
+    <string name="download_cancel">Cancel</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>
