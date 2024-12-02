@@ -1,6 +1,6 @@
 [versions]
 adaptive = "1.0.0"
-coil = "3.0.3"
+coil = "3.0.4"
 hilt = "2.52"
 libtorrent4j = "2.1.0-35"
 composeMaterial = "1.7.5"

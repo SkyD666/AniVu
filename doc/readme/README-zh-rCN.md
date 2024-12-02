@@ -25,7 +25,7 @@
         </a>
     </p>
     <p>
-        <b>AniVu</b>，一个集<b> RSS 订阅与更新、比特洪流下载、视频播放</b>为一体的工具。
+        <b>AniVu</b>，一个集<b> RSS 订阅与更新、媒体下载与播放</b>为一体的播客工具。
     </p>
     <p>
         使用 <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> 架构，完全采用 <b><a href="https://m3.material.io/">Material You</a></b> 设计风格。使用 <b>Jetpack Compose</b> 开发。
@@ -34,6 +34,7 @@
         <b><a href="../../README.md">English</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b>简体中文</b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="README-zh-rTW.md">正體中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">帮助我们翻译</a></b>
     </p>
 </div>
+
 
 <a href="https://f-droid.org/packages/com.skyd.anivu"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on-zh-cn.png" alt="Get it on F-Droid" height="80"></a>
 

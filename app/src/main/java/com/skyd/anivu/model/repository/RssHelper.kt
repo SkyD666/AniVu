@@ -1,20 +1,23 @@
 package com.skyd.anivu.model.repository
 
 import android.util.Log
-import com.rometools.modules.itunes.EntryInformationImpl
-import com.rometools.modules.mediarss.MediaEntryModuleImpl
+import com.rometools.modules.itunes.EntryInformation
+import com.rometools.modules.itunes.FeedInformation
+import com.rometools.modules.mediarss.MediaEntryModule
+import com.rometools.modules.mediarss.MediaModule
 import com.rometools.modules.mediarss.types.Rating
 import com.rometools.rome.feed.module.Module
 import com.rometools.rome.feed.synd.SyndEntry
+import com.rometools.rome.feed.synd.SyndFeed
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.rome.io.XmlReader
 import com.skyd.anivu.ext.toEncodedUrl
-import com.skyd.anivu.model.bean.feed.FeedBean
-import com.skyd.anivu.model.bean.feed.FeedWithArticleBean
 import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
 import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.bean.article.RssMediaBean
+import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedWithArticleBean
 import com.skyd.anivu.util.favicon.FaviconExtractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -45,7 +48,9 @@ class RssHelper @Inject constructor(
                 title = syndFeed.title,
                 description = syndFeed.description,
                 link = syndFeed.link,
-                icon = syndFeed.icon?.link ?: iconAsync.await(),
+                icon = getMediaRssIcon(syndFeed)
+                    ?: syndFeed.icon?.link
+                    ?: iconAsync.await(),
             )
             val list = syndFeed.entries.map { article(feed, it) }
             FeedWithArticleBean(feed, list)
@@ -75,7 +80,9 @@ class RssHelper @Inject constructor(
                                 title = syndFeed.title,
                                 description = syndFeed.description,
                                 link = syndFeed.link,
-                                icon = syndFeed.icon?.link ?: iconAsync.await(),
+                                icon = getMediaRssIcon(syndFeed)
+                                    ?: syndFeed.icon?.link
+                                    ?: iconAsync.await(),
                             ),
                             articles = syndFeed.entries
                                 .asSequence()
@@ -151,7 +158,7 @@ class RssHelper @Inject constructor(
     private fun getRssMedia(articleId: String, modules: List<Module>): RssMediaBean? {
         modules.forEach { module ->
             val media = when (module) {
-                is EntryInformationImpl -> {
+                is EntryInformation -> {
                     RssMediaBean(
                         articleId = articleId,
                         duration = module.duration?.milliseconds,
@@ -161,7 +168,7 @@ class RssHelper @Inject constructor(
                     )
                 }
 
-                is MediaEntryModuleImpl -> {
+                is MediaEntryModule -> {
                     val content = module.mediaContents.firstOrNull()
                     RssMediaBean(
                         articleId = articleId,
@@ -179,7 +186,21 @@ class RssHelper @Inject constructor(
         return null
     }
 
-    fun getRssIcon(url: String): String? {
+    private fun getMediaRssIcon(syndFeed: SyndFeed): String? {
+        var icon: String?
+        syndFeed.modules.forEach { module ->
+            icon = when (module) {
+                is FeedInformation -> module.image?.toString()
+                is MediaModule -> module.metadata?.thumbnail?.firstOrNull()?.url?.toString()
+
+                else -> null
+            }
+            if (icon != null) return icon
+        }
+        return null
+    }
+
+    private fun getRssIcon(url: String): String? {
         return runCatching {
             faviconExtractor.extractFavicon(url).apply { Log.e("TAG", "getRssIcon: $this") }
         }.onFailure { it.printStackTrace() }.getOrNull()
