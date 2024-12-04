@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.activity
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -39,6 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -370,13 +372,17 @@ private fun MainContent(onHandleIntent: @Composable () -> Unit) {
             MainNavHost()
             onHandleIntent()
         } else {
+            val context = LocalContext.current
             RequestStoragePermissionScreen(
                 shouldShowRationale = false,
                 onPermissionRequest = {
                     permissionGranted = Environment.isExternalStorageManager()
                     if (!permissionGranted) {
                         permissionRequester.launch(
-                            Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                            Intent(
+                                ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,
+                                Uri.parse("package:${context.packageName}"),
+                            )
                         )
                     }
                 },

@@ -9,7 +9,7 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
-import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
+import com.skyd.anivu.model.repository.download.bt.BtDownloadManager
 import com.skyd.anivu.model.worker.download.isTorrentMimetype
 import com.skyd.anivu.ui.component.showToast
 import java.io.File
@@ -29,7 +29,7 @@ object DownloadStarter {
             url.startsWith("magnet:") || isTorrentMimetype(type) ||
                     Regex("^(http|https)://.*\\.torrent$").matches(url)
         if (isMagnetOrTorrent) {
-            DownloadTorrentWorker.startWorker(context, url, requestId = null)
+            BtDownloadManager.download(context, url, requestId = null)
         } else {
             DownloadManager.getInstance(context).download(
                 url = url,

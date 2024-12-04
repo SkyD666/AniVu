@@ -50,8 +50,8 @@ import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean
 import com.skyd.anivu.model.repository.download.DownloadManager
 import com.skyd.anivu.model.repository.download.DownloadStarter
-import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
-import com.skyd.anivu.model.worker.download.DownloadTorrentWorker.Companion.rememberBtDownloadWorkStarter
+import com.skyd.anivu.model.repository.download.bt.BtDownloadManager
+import com.skyd.anivu.model.repository.download.bt.BtDownloadManager.rememberBtDownloadWorkStarter
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
@@ -239,7 +239,7 @@ private fun BtDownloadList(
                 BtDownloadItem(
                     data = item,
                     onPause = {
-                        DownloadTorrentWorker.pause(
+                        BtDownloadManager.pause(
                             context = context,
                             requestId = it.downloadRequestId,
                             link = it.link,
@@ -252,7 +252,7 @@ private fun BtDownloadList(
                         )
                     },
                     onCancel = { video ->
-                        DownloadTorrentWorker.cancel(
+                        BtDownloadManager.delete(
                             context = context,
                             requestId = video.downloadRequestId,
                             link = video.link,

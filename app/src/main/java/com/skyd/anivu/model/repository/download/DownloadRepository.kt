@@ -7,8 +7,6 @@ import com.skyd.anivu.ext.sampleWithoutFirst
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
 import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean
 import com.skyd.anivu.model.repository.download.bt.BtDownloadManager
-import com.skyd.anivu.model.worker.download.DownloadTorrentWorker
-import com.skyd.downloader.db.DownloadEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -22,8 +20,8 @@ class DownloadRepository @Inject constructor() : BaseRepository() {
     suspend fun requestBtDownloadTasksList(): Flow<List<BtDownloadInfoBean>> {
         return combine(
             BtDownloadManager.getDownloadInfoList().distinctUntilChanged(),
-            DownloadTorrentWorker.peerInfoMapFlow.sampleWithoutFirst(1000),
-            DownloadTorrentWorker.torrentStatusMapFlow.sampleWithoutFirst(1000),
+            BtDownloadManager.peerInfoMapFlow.sampleWithoutFirst(1000),
+            BtDownloadManager.torrentStatusMapFlow.sampleWithoutFirst(1000),
         ) { list, peerInfoMap, uploadPayloadRateMap ->
             list.map { downloadInfoBean ->
                 downloadInfoBean.copy().apply {

@@ -1,36 +1,21 @@
 package com.skyd.anivu.model.worker.download
 
-import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import androidx.work.CoroutineWorker
-import androidx.work.ExistingWorkPolicy
 import androidx.work.ForegroundInfo
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.OutOfQuotaPolicy
-import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.google.accompanist.permissions.rememberPermissionState
 import com.skyd.anivu.BuildConfig
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
@@ -45,7 +30,6 @@ import com.skyd.anivu.ext.toDecodedUrl
 import com.skyd.anivu.ext.toPercentage
 import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean
-import com.skyd.anivu.model.bean.download.bt.DownloadLinkUuidMapBean
 import com.skyd.anivu.model.bean.download.bt.PeerInfoBean
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
@@ -53,9 +37,7 @@ import com.skyd.anivu.model.repository.download.DownloadRepository
 import com.skyd.anivu.model.repository.download.bt.BtDownloadManager
 import com.skyd.anivu.model.repository.download.bt.BtDownloadManagerIntent
 import com.skyd.anivu.model.service.HttpService
-import com.skyd.anivu.model.worker.download.DownloadTorrentWorker.Companion.BtDownloadWorkStarter
 import com.skyd.anivu.ui.activity.MainActivity
-import com.skyd.anivu.ui.component.showToast
 import com.skyd.anivu.ui.screen.download.DOWNLOAD_SCREEN_DEEP_LINK_DATA
 import com.skyd.anivu.util.uniqueInt
 import dagger.hilt.EntryPoint
@@ -63,17 +45,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.job
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
@@ -102,12 +75,11 @@ import org.libtorrent4j.swig.settings_pack
 import org.libtorrent4j.swig.torrent_flags_t
 import retrofit2.Retrofit
 import java.io.File
-import java.util.UUID
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resumeWithException
 
 
-class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
+class BtDownloadWorker(context: Context, parameters: WorkerParameters) :
     CoroutineWorker(context, parameters) {
     private lateinit var torrentLinkUuid: String
     private lateinit var torrentLink: String
@@ -152,7 +124,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
             )
             workerDownload(saveDir)
         }
-        removeWorkerFromFlow(id.toString())
+        BtDownloadManager.removeWorkerFromFlow(id.toString())
         return Result.success(
             workDataOf(
                 STATE to (BtDownloadManager.getDownloadState(link = torrentLink)
@@ -421,7 +393,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 )
                 // Do not seeding when complete
                 if (!applicationContext.dataStore.getOrDefault(SeedingWhenCompletePreference)) {
-                    pause(
+                    BtDownloadManager.pause(
                         context = applicationContext,
                         requestId = id.toString(),
                         link = torrentLink
@@ -478,7 +450,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                     ?.handle()?.peerInfo()?.map { PeerInfoBean.from(it) }
 //                Log.e("TAG", "onAlert: ${peerInfo?.size}")
                 if (!peerInfo.isNullOrEmpty()) {
-                    updatePeerInfoMapFlow(id.toString(), peerInfo)
+                    BtDownloadManager.updatePeerInfoMapFlow(id.toString(), peerInfo)
                 }
             }
 
@@ -487,7 +459,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
                 // Download progress update
                 val handle = alert.handle()
                 if (handle.isValid) {
-                    updateTorrentStatusMapFlow(id.toString(), handle.status())
+                    BtDownloadManager.updateTorrentStatusMapFlow(id.toString(), handle.status())
                     if (progress != handle.status().progress()) {
                         progress = handle.status().progress()
                         updateNotificationAsync()     // update Notification
@@ -526,7 +498,7 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         sessionManager.stopDht()
         sessionManager.stop()
 
-        removeWorkerFromFlow(id.toString())
+        BtDownloadManager.removeWorkerFromFlow(id.toString())
     }
 
     companion object {
@@ -534,32 +506,6 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         const val STATE = "state"
         const val TORRENT_LINK_UUID = "torrentLinkUuid"
         const val CHANNEL_ID = "downloadTorrent"
-
-        private val coroutineScope = CoroutineScope(Dispatchers.IO)
-
-        val peerInfoMapFlow = MutableStateFlow(mutableMapOf<String, List<PeerInfoBean>>())
-        val torrentStatusMapFlow = MutableStateFlow(mutableMapOf<String, TorrentStatus>())
-
-        private fun updatePeerInfoMapFlow(requestId: String, list: List<PeerInfoBean>) {
-            peerInfoMapFlow.tryEmit(peerInfoMapFlow.value.toMutableMap().apply {
-                put(requestId, list)
-            })
-        }
-
-        private fun updateTorrentStatusMapFlow(requestId: String, status: TorrentStatus) {
-            torrentStatusMapFlow.tryEmit(torrentStatusMapFlow.value.toMutableMap().apply {
-                put(requestId, status)
-            })
-        }
-
-        private fun removeWorkerFromFlow(requestId: String) {
-            peerInfoMapFlow.tryEmit(
-                peerInfoMapFlow.value.toMutableMap().apply { remove(requestId) }
-            )
-            torrentStatusMapFlow.tryEmit(
-                torrentStatusMapFlow.value.toMutableMap().apply { remove(requestId) }
-            )
-        }
 
         @EntryPoint
         @InstallIn(SingletonComponent::class)
@@ -571,139 +517,5 @@ class DownloadTorrentWorker(context: Context, parameters: WorkerParameters) :
         internal val hiltEntryPoint = EntryPointAccessors.fromApplication(
             appContext, WorkerEntryPoint::class.java
         )
-
-        fun interface BtDownloadWorkStarter {
-            fun start(torrentLink: String, requestId: String?)
-        }
-
-        @Composable
-        fun rememberBtDownloadWorkStarter(): BtDownloadWorkStarter {
-            val context = LocalContext.current
-            var currentTorrentLink: String? by rememberSaveable { mutableStateOf(null) }
-            var currentRequestId: String? by rememberSaveable { mutableStateOf(null) }
-            val starter = { startWorker(context, currentTorrentLink!!, currentRequestId) }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                val storagePermissionState = rememberPermissionState(
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) {
-                    if (it) {
-                        starter()
-                    } else {
-                        context.getString(R.string.download_no_notification_permission_tip)
-                            .showToast()
-                    }
-                }
-                return remember {
-                    BtDownloadWorkStarter { torrentLink, requestId ->
-                        currentTorrentLink = torrentLink
-                        currentRequestId = requestId
-                        storagePermissionState.launchPermissionRequest()
-                    }
-                }
-            } else {
-                return remember {
-                    BtDownloadWorkStarter { torrentLink, requestId ->
-                        startWorker(context, torrentLink, requestId)
-                    }
-                }
-            }
-        }
-
-        fun startWorker(context: Context, torrentLink: String, requestId: String? = null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                if (ContextCompat.checkSelfPermission(
-                        context, Manifest.permission.POST_NOTIFICATIONS
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    context.getString(R.string.download_no_notification_permission_tip).showToast()
-                    return
-                }
-            }
-            coroutineScope.launch {
-                var torrentLinkUuid =
-                    BtDownloadManager.getDownloadUuidByLink(torrentLink)
-                if (torrentLinkUuid == null) {
-                    torrentLinkUuid = UUID.randomUUID().toString()
-                    BtDownloadManager.setDownloadLinkUuidMap(
-                        DownloadLinkUuidMapBean(
-                            link = torrentLink,
-                            uuid = torrentLinkUuid,
-                        )
-                    )
-                }
-
-                val workRequest = OneTimeWorkRequestBuilder<DownloadTorrentWorker>()
-                    .run { if (requestId != null) setId(UUID.fromString(requestId)) else this }
-                    .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                    .setInputData(workDataOf(TORRENT_LINK_UUID to torrentLinkUuid))
-                    .build()
-
-                WorkManager.getInstance(context).apply {
-                    // ENQUEUED generally means in queue, but not running. So we replace it to start
-                    val existingWorkPolicy = if (getWorkInfoById(workRequest.id)
-                            .get()?.state == WorkInfo.State.ENQUEUED
-                    ) {
-                        ExistingWorkPolicy.REPLACE
-                    } else {
-                        ExistingWorkPolicy.KEEP
-                    }
-                    enqueueUniqueWork(
-                        torrentLinkUuid,
-                        existingWorkPolicy,
-                        workRequest
-                    )
-
-                    getWorkInfoByIdFlow(workRequest.id)
-                        .take(1)
-                        .filter { it == null || it.state.isFinished }
-                        .onEach {
-                            removeWorkerFromFlow(workRequest.id.toString())
-                        }.collect {
-                            cancel()
-                        }
-                }
-            }
-        }
-
-        fun pause(
-            context: Context,
-            requestId: String,
-            link: String,
-        ) {
-            val requestUuid = UUID.fromString(requestId)
-            WorkManager.getInstance(context).apply {
-                val workerState = getWorkInfoById(requestUuid).get()?.state
-                if (workerState == null || workerState.isFinished) {
-                    coroutineScope.launch {
-                        val state = BtDownloadManager.getDownloadState(link)
-                        updateDownloadState(
-                            link = link,
-                            downloadState = getWhatPausedState(state),
-                        )
-                    }
-                } else {
-                    cancelWorkById(requestUuid)
-                }
-            }
-        }
-
-        fun cancel(
-            context: Context,
-            requestId: String,
-            link: String,
-        ) {
-            val requestUuid = UUID.fromString(requestId)
-            val worker = WorkManager.getInstance(context)
-            // 在worker结束后删除数据库中的下载任务信息
-            coroutineScope.launch {
-                worker.cancelWorkById(requestUuid)
-                worker.getWorkInfoByIdFlow(requestUuid)
-                    .filter { it == null || it.state.isFinished }
-                    .flatMapConcat {
-                        hiltEntryPoint.downloadRepository.deleteDownloadTaskInfo(link = link)
-                    }.take(1)
-                    .collect()
-            }
-        }
     }
 }
