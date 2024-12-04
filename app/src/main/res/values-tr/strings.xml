@@ -44,7 +44,7 @@
     <string name="player_reset_zoom">Sıfırla</string>
     <string name="player_long_press_playback_speed">Hızlı İleri Sarılıyor…</string>
     <string name="about_screen_name">Hakkında</string>
-    <string name="app_short_description">RSS anime aboneliği ve güncellemeleri, bit torrent indirmeleri ve video oynatma için hepsi bir arada bir araç.</string>
+    <string name="app_short_description">All-in-one Android podcast app for RSS, media dl &amp; play.</string>
     <string name="app_tech_stack_description">AniVu, MVI mimarisini kullanır ve tamamen Material You tasarım stilini benimser. Tüm sayfalar Android View ve Compose kullanılarak geliştirilmiştir.</string>
     <string name="about_screen_visit_github">GitHub deposu</string>
     <string name="about_screen_join_telegram">Telegram grubu</string>
