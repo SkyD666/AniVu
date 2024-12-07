@@ -43,11 +43,23 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AniVu.Pink"
         tools:targetApi="31">
+        <profileable
+            android:shell="true"
+            tools:targetApi="29" />
+
+        <receiver
+            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+            android:exported="true"
+            android:permission="android.permission.DUMP">
+            <intent-filter>
+                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
-            tools:node="merge">
-        </service>
+            tools:node="merge" />
 
         <activity
             android:name=".ui.activity.MainActivity"
@@ -57,6 +69,7 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
@@ -89,17 +102,51 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+                <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data android:scheme="http" />
                 <data android:scheme="https" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
                 <data android:host="*" />
                 <data android:pathPattern=".*\\.torrent" />
+                <data android:pathPattern=".*\\.xml" />
+                <data android:pathPattern=".*\\.opml" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="http" />
+                <data android:scheme="https" />
+                <data android:scheme="file" />
+                <data android:scheme="content" />
+                <data android:host="*" />
+                <data android:mimeType="application/x-bittorrent" />
+                <data android:mimeType="applications/x-bittorrent" />
+                <data android:mimeType="application/xml" />
+                <data android:mimeType="text/xml" />
+                <data android:mimeType="text/x-opml" />
+                <data android:mimeType="application/octet-stream" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="application/x-bittorrent" />
+                <data android:mimeType="applications/x-bittorrent" />
+                <data android:mimeType="application/xml" />
+                <data android:mimeType="text/xml" />
+                <data android:mimeType="text/x-opml" />
+                <data android:mimeType="application/octet-stream" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".ui.activity.PlayActivity"
             android:autoRemoveFromRecents="true"
@@ -122,7 +169,6 @@
                 <data android:mimeType="audio/*" />
             </intent-filter>
         </activity>
-
         <activity android:name=".ui.activity.CrashActivity" />
 
         <provider

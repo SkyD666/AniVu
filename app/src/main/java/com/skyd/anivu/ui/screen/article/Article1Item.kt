@@ -315,7 +315,8 @@ private fun Article1ItemContent(
                                         }
                                     }
                                 },
-                            model = article.image,
+                            model = articleWithEnclosure.media?.image.orEmpty()
+                                .ifBlank { article.image },
                             contentScale = ContentScale.Crop,
                         )
                     }

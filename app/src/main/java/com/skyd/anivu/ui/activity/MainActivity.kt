@@ -1,7 +1,6 @@
 package com.skyd.anivu.ui.activity
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -40,7 +39,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -58,6 +56,10 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.skyd.anivu.R
 import com.skyd.anivu.base.BaseComposeActivity
 import com.skyd.anivu.ext.toDecodedUrl
+import com.skyd.anivu.ext.type
+import com.skyd.anivu.ui.activity.intenthandler.ImportOpmlIntentHandler
+import com.skyd.anivu.ui.activity.intenthandler.OpenDownloadIntentHandler
+import com.skyd.anivu.ui.activity.intenthandler.UrlDownloadIntentHandler
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.screen.MAIN_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.MainScreen
@@ -125,6 +127,8 @@ import com.skyd.anivu.ui.screen.settings.data.importexport.exportopml.EXPORT_OPM
 import com.skyd.anivu.ui.screen.settings.data.importexport.exportopml.ExportOpmlScreen
 import com.skyd.anivu.ui.screen.settings.data.importexport.importopml.IMPORT_OPML_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.data.importexport.importopml.ImportOpmlScreen
+import com.skyd.anivu.ui.screen.settings.data.importexport.importopml.OPML_URL_KEY
+import com.skyd.anivu.ui.screen.settings.data.importexport.importopml.openImportOpmlScreen
 import com.skyd.anivu.ui.screen.settings.playerconfig.PLAYER_CONFIG_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.playerconfig.PlayerConfigScreen
 import com.skyd.anivu.ui.screen.settings.playerconfig.advanced.PLAYER_CONFIG_ADVANCED_SCREEN_ROUTE
@@ -137,7 +141,6 @@ import com.skyd.anivu.ui.screen.settings.transmission.TRANSMISSION_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.transmission.TransmissionScreen
 import com.skyd.anivu.ui.screen.settings.transmission.proxy.PROXY_SCREEN_ROUTE
 import com.skyd.anivu.ui.screen.settings.transmission.proxy.ProxyScreen
-import com.skyd.downloader.notification.NotificationConst
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.serialization.json.Json
 
@@ -180,27 +183,25 @@ class MainActivity : BaseComposeActivity() {
     private fun handleIntent(intent: Intent?, navController: NavController) {
         intent ?: return
         val data = intent.data
-        if (intent.extras?.containsKey(NotificationConst.KEY_DOWNLOAD_REQUEST_ID) == true) {
-            openDownloadScreen(navController = navController)
-        } else if (Intent.ACTION_VIEW == intent.action && data != null) {
-            val scheme = data.scheme
-            var url: String? = null
-            when (scheme) {
-                "magnet" -> url = data.toString()
-                "http", "https" -> {
-                    val path = data.path
-                    if (path != null && path.endsWith(".torrent")) {
-                        url = data.toString()
-                    }
-                }
-            }
-            if (url != null) {
+
+        listOf(
+            OpenDownloadIntentHandler {
+                openDownloadScreen(navController = navController)
+            },
+            UrlDownloadIntentHandler { downloadUrl ->
                 openDownloadScreen(
                     navController = navController,
-                    downloadLink = url,
+                    downloadLink = downloadUrl,
+                    mimetype = data?.type,
+                )
+            },
+            ImportOpmlIntentHandler { opmlUrl ->
+                openImportOpmlScreen(
+                    navController = navController,
+                    opmlUrl = opmlUrl,
                 )
             }
-        }
+        ).forEach { it.handle(intent) }
     }
 }
 
@@ -277,7 +278,12 @@ private fun MainNavHost() {
         composable(route = BEHAVIOR_SCREEN_ROUTE) { BehaviorScreen() }
         composable(route = AUTO_DELETE_SCREEN_ROUTE) { AutoDeleteScreen() }
         composable(route = EXPORT_OPML_SCREEN_ROUTE) { ExportOpmlScreen() }
-        composable(route = IMPORT_OPML_SCREEN_ROUTE) { ImportOpmlScreen() }
+        composable(
+            route = IMPORT_OPML_SCREEN_ROUTE,
+            arguments = listOf(navArgument(OPML_URL_KEY) { nullable = true }),
+        ) {
+            ImportOpmlScreen(opmlUrl = it.arguments?.getString(OPML_URL_KEY))
+        }
         composable(route = IMPORT_EXPORT_SCREEN_ROUTE) { ImportExportScreen() }
         composable(route = DATA_SCREEN_ROUTE) { DataScreen() }
         composable(route = PLAYER_CONFIG_SCREEN_ROUTE) { PlayerConfigScreen() }
@@ -372,17 +378,13 @@ private fun MainContent(onHandleIntent: @Composable () -> Unit) {
             MainNavHost()
             onHandleIntent()
         } else {
-            val context = LocalContext.current
             RequestStoragePermissionScreen(
                 shouldShowRationale = false,
                 onPermissionRequest = {
                     permissionGranted = Environment.isExternalStorageManager()
                     if (!permissionGranted) {
                         permissionRequester.launch(
-                            Intent(
-                                ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION,
-                                Uri.parse("package:${context.packageName}"),
-                            )
+                            Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                         )
                     }
                 },

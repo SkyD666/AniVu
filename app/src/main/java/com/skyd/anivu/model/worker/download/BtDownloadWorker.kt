@@ -169,8 +169,7 @@ class BtDownloadWorker(context: Context, parameters: WorkerParameters) :
 
     private fun howToDownload(saveDir: File) = runBlocking {
         sessionManager.apply {
-            val lastSessionParams = BtDownloadManager
-                .getSessionParams(link = torrentLink)
+            val lastSessionParams = BtDownloadManager.getSessionParams(link = torrentLink)
             val sessionParams = if (lastSessionParams == null) SessionParams()
             else SessionParams(lastSessionParams.data)
 
@@ -238,14 +237,19 @@ class BtDownloadWorker(context: Context, parameters: WorkerParameters) :
                 sessionManager.download(link, saveDir, flags)
             },
             onUnsupported = {
-                val tempTorrentFile = File(
-                    Const.TEMP_TORRENT_DIR,
-                    link.substringAfterLast('/').toDecodedUrl().validateFileName()
-                )
-                // May throw exceptions
-                hiltEntryPoint.retrofit.create(HttpService::class.java)
-                    .requestGetResponseBody(link).execute().body()!!.byteStream()
-                    .use { it.saveTo(tempTorrentFile) }
+                val tempTorrentFile = if (link.startsWith("file:") || link.startsWith("/")) {
+                    File(link)
+                } else {
+                    File(
+                        Const.TEMP_TORRENT_DIR,
+                        link.substringAfterLast('/').toDecodedUrl().validateFileName()
+                    ).apply {
+                        // May throw exceptions
+                        hiltEntryPoint.retrofit.create(HttpService::class.java)
+                            .requestGetResponseBody(link).execute().body()!!.byteStream()
+                            .use { it.saveTo(this) }
+                    }
+                }
                 sessionManager.download(
                     TorrentInfo(tempTorrentFile), saveDir,
                     null, null, null,

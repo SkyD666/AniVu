@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.screen.settings.data.importexport.importopml
 
 import android.net.Uri
+import android.os.Bundle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
@@ -23,6 +24,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -36,11 +38,14 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
+import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.safeLaunch
 import com.skyd.anivu.ext.showSnackbar
@@ -54,9 +59,25 @@ import com.skyd.anivu.ui.component.dialog.WaitingDialog
 
 
 const val IMPORT_OPML_SCREEN_ROUTE = "importOpmlScreen"
+const val OPML_URL_KEY = "opmlUrl"
+
+fun openImportOpmlScreen(
+    navController: NavController,
+    opmlUrl: String? = null,
+) {
+    navController.navigate(
+        IMPORT_OPML_SCREEN_ROUTE,
+        Bundle().apply {
+            putString(OPML_URL_KEY, opmlUrl)
+        },
+    )
+}
 
 @Composable
-fun ImportOpmlScreen(viewModel: ImportOpmlViewModel = hiltViewModel()) {
+fun ImportOpmlScreen(
+    opmlUrl: String? = null,
+    viewModel: ImportOpmlViewModel = hiltViewModel(),
+) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -69,7 +90,12 @@ fun ImportOpmlScreen(viewModel: ImportOpmlViewModel = hiltViewModel()) {
 
     val dispatch = viewModel.getDispatcher(startWith = ImportOpmlIntent.Init)
 
-    var opmlUri by rememberSaveable { mutableStateOf(Uri.EMPTY) }
+    var opmlUri by rememberSaveable(opmlUrl) { mutableStateOf(Uri.EMPTY) }
+
+    LaunchedEffect(opmlUrl) {
+        opmlUri = runCatching { opmlUrl?.toUri() }.getOrNull() ?: Uri.EMPTY
+    }
+
     val pickFileLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->

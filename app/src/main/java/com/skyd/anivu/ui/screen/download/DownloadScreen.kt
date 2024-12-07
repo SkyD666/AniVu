@@ -25,6 +25,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -68,27 +69,38 @@ val DOWNLOAD_SCREEN_DEEP_LINK_DATA = DeepLinkData(
     navOptions = navOptions { launchSingleTop = true },
 )
 const val DOWNLOAD_LINK_KEY = "downloadLink"
+const val MIMETYPE_KEY = "mimetype"
 
 fun openDownloadScreen(
     navController: NavController,
     downloadLink: String? = null,
+    mimetype: String? = null,
 ) {
     navController.navigate(
         DOWNLOAD_SCREEN_ROUTE,
         Bundle().apply {
             putString(DOWNLOAD_LINK_KEY, downloadLink)
+            putString(MIMETYPE_KEY, mimetype)
         },
         navOptions = navOptions { launchSingleTop = true },
     )
 }
 
 @Composable
-fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = hiltViewModel()) {
+fun DownloadScreen(
+    downloadLink: String? = null,
+    mimetype: String? = null,
+    viewModel: DownloadViewModel = hiltViewModel()
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
-    var openLinkDialog by rememberSaveable(downloadLink) { mutableStateOf(downloadLink) }
+    var openLinkDialog by rememberSaveable { mutableStateOf(downloadLink) }
+
+    LaunchedEffect(downloadLink) {
+        openLinkDialog = downloadLink
+    }
 
     var fabHeight by remember { mutableStateOf(0.dp) }
 
@@ -177,7 +189,7 @@ fun DownloadScreen(downloadLink: String? = null, viewModel: DownloadViewModel = 
         onDismissRequest = { openLinkDialog = null },
         onConfirm = { text ->
             openLinkDialog = null
-            DownloadStarter.download(context = context, url = text)
+            DownloadStarter.download(context = context, url = text, type = mimetype)
         },
     )
 }

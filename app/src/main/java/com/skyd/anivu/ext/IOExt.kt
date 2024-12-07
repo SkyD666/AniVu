@@ -29,7 +29,7 @@ import java.security.NoSuchAlgorithmException
 import java.util.LinkedList
 
 
-fun Uri.copyTo(target: File): File {
+fun Uri.copyTo(target: File): Long {
     return appContext.contentResolver.openInputStream(this)!!.use { it.saveTo(target) }
 }
 
@@ -51,6 +51,9 @@ fun Uri.fileName(): String? {
 
     return name ?: path?.substringAfterLast("/")?.toDecodedUrl()
 }
+
+val Uri.type: String?
+    get() = appContext.contentResolver.getType(this)
 
 fun String.openBrowser(context: Context) {
     Uri.parse(this).openBrowser(context)
@@ -200,11 +203,13 @@ fun Uri.findFile(contentResolver: ContentResolver, name: String): Uri? {
     return null
 }
 
-fun Uri.isLocal(): Boolean = URLUtil.isFileUrl(toString()) || URLUtil.isContentUrl(toString())
+fun Uri.isLocal(): Boolean = toString().startsWith("/") ||
+        URLUtil.isFileUrl(toString()) ||
+        URLUtil.isContentUrl(toString())
 
 fun Uri.isNetwork(): Boolean = URLUtil.isNetworkUrl(toString())
 
-fun InputStream.saveTo(target: File): File {
+fun InputStream.saveTo(target: File): Long {
     val parentFile = target.parentFile
     if (parentFile?.exists() == false) {
         parentFile.mkdirs()
@@ -212,8 +217,7 @@ fun InputStream.saveTo(target: File): File {
     if (!target.exists()) {
         target.createNewFile()
     }
-    FileOutputStream(target).use { copyTo(it) }
-    return target
+    return FileOutputStream(target).use { copyTo(it) }
 }
 
 fun File.md5(): String? {
