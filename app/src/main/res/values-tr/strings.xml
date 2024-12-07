@@ -354,6 +354,7 @@
     <string name="article_notification_channel_name">Article notification</string>
     <string name="update_notification_rule_name">Name</string>
     <string name="rename">Rename</string>
+    <string name="nickname">Nickname</string>
     <string name="download_screen_download_tasks">Download Tasks</string>
     <string name="download_screen_bt_tasks">BT Tasks</string>
     <string name="download_resume">Resume</string>
