@@ -314,7 +314,7 @@ private fun AutoHiddenBox(
 
                 TopBar(
                     modifier = Modifier.constrainAs(topBar) { top.linkTo(parent.top) },
-                    title = playState().title,
+                    title = playState().run { title.ifBlank { mediaTitle } },
                     topBarCallback = topBarCallback,
                 )
                 BottomBar(

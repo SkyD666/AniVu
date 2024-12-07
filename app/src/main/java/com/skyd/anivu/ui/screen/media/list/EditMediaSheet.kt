@@ -19,6 +19,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material.icons.outlined.Badge
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.DriveFileRenameOutline
@@ -57,6 +58,7 @@ fun EditMediaSheet(
     currentGroup: MediaGroupBean,
     groups: List<MediaGroupBean>,
     onRename: (MediaBean, String) -> Unit,
+    onSetFileDisplayName: (MediaBean, String?) -> Unit,
     onDelete: (MediaBean) -> Unit,
     onGroupChange: (MediaGroupBean) -> Unit,
     openCreateGroupDialog: () -> Unit,
@@ -65,6 +67,7 @@ fun EditMediaSheet(
 
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
         var openRenameInputDialog by rememberSaveable { mutableStateOf<String?>(null) }
+        var openSetFileDisplayNameInputDialog by rememberSaveable { mutableStateOf<String?>(null) }
 
         Column(
             modifier = Modifier
@@ -78,6 +81,9 @@ fun EditMediaSheet(
             OptionArea(
                 onOpenWith = { mediaBean.file.toUri(context).openWith(context) },
                 onRenameClicked = { openRenameInputDialog = mediaBean.file.name },
+                onSetFileDisplayNameClicked = {
+                    openSetFileDisplayNameInputDialog = mediaBean.displayName.orEmpty()
+                },
                 onDelete = {
                     onDelete(mediaBean)
                     onDismissRequest()
@@ -108,6 +114,23 @@ fun EditMediaSheet(
                 },
                 imeAction = ImeAction.Done,
                 onDismissRequest = { openRenameInputDialog = null }
+            )
+        }
+
+        if (openSetFileDisplayNameInputDialog != null) {
+            TextFieldDialog(
+                titleText = stringResource(R.string.nickname),
+                value = openSetFileDisplayNameInputDialog.orEmpty(),
+                onValueChange = { openSetFileDisplayNameInputDialog = it },
+                singleLine = false,
+                enableConfirm = { true },
+                onConfirm = {
+                    onSetFileDisplayName(mediaBean, it.replace(Regex("[\\n\\r]"), ""))
+                    openSetFileDisplayNameInputDialog = null
+                    onDismissRequest()
+                },
+                imeAction = ImeAction.Done,
+                onDismissRequest = { openSetFileDisplayNameInputDialog = null }
             )
         }
     }
@@ -149,6 +172,7 @@ internal fun OptionArea(
     deleteWarningText: String = stringResource(id = R.string.media_screen_delete_file_warning),
     onOpenWith: (() -> Unit)? = null,
     onRenameClicked: (() -> Unit)? = null,
+    onSetFileDisplayNameClicked: (() -> Unit)? = null,
     onDelete: (() -> Unit)? = null,
 ) {
     var openDeleteWarningDialog by rememberSaveable { mutableStateOf(false) }
@@ -177,6 +201,13 @@ internal fun OptionArea(
                     icon = Icons.Outlined.DriveFileRenameOutline,
                     text = stringResource(id = R.string.rename),
                     onClick = onRenameClicked,
+                )
+            }
+            if (onSetFileDisplayNameClicked != null) {
+                SheetChip(
+                    icon = Icons.Outlined.Badge,
+                    text = stringResource(id = R.string.nickname),
+                    onClick = onSetFileDisplayNameClicked,
                 )
             }
             if (onDelete != null) {

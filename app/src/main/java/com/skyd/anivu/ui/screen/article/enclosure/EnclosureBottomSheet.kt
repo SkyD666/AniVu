@@ -37,6 +37,7 @@ import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.repository.download.DownloadStarter
@@ -66,6 +67,7 @@ fun EnclosureBottomSheet(
     onDismissRequest: () -> Unit,
     sheetState: SheetState = rememberModalBottomSheetState(),
     dataList: List<Any>,
+    article: ArticleWithEnclosureBean,
 ) {
     val context = LocalContext.current
     val onDownload: (Any) -> Unit = remember {
@@ -104,9 +106,17 @@ fun EnclosureBottomSheet(
                         HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                     }
                     if (item is EnclosureBean) {
-                        EnclosureItem(item, onDownload = onDownload)
+                        EnclosureItem(
+                            enclosure = item,
+                            article = article,
+                            onDownload = onDownload,
+                        )
                     } else if (item is LinkEnclosureBean) {
-                        LinkEnclosureItem(item, onDownload = onDownload)
+                        LinkEnclosureItem(
+                            enclosure = item,
+                            article = article,
+                            onDownload = onDownload,
+                        )
                     }
                 }
             }
@@ -116,7 +126,8 @@ fun EnclosureBottomSheet(
 
 @Composable
 private fun EnclosureItem(
-    data: EnclosureBean,
+    enclosure: EnclosureBean,
+    article: ArticleWithEnclosureBean,
     onDownload: (EnclosureBean) -> Unit,
 ) {
     val context = LocalContext.current
@@ -124,21 +135,21 @@ private fun EnclosureItem(
     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                modifier = Modifier.clickable { data.url.copy(context) },
-                text = data.url,
+                modifier = Modifier.clickable { enclosure.url.copy(context) },
+                text = enclosure.url,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = 4,
             )
             Row(modifier = Modifier.padding(top = 6.dp)) {
                 Text(
-                    text = data.length.fileSize(context),
+                    text = enclosure.length.fileSize(context),
                     style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,
                 )
-                if (!data.type.isNullOrBlank()) {
+                if (!enclosure.type.isNullOrBlank()) {
                     Text(
                         modifier = Modifier.padding(start = 16.dp),
-                        text = data.type,
+                        text = enclosure.type,
                         style = MaterialTheme.typography.labelMedium,
                         maxLines = 1,
                     )
@@ -146,11 +157,15 @@ private fun EnclosureItem(
             }
         }
         Spacer(modifier = Modifier.width(12.dp))
-        if (data.isMedia) {
+        if (enclosure.isMedia) {
             AniVuIconButton(
                 onClick = {
                     try {
-                        PlayActivity.play(context.activity, Uri.parse(data.url))
+                        PlayActivity.play(
+                            context.activity,
+                            uri = Uri.parse(enclosure.url),
+                            title = article.article.title,
+                        )
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -160,7 +175,7 @@ private fun EnclosureItem(
             )
         }
         AniVuIconButton(
-            onClick = { onDownload(data) },
+            onClick = { onDownload(enclosure) },
             imageVector = Icons.Outlined.Download,
             contentDescription = stringResource(id = R.string.download),
         )
@@ -169,29 +184,34 @@ private fun EnclosureItem(
 
 @Composable
 private fun LinkEnclosureItem(
-    data: LinkEnclosureBean,
+    enclosure: LinkEnclosureBean,
+    article: ArticleWithEnclosureBean,
     onDownload: (LinkEnclosureBean) -> Unit,
 ) {
     val context = LocalContext.current
     val isMagnetOrTorrent = rememberSaveable {
-        data.link.startsWith("magnet:") ||
-                Regex("^(http|https)://.*\\.torrent$").matches(data.link)
+        enclosure.link.startsWith("magnet:") ||
+                Regex("^(http|https)://.*\\.torrent$").matches(enclosure.link)
     }
     Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(
             modifier = Modifier
                 .weight(1f)
-                .clickable { data.link.copy(context) },
-            text = data.link,
+                .clickable { enclosure.link.copy(context) },
+            text = enclosure.link,
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 5,
         )
         Spacer(modifier = Modifier.width(12.dp))
-        if (data.isMedia) {
+        if (enclosure.isMedia) {
             AniVuIconButton(
                 onClick = {
                     try {
-                        PlayActivity.play(context.activity, Uri.parse(data.link))
+                        PlayActivity.play(
+                            context.activity,
+                            uri = Uri.parse(enclosure.link),
+                            title = article.article.title,
+                        )
                     } catch (e: Exception) {
                         e.printStackTrace()
                     }
@@ -202,7 +222,7 @@ private fun LinkEnclosureItem(
         }
         if (isMagnetOrTorrent) {
             AniVuIconButton(
-                onClick = { onDownload(data) },
+                onClick = { onDownload(enclosure) },
                 imageVector = Icons.Outlined.Download,
                 contentDescription = stringResource(id = R.string.download),
             )

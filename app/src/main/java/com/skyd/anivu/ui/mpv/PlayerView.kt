@@ -141,6 +141,7 @@ private fun MPVView.solveCommand(
 @Composable
 fun PlayerView(
     uri: Uri,
+    title: String? = null,
     onBack: () -> Unit,
     onSaveScreenshot: (File) -> Unit,
     configDir: String = Const.MPV_CONFIG_DIR.path,
@@ -173,6 +174,11 @@ fun PlayerView(
     var subtitleTrackDialogState by remember { mutableStateOf(SubtitleTrackDialogState.initial) }
     var audioTrackDialogState by remember { mutableStateOf(AudioTrackDialogState.initial) }
     var speedDialogState by remember { mutableStateOf(SpeedDialogState.initial) }
+    LaunchedEffect(title) {
+        if (title != null) {
+            playState = playState.copy(title = title)
+        }
+    }
     LaunchedEffect(playState.speed) {
         speedDialogState = speedDialogState.copy(currentSpeed = playState.speed)
     }
@@ -274,7 +280,7 @@ fun PlayerView(
 
             override fun eventProperty(property: String, value: String) {
                 when (property) {
-                    "media-title" -> playState = playState.copy(title = value)
+                    "media-title" -> playState = playState.copy(mediaTitle = value)
                 }
             }
 

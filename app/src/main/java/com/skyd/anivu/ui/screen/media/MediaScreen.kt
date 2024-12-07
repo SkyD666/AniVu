@@ -97,10 +97,7 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
         if (result.pickFolder) {
             MediaLibLocationPreference.put(context, this, result.result)
         } else {
-            PlayActivity.play(
-                context.activity,
-                File(result.result).toUri(),
-            )
+            PlayActivity.play(context.activity, uri = File(result.result).toUri())
         }
     }
 

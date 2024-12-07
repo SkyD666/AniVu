@@ -1,6 +1,6 @@
 package com.skyd.anivu.ui.screen.read
 
-import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 
 
 internal sealed interface ReadPartialStateChange {
@@ -32,7 +32,7 @@ internal sealed interface ReadPartialStateChange {
             }
         }
 
-        data class Success(val article: ArticleWithEnclosureBean) : ArticleResult
+        data class Success(val article: ArticleWithFeed) : ArticleResult
         data class Failed(val msg: String) : ArticleResult
         data object Loading : ArticleResult
     }

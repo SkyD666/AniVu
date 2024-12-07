@@ -14,7 +14,7 @@ import com.skyd.anivu.ext.savePictureToMediaStore
 import com.skyd.anivu.ext.share
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.ext.validateFileName
-import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.util.image.ImageFormatChecker
 import kotlinx.coroutines.Dispatchers
@@ -32,8 +32,8 @@ import kotlin.time.Duration.Companion.milliseconds
 class ReadRepository @Inject constructor(
     private val articleDao: ArticleDao,
 ) : BaseRepository() {
-    fun requestArticleWithEnclosure(articleId: String): Flow<ArticleWithEnclosureBean?> {
-        return articleDao.getArticleWithEnclosures(articleId = articleId)
+    fun requestArticleWithFeed(articleId: String): Flow<ArticleWithFeed?> {
+        return articleDao.getArticleWithFeed(articleId = articleId)
             .filterNotNull()
             .flowOn(Dispatchers.IO)
     }

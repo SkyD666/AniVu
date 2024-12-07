@@ -10,6 +10,7 @@ data class PlayState(
     val bufferDuration: Int,
     val speed: Float,
     val title: String,
+    val mediaTitle: String,
 ) {
     companion object {
         val initial = PlayState(
@@ -20,6 +21,7 @@ data class PlayState(
             bufferDuration = 0,
             speed = 1f,
             title = "",
+            mediaTitle = "",
         )
     }
 }

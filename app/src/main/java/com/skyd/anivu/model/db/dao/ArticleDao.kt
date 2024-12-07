@@ -166,6 +166,15 @@ interface ArticleDao {
     )
     fun getArticleWithEnclosures(articleId: String): Flow<ArticleWithEnclosureBean?>
 
+    @Transaction
+    @Query(
+        """
+        SELECT * FROM $ARTICLE_TABLE_NAME 
+        WHERE ${ArticleBean.ARTICLE_ID_COLUMN} LIKE :articleId
+        """
+    )
+    fun getArticleWithFeed(articleId: String): Flow<ArticleWithFeed?>
+
     @RewriteQueriesToDropUnusedColumns
     @Query(
         """

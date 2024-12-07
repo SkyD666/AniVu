@@ -1,5 +1,6 @@
 package com.skyd.anivu.model.repository
 
+import androidx.collection.LruCache
 import androidx.compose.ui.util.fastFirstOrNull
 import com.skyd.anivu.base.BaseRepository
 import com.skyd.anivu.ext.validateFileName
@@ -24,120 +25,185 @@ class MediaRepository @Inject constructor(
 ) : BaseRepository() {
 
     companion object {
-        const val FOLDER_INFO_JSON_NAME = "info.json"
-        const val GROUP_JSON_NAME = "group.json"
+        private const val FOLDER_INFO_JSON_NAME = "info.json"
+        private const val OLD_MEDIA_LIB_JSON_NAME = "group.json"
+        private const val MEDIA_LIB_JSON_NAME = "MediaLib.json"
+
+        private val mediaLibJsons = LruCache<String, MediaLibJson>(maxSize = 5)
     }
 
-    fun requestGroups(uriPath: String): Flow<List<MediaGroupBean>> {
+    private fun parseMediaLibJson(mediaLibRootJsonFile: File): MediaLibJson? {
+        if (!mediaLibRootJsonFile.exists()) {
+            File(mediaLibRootJsonFile.parentFile, OLD_MEDIA_LIB_JSON_NAME).apply {
+                if (this.exists()) renameTo(mediaLibRootJsonFile)
+            }
+        }
+        if (!mediaLibRootJsonFile.exists()) return null
+        return mediaLibRootJsonFile.inputStream().use { inputStream ->
+            json.decodeFromStream<MediaLibJson>(inputStream)
+        }.apply {
+            files.removeIf {
+                !File(mediaLibRootJsonFile.parentFile, it.fileName).exists() ||
+                        it.fileName.equals(FOLDER_INFO_JSON_NAME, true) ||
+                        it.fileName.equals(MEDIA_LIB_JSON_NAME, true)
+            }
+        }
+    }
+
+    private fun getOrReadMediaLibJson(path: String): MediaLibJson {
+        return mediaLibJsons[path] ?: run {
+            val jsonFile = File(path, MEDIA_LIB_JSON_NAME)
+            parseMediaLibJson(jsonFile)?.also {
+                mediaLibJsons.put(path, it)
+            } ?: MediaLibJson(files = mutableListOf()).apply { mediaLibJsons.put(path, this) }
+        }
+    }
+
+    // Format groups
+    private fun formatMediaLibJson(old: MediaLibJson): MediaLibJson {
+        val allGroups = (old.files.map { it.groupName } + old.allGroups)
+            .distinct().filterNotNull().toMutableList()
+        return MediaLibJson(
+            allGroups = allGroups,
+            files = old.files,
+        )
+    }
+
+    private fun writeMediaLibJson(path: String, data: MediaLibJson) {
+        File(path, MEDIA_LIB_JSON_NAME).outputStream().use { outputStream ->
+            json.encodeToStream(formatMediaLibJson(data), outputStream)
+        }
+    }
+
+    private fun MutableList<FileJson>.appendFiles(
+        files: List<File>, fileJsonBuild: (File) -> FileJson = {
+            FileJson(
+                fileName = it.name,
+                groupName = null,
+                isFile = it.isFile,
+                displayName = null,
+            )
+        }
+    ) = apply {
+        files.forEach { file ->
+            if (file.name.equals(FOLDER_INFO_JSON_NAME, true) ||
+                file.name.equals(MEDIA_LIB_JSON_NAME, true)
+            ) {
+                return@forEach
+            }
+            if (firstOrNull { it.fileName == file.name } == null) {
+                add(fileJsonBuild(file))
+            }
+        }
+    }
+
+    fun requestGroups(path: String): Flow<List<MediaGroupBean>> {
         return flow {
-            val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
-            val mediaGroupJson = parseGroupJson(groupJsonFile)
-            val allGroups = mediaGroupJson?.allGroups.orEmpty()
+            val allGroups = getOrReadMediaLibJson(path).allGroups
             emit(listOf(MediaGroupBean.DefaultMediaGroup) +
                     allGroups.map { MediaGroupBean(name = it) }.sortedBy { it.name })
-        }.flowOn(Dispatchers.IO)
+        }
     }
 
-    fun requestFiles(uriPath: String, group: MediaGroupBean?): Flow<List<MediaBean>> {
+    fun requestFiles(path: String, group: MediaGroupBean?): Flow<List<MediaBean>> {
         return flow {
-            val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
-            val mediaGroupJson = parseGroupJson(groupJsonFile)
-            val filesInGroup = mediaGroupJson?.files.orEmpty()
-            val allFiles =
-                File(uriPath).listFiles().orEmpty().toMutableList().filter { it.exists() }
-            val videoList = if (group == null) {
-                allFiles.map {
+            val fileJsons = getOrReadMediaLibJson(path).files.appendFiles(
+                File(path).listFiles().orEmpty().toMutableList().filter { it.exists() }
+            )
+            val videoList = (if (group == null) fileJsons else {
+                val groupName = if (group.isDefaultGroup()) null else group.name
+                fileJsons.filter { it.groupName == groupName }
+            }).mapNotNull {
+                val file = File(path, it.fileName)
+                if (file.exists()) {
                     MediaBean(
-                        displayName = null,     // TODO
-                        file = it,
+                        displayName = it.displayName,
+                        file = file,
                     )
-                }
-            } else {
-                if (group.isDefaultGroup()) {
-                    allFiles.filter { file ->
-                        filesInGroup.fastFirstOrNull { it.fileName == file.name } == null
-                    }.map { file ->
-                        MediaBean(
-                            displayName = null,     // TODO
-                            file = file,
-                        )
-                    }
-                } else {
-                    filesInGroup.filter { it.groupName == group.name }.mapNotNull {
-                        val file = File(uriPath, it.fileName)
-                        if (file.exists()) {
-                            MediaBean(
-                                displayName = null,     // TODO
-                                file = file,
-                            )
-                        } else null
-                    }
-                }
-
+                } else null
             }
-            emit(videoList.toMutableList().apply {
-                fastFirstOrNull { it.name.equals(FOLDER_INFO_JSON_NAME, true) }?.let { remove(it) }
-                fastFirstOrNull { it.name.equals(GROUP_JSON_NAME, true) }?.let { remove(it) }
-            })
-        }.flowOn(Dispatchers.IO)
+
+            emit(
+                videoList.toMutableList().apply {
+                    fastFirstOrNull { it.name.equals(FOLDER_INFO_JSON_NAME, true) }
+                        ?.let { remove(it) }
+                    fastFirstOrNull { it.name.equals(MEDIA_LIB_JSON_NAME, true) }
+                        ?.let { remove(it) }
+                }
+            )
+        }
     }
 
     fun deleteFile(file: File): Flow<Boolean> {
         return flow {
+            val path = file.parentFile!!.path
+            val mediaLibJson = getOrReadMediaLibJson(path).apply {
+                files.removeIf { it.fileName == file.name }
+            }
+            writeMediaLibJson(path = path, mediaLibJson)
             emit(file.deleteRecursively())
         }.flowOn(Dispatchers.IO)
     }
 
     fun renameFile(file: File, newName: String): Flow<File?> {
         return flow {
+            val path = file.parentFile!!.path
+            val mediaLibJson = getOrReadMediaLibJson(path)
             val newFile = File(file.parentFile, newName.validateFileName())
-            emit(if (file.renameTo(newFile)) newFile else null)
+            if (file.renameTo(newFile)) {
+                mediaLibJson.files.firstOrNull { it.fileName == file.name }?.fileName = newName
+                writeMediaLibJson(path = path, mediaLibJson)
+                emit(newFile)
+            } else {
+                emit(null)
+            }
         }.flowOn(Dispatchers.IO)
     }
 
-    fun createGroup(uriPath: String, group: MediaGroupBean): Flow<Unit> = flow {
+    fun setFileDisplayName(mediaBean: MediaBean, displayName: String?): Flow<MediaBean> {
+        return flow {
+            val path = mediaBean.file.parentFile!!.path
+            val mediaLibJson = getOrReadMediaLibJson(path = path)
+            mediaLibJson.files.firstOrNull {
+                it.fileName == mediaBean.file.name
+            }?.displayName = if (displayName.isNullOrBlank()) null else displayName
+            writeMediaLibJson(path = path, mediaLibJson)
+
+            emit(mediaBean.copy(displayName = displayName))
+        }.flowOn(Dispatchers.IO)
+    }
+
+    fun createGroup(path: String, group: MediaGroupBean): Flow<Unit> = flow {
         if (group.isDefaultGroup()) {
             emit(Unit)
             return@flow
         }
-        val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
-        val mediaGroupJson = parseGroupJson(groupJsonFile) ?: MediaGroupJson(files = emptyList())
-
-        writeGroupToJson(
-            groupJsonFile,
-            mediaGroupJson.copy(allGroups = mediaGroupJson.allGroups + group.name),
-        )
+        val mediaLibJson = getOrReadMediaLibJson(path = path)
+        mediaLibJson.allGroups.add(group.name)
+        writeMediaLibJson(path = path, mediaLibJson)
 
         emit(Unit)
     }.flowOn(Dispatchers.IO)
 
-    fun deleteGroup(uriPath: String, group: MediaGroupBean): Flow<Int> = flow {
+    fun deleteGroup(path: String, group: MediaGroupBean): Flow<Unit> = flow {
         if (group.isDefaultGroup()) {
-            emit(0)
+            emit(Unit)
             return@flow
         }
-        val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
-        val mediaGroupJson = parseGroupJson(groupJsonFile)!!
-        val fileToGroups = mediaGroupJson.files.toSet()
-        val newFileToGroups = fileToGroups.filter { it.groupName != group.name }.toSet()
-
-        writeGroupToJson(
-            groupJsonFile,
-            mediaGroupJson.copy(
-                allGroups = mediaGroupJson.allGroups - group.name,
-                files = newFileToGroups.toList()
-            ),
-        )
-
-        (fileToGroups - newFileToGroups).forEach {
-            File(uriPath, it.fileName).deleteRecursively()
+        val mediaLibJson = getOrReadMediaLibJson(path = path)
+        mediaLibJson.files.forEach {
+            if (it.groupName == group.name) {
+                it.groupName = null
+            }
         }
+        mediaLibJson.allGroups.remove(group.name)
+        writeMediaLibJson(path = path, mediaLibJson)
 
-        emit(newFileToGroups.count() - fileToGroups.count())
+        emit(Unit)
     }.flowOn(Dispatchers.IO)
 
     fun renameGroup(
-        uriPath: String,
+        path: String,
         group: MediaGroupBean,
         newName: String,
     ): Flow<MediaGroupBean> = flow {
@@ -145,55 +211,44 @@ class MediaRepository @Inject constructor(
             emit(MediaGroupBean.DefaultMediaGroup)
             return@flow
         }
-        val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
-        val mediaGroupJson = parseGroupJson(groupJsonFile)!!
-
-        writeGroupToJson(
-            groupJsonFile,
-            mediaGroupJson.copy(
-                allGroups = mediaGroupJson.allGroups.toMutableList().apply {
-                    val index = indexOf(group.name)
-                    if (index != -1 && index < size) {
-                        set(index, newName)
-                    }
-                },
-                files = mediaGroupJson.files.map {
-                    if (it.groupName == group.name) {
-                        it.copy(groupName = newName)
-                    } else {
-                        it
-                    }
-                }
-            ),
-        )
+        val mediaLibJson = getOrReadMediaLibJson(path = path)
+        mediaLibJson.files.forEach {
+            if (it.groupName == group.name) {
+                it.groupName = newName
+            }
+        }
+        val index = mediaLibJson.allGroups.indexOf(group.name)
+        if (index >= 0) {
+            mediaLibJson.allGroups[index] = newName
+        }
+        writeMediaLibJson(path = path, mediaLibJson)
 
         emit(MediaGroupBean(name = newName))
     }.flowOn(Dispatchers.IO)
 
     fun changeMediaGroup(
-        uriPath: String,
+        path: String,
         mediaBean: MediaBean,
         group: MediaGroupBean,
     ): Flow<Unit> = flow {
-        val groupJsonFile = File(uriPath, GROUP_JSON_NAME)
-        val mediaGroupJson = parseGroupJson(groupJsonFile)!!
-        val fileToGroups = mediaGroupJson.files.toSet()
-        val file = fileToGroups.firstOrNull { it.fileName == mediaBean.file.name }
-
-        val newFileToGroups = (if (file != null) fileToGroups - file else fileToGroups)
-            .toMutableList()
-            .apply {
-                if (!group.isDefaultGroup()) {
-                    add(
-                        FileToGroup(
-                            fileName = mediaBean.file.name,
-                            groupName = group.name,
-                            isFile = mediaBean.file.isFile,
-                        )
+        val mediaLibJson = getOrReadMediaLibJson(path = path)
+        val index = mediaLibJson.files.indexOfFirst { it.fileName == mediaBean.file.name }
+        if (index >= 0) {
+            mediaLibJson.files[index].groupName =
+                if (group.isDefaultGroup()) null else group.name
+        } else {
+            if (!group.isDefaultGroup()) {
+                mediaLibJson.files.add(
+                    FileJson(
+                        fileName = mediaBean.file.name,
+                        groupName = group.name,
+                        isFile = mediaBean.file.isFile,
+                        displayName = mediaBean.displayName,
                     )
-                }
+                )
             }
-        writeGroupToJson(groupJsonFile, mediaGroupJson.copy(files = newFileToGroups.toList()))
+        }
+        writeMediaLibJson(path = path, mediaLibJson)
 
         emit(Unit)
     }.flowOn(Dispatchers.IO)
@@ -203,56 +258,58 @@ class MediaRepository @Inject constructor(
         from: MediaGroupBean,
         to: MediaGroupBean
     ): Flow<Unit> = flow {
-        val groupJsonFile = File(path, GROUP_JSON_NAME)
-        val mediaGroupJson = parseGroupJson(groupJsonFile)!!
-        val fileToGroups = mediaGroupJson.files.toSet()
-        val newFileToGroups: List<FileToGroup> = if (from.isDefaultGroup()) {
+        val mediaLibJson = getOrReadMediaLibJson(path = path)
+        if (from.isDefaultGroup()) {
             if (to.isDefaultGroup()) {
-                fileToGroups.toList()
+                emit(Unit)
+                return@flow
             } else {
-                fileToGroups.toList() + File(path).listFiles().orEmpty().filter { f ->
-                    // null means the current file f is not grouped
-                    fileToGroups.firstOrNull {
-                        f.isFile == it.isFile && f.name == it.fileName
-                    } == null
-                }.map { FileToGroup(it.name, to.name, isFile = it.isFile) }
+                mediaLibJson.files.appendFiles(
+                    files = File(path).listFiles().orEmpty().toList(),
+                    fileJsonBuild = {
+                        FileJson(
+                            fileName = it.name,
+                            groupName = to.name,
+                            isFile = it.isFile,
+                            displayName = null,
+                        )
+                    }
+                )
+                mediaLibJson.files.forEach {
+                    if (it.groupName == null) it.groupName = to.name
+                }
             }
         } else {
-            if (to.isDefaultGroup()) {
-                fileToGroups.toList() - fileToGroups.filter { it.groupName == from.name }.toSet()
-            } else {
-                fileToGroups.map {
-                    if (it.groupName == from.name) {
-                        it.copy(groupName = to.name)
-                    } else {
-                        it
-                    }
+            mediaLibJson.files.forEach {
+                if (it.groupName == from.name) {
+                    it.groupName = if (to.isDefaultGroup()) null else to.name
                 }
             }
         }
-
-        writeGroupToJson(groupJsonFile, mediaGroupJson.copy(files = newFileToGroups.toList()))
+        writeMediaLibJson(path = path, mediaLibJson)
 
         emit(Unit)
     }.flowOn(Dispatchers.IO)
 
     @Serializable
-    data class MediaGroupJson(
+    data class MediaLibJson(
         @SerialName("allGroups")
         @EncodeDefault
-        val allGroups: List<String> = listOf(),
+        val allGroups: MutableList<String> = mutableListOf(),
         @SerialName("files")
-        val files: List<FileToGroup>,
+        val files: MutableList<FileJson>,
     )
 
     @Serializable
-    data class FileToGroup(
+    data class FileJson(
         @SerialName("fileName")
-        val fileName: String,
+        var fileName: String,
         @SerialName("groupName")
-        val groupName: String,
+        var groupName: String? = null,
         @SerialName("isFile")
-        val isFile: Boolean = false,
+        var isFile: Boolean = false,
+        @SerialName("displayName")
+        var displayName: String? = null,
     )
 
     @Serializable
@@ -260,37 +317,4 @@ class MediaRepository @Inject constructor(
         @SerialName("displayName")
         val displayName: String? = null,
     )
-
-    // Format groups
-    private fun formatMediaGroupJson(old: MediaGroupJson): MediaGroupJson {
-        val allGroups = (old.files.map { it.groupName } + old.allGroups).distinct()
-        return MediaGroupJson(
-            allGroups = allGroups,
-            files = old.files,
-        )
-    }
-
-    private fun parseGroupJson(groupJsonFile: File): MediaGroupJson? {
-        if (!groupJsonFile.exists()) return null
-        return groupJsonFile.inputStream().use { inputStream ->
-            json.decodeFromStream<MediaGroupJson>(inputStream)
-        }
-    }
-
-    private fun parseGroupJsonToMap(groupJsonFile: File): Map<String, List<FileToGroup>> {
-        val mediaGroupJson = parseGroupJson(groupJsonFile) ?: return emptyMap()
-        return mediaGroupJson.files.groupBy { it.groupName }.toMutableMap().apply {
-            mediaGroupJson.allGroups.forEach {
-                if (!containsKey(it)) {
-                    put(it, emptyList())
-                }
-            }
-        }.toSortedMap()
-    }
-
-    private fun writeGroupToJson(groupJsonFile: File, data: MediaGroupJson) {
-        groupJsonFile.outputStream().use { outputStream ->
-            json.encodeToStream(formatMediaGroupJson(data), outputStream)
-        }
-    }
 }

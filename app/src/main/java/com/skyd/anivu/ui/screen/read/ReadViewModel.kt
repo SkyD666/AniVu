@@ -77,7 +77,7 @@ class ReadViewModel @Inject constructor(
         return merge(
             filterIsInstance<ReadIntent.Init>().flatMapConcat { intent ->
                 articleRepo.readArticle(intent.articleId, read = true).flatMapConcat {
-                    readRepo.requestArticleWithEnclosure(intent.articleId)
+                    readRepo.requestArticleWithFeed(intent.articleId)
                 }.map {
                     if (it == null) {
                         ReadPartialStateChange.ArticleResult.Failed(

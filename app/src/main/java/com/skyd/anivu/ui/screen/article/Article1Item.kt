@@ -188,7 +188,8 @@ fun Article1Item(
     if (openEnclosureBottomSheet != null) {
         EnclosureBottomSheet(
             onDismissRequest = { openEnclosureBottomSheet = null },
-            dataList = openEnclosureBottomSheet.orEmpty()
+            dataList = openEnclosureBottomSheet.orEmpty(),
+            article = data.articleWithEnclosure,
         )
     }
 }

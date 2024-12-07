@@ -353,6 +353,7 @@
     <string name="article_notification_channel_name">文章通知</string>
     <string name="update_notification_rule_name">名称</string>
     <string name="rename">重命名</string>
+    <string name="nickname">昵称</string>
     <string name="download_screen_download_tasks">下载任务</string>
     <string name="download_screen_bt_tasks">BT 任务</string>
     <string name="download_resume">继续下载</string>

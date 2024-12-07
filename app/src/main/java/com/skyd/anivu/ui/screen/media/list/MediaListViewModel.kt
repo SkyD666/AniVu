@@ -66,8 +66,8 @@ class MediaListViewModel @Inject constructor(
                 val group = if (intent is MediaListIntent.Init) intent.group
                 else (intent as MediaListIntent.Refresh).group
                 combine(
-                    mediaRepo.requestFiles(uriPath = path!!, group),
-                    mediaRepo.requestGroups(uriPath = path),
+                    mediaRepo.requestFiles(path = path!!, group),
+                    mediaRepo.requestGroups(path = path),
                 ) { files, groups ->
                     MediaListPartialStateChange.MediaListResult.Success(
                         list = files,
@@ -89,6 +89,14 @@ class MediaListViewModel @Inject constructor(
                     )
                 }.startWith(MediaListPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaListPartialStateChange.RenameFileResult.Failed(it.message.toString()) }
+            },
+            filterIsInstance<MediaListIntent.SetFileDisplayName>().flatMapConcat { intent ->
+                mediaRepo.setFileDisplayName(intent.media, intent.displayName).map {
+                    MediaListPartialStateChange.SetFileDisplayNameResult.Success(
+                        media = intent.media, displayName = intent.displayName
+                    )
+                }.startWith(MediaListPartialStateChange.LoadingDialog.Show)
+                    .catchMap { MediaListPartialStateChange.SetFileDisplayNameResult.Failed(it.message.toString()) }
             },
         )
     }

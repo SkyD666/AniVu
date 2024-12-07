@@ -145,7 +145,11 @@ fun Media1Item(
         Column {
             Text(
                 modifier = Modifier.wrapContentHeight(),
-                text = data.displayName ?: fileNameWithoutExtension,
+                text = if (data.displayName.isNullOrBlank()) {
+                    fileNameWithoutExtension
+                } else {
+                    data.displayName
+                },
                 maxLines = 3,
                 style = MaterialTheme.typography.titleSmall,
             )

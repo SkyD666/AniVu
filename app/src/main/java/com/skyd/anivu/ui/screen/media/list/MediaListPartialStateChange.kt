@@ -107,4 +107,43 @@ internal sealed interface MediaListPartialStateChange {
         data class Success(val oldFile: File, val newFile: File) : RenameFileResult
         data class Failed(val msg: String) : RenameFileResult
     }
+
+    sealed interface SetFileDisplayNameResult : MediaListPartialStateChange {
+        override fun reduce(oldState: MediaListState): MediaListState {
+            return when (this) {
+                is Success -> {
+                    val listState = oldState.listState
+                    oldState.copy(
+                        listState = if (listState is ListState.Success) {
+                            ListState.Success(listState.list.toMutableList().apply {
+                                val index = indexOfFirst { it.file == media.file }
+                                if (index in indices) {
+                                    val old = get(index)
+                                    removeAt(index)
+                                    add(
+                                        index, old.copy(
+                                            displayName = if (displayName.isNullOrBlank()) null
+                                            else displayName
+                                        )
+                                    )
+                                }
+                            })
+                        } else {
+                            listState
+                        },
+                        loadingDialog = false,
+                    )
+                }
+
+                is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data class Success(val media: MediaBean, val displayName: String?) :
+            SetFileDisplayNameResult
+
+        data class Failed(val msg: String) : SetFileDisplayNameResult
+    }
 }

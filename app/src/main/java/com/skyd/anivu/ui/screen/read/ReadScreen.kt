@@ -30,6 +30,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AttachFile
 import androidx.compose.material.icons.outlined.ContentCopy
 import androidx.compose.material.icons.outlined.Download
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.FormatSize
 import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.PlayCircleOutline
@@ -90,7 +92,7 @@ import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toEncodedUrl
 import com.skyd.anivu.model.bean.article.ArticleBean
-import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
+import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.bean.article.RssMediaBean
 import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
@@ -160,24 +162,11 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                     AniVuIconButton(
                         enabled = uiState.articleState is ArticleState.Success,
                         onClick = {
-                            val articleState = viewModel.viewState.value.articleState
+                            val articleState = uiState.articleState
                             if (articleState is ArticleState.Success) {
-                                val link = articleState.article.article.link
-                                if (!link.isNullOrBlank()) {
-                                    link.openBrowser(context)
-                                }
-                            }
-                        },
-                        imageVector = Icons.Outlined.Public,
-                        contentDescription = stringResource(R.string.read_screen_open_browser),
-                    )
-                    AniVuIconButton(
-                        enabled = uiState.articleState is ArticleState.Success,
-                        onClick = {
-                            val articleState = viewModel.viewState.value.articleState
-                            if (articleState is ArticleState.Success) {
-                                val link = articleState.article.article.link
-                                val title = articleState.article.article.title
+                                val article = articleState.article.articleWithEnclosure.article
+                                val link = article.link
+                                val title = article.title
                                 if (!link.isNullOrBlank()) {
                                     ShareUtil.shareText(
                                         context = context,
@@ -189,7 +178,30 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                         imageVector = Icons.Outlined.Share,
                         contentDescription = stringResource(R.string.share),
                     )
+                    val isFavorite = (uiState.articleState as? ArticleState.Success)
+                        ?.article?.articleWithEnclosure?.article?.isFavorite == true
                     AniVuIconButton(
+                        enabled = uiState.articleState is ArticleState.Success,
+                        onClick = {
+                            val articleState = uiState.articleState
+                            if (articleState is ArticleState.Success) {
+                                dispatcher(
+                                    ReadIntent.Favorite(
+                                        articleId = articleId,
+                                        favorite = !isFavorite,
+                                    )
+                                )
+                            }
+                        },
+                        imageVector = if (isFavorite) Icons.Outlined.Favorite
+                        else Icons.Outlined.FavoriteBorder,
+                        contentDescription = stringResource(
+                            if (isFavorite) R.string.article_screen_unfavorite
+                            else R.string.article_screen_favorite
+                        ),
+                    )
+                    AniVuIconButton(
+                        enabled = uiState.articleState is ArticleState.Success,
                         onClick = { openMoreMenu = true },
                         imageVector = Icons.Outlined.MoreVert,
                         contentDescription = stringResource(R.string.more),
@@ -197,6 +209,15 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                     MoreMenu(
                         expanded = openMoreMenu,
                         onDismissRequest = { openMoreMenu = false },
+                        onOpenInBrowserClick = {
+                            val articleState = uiState.articleState
+                            if (articleState is ArticleState.Success) {
+                                val link = articleState.article.articleWithEnclosure.article.link
+                                if (!link.isNullOrBlank()) {
+                                    link.openBrowser(context)
+                                }
+                            }
+                        },
                         onReadTextSizeClick = { openReadTextSizeSliderDialog = true },
                     )
                 }
@@ -206,9 +227,11 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             AniVuFloatingActionButton(
                 onSizeWithSinglePaddingChanged = { _, height -> fabHeight = height },
                 onClick = {
-                    val articleState = viewModel.viewState.value.articleState
+                    val articleState = uiState.articleState
                     if (articleState is ArticleState.Success) {
-                        openEnclosureBottomSheet = getEnclosuresList(context, articleState.article)
+                        openEnclosureBottomSheet = getEnclosuresList(
+                            context, articleState.article.articleWithEnclosure,
+                        )
                     }
                 },
             ) {
@@ -244,19 +267,28 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                 ArticleState.Init,
                 ArticleState.Loading -> Unit
 
-                is ArticleState.Success -> Content(
-                    articleState = articleState,
-                    shareImage = { dispatcher(ReadIntent.ShareImage(url = it)) },
-                    copyImage = { dispatcher(ReadIntent.CopyImage(url = it)) },
-                    downloadImage = {
-                        dispatcher(
-                            ReadIntent.DownloadImage(
-                                url = it,
-                                title = articleState.article.article.title,
+                is ArticleState.Success -> {
+                    Content(
+                        articleState = articleState,
+                        shareImage = { dispatcher(ReadIntent.ShareImage(url = it)) },
+                        copyImage = { dispatcher(ReadIntent.CopyImage(url = it)) },
+                        downloadImage = {
+                            dispatcher(
+                                ReadIntent.DownloadImage(
+                                    url = it,
+                                    title = articleState.article.articleWithEnclosure.article.title,
+                                )
                             )
+                        },
+                    )
+                    if (openEnclosureBottomSheet != null) {
+                        EnclosureBottomSheet(
+                            onDismissRequest = { openEnclosureBottomSheet = null },
+                            dataList = openEnclosureBottomSheet.orEmpty(),
+                            article = articleState.article.articleWithEnclosure,
                         )
-                    },
-                )
+                    }
+                }
             }
         }
 
@@ -275,13 +307,6 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
         }
 
         WaitingDialog(visible = uiState.loadingDialog)
-
-        if (openEnclosureBottomSheet != null) {
-            EnclosureBottomSheet(
-                onDismissRequest = { openEnclosureBottomSheet = null },
-                dataList = openEnclosureBottomSheet.orEmpty()
-            )
-        }
 
         if (openReadTextSizeSliderDialog) {
             ReadTextSizeSliderDialog(
@@ -315,7 +340,7 @@ private fun Content(
     shareImage: (url: String) -> Unit,
 ) {
     val context = LocalContext.current
-    val article = articleState.article
+    val article = articleState.article.articleWithEnclosure
     var openImageSheet by rememberSaveable { mutableStateOf<String?>(null) }
 
     SelectionContainer {
@@ -364,8 +389,8 @@ private fun Content(
             }
         }
     }
-    MediaRow(articleWithEnclosureBean = article, onPlay = { url ->
-        PlayActivity.play(context.activity, Uri.parse(url))
+    MediaRow(articleWithFeed = articleState.article, onPlay = { url ->
+        PlayActivity.play(context.activity, uri = Uri.parse(url), title = article.article.title)
     })
     HtmlText(
         modifier = Modifier.padding(horizontal = 16.dp),
@@ -395,9 +420,23 @@ private fun Content(
 private fun MoreMenu(
     expanded: Boolean,
     onDismissRequest: () -> Unit,
+    onOpenInBrowserClick: () -> Unit,
     onReadTextSizeClick: () -> Unit,
 ) {
     DropdownMenu(expanded = expanded, onDismissRequest = onDismissRequest) {
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.read_screen_open_browser)) },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Outlined.Public,
+                    contentDescription = null,
+                )
+            },
+            onClick = {
+                onDismissRequest()
+                onOpenInBrowserClick()
+            },
+        )
         DropdownMenuItem(
             text = { Text(text = stringResource(R.string.read_screen_text_size)) },
             leadingIcon = {
@@ -473,9 +512,10 @@ private fun RssMediaDuration(modifier: Modifier = Modifier, rssMedia: RssMediaBe
 }
 
 @Composable
-private fun MediaRow(articleWithEnclosureBean: ArticleWithEnclosureBean, onPlay: (String) -> Unit) {
-    val enclosures = articleWithEnclosureBean.enclosures.filter { it.isMedia }
-    val cover = articleWithEnclosureBean.media?.image
+private fun MediaRow(articleWithFeed: ArticleWithFeed, onPlay: (String) -> Unit) {
+    val articleWithEnclosure = articleWithFeed.articleWithEnclosure
+    val enclosures = articleWithEnclosure.enclosures.filter { it.isMedia }
+    val cover = articleWithEnclosure.media?.image ?: articleWithFeed.feed.icon
     if (enclosures.size > 1) {
         Spacer(modifier = Modifier.height(6.dp))
         LazyRow(
@@ -494,7 +534,7 @@ private fun MediaRow(articleWithEnclosureBean: ArticleWithEnclosureBean, onPlay:
                 )
             }
         }
-        articleWithEnclosureBean.media?.let { media ->
+        articleWithEnclosure.media?.let { media ->
             Spacer(modifier = Modifier.height(12.dp))
             Row {
                 RssMediaEpisode(rssMedia = media)
@@ -520,7 +560,7 @@ private fun MediaRow(articleWithEnclosureBean: ArticleWithEnclosureBean, onPlay:
                 enclosure = item,
                 onClick = { onPlay(item.url) },
             ) {
-                articleWithEnclosureBean.media?.let { media ->
+                articleWithEnclosure.media?.let { media ->
                     RssMediaEpisode(
                         modifier = Modifier
                             .align(Alignment.TopEnd)

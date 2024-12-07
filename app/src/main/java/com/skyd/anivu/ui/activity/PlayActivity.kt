@@ -11,7 +11,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.content.IntentCompat
 import androidx.core.util.Consumer
@@ -27,11 +26,13 @@ import java.io.File
 class PlayActivity : BaseComposeActivity() {
     companion object {
         const val VIDEO_URI_KEY = "videoUri"
+        const val VIDEO_TITLE_KEY = "videoTitle"
 
-        fun play(activity: Activity, uri: Uri) {
+        fun play(activity: Activity, uri: Uri, title: String? = null) {
             activity.startActivity(
                 Intent(activity, PlayActivity::class.java).apply {
                     putExtra(VIDEO_URI_KEY, uri)
+                    putExtra(VIDEO_TITLE_KEY, title)
                 }
             )
         }
@@ -49,6 +50,9 @@ class PlayActivity : BaseComposeActivity() {
         }
     }
 
+    private var videoUri by mutableStateOf<Uri?>(null)
+    private var videoTitle by mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         copyAssetsForMpv(this)
 
@@ -57,19 +61,18 @@ class PlayActivity : BaseComposeActivity() {
         // Keep screen on
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        setContentBase {
-            var videoUri by rememberSaveable { mutableStateOf(handleIntent(intent)) }
+        handleIntent(intent)
 
+        setContentBase {
             DisposableEffect(Unit) {
-                val listener = Consumer<Intent> { newIntent ->
-                    videoUri = handleIntent(newIntent)
-                }
+                val listener = Consumer<Intent> { newIntent -> handleIntent(newIntent) }
                 addOnNewIntentListener(listener)
                 onDispose { removeOnNewIntentListener(listener) }
             }
             videoUri?.let { uri ->
                 PlayerView(
                     uri = uri,
+                    title = videoTitle,
                     onBack = { finish() },
                     onSaveScreenshot = {
                         picture = it
@@ -81,10 +84,13 @@ class PlayActivity : BaseComposeActivity() {
         }
     }
 
-    private fun handleIntent(intent: Intent?): Uri? {
-        intent ?: return null
-        return IntentCompat.getParcelableExtra(intent, VIDEO_URI_KEY, Uri::class.java)
-            ?: intent.data
+    private fun handleIntent(intent: Intent?) {
+        intent ?: return
+
+        videoUri = IntentCompat.getParcelableExtra(
+            intent, VIDEO_URI_KEY, Uri::class.java
+        ) ?: intent.data
+        videoTitle = intent.getStringExtra(VIDEO_TITLE_KEY)
     }
 
     private fun saveScreenshot() {

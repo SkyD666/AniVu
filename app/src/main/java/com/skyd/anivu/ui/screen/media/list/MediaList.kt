@@ -119,6 +119,14 @@ internal fun MediaList(
                             onRename = { oldMedia, newName ->
                                 dispatch(MediaListIntent.RenameFile(oldMedia.file, newName))
                             },
+                            onSetFileDisplayName = { media, displayName ->
+                                dispatch(
+                                    MediaListIntent.SetFileDisplayName(
+                                        media = media,
+                                        displayName = displayName,
+                                    )
+                                )
+                            },
                             onRemove = { dispatch(MediaListIntent.DeleteFile(it.file)) },
                             contentPadding = innerPadding + contentPadding + fabPadding,
                         )
@@ -156,6 +164,7 @@ private fun MediaList(
     onPlay: (MediaBean) -> Unit,
     onOpenDir: (MediaBean) -> Unit,
     onRename: (MediaBean, String) -> Unit,
+    onSetFileDisplayName: (MediaBean, String?) -> Unit,
     onRemove: (MediaBean) -> Unit,
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
@@ -192,6 +201,7 @@ private fun MediaList(
             currentGroup = groupInfo!!.group,
             groups = groups,
             onRename = onRename,
+            onSetFileDisplayName = onSetFileDisplayName,
             onDelete = {
                 onRemove(it)
                 openEditMediaDialog = null

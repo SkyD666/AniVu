@@ -86,7 +86,7 @@ class MediaViewModel @Inject constructor(
             ).flatMapConcat { intent ->
                 val path = if (intent is MediaIntent.Init) intent.path
                 else (intent as MediaIntent.Refresh).path
-                mediaRepo.requestGroups(uriPath = path!!).map {
+                mediaRepo.requestGroups(path = path!!).map {
                     MediaPartialStateChange.GroupsResult.Success(groups = it)
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.GroupsResult.Failed(it.message.toString()) }
