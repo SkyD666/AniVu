@@ -13,7 +13,6 @@ import android.provider.DocumentsContract
 import android.provider.OpenableColumns
 import android.webkit.URLUtil
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import com.skyd.anivu.R
 import com.skyd.anivu.appContext
@@ -103,7 +102,7 @@ private fun Uri.openChooser(
         if (context.tryActivity == null) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         }
-        ContextCompat.startActivity(context, intent, null)
+        context.startActivity(intent, null)
     } catch (e: Exception) {
         e.printStackTrace()
         context.getString(R.string.failed_msg, e.message).showToast(Toast.LENGTH_LONG)

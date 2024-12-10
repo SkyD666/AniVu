@@ -1,14 +1,13 @@
 package com.skyd.anivu.ui.mpv
 
-import android.content.Context
-import android.os.Build
-import android.util.AttributeSet
+
+import android.app.Application
+import android.graphics.Bitmap
 import android.util.Log
 import android.view.KeyCharacterMap
 import android.view.KeyEvent
 import android.view.SurfaceHolder
-import android.view.SurfaceView
-import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
@@ -35,18 +34,37 @@ import kotlin.math.log
 import kotlin.random.Random
 import kotlin.reflect.KProperty
 
-class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, attrs),
-    SurfaceHolder.Callback {
-    private var surfaceCreated = false
-
-    private val scope = CoroutineScope(Dispatchers.IO)
-
+class MPVPlayer(private val context: Application) : SurfaceHolder.Callback, MPVLib.EventObserver {
     companion object {
-        private const val TAG = "mpv"
+        private const val TAG = "MPVPlayer"
+
+        // resolution (px) of the thumbnail
+        private const val THUMB_SIZE = 1024
 
         @Volatile
         private var initialized = false
+
+        @Volatile
+        private var instance: MPVPlayer? = null
+
+        fun getInstance(context: Application): MPVPlayer {
+            if (instance == null) {
+                synchronized(MPVPlayer::class.java) {
+                    if (instance == null) {
+                        instance = MPVPlayer(context)
+                    }
+                }
+            }
+            instance?.initialize(
+                configDir = Const.MPV_CONFIG_DIR.path,
+                cacheDir = Const.MPV_CACHE_DIR.path,
+                fontDir = Const.MPV_FONT_DIR.path,
+            )
+            return instance!!
+        }
     }
+
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     fun initialize(
         configDir: String,
@@ -56,12 +74,12 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         vo: String = "gpu",
     ) {
         if (initialized) return
-        synchronized(MPVView::class.java) {
+        synchronized(MPVPlayer::class.java) {
             if (initialized) return
             initialized = true
         }
 
-        MPVLib.create(this.context, logLvl)
+        MPVLib.create(context, logLvl)
         MPVLib.setOptionString("config", "yes")
         MPVLib.setOptionString("config-dir", configDir)
         for (opt in arrayOf("gpu-shader-cache-dir", "icc-cache-dir"))
@@ -78,8 +96,9 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.setPropertyString("sub-fonts-dir", fontDir)
         MPVLib.setPropertyString("osd-fonts-dir", fontDir)
 
-        holder.addCallback(this)
         observeProperties()
+
+        MPVLib.addObserver(this)
     }
 
     private var voInUse: String = ""
@@ -92,12 +111,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         voInUse = vo
 
         // vo: set display fps as reported by android
-        val disp = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            context.display
-        } else {
-            @Suppress("DEPRECATION")
-            (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
-        }
+        val disp = ContextCompat.getDisplayOrDefault(context)
         val refreshRate = disp.mode.refreshRate
 
         val dataStore = context.dataStore
@@ -127,16 +141,13 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.setOptionString("screenshot-directory", Const.PICTURES_DIR.path)
     }
 
-    private var filePath: String? = null
-
     // Called when back button is pressed, or app is shutting down
     fun destroy() {
-        // Disable surface callbacks to avoid using unintialized mpv state
-        holder.removeCallback(this)
-
-        MPVLib.destroy()
-
-        initialized = false
+        if (initialized) {
+            MPVLib.destroy()
+            MPVLib.removeObserver(this)
+            initialized = false
+        }
     }
 
     fun onKey(event: KeyEvent): Boolean {
@@ -193,6 +204,9 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             Property("pause", MPV_FORMAT_FLAG),
             Property("eof-reached", MPV_FORMAT_FLAG),
             Property("paused-for-cache", MPV_FORMAT_FLAG),
+            Property("idle-active", MPV_FORMAT_FLAG),
+            Property("aid", MPV_FORMAT_INT64),
+            Property("sid", MPV_FORMAT_INT64),
             Property("track-list"),
             // observing double properties is not hooked up in the JNI code, but doing this
             // will restrict updates to when it actually changes
@@ -206,8 +220,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
             Property("playlist-count", MPV_FORMAT_INT64),
             Property("video-format"),
             Property("media-title", MPV_FORMAT_STRING),
-            Property("metadata/by-key/Artist", MPV_FORMAT_STRING),
-            Property("metadata/by-key/Album", MPV_FORMAT_STRING),
+            Property("metadata"),
             Property("loop-playlist"),
             Property("loop-file"),
             Property("shuffle", MPV_FORMAT_FLAG),
@@ -219,26 +232,20 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         }
     }
 
-    fun addObserver(o: MPVLib.EventObserver) {
-        MPVLib.addObserver(o)
-    }
-
-    fun removeObserver(o: MPVLib.EventObserver) {
-        MPVLib.removeObserver(o)
-    }
-
     data class Track(val trackId: Int, val name: String)
 
-    var tracks = mapOf<String, MutableList<Track>>(
-        "audio" to arrayListOf(),
-        "video" to arrayListOf(),
-        "sub" to arrayListOf()
+    private var tracks = mapOf<String, MutableList<Track>>(
+        "audio" to mutableListOf(),
+        "video" to mutableListOf(),
+        "sub" to mutableListOf()
     )
 
     val subtitleTrack: List<Track>
         get() = tracks["sub"].orEmpty().toList()
     val audioTrack: List<Track>
         get() = tracks["audio"].orEmpty().toList()
+    val videoTrack: List<Track>
+        get() = tracks["video"].orEmpty().toList()
 
     private fun getTrackDisplayName(mpvId: Int, lang: String?, title: String?): String {
         return if (!lang.isNullOrEmpty() && !title.isNullOrEmpty()) {
@@ -335,6 +342,8 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     // Property getters/setters
     val filename: String?
         get() = MPVLib.getPropertyString("filename")
+    val mediaTitle: String?
+        get() = MPVLib.getPropertyString("media-title")
     var paused: Boolean
         get() = MPVLib.getPropertyBoolean("pause")
         set(paused) = MPVLib.setPropertyBoolean("pause", paused)
@@ -345,11 +354,11 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     val keepOpen: Boolean
         get() = MPVLib.getPropertyBoolean("keep-open") ?: false
 
-    val duration: Int?
-        get() = MPVLib.getPropertyInt("duration")
+    val duration: Int
+        get() = MPVLib.getPropertyInt("duration") ?: 0
 
     var timePos: Int
-        get() = MPVLib.getPropertyInt("time-pos")
+        get() = MPVLib.getPropertyInt("time-pos") ?: 0
         set(progress) = MPVLib.setPropertyInt("time-pos", progress)
 
     val hwdecActive: String
@@ -389,8 +398,28 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     val videoAspect: Double?
         get() = MPVLib.getPropertyDouble("video-params/aspect")
 
+    val videoFormat: String?
+        get() = MPVLib.getPropertyString("video-format")
+
     val demuxerCacheDuration: Double
         get() = MPVLib.getPropertyDouble("demuxer-cache-duration") ?: 0.0
+
+    val artist: String
+        get() = MPVLib.getPropertyString("metadata/by-key/Artist").orEmpty()
+
+    val album: String
+        get() = MPVLib.getPropertyString("metadata/by-key/Album").orEmpty()
+
+    var thumbnail: Bitmap? = null
+        private set
+        get() {
+            field = if (videoFormat.isNullOrEmpty()) {
+                null
+            } else {
+                MPVLib.grabThumbnail(THUMB_SIZE)
+            }
+            return field
+        }
 
     class TrackDelegate(private val name: String) {
         operator fun getValue(thisRef: Any?, property: KProperty<*>): Int {
@@ -400,10 +429,7 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         }
 
         operator fun setValue(thisRef: Any?, property: KProperty<*>, value: Int) {
-            if (value == -1)
-                MPVLib.setPropertyString(name, "no")
-            else
-                MPVLib.setPropertyInt(name, value)
+            MPVLib.setPropertyString(name, if (value == -1) "no" else value.toString())
         }
     }
 
@@ -412,9 +438,20 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     var secondarySid: Int by TrackDelegate("secondary-sid")
     var aid: Int by TrackDelegate("aid")
 
+    fun resetAid() = MPVLib.setPropertyString("aid", "auto")
+    fun resetVid() = MPVLib.setPropertyString("vid", "auto")
+    fun resetSid() = MPVLib.setPropertyString("sid", "auto")
+
     // Commands
 
-    fun cyclePause() = MPVLib.command(arrayOf("cycle", "pause"))
+    fun cyclePause() {
+        if (keepOpen && eofReached) {
+            seek(0)
+        } else {
+            MPVLib.command(arrayOf("cycle", "pause"))
+        }
+    }
+
     fun cycleAudio() = MPVLib.command(arrayOf("cycle", "audio"))
     fun cycleSub() = MPVLib.command(arrayOf("cycle", "sub"))
     fun cycleHwdec() = MPVLib.command(arrayOf("cycle-values", "hwdec", "auto", "no"))
@@ -461,38 +498,8 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
         MPVLib.setPropertyBoolean("shuffle", newState)
     }
 
-    // Surface callbacks
-
-    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        MPVLib.setPropertyString("android-surface-size", "${width}x$height")
-    }
-
-    override fun surfaceCreated(holder: SurfaceHolder) {
-        Log.w(TAG, "attaching surface")
-        MPVLib.attachSurface(holder.surface)
-        // This forces mpv to render subs/osd/whatever into our surface even if it would ordinarily not
-        MPVLib.setOptionString("force-window", "yes")
-
-        surfaceCreated = true
-        if (filePath != null) {
-            MPVLib.command(arrayOf("loadfile", filePath as String))
-            filePath = null
-        } else {
-            // We disable video output when the context disappears, enable it back
-            MPVLib.setPropertyString("vo", voInUse)
-        }
-    }
-
-    override fun surfaceDestroyed(holder: SurfaceHolder) {
-        Log.w(TAG, "detaching surface")
-        MPVLib.setPropertyString("vo", "null")
-        MPVLib.setOptionString("force-window", "no")
-        MPVLib.detachSurface()
-    }
-
     fun loadFile(filePath: String) {
-        if (surfaceCreated) MPVLib.command(arrayOf("loadfile", filePath))
-        else this.filePath = filePath
+        MPVLib.command(arrayOf("loadfile", filePath))
     }
 
     fun stop() {
@@ -563,5 +570,56 @@ class MPVView(context: Context, attrs: AttributeSet?) : SurfaceView(context, att
     fun addAudio(filePath: String) {
         MPVLib.command(arrayOf("audio-add", filePath, "cached"))
         loadAudioTrack()
+    }
+
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        MPVLib.setPropertyString("android-surface-size", "${width}x$height")
+    }
+
+    override fun surfaceCreated(holder: SurfaceHolder) {
+        Log.w(TAG, "attaching surface")
+        MPVLib.attachSurface(holder.surface)
+        // This forces mpv to render subs/osd/whatever into our surface even if it would ordinarily not
+        MPVLib.setOptionString("force-window", "yes")
+        // We disable video output when the context disappears, enable it back
+        MPVLib.setPropertyString("vo", voInUse)
+    }
+
+    override fun surfaceDestroyed(holder: SurfaceHolder) {
+        if (initialized) {
+            Log.w(TAG, "detaching surface")
+            MPVLib.setPropertyString("vo", "null")
+            MPVLib.setOptionString("force-window", "no")
+            MPVLib.detachSurface()
+        }
+    }
+
+    override fun eventProperty(property: String) {
+        when (property) {
+            "track-list" -> loadTracks()
+        }
+    }
+
+    override fun eventProperty(property: String, value: Long) {
+    }
+
+    override fun eventProperty(property: String, value: Boolean) {
+    }
+
+    override fun eventProperty(property: String, value: String) {
+    }
+
+    override fun event(eventId: Int) {
+        when (eventId) {
+            MPVLib.mpvEventId.MPV_EVENT_FILE_LOADED -> {
+                resetAid()
+                resetVid()
+                resetSid()
+            }
+        }
+    }
+
+    override fun efEvent(err: String?) {
+        Log.e(TAG, "efEvent: $err")
     }
 }

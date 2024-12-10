@@ -358,6 +358,9 @@
     <string name="download_screen_bt_tasks">BT 任务</string>
     <string name="download_resume">继续下载</string>
     <string name="download_cancel">取消下载</string>
+    <string name="player_notification_channel_name">播放器</string>
+    <string name="player_notification_channel_description">播放器通知栏控制</string>
+    <string name="player_config_screen_background_play">后台播放</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已读 %d 项</item>
     </plurals>

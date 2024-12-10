@@ -39,6 +39,7 @@ import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepFavo
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepUnreadPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
+import com.skyd.anivu.model.preference.player.BackgroundPlayPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
@@ -135,6 +136,7 @@ val LocalPlayerAutoPip = compositionLocalOf { PlayerAutoPipPreference.default }
 val LocalPlayerMaxCacheSize = compositionLocalOf { PlayerMaxCacheSizePreference.default }
 val LocalPlayerMaxBackCacheSize = compositionLocalOf { PlayerMaxBackCacheSizePreference.default }
 val LocalPlayerSeekOption = compositionLocalOf { PlayerSeekOptionPreference.default }
+val LocalBackgroundPlay = compositionLocalOf { BackgroundPlayPreference.default }
 
 // Data
 val LocalUseAutoDelete = compositionLocalOf { UseAutoDeletePreference.default }

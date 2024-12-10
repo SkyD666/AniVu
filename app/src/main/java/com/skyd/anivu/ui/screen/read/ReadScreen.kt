@@ -96,7 +96,7 @@ import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.bean.article.RssMediaBean
 import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
-import com.skyd.anivu.ui.activity.PlayActivity
+import com.skyd.anivu.ui.activity.player.PlayActivity
 import com.skyd.anivu.ui.component.AniVuFloatingActionButton
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.AniVuImage

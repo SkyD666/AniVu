@@ -37,7 +37,7 @@ import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.MediaBean
 import com.skyd.anivu.model.bean.MediaGroupBean
-import com.skyd.anivu.ui.activity.PlayActivity
+import com.skyd.anivu.ui.activity.player.PlayActivity
 import com.skyd.anivu.ui.component.CircularProgressPlaceholder
 import com.skyd.anivu.ui.component.EmptyPlaceholder
 import com.skyd.anivu.ui.local.LocalNavController

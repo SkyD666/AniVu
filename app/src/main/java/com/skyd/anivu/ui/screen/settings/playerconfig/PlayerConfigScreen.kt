@@ -15,6 +15,7 @@ import androidx.compose.material.icons.outlined.PhotoCamera
 import androidx.compose.material.icons.outlined.PictureInPictureAlt
 import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material.icons.outlined.Save
+import androidx.compose.material.icons.outlined.Speaker
 import androidx.compose.material.icons.outlined.Timelapse
 import androidx.compose.material.icons.outlined.TouchApp
 import androidx.compose.material3.Icon
@@ -39,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
+import com.skyd.anivu.model.preference.player.BackgroundPlayPreference
 import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
 import com.skyd.anivu.model.preference.player.PlayerMaxBackCacheSizePreference
@@ -55,6 +57,7 @@ import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.CheckableListMenu
 import com.skyd.anivu.ui.component.SwitchSettingsItem
 import com.skyd.anivu.ui.component.dialog.SliderDialog
+import com.skyd.anivu.ui.local.LocalBackgroundPlay
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalPlayerAutoPip
 import com.skyd.anivu.ui.local.LocalPlayerDoubleTap
@@ -97,6 +100,20 @@ fun PlayerConfigScreen() {
         ) {
             item {
                 CategorySettingsItem(text = stringResource(id = R.string.player_config_screen_behavior_category))
+            }
+            item {
+                SwitchSettingsItem(
+                    imageVector = Icons.Outlined.Speaker,
+                    text = stringResource(id = R.string.player_config_screen_background_play),
+                    checked = LocalBackgroundPlay.current,
+                    onCheckedChange = {
+                        BackgroundPlayPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
             }
             item {
                 BaseSettingsItem(

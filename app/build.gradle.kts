@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 24
-        versionName = "2.1-beta15"
+        versionName = "2.1-beta16"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -190,6 +190,7 @@ dependencies {
     implementation(libs.androidx.paging.compose)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.profileinstaller)
+    implementation(libs.androidx.media)
 
     implementation(libs.material)
     implementation(libs.material.kolor)

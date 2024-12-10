@@ -11,10 +11,12 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toAndroidRectF
@@ -52,32 +54,49 @@ internal fun PipListenerPreAPI12(shouldEnterPipMode: Boolean) {
     }
 }
 
+@Composable
 internal fun Modifier.pipParams(
     context: Context,
     shouldEnterPipMode: Boolean,
     playState: PlayState,
 ): Modifier = run {
+    var builder by rememberSaveable { mutableStateOf<PictureInPictureParams.Builder?>(null) }
+    val currentPlayState by rememberUpdatedState(playState)
+    val setActionsAndApplyBuilder: (PictureInPictureParams.Builder) -> Unit = remember {
+        { builder ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                builder.setActions(
+                    listOfRemoteActions(
+                        playState = currentPlayState,
+                        context = context,
+                    ),
+                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    builder.setAutoEnterEnabled(shouldEnterPipMode)
+                }
+                context.activity.setPictureInPictureParams(builder.build())
+            }
+        }
+    }
+
+    LaunchedEffect(playState.isPlaying) {
+        builder?.let { setActionsAndApplyBuilder(it) }
+    }
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         onGloballyPositioned { layoutCoordinates ->
-            val builder = PictureInPictureParams.Builder()
-            if (shouldEnterPipMode) {
-                builder.setSourceRectHint(
-                    layoutCoordinates
-                        .boundsInWindow()
-                        .toAndroidRectF()
-                        .toRect()
-                )
+            (builder ?: PictureInPictureParams.Builder()).let { b ->
+                builder = b
+                if (shouldEnterPipMode) {
+                    b.setSourceRectHint(
+                        layoutCoordinates
+                            .boundsInWindow()
+                            .toAndroidRectF()
+                            .toRect()
+                    )
+                }
+                setActionsAndApplyBuilder(b)
             }
-            builder.setActions(
-                listOfRemoteActions(
-                    playState = playState,
-                    context = context,
-                ),
-            )
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                builder.setAutoEnterEnabled(shouldEnterPipMode)
-            }
-            context.activity.setPictureInPictureParams(builder.build())
         }
     } else this
 }
@@ -130,7 +149,7 @@ fun PipBroadcastReceiver(playStateCallback: PlayStateCallback) {
     }
 }
 
-internal fun Activity.manualEnterPictureInPictureMode(){
+internal fun Activity.manualEnterPictureInPictureMode() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         enterPictureInPictureMode(PictureInPictureParams.Builder().build())
     }

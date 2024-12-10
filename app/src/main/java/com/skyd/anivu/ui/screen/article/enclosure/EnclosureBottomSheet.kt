@@ -37,12 +37,11 @@ import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.model.bean.LinkEnclosureBean
 import com.skyd.anivu.model.bean.article.ArticleWithEnclosureBean
-import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.repository.download.DownloadStarter
 import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
-import com.skyd.anivu.ui.activity.PlayActivity
+import com.skyd.anivu.ui.activity.player.PlayActivity
 import com.skyd.anivu.ui.component.AniVuIconButton
 
 fun getEnclosuresList(

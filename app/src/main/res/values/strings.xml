@@ -365,6 +365,9 @@
     <string name="download_screen_bt_tasks">BT Tasks</string>
     <string name="download_resume">Resume</string>
     <string name="download_cancel">Cancel</string>
+    <string name="player_notification_channel_name">Player</string>
+    <string name="player_notification_channel_description">Player controller</string>
+    <string name="player_config_screen_background_play">Background playback</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="one">Read %d item</item>
         <item quantity="other">Read %d items</item>

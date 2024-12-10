@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission
@@ -148,9 +150,10 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.activity.PlayActivity"
+            android:name=".ui.activity.player.PlayActivity"
+            android:alwaysRetainTaskState="true"
             android:autoRemoveFromRecents="true"
-            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|screenLayout|smallestScreenSize"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|uiMode|screenSize|screenLayout|smallestScreenSize"
             android:exported="true"
             android:label="@string/play_activity_label"
             android:launchMode="singleTask"
@@ -170,6 +173,15 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.activity.CrashActivity" />
+
+        <service
+            android:name=".ui.mpv.service.PlayerService"
+            android:exported="false"
+            android:foregroundServiceType="mediaPlayback"/>
+
+        <receiver
+            android:name=".ui.mpv.service.PlayerNotificationReceiver"
+            android:exported="false" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

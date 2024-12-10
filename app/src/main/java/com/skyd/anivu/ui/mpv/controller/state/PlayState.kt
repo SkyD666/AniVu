@@ -24,6 +24,36 @@ data class PlayState(
             mediaTitle = "",
         )
     }
+
+    fun copyIfNecessary(
+        isPlaying: Boolean = this.isPlaying,
+        isSeeking: Boolean = this.isSeeking,
+        currentPosition: Int = this.currentPosition,
+        duration: Int = this.duration,
+        bufferDuration: Int = this.bufferDuration,
+        speed: Float = this.speed,
+        title: String = this.title,
+        mediaTitle: String = this.mediaTitle,
+    ): PlayState {
+        return if (isPlaying != this.isPlaying ||
+            isSeeking != this.isSeeking ||
+            currentPosition != this.currentPosition ||
+            duration != this.duration ||
+            bufferDuration != this.bufferDuration ||
+            speed != this.speed ||
+            title != this.title ||
+            mediaTitle != this.mediaTitle
+        ) copy(
+            isPlaying = isPlaying,
+            isSeeking = isSeeking,
+            currentPosition = currentPosition,
+            duration = duration,
+            bufferDuration = bufferDuration,
+            speed = speed,
+            title = title,
+            mediaTitle = mediaTitle
+        ) else this
+    }
 }
 
 @Immutable

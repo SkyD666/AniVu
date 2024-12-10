@@ -35,7 +35,7 @@ interface MediaPlayHistoryDao {
         WHERE ${MediaPlayHistoryBean.PATH_COLUMN} = :path
         """
     )
-    fun getMediaPlayHistory(path: String): MediaPlayHistoryBean
+    fun getMediaPlayHistory(path: String): MediaPlayHistoryBean?
 
     @Transaction
     @Query("SELECT * FROM $MEDIA_PLAY_HISTORY_TABLE_NAME")

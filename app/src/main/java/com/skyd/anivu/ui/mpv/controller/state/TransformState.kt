@@ -15,6 +15,21 @@ data class TransformState(
             videoOffset = Offset.Zero,
         )
     }
+
+    fun copyIfNecessary(
+        videoRotate: Float = this.videoRotate,
+        videoZoom: Float = this.videoZoom,
+        videoOffset: Offset = this.videoOffset,
+    ): TransformState {
+        return if (videoRotate != this.videoRotate ||
+            videoZoom != this.videoZoom ||
+            videoOffset != this.videoOffset
+        ) copy(
+            videoRotate = videoRotate,
+            videoZoom = videoZoom,
+            videoOffset = videoOffset,
+        ) else this
+    }
 }
 
 @Immutable

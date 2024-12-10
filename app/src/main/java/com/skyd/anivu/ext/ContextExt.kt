@@ -6,13 +6,11 @@ import android.content.ContextWrapper
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.res.Configuration
-import android.graphics.Point
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.view.Window
-import androidx.core.content.ContextCompat
 import androidx.core.content.pm.PackageInfoCompat
 import coil3.ImageLoader
 import coil3.gif.AnimatedImageDecoder
@@ -55,24 +53,6 @@ val Context.tryWindow: Window?
 
 val Context.screenIsLand: Boolean
     get() = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
-
-fun Context.screenHeight(includeVirtualKey: Boolean): Int {
-    val display = ContextCompat.getDisplayOrDefault(this)
-    val outPoint = Point()
-    // 可能有虚拟按键的情况
-    if (includeVirtualKey) display.getRealSize(outPoint)
-    else display.getSize(outPoint)
-    return outPoint.y
-}
-
-fun Context.screenWidth(includeVirtualKey: Boolean): Int {
-    val display = ContextCompat.getDisplayOrDefault(this)
-    val outPoint = Point()
-    // 可能有虚拟按键的情况
-    if (includeVirtualKey) display.getRealSize(outPoint)
-    else display.getSize(outPoint)
-    return outPoint.x
-}
 
 fun Context.getAppVersionName(): String {
     var appVersionName = ""

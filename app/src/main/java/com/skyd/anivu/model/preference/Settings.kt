@@ -43,6 +43,7 @@ import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepFavo
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepUnreadPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
+import com.skyd.anivu.model.preference.player.BackgroundPlayPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
@@ -77,6 +78,7 @@ import com.skyd.anivu.ui.local.LocalAutoDeleteArticleBefore
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleFrequency
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleKeepFavorite
 import com.skyd.anivu.ui.local.LocalAutoDeleteArticleKeepUnread
+import com.skyd.anivu.ui.local.LocalBackgroundPlay
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalDateStyle
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
@@ -175,6 +177,7 @@ data class Settings(
     val playerMaxCacheSize: Long = PlayerMaxCacheSizePreference.default,
     val playerMaxBackCacheSize: Long = PlayerMaxBackCacheSizePreference.default,
     val playerSeekOption: String = PlayerSeekOptionPreference.default,
+    val backgroundPlay: Boolean = BackgroundPlayPreference.default,
     // Data
     val useAutoDelete: Boolean = UseAutoDeletePreference.default,
     val autoDeleteArticleFrequency: Long = AutoDeleteArticleFrequencyPreference.default,
@@ -251,6 +254,7 @@ fun SettingsProvider(
         LocalPlayerMaxCacheSize provides settings.playerMaxCacheSize,
         LocalPlayerMaxBackCacheSize provides settings.playerMaxBackCacheSize,
         LocalPlayerSeekOption provides settings.playerSeekOption,
+        LocalBackgroundPlay provides settings.backgroundPlay,
         // Data
         LocalUseAutoDelete provides settings.useAutoDelete,
         LocalAutoDeleteArticleFrequency provides settings.autoDeleteArticleFrequency,

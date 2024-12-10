@@ -21,7 +21,7 @@ class PlayerRepository @Inject constructor(
 
     fun requestLastPlayPosition(path: String): Flow<Long> {
         return flow {
-            emit(mediaPlayHistoryDao.getMediaPlayHistory(path).lastPlayPosition)
+            emit(mediaPlayHistoryDao.getMediaPlayHistory(path)?.lastPlayPosition ?: 0L)
         }.flowOn(Dispatchers.IO)
     }
 }

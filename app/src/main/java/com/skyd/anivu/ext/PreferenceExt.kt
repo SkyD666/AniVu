@@ -38,6 +38,7 @@ import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepFavo
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepUnreadPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
+import com.skyd.anivu.model.preference.player.BackgroundPlayPreference
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.PlayerAutoPipPreference
 import com.skyd.anivu.model.preference.player.PlayerDoubleTapPreference
@@ -117,6 +118,7 @@ fun Preferences.toSettings(): Settings {
         playerMaxCacheSize = PlayerMaxCacheSizePreference.fromPreferences(this),
         playerMaxBackCacheSize = PlayerMaxBackCacheSizePreference.fromPreferences(this),
         playerSeekOption = PlayerSeekOptionPreference.fromPreferences(this),
+        backgroundPlay = BackgroundPlayPreference.fromPreferences(this),
 
         // Data
         useAutoDelete = UseAutoDeletePreference.fromPreferences(this),
