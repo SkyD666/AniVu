@@ -11,6 +11,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.skyd.anivu.appContext
+import com.skyd.anivu.model.bean.article.ArticleBean
 import com.skyd.anivu.model.bean.feed.FEED_TABLE_NAME
 import com.skyd.anivu.model.bean.feed.FEED_VIEW_NAME
 import com.skyd.anivu.model.bean.feed.FeedBean
@@ -18,7 +19,6 @@ import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.bean.feed.FeedWithArticleBean
 import com.skyd.anivu.model.bean.group.GROUP_TABLE_NAME
 import com.skyd.anivu.model.bean.group.GroupBean
-import com.skyd.anivu.model.bean.article.ArticleBean
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
@@ -56,7 +56,7 @@ interface FeedDao {
                 val articleId = articleWithEnclosure.article.articleId
 
                 // Add ArticleWithEnclosure
-                if (articleWithEnclosure.article.feedUrl != feedUrl) {
+                return@map if (articleWithEnclosure.article.feedUrl != feedUrl) {
                     articleWithEnclosure.copy(
                         article = articleWithEnclosure.article.copy(feedUrl = feedUrl),
                         enclosures = articleWithEnclosure.enclosures.map {

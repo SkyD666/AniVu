@@ -28,8 +28,10 @@ import java.util.concurrent.atomic.AtomicInteger
 import kotlin.LazyThreadSafetyMode.PUBLICATION
 import kotlin.coroutines.ContinuationInterceptor
 
+var mviViewModelNeedMainThread: Boolean = BuildConfig.DEBUG
+
 private fun debugCheckMainThread() {
-    if (BuildConfig.DEBUG) {
+    if (mviViewModelNeedMainThread) {
         check(Looper.getMainLooper() === Looper.myLooper()) {
             "Expected to be called on the main thread but was " + Thread.currentThread().name
         }
@@ -37,7 +39,7 @@ private fun debugCheckMainThread() {
 }
 
 suspend fun debugCheckImmediateMainDispatcher() {
-    if (BuildConfig.DEBUG) {
+    if (mviViewModelNeedMainThread) {
         val interceptor = currentCoroutineContext()[ContinuationInterceptor]
         Log.d(
             "###",

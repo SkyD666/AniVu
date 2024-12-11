@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toAndroidRectF
@@ -60,7 +59,7 @@ internal fun Modifier.pipParams(
     shouldEnterPipMode: Boolean,
     playState: PlayState,
 ): Modifier = run {
-    var builder by rememberSaveable { mutableStateOf<PictureInPictureParams.Builder?>(null) }
+    var builder by remember { mutableStateOf<PictureInPictureParams.Builder?>(null) }
     val currentPlayState by rememberUpdatedState(playState)
     val setActionsAndApplyBuilder: (PictureInPictureParams.Builder) -> Unit = remember {
         { builder ->

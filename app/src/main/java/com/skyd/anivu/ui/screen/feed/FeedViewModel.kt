@@ -1,5 +1,6 @@
 package com.skyd.anivu.ui.screen.feed
 
+import android.util.Log
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith

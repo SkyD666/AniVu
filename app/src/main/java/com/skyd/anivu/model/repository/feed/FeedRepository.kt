@@ -82,11 +82,6 @@ class FeedRepository @Inject constructor(
             .flowOn(Dispatchers.IO)
     }
 
-    suspend fun setFeed(feedBean: FeedBean): Flow<Unit> {
-        return flowOf(feedDao.setFeed(feedBean))
-            .flowOn(Dispatchers.IO)
-    }
-
     suspend fun setFeed(
         url: String,
         groupId: String?,
