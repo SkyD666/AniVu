@@ -12,7 +12,6 @@ import com.skyd.anivu.ext.isNetwork
 import com.skyd.anivu.ext.put
 import com.skyd.anivu.model.bean.feed.FeedBean
 import com.skyd.anivu.model.bean.group.GroupVo
-import com.skyd.anivu.model.bean.group.GroupVo.Companion.isDefaultGroup
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
 import com.skyd.anivu.model.db.dao.GroupDao
@@ -208,15 +207,15 @@ class FeedRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun changeGroupExpanded(group: GroupVo, expanded: Boolean): Flow<Unit> {
+    suspend fun changeGroupExpanded(groupId: String?, expanded: Boolean): Flow<Unit> {
         return flow {
-            if (group.isDefaultGroup()) {
+            if (groupId == null || groupId == GroupVo.DEFAULT_GROUP_ID) {
                 appContext.dataStore.put(
                     FeedDefaultGroupExpandPreference.key,
                     value = expanded,
                 )
             } else {
-                groupDao.changeGroupExpanded(group.groupId, expanded)
+                groupDao.changeGroupExpanded(groupId, expanded)
             }
             emit(Unit)
         }.flowOn(Dispatchers.IO)

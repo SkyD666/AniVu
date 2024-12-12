@@ -21,6 +21,10 @@ open class GroupVo(
         return GroupBean(groupId, name, null, null, isExpanded = isExpanded)
     }
 
+    override fun toString(): String {
+        return "groupId: $groupId, name: $name, isExpanded: $isExpanded"
+    }
+
     object DefaultGroup :
         GroupVo(
             DEFAULT_GROUP_ID,

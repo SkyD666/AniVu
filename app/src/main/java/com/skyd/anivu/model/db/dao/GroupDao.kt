@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.group.GROUP_TABLE_NAME
 import com.skyd.anivu.model.bean.group.GroupBean
+import com.skyd.anivu.model.bean.group.GroupVo
 import com.skyd.anivu.model.bean.group.GroupWithFeedBean
 import com.skyd.anivu.model.repository.feed.tryDeleteFeedIconFile
 import dagger.hilt.EntryPoint
@@ -142,7 +143,13 @@ interface GroupDao {
         newPreviousGroupId: String? = null,
         newNextGroupId: String? = null,
     ): Boolean {
-        if (groupId == newPreviousGroupId ||
+        if (groupId == GroupVo.DEFAULT_GROUP_ID ||
+            newPreviousGroupId == GroupVo.DEFAULT_GROUP_ID ||
+            newNextGroupId == GroupVo.DEFAULT_GROUP_ID ||
+            containsById(groupId) == 0 ||
+            newPreviousGroupId != null && containsById(newPreviousGroupId) == 0 ||
+            newNextGroupId != null && containsById(newNextGroupId) == 0 ||
+            groupId == newPreviousGroupId ||
             groupId == newNextGroupId ||
             newPreviousGroupId != null && newPreviousGroupId == newNextGroupId
         ) {
@@ -193,6 +200,10 @@ interface GroupDao {
     @Transaction
     @Query("SELECT COUNT(*) FROM `$GROUP_TABLE_NAME` WHERE ${GroupBean.NAME_COLUMN} LIKE :name")
     fun containsByName(name: String): Int
+
+    @Transaction
+    @Query("SELECT COUNT(*) FROM `$GROUP_TABLE_NAME` WHERE ${GroupBean.GROUP_ID_COLUMN} LIKE :groupId")
+    fun containsById(groupId: String): Int
 
     @Transaction
     @Query(

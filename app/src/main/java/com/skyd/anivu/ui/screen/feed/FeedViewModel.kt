@@ -202,7 +202,7 @@ class FeedViewModel @Inject constructor(
                     .catchMap { FeedPartialStateChange.CreateGroup.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.ChangeGroupExpanded>().flatMapConcat { intent ->
-                feedRepo.changeGroupExpanded(intent.group, intent.expanded).map {
+                feedRepo.changeGroupExpanded(intent.group.groupId, intent.expanded).map {
                     FeedPartialStateChange.GroupExpandedChanged.Success
                 }.catchMap<FeedPartialStateChange.GroupExpandedChanged> {
                     FeedPartialStateChange.GroupExpandedChanged.Failed(it.message.toString())
