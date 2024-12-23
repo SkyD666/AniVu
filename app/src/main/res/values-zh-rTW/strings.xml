@@ -361,6 +361,8 @@
     <string name="player_notification_channel_name">Player</string>
     <string name="player_notification_channel_description">Player controller</string>
     <string name="player_config_screen_background_play">Background playback</string>
+    <string name="expend">Expand</string>
+    <string name="collapse">Collapse</string>
     <plurals name="feed_screen_read_all_result">
         <item quantity="other">已讀 %d 項</item>
     </plurals>
