@@ -95,6 +95,7 @@ android {
         create("benchmark") {
             initWith(buildTypes.getByName("release"))
             matchingFallbacks += listOf("release")
+            isMinifyEnabled = false
             isDebuggable = false
             applicationIdSuffix = ".benchmark"
         }
@@ -173,6 +174,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.runtime.tracing)
     implementation(libs.androidx.compose.material)
     implementation(libs.androidx.compose.icons)
     implementation(libs.androidx.compose.material3)
@@ -184,6 +186,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.paging)
     implementation(libs.androidx.junit.ktx)
+    implementation(libs.androidx.test.rules)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.datastore.preferences)
@@ -244,4 +247,6 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.paging.test)
+    androidTestImplementation(libs.androidx.work.test)
+    androidTestImplementation(libs.androidx.test.rules)
 }

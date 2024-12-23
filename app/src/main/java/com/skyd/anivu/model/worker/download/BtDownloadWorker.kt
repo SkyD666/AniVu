@@ -335,7 +335,7 @@ class BtDownloadWorker(context: Context, parameters: WorkerParameters) :
     private fun onAlert(continuation: CancellableContinuation<Unit>, alert: Alert<*>) {
         when (alert) {
             is SaveResumeDataAlert -> {
-                serializeResumeData(id.toString(), alert)
+                serializeResumeData(id.toString(), alert.params())
             }
 
             is TorrentErrorAlert -> {

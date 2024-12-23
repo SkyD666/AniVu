@@ -2,26 +2,30 @@
 adaptive = "1.0.0"
 coil = "3.0.4"
 hilt = "2.53"
+androidxTest = "1.2.1"
 libtorrent4j = "2.1.0-35"
-composeMaterial = "1.7.5"
+composeMaterial = "1.7.6"
 composeMaterial3 = "1.4.0-alpha04"
+coroutines = "1.9.0"
 okhttp3 = "4.12.0"
 paging = "3.3.5"
 rome = "2.1.0"
 room = "2.6.1"
+tracingPerfetto = "1.0.0"
+worker = "2.10.0"
 kotlin = "2.0.21"
 agp = "8.7.3"
 
 [libraries]
-
 androidx-core-ktx = { module = "androidx.core:core-ktx", version = "1.15.0" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version = "1.7.0" }
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version = "1.9.3" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version = "1.1.0" }
 androidx-media = { module = "androidx.media:media", version = "1.7.0" }
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version = "2.8.4" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version = "2.8.5" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version = "2.8.7" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "composeMaterial" }
+androidx-compose-runtime-tracing = { module = "androidx.compose.runtime:runtime-tracing", version = "1.7.6" }
 androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "composeMaterial" }
 androidx-compose-icons = { module = "androidx.compose.material:material-icons-extended", version.ref = "composeMaterial" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "composeMaterial3" }
@@ -33,7 +37,9 @@ androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
-androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version = "2.10.0" }
+androidx-tracing-perfetto = { module = "androidx.tracing:tracing-perfetto", version.ref = "tracingPerfetto" }
+androidx-tracing-perfetto-binary = { module = "androidx.tracing:tracing-perfetto-binary", version.ref = "tracingPerfetto" }
+androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "worker" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version = "1.1.1" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version = "1.0.1" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging" }
@@ -53,7 +59,7 @@ okhttp3-logging = { module = "com.squareup.okhttp3:logging-interceptor", version
 retrofit2 = { module = "com.squareup.retrofit2:retrofit", version = "2.11.0" }
 retrofit2-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version = "1.0.0" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.7.3" }
-kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version = "1.9.0" }
+kotlinx-coroutines-guava = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-guava", version.ref = "coroutines" }
 
 aniyomi-mpv-lib = { module = "com.github.aniyomiorg:aniyomi-mpv-lib", version = "1.15.n" }
 ffmpeg-kit = { module = "com.github.jmir1:ffmpeg-kit", version = "1.15" }
@@ -80,15 +86,17 @@ libtorrent4j-x86 = { module = "org.libtorrent4j:libtorrent4j-android-x86", versi
 libtorrent4j-x8664 = { module = "org.libtorrent4j:libtorrent4j-android-x86_64", version.ref = "libtorrent4j" }
 
 junit = { module = "junit:junit", version = "4.13.2" }
-androidx-junit = { module = "androidx.test.ext:junit", version = "1.2.1" }
-androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version = "1.2.1" }
+androidx-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTest" }
+androidx-junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "androidxTest" }
 mockito-core = { module = "org.mockito:mockito-core", version = "5.14.2" }
 mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version = "5.4.0" }
 androidx-espresso-core = { module = "androidx.test.espresso:espresso-core", version = "3.6.1" }
-androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version = "2.3.0" }
-androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version = "1.3.3" }
+androidx-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version = "2.3.0" }
+androidx-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version = "1.2.0" }
 androidx-paging-test = { module = "androidx.paging:paging-testing", version.ref = "paging" }
-kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version = "1.9.0" }
+androidx-work-test = { module = "androidx.work:work-testing", version.ref = "worker" }
+androidx-test-rules = { module = "androidx.test:rules", version = "1.6.1" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 
 [plugins]
 android-application = { id = "com.android.application", version = "8.7.3" }

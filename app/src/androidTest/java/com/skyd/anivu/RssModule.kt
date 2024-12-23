@@ -8,7 +8,6 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.skyd.anivu.base.mvi.mviViewModelNeedMainThread
 import com.skyd.anivu.config.Const
 import com.skyd.anivu.model.bean.article.ARTICLE_TABLE_NAME
 import com.skyd.anivu.model.bean.article.ArticleBean
@@ -47,7 +46,7 @@ import java.util.UUID
 
 
 /**
- * Example local unit test, which will execute on the development machine (host).
+ * Instrumented test, which will execute on an Android device.
  *
  * See [testing documentation](http://d.android.com/tools/testing).
  */
@@ -867,10 +866,10 @@ class RssModule {
 
     @Before
     fun init() {
-        mviViewModelNeedMainThread = false
-
         val context = ApplicationProvider.getApplicationContext<Context>()
         db = AppDatabase.getInstance(context)
+        db.clearAllTables()
+
         groupDao = db.groupDao()
         feedDao = db.feedDao()
         articleDao = db.articleDao()

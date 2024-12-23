@@ -1,6 +1,5 @@
 package com.skyd.macrobenchmark
 
-import androidx.benchmark.macro.CompilationMode
 import androidx.benchmark.macro.StartupMode
 import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
@@ -22,18 +21,35 @@ import org.junit.runner.RunWith
  * for investigating your app's performance.
  */
 @RunWith(AndroidJUnit4::class)
-class ExampleStartupBenchmark {
+class StartupBenchmark {
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
     @Test
-    fun startup() = benchmarkRule.measureRepeated(
+    fun coldStartup() = benchmarkRule.measureRepeated(
         packageName = "com.skyd.anivu.benchmark",
         metrics = listOf(StartupTimingMetric()),
         iterations = 5,
-        startupMode = StartupMode.COLD
+        startupMode = StartupMode.COLD,
+        setupBlock = {
+            allowManageFiles()
+            pressHome()
+        },
     ) {
-        pressHome()
+        startActivityAndWait()
+    }
+
+    @Test
+    fun hotStartup() = benchmarkRule.measureRepeated(
+        packageName = "com.skyd.anivu.benchmark",
+        metrics = listOf(StartupTimingMetric()),
+        iterations = 5,
+        startupMode = StartupMode.HOT,
+        setupBlock = {
+            allowManageFiles()
+            pressHome()
+        },
+    ) {
         startActivityAndWait()
     }
 }

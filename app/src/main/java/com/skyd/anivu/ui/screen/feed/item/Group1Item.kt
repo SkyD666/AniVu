@@ -16,8 +16,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.skyd.anivu.R
 import com.skyd.anivu.model.bean.group.GroupVo
 import com.skyd.anivu.model.bean.group.GroupVo.Companion.isDefaultGroup
 import com.skyd.anivu.ui.component.AniVuIconButton
@@ -79,7 +81,7 @@ fun Group1Item(
         AniVuIconButton(
             onClick = { onExpandChange(data, !isExpanded) },
             imageVector = Icons.Outlined.KeyboardArrowUp,
-            contentDescription = null,
+            contentDescription = stringResource(if (isExpanded) R.string.collapse else R.string.expend),
             rotate = expandIconRotate,
         )
     }

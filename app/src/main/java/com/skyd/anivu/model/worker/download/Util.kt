@@ -23,11 +23,11 @@ import com.skyd.anivu.model.preference.proxy.UseProxyPreference
 import com.skyd.anivu.model.repository.download.bt.BtDownloadManager
 import com.skyd.anivu.model.repository.download.bt.BtDownloadManagerIntent
 import kotlinx.coroutines.runBlocking
+import org.libtorrent4j.AddTorrentParams
 import org.libtorrent4j.FileStorage
 import org.libtorrent4j.SettingsPack
 import org.libtorrent4j.TorrentStatus
 import org.libtorrent4j.Vectors
-import org.libtorrent4j.alerts.SaveResumeDataAlert
 import org.libtorrent4j.swig.add_torrent_params
 import org.libtorrent4j.swig.error_code
 import org.libtorrent4j.swig.libtorrent
@@ -293,10 +293,10 @@ internal fun addNewDownloadInfoToDbIfNotExists(
     )
 }
 
-fun serializeResumeData(name: String, alert: SaveResumeDataAlert) {
+fun serializeResumeData(name: String, params: AddTorrentParams) {
     val resume = File(Const.TORRENT_RESUME_DATA_DIR, name)
     if (!resume.exists()) resume.createNewFile()
-    val data = libtorrent.write_resume_data(alert.params().swig()).bencode()
+    val data = libtorrent.write_resume_data(params.swig()).bencode()
     try {
         FileOutputStream(resume).use { it.write(Vectors.byte_vector2bytes(data)) }
     } catch (e: IOException) {

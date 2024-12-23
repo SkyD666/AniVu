@@ -214,17 +214,17 @@ private fun IconArea() {
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
             contentDescription = null
         )
-        val c = Calendar.getInstance()
-        val month = c.get(Calendar.MONTH)
-        val day = c.get(Calendar.DAY_OF_MONTH)
+        val c = remember { Calendar.getInstance() }
+        val month = remember(c) { c.get(Calendar.MONTH) }
+        val day = remember(c) { c.get(Calendar.DAY_OF_MONTH) }
         if (month == Calendar.DECEMBER && (day in 22..28)) {     // Xmas
             Image(
                 modifier = Modifier
                     .fillMaxWidth(0.67f)
                     .aspectRatio(1f)
-                    .rotate(20f)
-                    .padding(start = 17.dp)
-                    .align(Alignment.TopStart),
+                    .rotate(15f)
+                    .padding(end = 10.dp)
+                    .align(Alignment.TopEnd),
                 painter = painterResource(R.drawable.ic_santa_hat),
                 contentDescription = null,
             )

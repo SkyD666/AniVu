@@ -165,6 +165,7 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                     onClick = {
                         openEditGroupDialog = uiState.groups[pagerState.currentPage].first
                     },
+                    contentDescription = stringResource(R.string.edit),
                 ) {
                     Icon(imageVector = Icons.Outlined.Edit, contentDescription = null)
                 }

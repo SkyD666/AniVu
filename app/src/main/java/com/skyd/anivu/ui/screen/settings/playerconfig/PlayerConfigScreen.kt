@@ -341,6 +341,7 @@ internal fun MaxCacheSizeDialog(
                     modifier = Modifier.align(Alignment.CenterEnd),
                     onClick = { value = defaultValue() },
                     imageVector = Icons.Outlined.Restore,
+                    contentDescription = stringResource(R.string.reset),
                 )
             }
         },

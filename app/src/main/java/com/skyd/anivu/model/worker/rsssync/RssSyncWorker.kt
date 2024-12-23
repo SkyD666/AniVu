@@ -9,7 +9,6 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
 
@@ -28,13 +27,14 @@ class RssSyncWorker(context: Context, parameters: WorkerParameters) :
     )
 
     override suspend fun doWork(): Result {
-        coroutineScope {
-            runCatching {
-                hiltEntryPoint.articleRepo.refreshArticleList(hiltEntryPoint.feedDao.getAllFeedUrl())
-                    .catch { it.printStackTrace() }.collect()
-            }
-        }
-        return Result.success()
+        var hasError = false
+        hiltEntryPoint.articleRepo
+            .refreshArticleList(hiltEntryPoint.feedDao.getAllFeedUrl())
+            .catch {
+                hasError = true
+                it.printStackTrace()
+            }.collect()
+        return if (hasError) Result.failure() else Result.success()
     }
 
     companion object {

@@ -40,7 +40,7 @@ class DownloadRepository @Inject constructor() : BaseRepository() {
         return DownloadManager.getInstance(appContext).downloadInfoListFlow
     }
 
-    suspend fun deleteDownloadTaskInfo(
+    suspend fun deleteBtDownloadTaskInfo(
         link: String,
     ): Flow<Unit> {
         return flow {

@@ -9,6 +9,7 @@ import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.MediaGroupBean.Companion.isDefaultGroup
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.serialization.EncodeDefault
@@ -27,7 +28,7 @@ class MediaRepository @Inject constructor(
     companion object {
         private const val FOLDER_INFO_JSON_NAME = "info.json"
         private const val OLD_MEDIA_LIB_JSON_NAME = "group.json"
-        private const val MEDIA_LIB_JSON_NAME = "MediaLib.json"
+        const val MEDIA_LIB_JSON_NAME = "MediaLib.json"
 
         private val mediaLibJsons = LruCache<String, MediaLibJson>(maxSize = 5)
     }
@@ -70,7 +71,12 @@ class MediaRepository @Inject constructor(
     }
 
     private fun writeMediaLibJson(path: String, data: MediaLibJson) {
-        File(path, MEDIA_LIB_JSON_NAME).outputStream().use { outputStream ->
+        File(path, MEDIA_LIB_JSON_NAME).apply {
+            if (!exists()) {
+                getParentFile()?.mkdirs()
+                createNewFile()
+            }
+        }.outputStream().use { outputStream ->
             json.encodeToStream(formatMediaLibJson(data), outputStream)
         }
     }
@@ -149,9 +155,10 @@ class MediaRepository @Inject constructor(
         return flow {
             val path = file.parentFile!!.path
             val mediaLibJson = getOrReadMediaLibJson(path)
-            val newFile = File(file.parentFile, newName.validateFileName())
+            val validateFileName = newName.validateFileName()
+            val newFile = File(file.parentFile, validateFileName)
             if (file.renameTo(newFile)) {
-                mediaLibJson.files.firstOrNull { it.fileName == file.name }?.fileName = newName
+                mediaLibJson.files.firstOrNull { it.fileName == file.name }?.fileName = validateFileName
                 writeMediaLibJson(path = path, mediaLibJson)
                 emit(newFile)
             } else {
@@ -179,6 +186,10 @@ class MediaRepository @Inject constructor(
             return@flow
         }
         val mediaLibJson = getOrReadMediaLibJson(path = path)
+        if (mediaLibJson.allGroups.contains(group.name)) {
+            emit(Unit)
+            return@flow
+        }
         mediaLibJson.allGroups.add(group.name)
         writeMediaLibJson(path = path, mediaLibJson)
 
@@ -231,11 +242,14 @@ class MediaRepository @Inject constructor(
         mediaBean: MediaBean,
         group: MediaGroupBean,
     ): Flow<Unit> = flow {
-        val mediaLibJson = getOrReadMediaLibJson(path = path)
+        var mediaLibJson = getOrReadMediaLibJson(path = path)
+        if (!group.isDefaultGroup() && !mediaLibJson.allGroups.contains(group.name)) {
+            createGroup(path, group).first()
+            mediaLibJson = getOrReadMediaLibJson(path = path)
+        }
         val index = mediaLibJson.files.indexOfFirst { it.fileName == mediaBean.file.name }
         if (index >= 0) {
-            mediaLibJson.files[index].groupName =
-                if (group.isDefaultGroup()) null else group.name
+            mediaLibJson.files[index].groupName = if (group.isDefaultGroup()) null else group.name
         } else {
             if (!group.isDefaultGroup()) {
                 mediaLibJson.files.add(
@@ -258,7 +272,11 @@ class MediaRepository @Inject constructor(
         from: MediaGroupBean,
         to: MediaGroupBean
     ): Flow<Unit> = flow {
-        val mediaLibJson = getOrReadMediaLibJson(path = path)
+        var mediaLibJson = getOrReadMediaLibJson(path = path)
+        if (!to.isDefaultGroup() && !mediaLibJson.allGroups.contains(to.name)) {
+            createGroup(path, to).first()
+            mediaLibJson = getOrReadMediaLibJson(path = path)
+        }
         if (from.isDefaultGroup()) {
             if (to.isDefaultGroup()) {
                 emit(Unit)

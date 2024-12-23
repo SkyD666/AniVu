@@ -95,41 +95,40 @@ class ArticleRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    fun refreshArticleList(feedUrls: List<String>): Flow<Unit> {
-        return flow {
-            emit(coroutineScope {
-                val requests = mutableListOf<Deferred<Unit>>()
-                feedUrls.forEach { feedUrl ->
-                    requests += async {
-                        val articleBeanList = runCatching {
-                            rssHelper.queryRssXml(
-                                feed = feedDao.getFeed(feedUrl),
-                                latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link,
-                            )?.also { feedWithArticle ->
-                                feedDao.updateFeed(feedWithArticle.feed)
-                            }?.articles
-                        }.onFailure { e ->
-                            if (e !is CancellationException) {
-                                e.printStackTrace()
-                                (feedUrl + "\n" + e.message).showToast()
-                            }
-                        }.getOrNull()
+    fun refreshArticleList(feedUrls: List<String>): Flow<Unit> = flow {
+        coroutineScope {
+            val requests = mutableListOf<Deferred<Unit>>()
+            feedUrls.forEach { feedUrl ->
+                requests += async {
+                    val articleBeanList = runCatching {
+                        rssHelper.queryRssXml(
+                            feed = feedDao.getFeed(feedUrl),
+                            latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link,
+                        )?.also { feedWithArticle ->
+                            feedDao.updateFeed(feedWithArticle.feed)
+                        }?.articles
+                    }.onFailure { e ->
+                        if (e !is CancellationException) {
+                            e.printStackTrace()
+                            (feedUrl + "\n" + e.message).showToast()
+                        }
+                    }.getOrNull()
 
-                        if (articleBeanList.isNullOrEmpty()) return@async
+                    if (articleBeanList.isNullOrEmpty()) return@async
 
-                        articleDao.insertListIfNotExist(articleBeanList.map { articleWithEnclosure ->
-                            if (articleWithEnclosure.article.feedUrl != feedUrl) {
-                                articleWithEnclosure.copy(
-                                    article = articleWithEnclosure.article.copy(feedUrl = feedUrl)
-                                )
-                            } else articleWithEnclosure
-                        })
-                    }
+                    articleDao.insertListIfNotExist(articleBeanList.map { articleWithEnclosure ->
+                        if (articleWithEnclosure.article.feedUrl != feedUrl) {
+                            articleWithEnclosure.copy(
+                                article = articleWithEnclosure.article.copy(feedUrl = feedUrl)
+                            )
+                        } else articleWithEnclosure
+                    })
                 }
-                requests.forEach { it.await() }
-            })
-        }.flowOn(Dispatchers.IO)
-    }
+            }
+            requests.forEach { it.await() }
+            emit(Unit)
+        }
+    }.flowOn(Dispatchers.IO)
 
     fun favoriteArticle(articleId: String, favorite: Boolean): Flow<Unit> {
         return flow {

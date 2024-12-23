@@ -220,7 +220,7 @@ object BtDownloadManager {
             worker.getWorkInfoByIdFlow(requestUuid)
                 .filter { it == null || it.state.isFinished }
                 .flatMapConcat {
-                    BtDownloadWorker.hiltEntryPoint.downloadRepository.deleteDownloadTaskInfo(
+                    BtDownloadWorker.hiltEntryPoint.downloadRepository.deleteBtDownloadTaskInfo(
                         link = link
                     )
                 }.take(1)
