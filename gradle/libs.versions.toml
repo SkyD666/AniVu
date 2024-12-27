@@ -1,12 +1,12 @@
 [versions]
 adaptive = "1.0.0"
 coil = "3.0.4"
-hilt = "2.53"
+hilt = "2.54"
 androidxTest = "1.2.1"
 libtorrent4j = "2.1.0-35"
 composeMaterial = "1.7.6"
 composeMaterial3 = "1.4.0-alpha04"
-coroutines = "1.9.0"
+coroutines = "1.10.1"
 okhttp3 = "4.12.0"
 paging = "3.3.5"
 rome = "2.1.0"
@@ -48,7 +48,7 @@ androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstall
 
 material = { module = "com.google.android.material:material", version = "1.12.0" }
 material-kolor = { module = "com.materialkolor:material-kolor", version = "2.0.0" }
-accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version = "0.36.0" }
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version = "0.37.0" }
 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
@@ -70,7 +70,7 @@ coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coil" }
 coil-svg = { module = "io.coil-kt.coil3:coil-svg", version.ref = "coil" }
 coil-video = { module = "io.coil-kt.coil3:coil-video", version.ref = "coil" }
 
-lottie-compose = { module = "com.airbnb.android:lottie-compose", version = "6.6.1" }
+lottie-compose = { module = "com.airbnb.android:lottie-compose", version = "6.6.2" }
 
 rome = { module = "com.rometools:rome", version.ref = "rome" }
 rome-modules = { module = "com.rometools:rome-modules", version.ref = "rome" }
@@ -78,7 +78,7 @@ ceau-opmlparser = { module = "be.ceau:opml-parser", version = "3.1.0" }
 
 readability4j = { module = "net.dankito.readability4j:readability4j", version = "1.0.8" }
 
-reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.4.0" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version = "2.4.2" }
 
 libtorrent4j-arm64 = { module = "org.libtorrent4j:libtorrent4j-android-arm64", version.ref = "libtorrent4j" }
 libtorrent4j-arm = { module = "org.libtorrent4j:libtorrent4j-android-arm", version.ref = "libtorrent4j" }

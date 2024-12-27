@@ -1,6 +1,7 @@
 package com.skyd.anivu.ui.screen.media.list
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.OpenInNew
@@ -144,7 +145,6 @@ fun Media1Item(
         Spacer(modifier = Modifier.width(10.dp))
         Column {
             Text(
-                modifier = Modifier.wrapContentHeight(),
                 text = if (data.displayName.isNullOrBlank()) {
                     fileNameWithoutExtension
                 } else {
@@ -156,21 +156,29 @@ fun Media1Item(
             Spacer(modifier = Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (fileExtension.isNotBlank()) {
-                    TagText(text = fileExtension.uppercase(Locale.getDefault()))
+                    TagText(text = remember(fileExtension) { fileExtension.uppercase(Locale.getDefault()) })
                     Spacer(modifier = Modifier.width(12.dp))
                 } else if (data.isDir) {
                     TagText(text = stringResource(id = R.string.folder))
                 }
                 if (!data.isDir) {
                     Text(
-                        text = data.size.fileSize(context),
+                        modifier = Modifier
+                            .basicMarquee()
+                            .widthIn(min = 40.dp),
+                        text = remember(data) { data.size.fileSize(context) },
                         style = MaterialTheme.typography.labelMedium,
+                        maxLines = 1,
                     )
                 }
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
-                    text = data.date.toDateTimeString(context = context),
+                    modifier = Modifier
+                        .basicMarquee()
+                        .widthIn(min = 40.dp),
+                    text = remember(data) { data.date.toDateTimeString(context = context) },
                     style = MaterialTheme.typography.labelMedium,
+                    maxLines = 1,
                 )
             }
 
