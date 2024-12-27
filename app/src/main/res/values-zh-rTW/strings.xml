@@ -363,9 +363,10 @@
     <string name="player_config_screen_background_play">Background playback</string>
     <string name="expend">Expand</string>
     <string name="collapse">Collapse</string>
-    <plurals name="feed_screen_read_all_result">
-        <item quantity="other">已讀 %d 項</item>
-    </plurals>
+    <string name="feed_number_badge_unread">Unread</string>
+    <string name="feed_number_badge_all">All</string>
+    <string name="feed_style_screen_number_badge">Number badge</string>
+    <string name="feed_number_badge_unread_all"><![CDATA[Unread & All]]></string>
     <plurals name="import_opml_result">
         <item quantity="other">匯入 %d 項, 耗時 %.2f 秒</item>
     </plurals>
