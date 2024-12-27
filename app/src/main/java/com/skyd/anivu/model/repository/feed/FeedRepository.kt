@@ -10,7 +10,7 @@ import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.isLocal
 import com.skyd.anivu.ext.isNetwork
 import com.skyd.anivu.ext.put
-import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.bean.group.GroupVo
 import com.skyd.anivu.model.db.dao.ArticleDao
 import com.skyd.anivu.model.db.dao.FeedDao
@@ -35,29 +35,25 @@ class FeedRepository @Inject constructor(
     private val reorderGroupRepository: ReorderGroupRepository,
     private val rssHelper: RssHelper,
 ) : BaseRepository() {
-    fun requestGroupAnyList(): Flow<List<Any>> {
-        return combine(
-            groupDao.getGroupWithFeeds(),
-            groupDao.getGroupIds(),
-        ) { groupList, groupIds ->
-            groupList to feedDao.getFeedsNotIn(groupIds)
-        }.map { (groupList, defaultFeeds) ->
-            mutableListOf<Any>().apply {
-                add(GroupVo.DefaultGroup)
-                addAll(defaultFeeds)
-                reorderGroupRepository.sortGroupWithFeed(groupList).forEach { group ->
-                    add(group.group.toVo())
-                    addAll(group.feeds)
-                }
+    fun requestGroupAnyList(): Flow<List<Any>> = combine(
+        groupDao.getGroupWithFeeds(),
+        groupDao.getGroupIds(),
+    ) { groupList, groupIds ->
+        groupList to feedDao.getFeedsNotInGroup(groupIds)
+    }.map { (groupList, defaultFeeds) ->
+        mutableListOf<Any>().apply {
+            add(GroupVo.DefaultGroup)
+            addAll(defaultFeeds)
+            reorderGroupRepository.sortGroupWithFeed(groupList).forEach { group ->
+                add(group.group.toVo())
+                addAll(group.feeds)
             }
-        }.flowOn(Dispatchers.IO)
-    }
-
-    suspend fun clearGroupArticles(groupId: String): Flow<Int> {
-        return flow {
-            val realGroupId = if (groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
-            emit(articleDao.deleteArticlesInGroup(realGroupId))
         }
+    }.flowOn(Dispatchers.IO)
+
+    fun clearGroupArticles(groupId: String): Flow<Int> = flow {
+        val realGroupId = if (groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
+        emit(articleDao.deleteArticlesInGroup(realGroupId))
     }
 
     suspend fun deleteGroup(groupId: String): Flow<Int> {
@@ -65,7 +61,7 @@ class FeedRepository @Inject constructor(
         else flowOf(groupDao.removeGroupWithFeed(groupId)).flowOn(Dispatchers.IO)
     }
 
-    suspend fun renameGroup(groupId: String, name: String): Flow<GroupVo> {
+    fun renameGroup(groupId: String, name: String): Flow<GroupVo> {
         return if (groupId == GroupVo.DEFAULT_GROUP_ID) flow {
             emit(GroupVo.DefaultGroup)
         } else flow {
@@ -81,83 +77,91 @@ class FeedRepository @Inject constructor(
             .flowOn(Dispatchers.IO)
     }
 
-    suspend fun setFeed(
+    fun getFeedViewsByUrls(urls: List<String>) = flow {
+        emit(feedDao.getFeedsIn(urls))
+    }.flowOn(Dispatchers.IO)
+
+    fun getFeedViewsByGroupId(groupId: String?) = flow {
+        emit(feedDao.getFeedsByGroupId(groupId))
+    }.flowOn(Dispatchers.IO)
+
+    fun setFeed(
         url: String,
         groupId: String?,
         nickname: String?,
-    ): Flow<FeedBean> {
-        return flow {
-            val realNickname = if (nickname.isNullOrBlank()) null else nickname
-            val realGroupId =
-                if (groupId.isNullOrBlank() || groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
-            val feedWithArticleBean = rssHelper.searchFeed(url = url).run {
-                copy(
-                    feed = feed.copy(
-                        groupId = realGroupId,
-                        nickname = realNickname,
-                    )
+    ): Flow<FeedViewBean> = flow {
+        val realNickname = if (nickname.isNullOrBlank()) null else nickname
+        val realGroupId =
+            if (groupId.isNullOrBlank() || groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
+        val feedWithArticleBean = rssHelper.searchFeed(url = url).run {
+            copy(
+                feed = feed.copy(
+                    groupId = realGroupId,
+                    nickname = realNickname,
                 )
-            }
-            feedDao.setFeedWithArticle(feedWithArticleBean)
-            emit(feedWithArticleBean.feed)
-        }.flowOn(Dispatchers.IO)
-    }
+            )
+        }
+        feedDao.setFeedWithArticle(feedWithArticleBean)
+        emit(feedDao.getFeed(url))
+    }.flowOn(Dispatchers.IO)
 
-    suspend fun editFeedUrl(
+    fun editFeedUrl(
         oldUrl: String,
         newUrl: String,
-    ): Flow<FeedBean> = flow {
+    ): Flow<FeedViewBean> = flow {
         val oldFeed = feedDao.getFeed(oldUrl)
         var newFeed = oldFeed
         if (oldUrl != newUrl) {
             val feedWithArticleBean = rssHelper.searchFeed(url = newUrl).run {
-                newFeed = feed.copy(
-                    groupId = oldFeed.groupId,
-                    nickname = oldFeed.nickname,
-                    customDescription = oldFeed.customDescription,
-                    customIcon = oldFeed.customIcon,
+                copy(
+                    feed = feed.copy(
+                        groupId = oldFeed.feed.groupId,
+                        nickname = oldFeed.feed.nickname,
+                        customDescription = oldFeed.feed.customDescription,
+                        customIcon = oldFeed.feed.customIcon,
+                    )
                 )
-                copy(feed = newFeed)
             }
             feedDao.removeFeed(oldUrl)
             feedDao.setFeedWithArticle(feedWithArticleBean)
+            newFeed = feedDao.getFeed(newUrl)
         }
         emit(newFeed)
     }.flowOn(Dispatchers.IO)
 
-    suspend fun editFeedNickname(
+    fun editFeedNickname(
         url: String,
         nickname: String?,
-    ): Flow<FeedBean> = flow {
+    ): Flow<FeedViewBean> = flow {
         val realNickname = if (nickname.isNullOrBlank()) null else nickname
-        feedDao.updateFeed(feedDao.getFeed(url).copy(nickname = realNickname))
+        feedDao.updateFeed(feedDao.getFeed(url).feed.copy(nickname = realNickname))
         emit(feedDao.getFeed(url))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun editFeedGroup(
+    fun editFeedGroup(
         url: String,
         groupId: String?,
-    ): Flow<FeedBean> = flow {
+    ): Flow<FeedViewBean> = flow {
         val realGroupId =
             if (groupId.isNullOrBlank() || groupId == GroupVo.DEFAULT_GROUP_ID) null
             else groupId
 
-        feedDao.updateFeed(feedDao.getFeed(url).copy(groupId = realGroupId))
+        feedDao.updateFeed(feedDao.getFeed(url).feed.copy(groupId = realGroupId))
         emit(feedDao.getFeed(url))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun editFeedCustomDescription(
+    fun editFeedCustomDescription(
         url: String,
         customDescription: String?,
-    ): Flow<FeedBean> = flow {
-        feedDao.updateFeed(feedDao.getFeed(url).copy(customDescription = customDescription))
+    ): Flow<FeedViewBean> = flow {
+        feedDao.updateFeed(feedDao.getFeed(url).feed.copy(customDescription = customDescription))
         emit(feedDao.getFeed(url))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun editFeedCustomIcon(
+    fun editFeedCustomIcon(
         url: String,
         customIcon: Uri?,
-    ): Flow<FeedBean> = flow {
+    ): Flow<FeedViewBean> = flow {
         var filePath: String? = null
         if (customIcon != null) {
             if (customIcon.isLocal()) {
@@ -171,43 +175,39 @@ class FeedRepository @Inject constructor(
             }
         }
         val oldFeed = feedDao.getFeed(url)
-        oldFeed.customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
-        feedDao.updateFeed(oldFeed.copy(customIcon = filePath))
+        oldFeed.feed.customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
+        feedDao.updateFeed(oldFeed.feed.copy(customIcon = filePath))
         emit(feedDao.getFeed(url))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun editFeedSortXmlArticlesOnUpdate(
+    fun editFeedSortXmlArticlesOnUpdate(
         url: String,
         sort: Boolean,
-    ): Flow<FeedBean> = flow {
+    ): Flow<FeedViewBean> = flow {
         feedDao.updateFeedSortXmlArticlesOnUpdate(feedUrl = url, sort = sort)
         emit(feedDao.getFeed(url))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun removeFeed(url: String): Flow<Int> {
+    fun removeFeed(url: String): Flow<Int> {
         return flow {
-            feedDao.getFeed(url).customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
+            feedDao.getFeed(url).feed.customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
             emit(feedDao.removeFeed(url))
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun clearFeedArticles(url: String): Flow<Int> {
-        return flow {
-            emit(articleDao.deleteArticleInFeed(url))
-        }.flowOn(Dispatchers.IO)
-    }
+    fun clearFeedArticles(url: String): Flow<Int> = flow {
+        emit(articleDao.deleteArticleInFeed(url))
+    }.flowOn(Dispatchers.IO)
 
-    suspend fun createGroup(group: GroupVo): Flow<Unit> {
-        return flow {
-            if (groupDao.containsByName(group.name) == 0) {
-                emit(groupDao.setGroup(group.toPo()))
-            } else {
-                emit(Unit)
-            }
-        }.flowOn(Dispatchers.IO)
-    }
+    fun createGroup(group: GroupVo): Flow<Unit> = flow {
+        if (groupDao.containsByName(group.name) == 0) {
+            emit(groupDao.setGroup(group.toPo()))
+        } else {
+            emit(Unit)
+        }
+    }.flowOn(Dispatchers.IO)
 
-    suspend fun changeGroupExpanded(groupId: String?, expanded: Boolean): Flow<Unit> {
+    fun changeGroupExpanded(groupId: String?, expanded: Boolean): Flow<Unit> {
         return flow {
             if (groupId == null || groupId == GroupVo.DEFAULT_GROUP_ID) {
                 appContext.dataStore.put(
@@ -221,18 +221,14 @@ class FeedRepository @Inject constructor(
         }.flowOn(Dispatchers.IO)
     }
 
-    suspend fun readAllInGroup(groupId: String?): Flow<Int> {
-        return flow {
-            val realGroupId = if (groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
-            emit(articleDao.readAllInGroup(realGroupId))
-        }.flowOn(Dispatchers.IO)
-    }
+    fun readAllInGroup(groupId: String?): Flow<Int> = flow {
+        val realGroupId = if (groupId == GroupVo.DEFAULT_GROUP_ID) null else groupId
+        emit(articleDao.readAllInGroup(realGroupId))
+    }.flowOn(Dispatchers.IO)
 
-    suspend fun readAllInFeed(feedUrl: String): Flow<Int> {
-        return flow {
-            emit(articleDao.readAllInFeed(feedUrl))
-        }.flowOn(Dispatchers.IO)
-    }
+    fun readAllInFeed(feedUrl: String): Flow<Int> = flow {
+        emit(articleDao.readAllInFeed(feedUrl))
+    }.flowOn(Dispatchers.IO)
 }
 
 fun tryDeleteFeedIconFile(path: String?) {

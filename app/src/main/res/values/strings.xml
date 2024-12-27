@@ -370,10 +370,10 @@
     <string name="player_config_screen_background_play">Background playback</string>
     <string name="expend">Expand</string>
     <string name="collapse">Collapse</string>
-    <plurals name="feed_screen_read_all_result">
-        <item quantity="one">Read %d item</item>
-        <item quantity="other">Read %d items</item>
-    </plurals>
+    <string name="feed_number_badge_unread">Unread</string>
+    <string name="feed_number_badge_all">All</string>
+    <string name="feed_style_screen_number_badge">Number badge</string>
+    <string name="feed_number_badge_unread_all"><![CDATA[Unread & All]]></string>
     <plurals name="import_opml_result">
         <item quantity="one">Imported %d item, takes %.2f seconds</item>
         <item quantity="other">Imported %d items, takes %.2f seconds</item>

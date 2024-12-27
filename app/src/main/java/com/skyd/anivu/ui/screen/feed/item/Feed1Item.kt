@@ -9,11 +9,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Badge
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,6 +27,8 @@ import androidx.compose.ui.unit.dp
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.model.bean.feed.FeedBean
 import com.skyd.anivu.model.bean.feed.FeedViewBean
+import com.skyd.anivu.model.preference.appearance.feed.FeedNumberBadgePreference
+import com.skyd.anivu.ui.local.LocalFeedNumberBadge
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.screen.article.FeedIcon
 import com.skyd.anivu.ui.screen.article.openArticleScreen
@@ -39,7 +41,7 @@ fun Feed1Item(
     inGroup: Boolean = false,
     isEnd: Boolean = false,
     onClick: ((FeedBean) -> Unit)? = null,
-    onEdit: ((FeedBean) -> Unit)? = null,
+    onEdit: ((FeedViewBean) -> Unit)? = null,
 ) {
     val navController = LocalNavController.current
     val feed = data.feed
@@ -66,7 +68,7 @@ fun Feed1Item(
                 )
                 .combinedClickable(
                     onLongClick = if (onEdit != null) {
-                        { onEdit(feed) }
+                        { onEdit(data) }
                     } else null,
                     onClick = {
                         if (onClick == null) {
@@ -94,20 +96,7 @@ fun Feed1Item(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
-                    val feedCount = data.articleCount
-                    if (feedCount > 0) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Badge(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                            contentColor = MaterialTheme.colorScheme.outline,
-                            content = {
-                                Text(
-                                    text = feedCount.toString(),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            },
-                        )
-                    }
+                    FeedNumberBadge(data)
                 }
                 val description = rememberSaveable(feed.customDescription, feed.description) {
                     if (feed.customDescription == null) {
@@ -126,6 +115,55 @@ fun Feed1Item(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FeedNumberBadge(feedView: FeedViewBean) {
+    if (feedView.articleCount > 0) {
+        val startEndPadding = 3.dp
+        val midPadding = 2.dp
+        val feedNumberBadge = LocalFeedNumberBadge.current
+        var allCountContent: (@Composable RowScope.() -> Unit)? = null
+        var unreadCountContent: (@Composable RowScope.() -> Unit)? = null
+        val showUnread = feedNumberBadge and FeedNumberBadgePreference.UNREAD != 0
+                && feedView.unreadArticleCount > 0
+        val showAll = feedNumberBadge and FeedNumberBadgePreference.ALL != 0
+        if (showUnread) {
+            unreadCountContent = {
+                Text(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.error)
+                        .padding(
+                            start = startEndPadding,
+                            end = if (showAll) midPadding else startEndPadding,
+                        ),
+                    text = feedView.unreadArticleCount.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onError,
+                )
+            }
+        }
+        if (showAll) {
+            allCountContent = {
+                Text(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                        .padding(
+                            start = if (showUnread) midPadding else startEndPadding,
+                            end = startEndPadding,
+                        ),
+                    text = feedView.articleCount.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outline,
+                )
+            }
+        }
+        Spacer(modifier = Modifier.width(8.dp))
+        Row(modifier = Modifier.clip(RoundedCornerShape(20.dp))) {
+            unreadCountContent?.invoke(this)
+            allCountContent?.invoke(this)
         }
     }
 }

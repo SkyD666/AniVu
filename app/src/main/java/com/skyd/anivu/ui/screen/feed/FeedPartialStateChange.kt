@@ -1,6 +1,6 @@
 package com.skyd.anivu.ui.screen.feed
 
-import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.bean.group.GroupVo
 
 
@@ -26,7 +26,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data class Success(val feed: FeedBean) : AddFeed
+        data class Success(val feed: FeedViewBean) : AddFeed
         data class Failed(val msg: String) : AddFeed
     }
 
@@ -43,7 +43,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data class Success(val feed: FeedBean) : EditFeed
+        data class Success(val feed: FeedViewBean) : EditFeed
         data class Failed(val msg: String) : EditFeed
     }
 
@@ -60,7 +60,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data object Success : ClearFeedArticles
+        data class Success(val feed: FeedViewBean) : ClearFeedArticles
         data class Failed(val msg: String) : ClearFeedArticles
     }
 
@@ -94,7 +94,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data class Success(val count: Int) : ReadAll
+        data class Success(val feeds: List<FeedViewBean>) : ReadAll
         data class Failed(val msg: String) : ReadAll
     }
 
@@ -111,7 +111,7 @@ internal sealed interface FeedPartialStateChange {
             }
         }
 
-        data object Success : RefreshFeed
+        data class Success(val feeds: List<FeedViewBean>) : RefreshFeed
         data class Failed(val msg: String) : RefreshFeed
     }
 

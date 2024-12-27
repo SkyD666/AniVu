@@ -139,17 +139,16 @@ interface FeedDao {
     fun getFeedPagingSource(): PagingSource<Int, FeedBean>
 
     @Transaction
-    @Query("SELECT * FROM $FEED_TABLE_NAME WHERE ${FeedBean.URL_COLUMN} = :feedUrl")
-    suspend fun getFeed(feedUrl: String): FeedBean
+    @Query("SELECT * FROM $FEED_VIEW_NAME WHERE ${FeedBean.URL_COLUMN} = :feedUrl")
+    suspend fun getFeed(feedUrl: String): FeedViewBean
 
     @Transaction
-    @Query(
-        """
-            SELECT * FROM $FEED_VIEW_NAME
-            WHERE ${FeedBean.GROUP_ID_COLUMN} IN (:groupIds)
-        """
-    )
-    suspend fun getFeedsIn(groupIds: List<String>): List<FeedViewBean>
+    @Query("SELECT * FROM $FEED_VIEW_NAME WHERE ${FeedBean.URL_COLUMN} IN (:feedUrls)")
+    suspend fun getFeedsIn(feedUrls: List<String>): List<FeedViewBean>
+
+    @Transaction
+    @Query("SELECT * FROM $FEED_VIEW_NAME WHERE ${FeedBean.GROUP_ID_COLUMN} IN (:groupIds)")
+    suspend fun getFeedsInGroup(groupIds: List<String>): List<FeedViewBean>
 
     @Transaction
     @Query(
@@ -159,7 +158,7 @@ interface FeedDao {
             ${FeedBean.GROUP_ID_COLUMN} NOT IN (:groupIds)
         """
     )
-    suspend fun getFeedsNotIn(groupIds: List<String>): List<FeedViewBean>
+    suspend fun getFeedsNotInGroup(groupIds: List<String>): List<FeedViewBean>
 
     @Transaction
     @Query(

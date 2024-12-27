@@ -278,9 +278,6 @@
     <string name="article_action_switch_read_state">切換已讀狀態</string>
     <string name="article_action_switch_favorite_state">切換收藏狀態</string>
     <string name="none">無</string>
-    <plurals name="feed_screen_read_all_result">
-        <item quantity="other">已讀 %d 項</item>
-    </plurals>
     <plurals name="import_opml_result">
         <item quantity="other">匯入 %d 項, 耗時 %.2f 秒</item>
     </plurals>

@@ -68,7 +68,6 @@ import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.plus
-import com.skyd.anivu.model.bean.feed.FeedBean
 import com.skyd.anivu.model.bean.feed.FeedBean.Companion.isDefaultGroup
 import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.bean.group.GroupVo
@@ -179,7 +178,7 @@ private fun FeedList(
     var openMoreMenu by rememberSaveable { mutableStateOf(false) }
     var openAddDialog by rememberSaveable { mutableStateOf(false) }
     var addDialogUrl by rememberSaveable { mutableStateOf("") }
-    var openEditFeedDialog by rememberSaveable { mutableStateOf<FeedBean?>(null) }
+    var openEditFeedDialog by rememberSaveable { mutableStateOf<FeedViewBean?>(null) }
     var openEditGroupDialog by rememberSaveable { mutableStateOf<GroupVo?>(value = null) }
 
     var openCreateGroupDialog by rememberSaveable { mutableStateOf(false) }
@@ -306,21 +305,29 @@ private fun FeedList(
                     if (openEditGroupDialog != null) openEditGroupDialog = event.group
                 }
 
+                is FeedEvent.ClearFeedArticlesResultEvent.Success -> {
+                    if (openEditFeedDialog != null) openEditFeedDialog = event.feed
+                }
+
+                is FeedEvent.ReadAllResultEvent.Success -> if (openEditFeedDialog != null) {
+                    val newFeed = event.feeds.firstOrNull {
+                        it.feed.url == openEditFeedDialog?.feed?.url
+                    }
+                    if (newFeed != null) openEditFeedDialog = newFeed
+                }
+
+                is FeedEvent.RefreshFeedResultEvent.Success -> if (openEditFeedDialog != null) {
+                    val newFeed = event.feeds.firstOrNull {
+                        it.feed.url == openEditFeedDialog?.feed?.url
+                    }
+                    if (newFeed != null) openEditFeedDialog = newFeed
+                }
+
                 is FeedEvent.AddFeedResultEvent.Success -> openEditFeedDialog = event.feed
 
-                is FeedEvent.ReadAllResultEvent.Success -> snackbarHostState.showSnackbar(
-                    context.resources.getQuantityString(
-                        R.plurals.feed_screen_read_all_result,
-                        event.count,
-                        event.count,
-                    ),
-                )
-
                 FeedEvent.RemoveFeedResultEvent.Success,
-                is FeedEvent.RefreshFeedResultEvent.Success,
                 FeedEvent.CreateGroupResultEvent.Success,
                 FeedEvent.MoveFeedsToGroupResultEvent.Success,
-                FeedEvent.ClearFeedArticlesResultEvent.Success,
                 FeedEvent.ClearGroupArticlesResultEvent.Success,
                 FeedEvent.DeleteGroupResultEvent.Success -> Unit
             }
@@ -351,19 +358,24 @@ private fun FeedList(
             }
             EditFeedSheet(
                 onDismissRequest = { openEditFeedDialog = null },
-                feed = openEditFeedDialog!!,
+                feedView = openEditFeedDialog!!,
                 groups = groups,
                 onReadAll = { dispatch(FeedIntent.ReadAllInFeed(it)) },
                 onRefresh = { dispatch(FeedIntent.RefreshFeed(it)) },
                 onClear = { dispatch(FeedIntent.ClearFeedArticles(it)) },
                 onDelete = { dispatch(FeedIntent.RemoveFeed(it)) },
                 onUrlChange = {
-                    dispatch(FeedIntent.EditFeedUrl(oldUrl = openEditFeedDialog!!.url, newUrl = it))
+                    dispatch(
+                        FeedIntent.EditFeedUrl(
+                            oldUrl = openEditFeedDialog!!.feed.url,
+                            newUrl = it
+                        )
+                    )
                 },
                 onNicknameChange = {
                     dispatch(
                         FeedIntent.EditFeedNickname(
-                            url = openEditFeedDialog!!.url,
+                            url = openEditFeedDialog!!.feed.url,
                             nickname = it
                         )
                     )
@@ -371,28 +383,28 @@ private fun FeedList(
                 onCustomDescriptionChange = {
                     dispatch(
                         FeedIntent.EditFeedCustomDescription(
-                            url = openEditFeedDialog!!.url, customDescription = it,
+                            url = openEditFeedDialog!!.feed.url, customDescription = it,
                         )
                     )
                 },
                 onCustomIconChange = {
                     dispatch(
                         FeedIntent.EditFeedCustomIcon(
-                            url = openEditFeedDialog!!.url, customIcon = it,
+                            url = openEditFeedDialog!!.feed.url, customIcon = it,
                         )
                     )
                 },
                 onSortXmlArticlesOnUpdateChanged = {
                     dispatch(
                         FeedIntent.EditFeedSortXmlArticlesOnUpdate(
-                            url = openEditFeedDialog!!.url, sort = it,
+                            url = openEditFeedDialog!!.feed.url, sort = it,
                         )
                     )
                 },
                 onGroupChange = {
                     dispatch(
                         FeedIntent.EditFeedGroup(
-                            url = openEditFeedDialog!!.url,
+                            url = openEditFeedDialog!!.feed.url,
                             groupId = it.groupId
                         )
                     )
@@ -550,7 +562,7 @@ private fun FeedList(
     selectedFeedUrls: List<String>? = null,
     onShowArticleList: (List<String>) -> Unit,
     onExpandChanged: (GroupVo, Boolean) -> Unit,
-    onEditFeed: (FeedBean) -> Unit,
+    onEditFeed: (FeedViewBean) -> Unit,
     onEditGroup: (GroupVo) -> Unit,
 ) {
     val hideEmptyDefault = LocalHideEmptyDefault.current

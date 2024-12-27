@@ -22,6 +22,7 @@ import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefresh
 import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedNumberBadgePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
@@ -84,6 +85,7 @@ import com.skyd.anivu.ui.local.LocalDateStyle
 import com.skyd.anivu.ui.local.LocalDeduplicateTitleInDesc
 import com.skyd.anivu.ui.local.LocalFeedDefaultGroupExpand
 import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
+import com.skyd.anivu.ui.local.LocalFeedNumberBadge
 import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalHardwareDecode
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
@@ -152,6 +154,7 @@ data class Settings(
     val readTextSize: Float = ReadTextSizePreference.default,
     val readContentTonalElevation: Float = ReadContentTonalElevationPreference.default,
     val readTopBarTonalElevation: Float = ReadTopBarTonalElevationPreference.default,
+    val feedNumberBadge: Int = FeedNumberBadgePreference.default,
     // Update
     val ignoreUpdateVersion: Long = IgnoreUpdateVersionPreference.default,
     // Behavior
@@ -229,6 +232,7 @@ fun SettingsProvider(
         LocalReadTextSize provides settings.readTextSize,
         LocalReadContentTonalElevation provides settings.readContentTonalElevation,
         LocalReadTopBarTonalElevation provides settings.readTopBarTonalElevation,
+        LocalFeedNumberBadge provides settings.feedNumberBadge,
         // Update
         LocalIgnoreUpdateVersion provides settings.ignoreUpdateVersion,
         // Behavior

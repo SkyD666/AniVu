@@ -2,6 +2,7 @@ package com.skyd.anivu.ui.screen.feed
 
 import com.skyd.anivu.base.mvi.MviSingleEvent
 import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.bean.group.GroupVo
 
 sealed interface FeedEvent : MviSingleEvent {
@@ -10,12 +11,12 @@ sealed interface FeedEvent : MviSingleEvent {
     }
 
     sealed interface AddFeedResultEvent : FeedEvent {
-        data class Success(val feed: FeedBean) : AddFeedResultEvent
+        data class Success(val feed: FeedViewBean) : AddFeedResultEvent
         data class Failed(val msg: String) : AddFeedResultEvent
     }
 
     sealed interface EditFeedResultEvent : FeedEvent {
-        data class Success(val feed: FeedBean) : EditFeedResultEvent
+        data class Success(val feed: FeedViewBean) : EditFeedResultEvent
         data class Failed(val msg: String) : EditFeedResultEvent
     }
 
@@ -25,12 +26,12 @@ sealed interface FeedEvent : MviSingleEvent {
     }
 
     sealed interface ClearFeedArticlesResultEvent : FeedEvent {
-        data object Success : ClearFeedArticlesResultEvent
+        data class Success(val feed: FeedViewBean) : ClearFeedArticlesResultEvent
         data class Failed(val msg: String) : ClearFeedArticlesResultEvent
     }
 
     sealed interface RefreshFeedResultEvent : FeedEvent {
-        data object Success : RefreshFeedResultEvent
+        data class Success(val feeds: List<FeedViewBean>) : RefreshFeedResultEvent
         data class Failed(val msg: String) : RefreshFeedResultEvent
     }
 
@@ -60,7 +61,7 @@ sealed interface FeedEvent : MviSingleEvent {
     }
 
     sealed interface ReadAllResultEvent : FeedEvent {
-        data class Success(val count: Int) : ReadAllResultEvent
+        data class Success(val feeds: List<FeedViewBean>) : ReadAllResultEvent
         data class Failed(val msg: String) : ReadAllResultEvent
     }
 }

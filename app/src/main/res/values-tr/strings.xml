@@ -330,10 +330,6 @@
     <string name="data_screen_clear_play_history_warning">Oynatma geçmişini silmek istediğinizden emin misiniz?</string>
     <string name="data_screen_clear_play_history_success">%d öğe silindi</string>
     <string name="folder">Klasör</string>
-    <plurals name="feed_screen_read_all_result">
-        <item quantity="one">%d öğeyi okundu</item>
-        <item quantity="other">%d öğe okundu</item>
-    </plurals>
     <plurals name="import_opml_result">
         <item quantity="one">%d öğe içe aktarıldı, %.2f saniye sürdü</item>
         <item quantity="other">%d öğe içe aktarıldı, %.2f saniye sürdü</item>

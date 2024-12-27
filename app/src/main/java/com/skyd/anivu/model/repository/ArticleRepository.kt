@@ -102,7 +102,7 @@ class ArticleRepository @Inject constructor(
                 requests += async {
                     val articleBeanList = runCatching {
                         rssHelper.queryRssXml(
-                            feed = feedDao.getFeed(feedUrl),
+                            feed = feedDao.getFeed(feedUrl).feed,
                             latestLink = articleDao.queryLatestByFeedUrl(feedUrl)?.link,
                         )?.also { feedWithArticle ->
                             feedDao.updateFeed(feedWithArticle.feed)

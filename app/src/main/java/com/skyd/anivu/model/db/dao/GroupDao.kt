@@ -130,7 +130,7 @@ interface GroupDao {
         removeGroupIdFromList(groupId)
         innerRemoveGroup(groupId)
         return EntryPointAccessors.fromApplication(appContext, GroupDaoEntryPoint::class.java).run {
-            feedDao.getFeedsIn(listOf(groupId)).forEach {
+            feedDao.getFeedsInGroup(listOf(groupId)).forEach {
                 it.feed.customIcon?.let { icon -> tryDeleteFeedIconFile(icon) }
             }
             feedDao.removeFeedByGroupId(groupId)

@@ -17,6 +17,7 @@ import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefresh
 import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedNumberBadgePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
@@ -87,6 +88,7 @@ fun Preferences.toSettings(): Settings {
         readTextSize = ReadTextSizePreference.fromPreferences(this),
         readContentTonalElevation = ReadContentTonalElevationPreference.fromPreferences(this),
         readTopBarTonalElevation = ReadTopBarTonalElevationPreference.fromPreferences(this),
+        feedNumberBadge = FeedNumberBadgePreference.fromPreferences(this),
 
         // Update
         ignoreUpdateVersion = IgnoreUpdateVersionPreference.fromPreferences(this),

@@ -1,6 +1,5 @@
 package com.skyd.anivu.ui.screen.feed
 
-import android.util.Log
 import com.skyd.anivu.base.mvi.AbstractMviViewModel
 import com.skyd.anivu.ext.catchMap
 import com.skyd.anivu.ext.startWith
@@ -58,7 +57,7 @@ class FeedViewModel @Inject constructor(
                     FeedEvent.EditFeedResultEvent.Failed(change.msg)
 
                 is FeedPartialStateChange.ClearFeedArticles.Success ->
-                    FeedEvent.ClearFeedArticlesResultEvent.Success
+                    FeedEvent.ClearFeedArticlesResultEvent.Success(change.feed)
 
                 is FeedPartialStateChange.ClearFeedArticles.Failed ->
                     FeedEvent.ClearFeedArticlesResultEvent.Failed(change.msg)
@@ -70,7 +69,7 @@ class FeedViewModel @Inject constructor(
                     FeedEvent.RemoveFeedResultEvent.Failed(change.msg)
 
                 is FeedPartialStateChange.RefreshFeed.Success ->
-                    FeedEvent.RefreshFeedResultEvent.Success
+                    FeedEvent.RefreshFeedResultEvent.Success(change.feeds)
 
                 is FeedPartialStateChange.RefreshFeed.Failed ->
                     FeedEvent.RefreshFeedResultEvent.Failed(change.msg)
@@ -109,7 +108,7 @@ class FeedViewModel @Inject constructor(
                     FeedEvent.EditGroupResultEvent.Failed(change.msg)
 
                 is FeedPartialStateChange.ReadAll.Success ->
-                    FeedEvent.ReadAllResultEvent.Success(change.count)
+                    FeedEvent.ReadAllResultEvent.Success(change.feeds)
 
                 is FeedPartialStateChange.ReadAll.Failed ->
                     FeedEvent.ReadAllResultEvent.Failed(change.msg)
@@ -164,8 +163,10 @@ class FeedViewModel @Inject constructor(
                     .catchMap { FeedPartialStateChange.EditFeed.Failed(it.message.toString()) }
             },
             filterIsInstance<FeedIntent.ClearFeedArticles>().flatMapConcat { intent ->
-                feedRepo.clearFeedArticles(intent.url).map {
-                    FeedPartialStateChange.ClearFeedArticles.Success
+                feedRepo.clearFeedArticles(intent.url).flatMapConcat {
+                    feedRepo.getFeedViewsByUrls(listOf(intent.url))
+                }.map {
+                    FeedPartialStateChange.ClearFeedArticles.Success(it.first())
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.ClearFeedArticles.Failed(it.message.toString()) }
             },
@@ -176,22 +177,35 @@ class FeedViewModel @Inject constructor(
                 }.startWith(FeedPartialStateChange.LoadingDialog.Show)
             },
             merge(
-                filterIsInstance<FeedIntent.ReadAllInGroup>()
-                    .map { intent -> feedRepo.readAllInGroup(intent.groupId) },
-                filterIsInstance<FeedIntent.ReadAllInFeed>()
-                    .map { intent -> feedRepo.readAllInFeed(intent.feedUrl) },
+                filterIsInstance<FeedIntent.ReadAllInGroup>().map { intent ->
+                    feedRepo.readAllInGroup(intent.groupId).flatMapConcat {
+                        feedRepo.getFeedViewsByGroupId(intent.groupId)
+                    }
+                },
+                filterIsInstance<FeedIntent.ReadAllInFeed>().map { intent ->
+                    feedRepo.readAllInFeed(intent.feedUrl).flatMapConcat {
+                        feedRepo.getFeedViewsByUrls(listOf(intent.feedUrl))
+                    }
+                },
             ).flatMapConcat { flow ->
                 flow.map { FeedPartialStateChange.ReadAll.Success(it) }
                     .startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.ReadAll.Failed(it.message.toString()) }
             },
             merge(
-                filterIsInstance<FeedIntent.RefreshFeed>()
-                    .map { intent -> articleRepo.refreshArticleList(listOf(intent.url)) },
-                filterIsInstance<FeedIntent.RefreshGroupFeed>()
-                    .map { intent -> articleRepo.refreshGroupArticles(intent.groupId) },
+                filterIsInstance<FeedIntent.RefreshFeed>().map { intent ->
+                    val urls = listOf(intent.url)
+                    articleRepo.refreshArticleList(urls).flatMapConcat {
+                        feedRepo.getFeedViewsByUrls(urls)
+                    }
+                },
+                filterIsInstance<FeedIntent.RefreshGroupFeed>().map { intent ->
+                    articleRepo.refreshGroupArticles(intent.groupId).flatMapConcat {
+                        feedRepo.getFeedViewsByGroupId(intent.groupId)
+                    }
+                },
             ).flatMapConcat { flow ->
-                flow.map { FeedPartialStateChange.RefreshFeed.Success }
+                flow.map { FeedPartialStateChange.RefreshFeed.Success(it) }
                     .startWith(FeedPartialStateChange.LoadingDialog.Show)
                     .catchMap { FeedPartialStateChange.RefreshFeed.Failed(it.message.toString()) }
             },

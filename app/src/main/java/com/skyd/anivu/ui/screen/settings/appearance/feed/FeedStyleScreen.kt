@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Pin
 import androidx.compose.material.icons.outlined.Restore
 import androidx.compose.material.icons.outlined.Tonality
 import androidx.compose.material3.Icon
@@ -18,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -29,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.skyd.anivu.R
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedNumberBadgePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.TonalElevationPreferenceUtil
 import com.skyd.anivu.ui.component.AniVuIconButton
@@ -36,8 +39,10 @@ import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
+import com.skyd.anivu.ui.component.CheckableListMenu
 import com.skyd.anivu.ui.component.dialog.SliderDialog
 import com.skyd.anivu.ui.local.LocalFeedListTonalElevation
+import com.skyd.anivu.ui.local.LocalFeedNumberBadge
 import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 
 
@@ -60,6 +65,7 @@ fun FeedStyleScreen() {
     ) { paddingValues ->
         var openTopBarTonalElevationDialog by rememberSaveable { mutableStateOf(false) }
         var openGroupListTonalElevationDialog by rememberSaveable { mutableStateOf(false) }
+        var expandFeedNumberBadgeMenu by rememberSaveable { mutableStateOf(false) }
 
         LazyColumn(
             modifier = Modifier
@@ -91,6 +97,22 @@ fun FeedStyleScreen() {
                         LocalFeedListTonalElevation.current
                     ),
                     onClick = { openGroupListTonalElevationDialog = true }
+                )
+            }
+            item {
+                BaseSettingsItem(
+                    icon = rememberVectorPainter(Icons.Outlined.Pin),
+                    text = stringResource(id = R.string.feed_style_screen_number_badge),
+                    descriptionText = FeedNumberBadgePreference.toDisplayName(
+                        context, LocalFeedNumberBadge.current,
+                    ),
+                    extraContent = {
+                        FeedNumberBadgeMenu(
+                            expanded = expandFeedNumberBadgeMenu,
+                            onDismissRequest = { expandFeedNumberBadgeMenu = false },
+                        )
+                    },
+                    onClick = { expandFeedNumberBadgeMenu = true }
                 )
             }
         }
@@ -166,5 +188,21 @@ internal fun TonalElevationDialog(
                 Text(text = stringResource(id = R.string.ok))
             }
         }
+    )
+}
+
+@Composable
+private fun FeedNumberBadgeMenu(expanded: Boolean, onDismissRequest: () -> Unit) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val feedNumberBadge = LocalFeedNumberBadge.current
+
+    CheckableListMenu(
+        expanded = expanded,
+        current = feedNumberBadge,
+        values = remember { FeedNumberBadgePreference.values.toList() },
+        displayName = { FeedNumberBadgePreference.toDisplayName(context, it) },
+        onChecked = { FeedNumberBadgePreference.put(context, scope, it) },
+        onDismissRequest = onDismissRequest,
     )
 }

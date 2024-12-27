@@ -42,7 +42,7 @@ class ImportExportRepository @Inject constructor(
 
     private suspend fun defaultGroupFeeds(): Flow<List<FeedViewBean>> {
         return groupDao.getGroupIds().map { groupIds ->
-            feedDao.getFeedsNotIn(groupIds)
+            feedDao.getFeedsNotInGroup(groupIds)
         }.flowOn(Dispatchers.IO)
     }
 

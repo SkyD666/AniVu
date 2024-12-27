@@ -18,6 +18,7 @@ import com.skyd.anivu.model.preference.appearance.article.ShowArticlePullRefresh
 import com.skyd.anivu.model.preference.appearance.article.ShowArticleTopBarRefreshPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.feed.FeedNumberBadgePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
@@ -103,6 +104,7 @@ val LocalReadContentTonalElevation =
     compositionLocalOf { ReadContentTonalElevationPreference.default }
 val LocalReadTopBarTonalElevation =
     compositionLocalOf { ReadTopBarTonalElevationPreference.default }
+val LocalFeedNumberBadge = compositionLocalOf { FeedNumberBadgePreference.default }
 
 // Update
 val LocalIgnoreUpdateVersion = compositionLocalOf { IgnoreUpdateVersionPreference.default }

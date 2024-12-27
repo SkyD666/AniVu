@@ -67,15 +67,15 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ext.copy
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.readable
-import com.skyd.anivu.model.bean.feed.FeedBean
+import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.bean.group.GroupVo
 import com.skyd.anivu.ui.component.AniVuIconButton
 import com.skyd.anivu.ui.component.dialog.AniVuDialog
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
-import com.skyd.anivu.ui.screen.article.FeedIcon
 import com.skyd.anivu.ui.component.showToast
 import com.skyd.anivu.ui.local.LocalNavController
+import com.skyd.anivu.ui.screen.article.FeedIcon
 import com.skyd.anivu.ui.screen.feed.requestheaders.openRequestHeadersScreen
 import com.skyd.anivu.util.launchImagePicker
 import com.skyd.anivu.util.rememberImagePicker
@@ -83,7 +83,7 @@ import com.skyd.anivu.util.rememberImagePicker
 @Composable
 fun EditFeedSheet(
     onDismissRequest: () -> Unit,
-    feed: FeedBean,
+    feedView: FeedViewBean,
     groups: List<GroupVo>,
     onReadAll: (String) -> Unit,
     onRefresh: (String) -> Unit,
@@ -98,6 +98,7 @@ fun EditFeedSheet(
     openCreateGroupDialog: () -> Unit,
 ) {
     val navController = LocalNavController.current
+    val feed = feedView.feed
     var openUrlDialog by rememberSaveable { mutableStateOf(false) }
     var url by rememberSaveable(feed.url) { mutableStateOf(feed.url) }
     var openNicknameDialog by rememberSaveable { mutableStateOf(false) }
@@ -116,7 +117,7 @@ fun EditFeedSheet(
                 .padding(horizontal = 20.dp)
         ) {
             InfoArea(
-                feed = feed,
+                feedView = feedView,
                 onCustomIconChange = onCustomIconChange,
                 onNicknameChanged = { openNicknameDialog = true },
                 onCustomDescriptionChanged = { openCustomDescriptionDialog = true },
@@ -234,11 +235,12 @@ fun EditFeedSheet(
 
 @Composable
 private fun InfoArea(
-    feed: FeedBean,
+    feedView: FeedViewBean,
     onCustomIconChange: (Uri?) -> Unit,
     onNicknameChanged: () -> Unit,
     onCustomDescriptionChanged: () -> Unit
 ) {
+    val feed = feedView.feed
     Row {
         val pickStickerLauncher = rememberImagePicker(multiple = false) { result ->
             result.firstOrNull()?.let { uri -> onCustomIconChange(uri) }
@@ -271,7 +273,7 @@ private fun InfoArea(
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(6.dp))
                     .clickable(onClick = onNicknameChanged),
-                text = feed.nickname ?: feed.title.orEmpty(),
+                text = feedView.feed.nickname ?: feed.title.orEmpty(),
                 style = MaterialTheme.typography.titleLarge,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
