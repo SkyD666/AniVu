@@ -329,6 +329,7 @@
     <string name="media_style_screen_name">媒体页面</string>
     <string name="media_style_screen_media_list_category">媒体列表</string>
     <string name="media_style_screen_media_list_show_thumbnail">显示预览图</string>
+    <string name="media_style_screen_media_list_show_group_tab">显示组选项卡</string>
     <string name="read_screen_episode">第 %s 集</string>
     <string name="feed_screen_clear_articles_warning">这将删除所有文章，但不会删除订阅，确定吗？</string>
     <string name="request_headers_screen_name">请求头</string>
@@ -367,6 +368,14 @@
     <string name="feed_number_badge_all">All</string>
     <string name="feed_style_screen_number_badge">Number badge</string>
     <string name="feed_number_badge_unread_all"><![CDATA[Unread & All]]></string>
+    <string name="media_screen_style">样式</string>
+    <string name="media_display_filter_video">视频</string>
+    <string name="media_display_filter_audio">音频</string>
+    <string name="media_display_filter_media">媒体</string>
+    <string name="media_display_filter_all">所有文件</string>
+    <string name="behavior_screen_media_screen_category">媒体库</string>
+    <string name="behavior_screen_media_file_filter">文件过滤</string>
+    <string name="behavior_screen_media_file_filter_placeholder">文件名正则</string>
     <plurals name="import_opml_result">
         <item quantity="other">导入了 %d 项，花费 %.2f 秒</item>
     </plurals>
