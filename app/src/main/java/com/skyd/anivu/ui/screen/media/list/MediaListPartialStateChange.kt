@@ -76,6 +76,19 @@ internal sealed interface MediaListPartialStateChange {
         data class Failed(val msg: String) : DeleteFileResult
     }
 
+    sealed interface RefreshFilesResult : MediaListPartialStateChange {
+        override fun reduce(oldState: MediaListState): MediaListState {
+            return when (this) {
+                is Success, is Failed -> oldState.copy(
+                    loadingDialog = false,
+                )
+            }
+        }
+
+        data object Success : RefreshFilesResult
+        data class Failed(val msg: String) : RefreshFilesResult
+    }
+
     sealed interface RenameFileResult : MediaListPartialStateChange {
         override fun reduce(oldState: MediaListState): MediaListState {
             return when (this) {

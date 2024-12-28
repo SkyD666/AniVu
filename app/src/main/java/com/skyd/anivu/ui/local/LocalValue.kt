@@ -20,6 +20,8 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPre
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedNumberBadgePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.media.MediaFileFilterPreference
+import com.skyd.anivu.model.preference.appearance.media.MediaShowGroupTabPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
@@ -99,6 +101,7 @@ val LocalShowArticlePullRefresh = compositionLocalOf { ShowArticlePullRefreshPre
 val LocalArticleItemMinWidth = compositionLocalOf { ArticleItemMinWidthPreference.default }
 val LocalSearchItemMinWidth = compositionLocalOf { SearchItemMinWidthPreference.default }
 val LocalMediaShowThumbnail = compositionLocalOf { MediaShowThumbnailPreference.default }
+val LocalMediaShowGroupTab = compositionLocalOf { MediaShowGroupTabPreference.default }
 val LocalReadTextSize = compositionLocalOf { ReadTextSizePreference.default }
 val LocalReadContentTonalElevation =
     compositionLocalOf { ReadContentTonalElevationPreference.default }
@@ -116,6 +119,7 @@ val LocalArticleSwipeLeftAction = compositionLocalOf { ArticleSwipeLeftActionPre
 val LocalArticleSwipeRightAction = compositionLocalOf { ArticleSwipeRightActionPreference.default }
 val LocalHideEmptyDefault = compositionLocalOf { HideEmptyDefaultPreference.default }
 val LocalPickImageMethod = compositionLocalOf { PickImageMethodPreference.default }
+val LocalMediaFileFilter = compositionLocalOf { MediaFileFilterPreference.default }
 
 // RSS
 val LocalRssSyncFrequency = compositionLocalOf { RssSyncFrequencyPreference.default }

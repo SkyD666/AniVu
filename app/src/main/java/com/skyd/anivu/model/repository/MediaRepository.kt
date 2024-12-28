@@ -2,16 +2,23 @@ package com.skyd.anivu.model.repository
 
 import androidx.collection.LruCache
 import androidx.compose.ui.util.fastFirstOrNull
+import com.skyd.anivu.appContext
 import com.skyd.anivu.base.BaseRepository
+import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.validateFileName
 import com.skyd.anivu.model.bean.MediaBean
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.bean.MediaGroupBean.Companion.isDefaultGroup
+import com.skyd.anivu.model.preference.appearance.media.MediaFileFilterPreference
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -111,32 +118,45 @@ class MediaRepository @Inject constructor(
         }
     }
 
-    fun requestFiles(path: String, group: MediaGroupBean?): Flow<List<MediaBean>> {
-        return flow {
-            val fileJsons = getOrReadMediaLibJson(path).files.appendFiles(
-                File(path).listFiles().orEmpty().toMutableList().filter { it.exists() }
-            )
-            val videoList = (if (group == null) fileJsons else {
-                val groupName = if (group.isDefaultGroup()) null else group.name
-                fileJsons.filter { it.groupName == groupName }
-            }).mapNotNull {
-                val file = File(path, it.fileName)
-                if (file.exists()) {
-                    MediaBean(
-                        displayName = it.displayName,
-                        file = file,
-                    )
-                } else null
-            }
+    private val refreshFiles = MutableStateFlow(0)
 
-            emit(
+    fun refreshFile(): Flow<Unit> = flow {
+        refreshFiles.emit((refreshFiles.value + 1) % 100)
+        emit(Unit)
+    }
+
+    fun requestFiles(path: String, group: MediaGroupBean?): Flow<List<MediaBean>> {
+        return combine(
+            refreshFiles.map {
+                val fileJsons = getOrReadMediaLibJson(path).files.appendFiles(
+                    File(path).listFiles().orEmpty().toMutableList().filter { it.exists() }
+                )
+                val videoList = (if (group == null) fileJsons else {
+                    val groupName = if (group.isDefaultGroup()) null else group.name
+                    fileJsons.filter { it.groupName == groupName }
+                }).mapNotNull {
+                    val file = File(path, it.fileName)
+                    if (file.exists()) {
+                        MediaBean(
+                            displayName = it.displayName,
+                            file = file,
+                        )
+                    } else null
+                }
                 videoList.toMutableList().apply {
                     fastFirstOrNull { it.name.equals(FOLDER_INFO_JSON_NAME, true) }
                         ?.let { remove(it) }
                     fastFirstOrNull { it.name.equals(MEDIA_LIB_JSON_NAME, true) }
                         ?.let { remove(it) }
                 }
-            )
+            },
+            appContext.dataStore.data.map {
+                it[MediaFileFilterPreference.key] ?: MediaFileFilterPreference.default
+            }.distinctUntilChanged()
+        ) { videoList, displayFilter ->
+            videoList.filter {
+                runCatching { it.file.name.matches(Regex(displayFilter)) }.getOrNull() == true
+            }
         }
     }
 
@@ -158,7 +178,8 @@ class MediaRepository @Inject constructor(
             val validateFileName = newName.validateFileName()
             val newFile = File(file.parentFile, validateFileName)
             if (file.renameTo(newFile)) {
-                mediaLibJson.files.firstOrNull { it.fileName == file.name }?.fileName = validateFileName
+                mediaLibJson.files.firstOrNull { it.fileName == file.name }?.fileName =
+                    validateFileName
                 writeMediaLibJson(path = path, mediaLibJson)
                 emit(newFile)
             } else {

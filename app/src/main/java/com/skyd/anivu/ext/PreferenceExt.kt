@@ -19,6 +19,8 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPre
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedNumberBadgePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.media.MediaFileFilterPreference
+import com.skyd.anivu.model.preference.appearance.media.MediaShowGroupTabPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
@@ -85,6 +87,7 @@ fun Preferences.toSettings(): Settings {
         articleItemMinWidth = ArticleItemMinWidthPreference.fromPreferences(this),
         searchItemMinWidth = SearchItemMinWidthPreference.fromPreferences(this),
         mediaShowThumbnail = MediaShowThumbnailPreference.fromPreferences(this),
+        mediaShowGroupTab = MediaShowGroupTabPreference.fromPreferences(this),
         readTextSize = ReadTextSizePreference.fromPreferences(this),
         readContentTonalElevation = ReadContentTonalElevationPreference.fromPreferences(this),
         readTopBarTonalElevation = ReadTopBarTonalElevationPreference.fromPreferences(this),
@@ -100,6 +103,7 @@ fun Preferences.toSettings(): Settings {
         articleSwipeRightAction = ArticleSwipeRightActionPreference.fromPreferences(this),
         hideEmptyDefault = HideEmptyDefaultPreference.fromPreferences(this),
         pickImageMethod = PickImageMethodPreference.fromPreferences(this),
+        mediaFileFilter = MediaFileFilterPreference.fromPreferences(this),
 
         // RSS
         rssSyncFrequency = RssSyncFrequencyPreference.fromPreferences(this),

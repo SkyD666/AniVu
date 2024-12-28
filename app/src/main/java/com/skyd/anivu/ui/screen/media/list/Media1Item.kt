@@ -165,7 +165,8 @@ fun Media1Item(
                     Text(
                         modifier = Modifier
                             .basicMarquee()
-                            .widthIn(min = 40.dp),
+                            .widthIn(min = 40.dp)
+                            .alignByBaseline(),
                         text = remember(data) { data.size.fileSize(context) },
                         style = MaterialTheme.typography.labelMedium,
                         maxLines = 1,
@@ -174,8 +175,10 @@ fun Media1Item(
                 Spacer(modifier = Modifier.weight(1f))
                 Text(
                     modifier = Modifier
+                        .padding(start = 12.dp)
                         .basicMarquee()
-                        .widthIn(min = 40.dp),
+                        .widthIn(min = 40.dp)
+                        .alignByBaseline(),
                     text = remember(data) { data.date.toDateTimeString(context = context) },
                     style = MaterialTheme.typography.labelMedium,
                     maxLines = 1,

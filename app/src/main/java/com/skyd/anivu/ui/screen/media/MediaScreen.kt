@@ -17,9 +17,13 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.FileOpen
+import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.MyLocation
+import androidx.compose.material.icons.outlined.Palette
 import androidx.compose.material.icons.outlined.Refresh
 import androidx.compose.material.icons.outlined.Workspaces
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -63,12 +67,14 @@ import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
+import com.skyd.anivu.ui.local.LocalMediaShowGroupTab
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
 import com.skyd.anivu.ui.screen.filepicker.ListenToFilePicker
 import com.skyd.anivu.ui.screen.filepicker.openFilePicker
 import com.skyd.anivu.ui.screen.media.list.GroupInfo
 import com.skyd.anivu.ui.screen.media.list.MediaList
+import com.skyd.anivu.ui.screen.settings.appearance.media.MEDIA_STYLE_SCREEN_ROUTE
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.min
@@ -92,6 +98,7 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
 
     val pagerState = rememberPagerState(pageCount = { uiState.groups.size })
     var openEditGroupDialog by rememberSaveable { mutableStateOf<MediaGroupBean?>(value = null) }
+    var openMoreMenu by rememberSaveable { mutableStateOf(false) }
 
     ListenToFilePicker { result ->
         if (result.pickFolder) {
@@ -130,6 +137,12 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                         imageVector = Icons.Outlined.Refresh,
                         contentDescription = stringResource(id = R.string.refresh),
                     )
+                    AniVuIconButton(
+                        onClick = { openMoreMenu = true },
+                        imageVector = Icons.Outlined.MoreVert,
+                        contentDescription = stringResource(R.string.more),
+                    )
+                    MoreMenu(expanded = openMoreMenu, onDismissRequest = { openMoreMenu = false })
                 }
             )
         },
@@ -189,29 +202,31 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                 .padding(innerPadding),
         ) {
             if (uiState.groups.isNotEmpty()) {
-                PrimaryScrollableTabRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    selectedTabIndex = min(uiState.groups.size - 1, pagerState.currentPage),
-                    edgePadding = 0.dp,
-                    divider = {},
-                ) {
-                    uiState.groups.forEachIndexed { index, group ->
-                        Tab(
-                            selected = pagerState.currentPage == index,
-                            onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                            text = {
-                                Text(
-                                    modifier = Modifier
-                                        .widthIn(max = 220.dp)
-                                        .basicMarquee(iterations = Int.MAX_VALUE),
-                                    text = group.first.name,
-                                    maxLines = 1,
-                                )
-                            },
-                        )
+                if (LocalMediaShowGroupTab.current) {
+                    PrimaryScrollableTabRow(
+                        modifier = Modifier.fillMaxWidth(),
+                        selectedTabIndex = min(uiState.groups.size - 1, pagerState.currentPage),
+                        edgePadding = 0.dp,
+                        divider = {},
+                    ) {
+                        uiState.groups.forEachIndexed { index, group ->
+                            Tab(
+                                selected = pagerState.currentPage == index,
+                                onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
+                                text = {
+                                    Text(
+                                        modifier = Modifier
+                                            .widthIn(max = 220.dp)
+                                            .basicMarquee(iterations = Int.MAX_VALUE),
+                                        text = group.first.name,
+                                        maxLines = 1,
+                                    )
+                                },
+                            )
+                        }
                     }
+                    HorizontalDivider()
                 }
-                HorizontalDivider()
 
                 HorizontalPager(state = pagerState) { index ->
                     MediaList(
@@ -318,4 +333,24 @@ internal fun CreateGroupDialog(
         onConfirm = { text -> onCreateGroup(MediaGroupBean(name = text)) },
         onDismissRequest = onDismissRequest,
     )
+}
+
+@Composable
+private fun MoreMenu(
+    expanded: Boolean,
+    onDismissRequest: () -> Unit,
+) {
+    val navController = LocalNavController.current
+    DropdownMenu(expanded = expanded, onDismissRequest = onDismissRequest) {
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.media_screen_style)) },
+            leadingIcon = {
+                Icon(imageVector = Icons.Outlined.Palette, contentDescription = null)
+            },
+            onClick = {
+                onDismissRequest()
+                navController.navigate(MEDIA_STYLE_SCREEN_ROUTE)
+            },
+        )
+    }
 }

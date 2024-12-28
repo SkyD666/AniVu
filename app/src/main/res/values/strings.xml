@@ -336,6 +336,7 @@
     <string name="media_style_screen_name">Media screen</string>
     <string name="media_style_screen_media_list_category">Media list</string>
     <string name="media_style_screen_media_list_show_thumbnail">Show thumbnails</string>
+    <string name="media_style_screen_media_list_show_group_tab">Show group tab</string>
     <string name="read_screen_episode">Episode %s</string>
     <string name="feed_screen_clear_articles_warning">This will delete all articles, but not feeds, sure?</string>
     <string name="request_headers_screen_name">Request headers</string>
@@ -374,6 +375,14 @@
     <string name="feed_number_badge_all">All</string>
     <string name="feed_style_screen_number_badge">Number badge</string>
     <string name="feed_number_badge_unread_all"><![CDATA[Unread & All]]></string>
+    <string name="media_screen_style">Style</string>
+    <string name="media_display_filter_video">Video</string>
+    <string name="media_display_filter_audio">Audio</string>
+    <string name="media_display_filter_media">Media</string>
+    <string name="media_display_filter_all">All files</string>
+    <string name="behavior_screen_media_screen_category">Media library</string>
+    <string name="behavior_screen_media_file_filter">File filter</string>
+    <string name="behavior_screen_media_file_filter_placeholder">Filename regex</string>
     <plurals name="import_opml_result">
         <item quantity="one">Imported %d item, takes %.2f seconds</item>
         <item quantity="other">Imported %d items, takes %.2f seconds</item>

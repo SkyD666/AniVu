@@ -24,6 +24,8 @@ import com.skyd.anivu.model.preference.appearance.feed.FeedDefaultGroupExpandPre
 import com.skyd.anivu.model.preference.appearance.feed.FeedListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedNumberBadgePreference
 import com.skyd.anivu.model.preference.appearance.feed.FeedTopBarTonalElevationPreference
+import com.skyd.anivu.model.preference.appearance.media.MediaFileFilterPreference
+import com.skyd.anivu.model.preference.appearance.media.MediaShowGroupTabPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadContentTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
@@ -90,7 +92,9 @@ import com.skyd.anivu.ui.local.LocalFeedTopBarTonalElevation
 import com.skyd.anivu.ui.local.LocalHardwareDecode
 import com.skyd.anivu.ui.local.LocalHideEmptyDefault
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
+import com.skyd.anivu.ui.local.LocalMediaFileFilter
 import com.skyd.anivu.ui.local.LocalMediaLibLocation
+import com.skyd.anivu.ui.local.LocalMediaShowGroupTab
 import com.skyd.anivu.ui.local.LocalMediaShowThumbnail
 import com.skyd.anivu.ui.local.LocalNavigationBarLabel
 import com.skyd.anivu.ui.local.LocalOpmlExportDir
@@ -151,6 +155,7 @@ data class Settings(
     val articleItemMinWidth: Float = ArticleItemMinWidthPreference.default,
     val searchItemMinWidth: Float = SearchItemMinWidthPreference.default,
     val mediaShowThumbnail: Boolean = MediaShowThumbnailPreference.default,
+    val mediaShowGroupTab: Boolean = MediaShowGroupTabPreference.default,
     val readTextSize: Float = ReadTextSizePreference.default,
     val readContentTonalElevation: Float = ReadContentTonalElevationPreference.default,
     val readTopBarTonalElevation: Float = ReadTopBarTonalElevationPreference.default,
@@ -164,6 +169,7 @@ data class Settings(
     val articleSwipeRightAction: String = ArticleSwipeRightActionPreference.default,
     val hideEmptyDefault: Boolean = HideEmptyDefaultPreference.default,
     val pickImageMethod: String = PickImageMethodPreference.default,
+    val mediaFileFilter: String = MediaFileFilterPreference.default,
     // RSS
     val rssSyncFrequency: Long = RssSyncFrequencyPreference.default,
     val rssSyncWifiConstraint: Boolean = RssSyncWifiConstraintPreference.default,
@@ -229,6 +235,7 @@ fun SettingsProvider(
         LocalArticleItemMinWidth provides settings.articleItemMinWidth,
         LocalSearchItemMinWidth provides settings.searchItemMinWidth,
         LocalMediaShowThumbnail provides settings.mediaShowThumbnail,
+        LocalMediaShowGroupTab provides settings.mediaShowGroupTab,
         LocalReadTextSize provides settings.readTextSize,
         LocalReadContentTonalElevation provides settings.readContentTonalElevation,
         LocalReadTopBarTonalElevation provides settings.readTopBarTonalElevation,
@@ -242,6 +249,7 @@ fun SettingsProvider(
         LocalArticleSwipeRightAction provides settings.articleSwipeRightAction,
         LocalHideEmptyDefault provides settings.hideEmptyDefault,
         LocalPickImageMethod provides settings.pickImageMethod,
+        LocalMediaFileFilter provides settings.mediaFileFilter,
         // rss
         LocalRssSyncFrequency provides settings.rssSyncFrequency,
         LocalRssSyncWifiConstraint provides settings.rssSyncWifiConstraint,

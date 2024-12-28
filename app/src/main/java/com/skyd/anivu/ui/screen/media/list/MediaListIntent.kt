@@ -6,7 +6,7 @@ import com.skyd.anivu.model.bean.MediaGroupBean
 import java.io.File
 
 sealed interface MediaListIntent : MviIntent {
-    data class Init(val path: String?, val group: MediaGroupBean?, val version: Long?) :
+    data class Init(val path: String, val group: MediaGroupBean?, val version: Long?) :
         MediaListIntent
 
     data class Refresh(val path: String?, val group: MediaGroupBean?) : MediaListIntent

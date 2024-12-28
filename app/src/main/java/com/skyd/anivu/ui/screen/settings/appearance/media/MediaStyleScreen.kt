@@ -3,6 +3,7 @@ package com.skyd.anivu.ui.screen.settings.appearance.media
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.Toc
 import androidx.compose.material.icons.outlined.HideImage
 import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material3.Scaffold
@@ -15,11 +16,13 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.skyd.anivu.R
+import com.skyd.anivu.model.preference.appearance.media.MediaShowGroupTabPreference
 import com.skyd.anivu.model.preference.appearance.media.MediaShowThumbnailPreference
 import com.skyd.anivu.ui.component.AniVuTopBar
 import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.SwitchSettingsItem
+import com.skyd.anivu.ui.local.LocalMediaShowGroupTab
 import com.skyd.anivu.ui.local.LocalMediaShowThumbnail
 
 
@@ -57,6 +60,21 @@ fun MediaStyleScreen() {
                     checked = mediaShowThumbnail,
                     onCheckedChange = {
                         MediaShowThumbnailPreference.put(
+                            context = context,
+                            scope = scope,
+                            value = it,
+                        )
+                    }
+                )
+            }
+            item {
+                val mediaShowGroupTab = LocalMediaShowGroupTab.current
+                SwitchSettingsItem(
+                    imageVector = Icons.AutoMirrored.Outlined.Toc,
+                    text = stringResource(id = R.string.media_style_screen_media_list_show_group_tab),
+                    checked = mediaShowGroupTab,
+                    onCheckedChange = {
+                        MediaShowGroupTabPreference.put(
                             context = context,
                             scope = scope,
                             value = it,

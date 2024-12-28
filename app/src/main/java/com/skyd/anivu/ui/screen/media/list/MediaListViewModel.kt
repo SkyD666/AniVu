@@ -57,24 +57,22 @@ class MediaListViewModel @Inject constructor(
 
     private fun Flow<MediaListIntent>.toMediaListPartialStateChangeFlow(): Flow<MediaListPartialStateChange> {
         return merge(
-            merge(
-                filterIsInstance<MediaListIntent.Init>().filterNot { it.path.isNullOrBlank() },
-                filterIsInstance<MediaListIntent.Refresh>().filterNot { it.path.isNullOrBlank() },
-            ).flatMapConcat { intent ->
-                val path = if (intent is MediaListIntent.Init) intent.path
-                else (intent as MediaListIntent.Refresh).path
-                val group = if (intent is MediaListIntent.Init) intent.group
-                else (intent as MediaListIntent.Refresh).group
+            filterIsInstance<MediaListIntent.Init>().flatMapConcat { intent ->
                 combine(
-                    mediaRepo.requestFiles(path = path!!, group),
-                    mediaRepo.requestGroups(path = path),
+                    mediaRepo.requestFiles(path = intent.path, intent.group),
+                    mediaRepo.requestGroups(path = intent.path),
                 ) { files, groups ->
                     MediaListPartialStateChange.MediaListResult.Success(
-                        list = files,
-                        groups = groups
+                        list = files, groups = groups
                     )
                 }.startWith(MediaListPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaListPartialStateChange.MediaListResult.Failed(it.message.toString()) }
+            },
+            filterIsInstance<MediaListIntent.Refresh>().flatMapConcat {
+                mediaRepo.refreshFile().map {
+                    MediaListPartialStateChange.RefreshFilesResult.Success
+                }.startWith(MediaListPartialStateChange.LoadingDialog.Show)
+                    .catchMap { MediaListPartialStateChange.RefreshFilesResult.Failed(it.message.toString()) }
             },
             filterIsInstance<MediaListIntent.DeleteFile>().flatMapConcat { intent ->
                 mediaRepo.deleteFile(intent.file).map {
