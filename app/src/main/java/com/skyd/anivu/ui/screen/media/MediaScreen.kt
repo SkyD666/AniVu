@@ -113,7 +113,18 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
         topBar = {
             AniVuTopBar(
                 style = AniVuTopBarStyle.Small,
-                title = { Text(text = stringResource(R.string.media_screen_name)) },
+                title = {
+                    val title = stringResource(R.string.media_screen_name)
+                    Text(
+                        modifier = Modifier.basicMarquee(),
+                        text = if (LocalMediaShowGroupTab.current) title else {
+                            val groupName = uiState.groups
+                                .getOrNull(pagerState.currentPage)?.first?.name
+                            if (groupName.isNullOrBlank()) title else "$title - $groupName"
+                        },
+                        maxLines = 1,
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     navigationIconContentColor = TopAppBarDefaults.topAppBarColors().actionIconContentColor
                 ),

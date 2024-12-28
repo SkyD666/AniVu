@@ -81,53 +81,43 @@ class MediaViewModel @Inject constructor(
     private fun Flow<MediaIntent>.toMediaPartialStateChangeFlow(): Flow<MediaPartialStateChange> {
         return merge(
             merge(
-                filterIsInstance<MediaIntent.Init>().filterNot { it.path.isNullOrBlank() },
-                filterIsInstance<MediaIntent.Refresh>().filterNot { it.path.isNullOrBlank() },
+                filterIsInstance<MediaIntent.Init>(),
+                filterIsInstance<MediaIntent.Refresh>(),
             ).flatMapConcat { intent ->
                 val path = if (intent is MediaIntent.Init) intent.path
                 else (intent as MediaIntent.Refresh).path
-                mediaRepo.requestGroups(path = path!!).map {
+                mediaRepo.requestGroups(path = path).map {
                     MediaPartialStateChange.GroupsResult.Success(groups = it)
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.GroupsResult.Failed(it.message.toString()) }
             },
-            filterIsInstance<MediaIntent.ChangeMediaGroup>().filterNot {
-                it.path.isNullOrBlank()
-            }.flatMapConcat { intent ->
-                mediaRepo.changeMediaGroup(intent.path!!, intent.mediaBean, intent.group)
+            filterIsInstance<MediaIntent.ChangeMediaGroup>().flatMapConcat { intent ->
+                mediaRepo.changeMediaGroup(intent.path, intent.mediaBean, intent.group)
                     .map {
                         MediaPartialStateChange.ChangeMediaGroup.Success
                     }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.ChangeMediaGroup.Failed(it.message.toString()) }
             },
-            filterIsInstance<MediaIntent.DeleteGroup>().filterNot {
-                it.path.isNullOrBlank()
-            }.flatMapConcat { intent ->
-                mediaRepo.deleteGroup(intent.path!!, intent.group).map {
+            filterIsInstance<MediaIntent.DeleteGroup>().flatMapConcat { intent ->
+                mediaRepo.deleteGroup(intent.path, intent.group).map {
                     MediaPartialStateChange.DeleteGroup.Success(intent.group)
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.DeleteGroup.Failed(it.message.toString()) }
             },
-            filterIsInstance<MediaIntent.CreateGroup>().filterNot {
-                it.path.isNullOrBlank()
-            }.flatMapConcat { intent ->
-                mediaRepo.createGroup(intent.path!!, intent.group).map {
+            filterIsInstance<MediaIntent.CreateGroup>().flatMapConcat { intent ->
+                mediaRepo.createGroup(intent.path, intent.group).map {
                     MediaPartialStateChange.CreateGroup.Success
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.CreateGroup.Failed(it.message.toString()) }
             },
-            filterIsInstance<MediaIntent.MoveFilesToGroup>().filterNot {
-                it.path.isNullOrBlank()
-            }.flatMapConcat { intent ->
-                mediaRepo.moveFilesToGroup(intent.path!!, intent.from, intent.to).map {
+            filterIsInstance<MediaIntent.MoveFilesToGroup>().flatMapConcat { intent ->
+                mediaRepo.moveFilesToGroup(intent.path, intent.from, intent.to).map {
                     MediaPartialStateChange.MoveFilesToGroup.Success
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.MoveFilesToGroup.Failed(it.message.toString()) }
             },
-            filterIsInstance<MediaIntent.RenameGroup>().filterNot {
-                it.path.isNullOrBlank()
-            }.flatMapConcat { intent ->
-                mediaRepo.renameGroup(intent.path!!, intent.group, intent.newName).map {
+            filterIsInstance<MediaIntent.RenameGroup>().flatMapConcat { intent ->
+                mediaRepo.renameGroup(intent.path, intent.group, intent.newName).map {
                     MediaPartialStateChange.EditGroup.Success(it)
                 }.startWith(MediaPartialStateChange.LoadingDialog.Show)
                     .catchMap { MediaPartialStateChange.EditGroup.Failed(it.message.toString()) }
