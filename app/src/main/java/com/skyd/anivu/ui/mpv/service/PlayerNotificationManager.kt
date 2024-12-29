@@ -53,7 +53,7 @@ class PlayerNotificationManager(
         title: CharSequence,
         intentAction: String,
     ): NotificationCompat.Action {
-        val intent = PlayerNotificationReceiver.createIntent(context, intentAction)
+        val intent = PlayerService.createIntent(context, intentAction)
         val builder = NotificationCompat.Action.Builder(icon, title, intent)
         with(builder) {
             setContextual(false)
@@ -81,16 +81,16 @@ class PlayerNotificationManager(
             if (sessionManager.state != PlaybackStateCompat.STATE_PLAYING) buildNotificationAction(
                 icon = R.drawable.ic_play_arrow_24,
                 title = context.getString(R.string.play),
-                intentAction = PlayerNotificationReceiver.PLAY_ACTION
+                intentAction = PlayerService.PLAY_ACTION
             ) else buildNotificationAction(
                 icon = R.drawable.ic_pause_24,
                 title = context.getString(R.string.pause),
-                intentAction = PlayerNotificationReceiver.PLAY_ACTION
+                intentAction = PlayerService.PLAY_ACTION
             )
         val closePendingIntent = buildNotificationAction(
             icon = R.drawable.ic_close_24,
             title = context.getString(R.string.close),
-            intentAction = PlayerNotificationReceiver.CLOSE_ACTION
+            intentAction = PlayerService.CLOSE_ACTION
         )
         addAction(playPendingIntent)
         addAction(closePendingIntent)

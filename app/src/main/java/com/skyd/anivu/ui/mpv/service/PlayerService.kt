@@ -3,9 +3,14 @@ package com.skyd.anivu.ui.mpv.service
 import android.app.Application
 import android.app.ForegroundServiceStartNotAllowedException
 import android.app.Notification
+import android.app.PendingIntent
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
+import android.media.AudioManager
 import android.net.Uri
 import android.os.Binder
 import android.os.Build
@@ -13,6 +18,8 @@ import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.app.ServiceCompat
+import androidx.core.content.ContextCompat
+import com.skyd.anivu.BuildConfig
 import com.skyd.anivu.appContext
 import com.skyd.anivu.model.bean.MediaPlayHistoryBean
 import com.skyd.anivu.model.repository.PlayerRepository
@@ -40,12 +47,13 @@ class PlayerService : Service() {
 
     private val lifecycleScope = CoroutineScope(Dispatchers.Main)
 
+    private val playerNotificationReceiver = PlayerNotificationReceiver()
     private val binder = PlayerServiceBinder()
     var uri: Uri = Uri.EMPTY
         private set
+    val player = MPVPlayer.getInstance(appContext as Application)
     private val sessionManager = MediaSessionManager(appContext, createMediaSessionCallback())
     private val notificationManager = PlayerNotificationManager(appContext, sessionManager)
-    val player = MPVPlayer.getInstance(appContext as Application)
     val playerState get() = sessionManager.playerState
 
     private val observers = mutableSetOf<Observer>()
@@ -110,7 +118,11 @@ class PlayerService : Service() {
         override fun event(eventId: Int) {
             when (eventId) {
                 MPVLib.mpvEventId.MPV_EVENT_SEEK -> sendEvent(PlayerEvent.Seek)
-                MPVLib.mpvEventId.MPV_EVENT_END_FILE -> sendEvent(PlayerEvent.EndFile)
+                MPVLib.mpvEventId.MPV_EVENT_END_FILE -> {
+                    sendEvent(PlayerEvent.EndFile)
+                    savePosition()
+                }
+
                 MPVLib.mpvEventId.MPV_EVENT_FILE_LOADED -> {
                     sendEvent(PlayerEvent.FileLoaded)
                     sendEvent(PlayerEvent.Paused(player.paused))
@@ -137,6 +149,18 @@ class PlayerService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+
+        ContextCompat.registerReceiver(
+            this,
+            playerNotificationReceiver,
+            IntentFilter().apply {
+                addAction(PLAY_ACTION)
+                addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+                addAction(CLOSE_ACTION)
+            },
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+
         addObserver(sessionManager)
         MPVLib.addObserver(mpvObserver)
         notificationManager.createNotificationChannel()
@@ -159,6 +183,8 @@ class PlayerService : Service() {
         notificationManager.cancel()
         removeAllObserver()
         lifecycleScope.cancel()
+
+        unregisterReceiver(playerNotificationReceiver)
         super.onDestroy()
     }
 
@@ -203,7 +229,7 @@ class PlayerService : Service() {
                     if (keepOpen && eofReached) {
                         seek(0)
                     } else if (isIdling) {
-                        command.uri.resolveUri(this@PlayerService)?.let { loadFile(it) }
+                        command.uri!!.resolveUri(this@PlayerService)?.let { loadFile(it) }
                     }
                 }
                 paused = command.paused
@@ -287,7 +313,35 @@ class PlayerService : Service() {
         }
     }
 
+    inner class PlayerNotificationReceiver : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent == null) return
+
+            when (intent.action) {
+                AudioManager.ACTION_AUDIO_BECOMING_NOISY ->
+                    onCommand(PlayerCommand.Paused(true, null))
+
+                PLAY_ACTION -> onCommand(PlayerCommand.PlayOrPause)
+                CLOSE_ACTION -> {
+                    onCommand(PlayerCommand.Destroy)
+                    context?.sendBroadcast(Intent(FINISH_PLAY_ACTIVITY_ACTION))
+                }
+            }
+        }
+    }
+
     companion object {
         private val scope = CoroutineScope(Dispatchers.IO)
+
+        const val PLAY_ACTION = BuildConfig.APPLICATION_ID + ".PlayerPlay"
+        const val CLOSE_ACTION = BuildConfig.APPLICATION_ID + ".PlayerClose"
+        const val FINISH_PLAY_ACTIVITY_ACTION = BuildConfig.APPLICATION_ID + ".FinishPlayActivity"
+
+        fun createIntent(context: Context, action: String): PendingIntent {
+            val intent = Intent(action).apply {
+                setPackage(BuildConfig.APPLICATION_ID)
+            }
+            return PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        }
     }
 }

@@ -14,7 +14,7 @@ sealed interface PlayerCommand {
     data class Detach(val surface: Surface) : PlayerCommand
     data class SetUri(val uri: Uri) : PlayerCommand
     data object Destroy : PlayerCommand
-    data class Paused(val paused: Boolean, val uri: Uri) : PlayerCommand
+    data class Paused(val paused: Boolean, val uri: Uri?) : PlayerCommand
     data object PlayOrPause : PlayerCommand
     data class SeekTo(val position: Int) : PlayerCommand
     data class Rotate(val rotate: Int) : PlayerCommand

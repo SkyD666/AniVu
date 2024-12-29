@@ -29,10 +29,9 @@ import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.savePictureToMediaStore
 import com.skyd.anivu.model.preference.player.BackgroundPlayPreference
 import com.skyd.anivu.ui.component.showToast
-import com.skyd.anivu.ui.mpv.service.PlayerNotificationReceiver
-import com.skyd.anivu.ui.mpv.service.PlayerService
 import com.skyd.anivu.ui.mpv.PlayerViewRoute
 import com.skyd.anivu.ui.mpv.copyAssetsForMpv
+import com.skyd.anivu.ui.mpv.service.PlayerService
 import java.io.File
 
 
@@ -85,7 +84,7 @@ class PlayActivity : BaseComposeActivity() {
     private val serviceStopReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (context == null || intent == null) return
-            if (intent.action == PlayerNotificationReceiver.FINISH_PLAY_ACTIVITY_ACTION) {
+            if (intent.action == PlayerService.FINISH_PLAY_ACTIVITY_ACTION) {
                 finish()
             }
         }
@@ -104,7 +103,7 @@ class PlayActivity : BaseComposeActivity() {
         ContextCompat.registerReceiver(
             this,
             serviceStopReceiver,
-            IntentFilter(PlayerNotificationReceiver.FINISH_PLAY_ACTIVITY_ACTION),
+            IntentFilter(PlayerService.FINISH_PLAY_ACTIVITY_ACTION),
             ContextCompat.RECEIVER_NOT_EXPORTED
         )
 

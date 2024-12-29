@@ -46,8 +46,8 @@
         android:theme="@style/Theme.AniVu.Pink"
         tools:targetApi="31">
         <profileable
-            android:shell="true"
             android:enabled="true"
+            android:shell="true"
             tools:targetApi="29" />
 
         <receiver
@@ -178,11 +178,7 @@
         <service
             android:name=".ui.mpv.service.PlayerService"
             android:exported="false"
-            android:foregroundServiceType="mediaPlayback"/>
-
-        <receiver
-            android:name=".ui.mpv.service.PlayerNotificationReceiver"
-            android:exported="false" />
+            android:foregroundServiceType="mediaPlayback" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
