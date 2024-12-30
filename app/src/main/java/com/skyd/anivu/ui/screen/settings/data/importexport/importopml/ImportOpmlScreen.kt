@@ -50,9 +50,9 @@ import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.safeLaunch
 import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.model.repository.importexport.ImportOpmlConflictStrategy
-import com.skyd.anivu.ui.component.AniVuExtendedFloatingActionButton
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraExtendedFloatingActionButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.TipSettingsItem
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
@@ -109,14 +109,14 @@ fun ImportOpmlScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.import_opml_screen_name)) },
             )
         },
         floatingActionButton = {
-            AniVuExtendedFloatingActionButton(
+            PodAuraExtendedFloatingActionButton(
                 text = { Text(text = stringResource(R.string.import_opml_screen_import)) },
                 icon = { Icon(imageVector = Icons.Default.Done, contentDescription = null) },
                 onClick = {

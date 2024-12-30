@@ -8,7 +8,7 @@ import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import com.skyd.anivu.R
-import com.skyd.anivu.config.Const.ANIVU_PICTURES_DIR
+import com.skyd.anivu.config.Const.PODAURA_PICTURES_DIR
 import com.skyd.anivu.ext.content.saveToGallery
 import com.skyd.anivu.ui.component.showToast
 import java.io.File
@@ -62,7 +62,7 @@ fun File.savePictureToMediaStore(
             }
         )
     } else {
-        this.copyTo(File(ANIVU_PICTURES_DIR, fileName))
+        this.copyTo(File(PODAURA_PICTURES_DIR, fileName))
     }
     context.getString(R.string.save_picture_to_media_store_saved).showToast()
     if (autoDelete) delete()

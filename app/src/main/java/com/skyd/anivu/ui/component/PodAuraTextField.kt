@@ -31,12 +31,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import com.skyd.anivu.R
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
 
-enum class AniVuTextFieldStyle(val value: String) {
+enum class PodAuraTextFieldStyle(val value: String) {
     Normal("Normal"),
     Outlined("Outlined");
 
     companion object {
-        fun toEnum(value: String): AniVuTextFieldStyle {
+        fun toEnum(value: String): PodAuraTextFieldStyle {
             return if (value == Normal.value) Normal else Outlined
         }
     }
@@ -45,7 +45,7 @@ enum class AniVuTextFieldStyle(val value: String) {
 val DefaultTrailingIcon: @Composable () -> Unit = {}
 
 @Composable
-fun AniVuTextField(
+fun PodAuraTextField(
     modifier: Modifier = Modifier,
     value: String,
     label: String = "",
@@ -53,7 +53,7 @@ fun AniVuTextField(
     readOnly: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     singleLine: Boolean = maxLines == 1,
-    style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
+    style: PodAuraTextFieldStyle = PodAuraTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     autoRequestFocus: Boolean = true,
     onValueChange: (String) -> Unit,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -64,7 +64,7 @@ fun AniVuTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions(),
     colors: TextFieldColors =
-        if (style == AniVuTextFieldStyle.Normal) TextFieldDefaults.colors()
+        if (style == PodAuraTextFieldStyle.Normal) TextFieldDefaults.colors()
         else OutlinedTextFieldDefaults.colors(),
 ) {
     var showPassword by rememberSaveable { mutableStateOf(false) }
@@ -95,7 +95,7 @@ fun AniVuTextField(
     val newTrailingIcon: (@Composable () -> Unit)? = if (trailingIcon == DefaultTrailingIcon) {
         {
             if (value.isNotEmpty()) {
-                AniVuIconButton(
+                PodAuraIconButton(
                     imageVector = if (isPassword) {
                         if (showPassword) Icons.Rounded.Visibility
                         else Icons.Rounded.VisibilityOff
@@ -113,7 +113,7 @@ fun AniVuTextField(
                     }
                 )
             } else {
-                AniVuIconButton(
+                PodAuraIconButton(
                     imageVector = Icons.Rounded.ContentPaste,
                     contentDescription = stringResource(R.string.paste),
                     tint = MaterialTheme.colorScheme.primary,
@@ -126,7 +126,7 @@ fun AniVuTextField(
     }
 
     when (style) {
-        AniVuTextFieldStyle.Normal -> TextField(
+        PodAuraTextFieldStyle.Normal -> TextField(
             modifier = newModifier,
             maxLines = maxLines,
             readOnly = readOnly,
@@ -144,7 +144,7 @@ fun AniVuTextField(
             colors = colors,
         )
 
-        AniVuTextFieldStyle.Outlined -> OutlinedTextField(
+        PodAuraTextFieldStyle.Outlined -> OutlinedTextField(
             modifier = newModifier,
             maxLines = maxLines,
             readOnly = readOnly,

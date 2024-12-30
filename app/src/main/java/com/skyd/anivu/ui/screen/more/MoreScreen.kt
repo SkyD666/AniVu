@@ -48,8 +48,8 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.model.bean.MoreBean
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.shape.CloverShape
 import com.skyd.anivu.ui.component.shape.CurlyCornerShape
 import com.skyd.anivu.ui.component.shape.RoundedCornerStarShape
@@ -75,8 +75,8 @@ fun MoreScreen() {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Small,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Small,
                 title = { Text(text = stringResource(id = R.string.more_screen_name)) },
                 navigationIcon = {},
                 windowInsets = WindowInsets.safeDrawing.only(

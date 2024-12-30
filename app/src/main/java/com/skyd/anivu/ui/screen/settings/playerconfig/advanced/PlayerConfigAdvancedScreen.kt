@@ -24,8 +24,8 @@ import com.skyd.anivu.R
 import com.skyd.anivu.model.preference.player.HardwareDecodePreference
 import com.skyd.anivu.model.preference.player.MpvConfigPreference
 import com.skyd.anivu.model.preference.player.MpvInputConfigPreference
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.SwitchSettingsItem
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
@@ -46,8 +46,8 @@ fun PlayerConfigAdvancedScreen() {
 
     Scaffold(
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.player_config_advanced_screen_name)) },
             )

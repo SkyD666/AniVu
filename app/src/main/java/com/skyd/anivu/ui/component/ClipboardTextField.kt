@@ -26,7 +26,7 @@ fun ClipboardTextField(
     label: String = "",
     maxLines: Int = Int.MAX_VALUE,
     singleLine: Boolean = maxLines == 1,
-    style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
+    style: PodAuraTextFieldStyle = PodAuraTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     autoRequestFocus: Boolean = true,
     onValueChange: (String) -> Unit = {},
     placeholder: String = "",
@@ -40,7 +40,7 @@ fun ClipboardTextField(
     onConfirm: (String) -> Unit = {},
 ) {
     Column {
-        AniVuTextField(
+        PodAuraTextField(
             modifier = modifier,
             readOnly = readOnly,
             value = value,

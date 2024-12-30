@@ -7,7 +7,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.DefaultAlpha
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.ComponentRegistry
 import coil3.EventListener
 import coil3.ImageLoader
@@ -20,11 +19,11 @@ import com.skyd.anivu.ext.imageLoaderBuilder
 
 
 @Composable
-fun AniVuImage(
+fun PodAuraImage(
     model: Any?,
     modifier: Modifier = Modifier,
     contentDescription: String? = null,
-    imageLoader: ImageLoader = rememberAniVuImageLoader(),
+    imageLoader: ImageLoader = rememberPodAuraImageLoader(),
     contentScale: ContentScale = ContentScale.FillWidth,
     alpha: Float = DefaultAlpha,
     colorFilter: ColorFilter? = null,
@@ -53,7 +52,7 @@ fun AniVuImage(
 }
 
 @Composable
-fun rememberAniVuImageLoader(
+fun rememberPodAuraImageLoader(
     listener: EventListener? = null,
     components: ComponentRegistry.Builder.() -> Unit = {},
 ): ImageLoader {

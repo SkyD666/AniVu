@@ -60,7 +60,7 @@ fun AnimatedPlaceholder(
         text = tip,
         maxLines = maxLines,
     ) {
-        AniVuLottieAnimation(resId = resId)
+        PodAuraLottieAnimation(resId = resId)
     }
 }
 

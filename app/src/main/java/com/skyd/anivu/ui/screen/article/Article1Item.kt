@@ -78,8 +78,8 @@ import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeActionPrefer
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeLeftActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleSwipeRightActionPreference
 import com.skyd.anivu.model.preference.behavior.article.ArticleTapActionPreference
-import com.skyd.anivu.ui.component.AniVuImage
-import com.skyd.anivu.ui.component.rememberAniVuImageLoader
+import com.skyd.anivu.ui.component.PodAuraImage
+import com.skyd.anivu.ui.component.rememberPodAuraImageLoader
 import com.skyd.anivu.ui.local.LocalArticleItemTonalElevation
 import com.skyd.anivu.ui.local.LocalArticleSwipeLeftAction
 import com.skyd.anivu.ui.local.LocalArticleSwipeRightAction
@@ -301,7 +301,7 @@ private fun Article1ItemContent(
                             .padding(top = 12.dp, end = 12.dp)
                             .align(Alignment.CenterVertically),
                     ) {
-                        AniVuImage(
+                        PodAuraImage(
                             modifier = Modifier
                                 .width(100.dp)
                                 .fillMaxHeight()
@@ -512,12 +512,12 @@ fun FeedIcon(modifier: Modifier = Modifier, data: FeedBean, size: Dp = 22.dp) {
     if (icon.isNullOrBlank() || imageLoadError) {
         defaultIcon()
     } else {
-        AniVuImage(
+        PodAuraImage(
             modifier = modifier
                 .size(size)
                 .clip(CircleShape),
             model = icon,
-            imageLoader = rememberAniVuImageLoader(listener = object : EventListener() {
+            imageLoader = rememberPodAuraImageLoader(listener = object : EventListener() {
                 override fun onError(request: ImageRequest, result: ErrorResult) {
                     if (icon == data.customIcon) {
                         icon = data.icon

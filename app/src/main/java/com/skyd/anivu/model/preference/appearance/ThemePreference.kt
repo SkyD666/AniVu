@@ -70,13 +70,13 @@ object ThemePreference : BasePreference<String> {
         context: Context,
         value: String = context.dataStore.getOrDefault(this),
     ): Int = when (value) {
-        DYNAMIC -> R.style.Theme_AniVu_Dynamic
-        PINK -> R.style.Theme_AniVu_Pink
-        GREEN -> R.style.Theme_AniVu_Green
-        BLUE -> R.style.Theme_AniVu_Blue
-        YELLOW -> R.style.Theme_AniVu_Yellow
-        PURPLE -> R.style.Theme_AniVu_Purple
-        else -> R.style.Theme_AniVu_Pink
+        DYNAMIC -> R.style.Theme_PodAura_Dynamic
+        PINK -> R.style.Theme_PodAura_Pink
+        GREEN -> R.style.Theme_PodAura_Green
+        BLUE -> R.style.Theme_PodAura_Blue
+        YELLOW -> R.style.Theme_PodAura_Yellow
+        PURPLE -> R.style.Theme_PodAura_Purple
+        else -> R.style.Theme_PodAura_Pink
     }
 
     fun toSeedColor(

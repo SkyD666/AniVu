@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.window.DialogProperties
 
 @Composable
-fun AniVuDialog(
+fun PodAuraDialog(
     modifier: Modifier = Modifier,
     visible: Boolean = true,
     properties: DialogProperties = DialogProperties(),

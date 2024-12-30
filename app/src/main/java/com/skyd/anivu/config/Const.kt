@@ -5,9 +5,9 @@ import com.skyd.anivu.appContext
 import java.io.File
 
 object Const {
-    const val GITHUB_REPO = "https://github.com/SkyD666/AniVu"
-    const val GITHUB_LATEST_RELEASE = "https://api.github.com/repos/SkyD666/AniVu/releases/latest"
-    const val GITHUB_NEW_ISSUE_URL = "https://github.com/SkyD666/AniVu/issues/new"
+    const val GITHUB_REPO = "https://github.com/SkyD666/PodAura"
+    const val GITHUB_LATEST_RELEASE = "https://api.github.com/repos/SkyD666/PodAura/releases/latest"
+    const val GITHUB_NEW_ISSUE_URL = "https://github.com/SkyD666/PodAura/issues/new"
     const val TELEGRAM_GROUP = "https://t.me/SkyD666Chat"
     const val DISCORD_SERVER = "https://discord.gg/pEWEjeJTa3"
 
@@ -46,9 +46,9 @@ object Const {
         .apply { if (!exists()) mkdirs() }
 
     val PICTURES_DIR = appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
-    val ANIVU_PICTURES_DIR = File(
+    val PODAURA_PICTURES_DIR = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-        "AniVu"
+        "PodAura"
     ).apply { if (!exists()) mkdirs() }
     val TEMP_PICTURES_DIR = File(appContext.cacheDir.path, "Pictures").apply {
         if (!exists()) mkdirs()

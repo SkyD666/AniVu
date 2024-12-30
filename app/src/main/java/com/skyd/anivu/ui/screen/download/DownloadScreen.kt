@@ -53,9 +53,9 @@ import com.skyd.anivu.model.repository.download.DownloadManager
 import com.skyd.anivu.model.repository.download.DownloadStarter
 import com.skyd.anivu.model.repository.download.bt.BtDownloadManager
 import com.skyd.anivu.model.repository.download.bt.BtDownloadManager.rememberBtDownloadWorkStarter
-import com.skyd.anivu.ui.component.AniVuFloatingActionButton
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraFloatingActionButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.CircularProgressPlaceholder
 import com.skyd.anivu.ui.component.EmptyPlaceholder
 import com.skyd.anivu.ui.component.deeplink.DeepLinkData
@@ -110,14 +110,14 @@ fun DownloadScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.CenterAligned,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.CenterAligned,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.download_screen_name)) },
             )
         },
         floatingActionButton = {
-            AniVuFloatingActionButton(
+            PodAuraFloatingActionButton(
                 onClick = { openLinkDialog = "" },
                 contentDescription = stringResource(id = R.string.download_screen_add_download),
                 onSizeWithSinglePaddingChanged = { _, height -> fabHeight = height },

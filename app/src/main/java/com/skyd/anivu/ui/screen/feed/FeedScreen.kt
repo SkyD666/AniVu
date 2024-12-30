@@ -54,7 +54,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -72,12 +71,12 @@ import com.skyd.anivu.model.bean.feed.FeedBean.Companion.isDefaultGroup
 import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.bean.group.GroupVo
 import com.skyd.anivu.model.bean.group.GroupVo.Companion.isDefaultGroup
-import com.skyd.anivu.ui.component.AniVuFloatingActionButton
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
 import com.skyd.anivu.ui.component.ClipboardTextField
-import com.skyd.anivu.ui.component.dialog.AniVuDialog
+import com.skyd.anivu.ui.component.PodAuraFloatingActionButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
+import com.skyd.anivu.ui.component.dialog.PodAuraDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.showToast
@@ -172,7 +171,6 @@ private fun FeedList(
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val navController = LocalNavController.current
-    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val windowSizeClass = LocalWindowSizeClass.current
     var openMoreMenu by rememberSaveable { mutableStateOf(false) }
@@ -193,11 +191,11 @@ private fun FeedList(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Small,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Small,
                 title = { Text(text = stringResource(id = R.string.feed_screen_name)) },
                 actions = {
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = {
                             onShowArticleList(
                                 (uiState.groupListState as? GroupListState.Success)
@@ -210,7 +208,7 @@ private fun FeedList(
                         imageVector = Icons.AutoMirrored.Outlined.Article,
                         contentDescription = stringResource(id = R.string.feed_screen_all_articles),
                     )
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = {
                             openSearchScreen(
                                 navController = navController,
@@ -220,7 +218,7 @@ private fun FeedList(
                         imageVector = Icons.Outlined.Search,
                         contentDescription = stringResource(id = R.string.feed_screen_search_feed),
                     )
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = { openMoreMenu = true },
                         imageVector = Icons.Outlined.MoreVert,
                         contentDescription = stringResource(id = R.string.more),
@@ -245,7 +243,7 @@ private fun FeedList(
             )
         },
         floatingActionButton = {
-            AniVuFloatingActionButton(
+            PodAuraFloatingActionButton(
                 onClick = { openAddDialog = true },
                 onSizeWithSinglePaddingChanged = { width, height ->
                     fabWidth = width
@@ -473,7 +471,7 @@ private fun AddFeedDialog(
     onConfirm: (url: String) -> Unit,
     onDismissRequest: () -> Unit,
 ) {
-    AniVuDialog(
+    PodAuraDialog(
         visible = true,
         icon = { Icon(imageVector = Icons.Outlined.RssFeed, contentDescription = null) },
         title = { Text(text = stringResource(id = R.string.add)) },

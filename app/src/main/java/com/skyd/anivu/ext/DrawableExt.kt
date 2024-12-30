@@ -21,7 +21,7 @@ fun BitmapDrawable.saveToGallery(
             }
         )
     } else {
-        Const.ANIVU_PICTURES_DIR.outputStream().use { outputStream ->
+        Const.PODAURA_PICTURES_DIR.outputStream().use { outputStream ->
             bitmap?.compress(Bitmap.CompressFormat.PNG, 100, outputStream) == true
         }
     }

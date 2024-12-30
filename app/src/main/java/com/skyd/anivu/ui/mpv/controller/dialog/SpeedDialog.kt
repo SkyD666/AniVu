@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
-import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
 import com.skyd.anivu.ui.mpv.controller.state.dialog.SpeedDialogCallback
 import com.skyd.anivu.ui.mpv.controller.state.dialog.SpeedDialogState
 import java.util.Locale
@@ -48,7 +48,7 @@ internal fun SpeedDialog(
                         modifier = Modifier.weight(1f),
                         text = String.format(Locale.getDefault(), "%.2f", value),
                     )
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = {
                             value = 1f
                             speedDialogCallback.onSpeedChanged(value)

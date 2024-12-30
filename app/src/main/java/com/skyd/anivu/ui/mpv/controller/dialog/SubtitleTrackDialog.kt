@@ -20,7 +20,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
-import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
 import com.skyd.anivu.ui.mpv.controller.state.dialog.track.SubtitleTrackDialogCallback
 import com.skyd.anivu.ui.mpv.controller.state.dialog.track.SubtitleTrackDialogState
 import com.skyd.anivu.ui.mpv.resolveUri
@@ -57,7 +57,7 @@ internal fun SubtitleTrackDialog(
                         text = stringResource(id = R.string.player_subtitle_track),
                         style = MaterialTheme.typography.headlineSmall,
                     )
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = { pickSubtitleFileLauncher.launch("*/*") },
                         imageVector = Icons.Rounded.Add,
                         contentDescription = stringResource(id = R.string.player_add_external_subtitle),

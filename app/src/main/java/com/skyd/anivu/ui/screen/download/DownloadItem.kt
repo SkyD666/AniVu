@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.model.bean.download.DownloadInfoBean
-import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
 import com.skyd.downloader.Status
 
 @Composable
@@ -134,7 +134,7 @@ fun DownloadItem(
                     )
                 }
             }
-            AniVuIconButton(
+            PodAuraIconButton(
                 enabled = pauseButtonEnabled,
                 onClick = {
                     when (data.status) {
@@ -162,7 +162,7 @@ fun DownloadItem(
                 imageVector = pauseButtonIcon,
                 contentDescription = pauseButtonContentDescription,
             )
-            AniVuIconButton(
+            PodAuraIconButton(
                 enabled = cancelButtonEnabled,
                 onClick = {
                     onDelete(data)

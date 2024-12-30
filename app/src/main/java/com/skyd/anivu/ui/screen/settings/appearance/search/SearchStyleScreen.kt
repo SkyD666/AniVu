@@ -24,8 +24,8 @@ import com.skyd.anivu.model.preference.appearance.feed.TonalElevationPreferenceU
 import com.skyd.anivu.model.preference.appearance.search.SearchItemMinWidthPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchListTonalElevationPreference
 import com.skyd.anivu.model.preference.appearance.search.SearchTopBarTonalElevationPreference
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.screen.settings.appearance.article.ItemMinWidthDialog
@@ -45,8 +45,8 @@ fun SearchStyleScreen() {
 
     Scaffold(
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.search_style_screen_name)) },
             )

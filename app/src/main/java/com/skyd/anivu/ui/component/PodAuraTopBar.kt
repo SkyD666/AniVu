@@ -23,28 +23,28 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ui.local.LocalNavController
 
-enum class AniVuTopBarStyle {
+enum class PodAuraTopBarStyle {
     Small, Large, CenterAligned
 }
 
 @Composable
-fun AniVuTopBar(
-    style: AniVuTopBarStyle = AniVuTopBarStyle.Small,
+fun PodAuraTopBar(
+    style: PodAuraTopBarStyle = PodAuraTopBarStyle.Small,
     title: @Composable () -> Unit,
     contentPadding: @Composable () -> PaddingValues = { PaddingValues() },
     navigationIcon: @Composable () -> Unit = { BackIcon() },
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
     colors: TopAppBarColors = when (style) {
-        AniVuTopBarStyle.Small -> TopAppBarDefaults.topAppBarColors()
-        AniVuTopBarStyle.Large -> TopAppBarDefaults.largeTopAppBarColors()
-        AniVuTopBarStyle.CenterAligned -> TopAppBarDefaults.centerAlignedTopAppBarColors()
+        PodAuraTopBarStyle.Small -> TopAppBarDefaults.topAppBarColors()
+        PodAuraTopBarStyle.Large -> TopAppBarDefaults.largeTopAppBarColors()
+        PodAuraTopBarStyle.CenterAligned -> TopAppBarDefaults.centerAlignedTopAppBarColors()
     },
     actions: @Composable RowScope.() -> Unit = {},
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
     val topBarModifier = Modifier.padding(contentPadding())
     when (style) {
-        AniVuTopBarStyle.Small -> {
+        PodAuraTopBarStyle.Small -> {
             TopAppBar(
                 title = title,
                 modifier = topBarModifier,
@@ -56,7 +56,7 @@ fun AniVuTopBar(
             )
         }
 
-        AniVuTopBarStyle.Large -> {
+        PodAuraTopBarStyle.Large -> {
             LargeTopAppBar(
                 modifier = topBarModifier,
                 title = title,
@@ -68,7 +68,7 @@ fun AniVuTopBar(
             )
         }
 
-        AniVuTopBarStyle.CenterAligned -> {
+        PodAuraTopBarStyle.CenterAligned -> {
             CenterAlignedTopAppBar(
                 modifier = topBarModifier,
                 title = title,
@@ -90,7 +90,7 @@ fun TopBarIcon(
     tint: Color = LocalContentColor.current,
     contentDescription: String?,
 ) {
-    AniVuIconButton(
+    PodAuraIconButton(
         modifier = modifier,
         painter = painter,
         tint = tint,
@@ -107,7 +107,7 @@ fun TopBarIcon(
     tint: Color = LocalContentColor.current,
     contentDescription: String?,
 ) {
-    AniVuIconButton(
+    PodAuraIconButton(
         modifier = modifier,
         imageVector = imageVector,
         tint = tint,

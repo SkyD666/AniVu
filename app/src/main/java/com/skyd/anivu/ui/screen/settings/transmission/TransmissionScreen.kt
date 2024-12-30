@@ -17,8 +17,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.skyd.anivu.R
 import com.skyd.anivu.model.preference.transmission.SeedingWhenCompletePreference
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.SwitchSettingsItem
@@ -38,8 +38,8 @@ fun TransmissionScreen() {
 
     Scaffold(
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.transmission_screen_name)) },
             )

@@ -51,8 +51,8 @@ import com.skyd.anivu.ext.share
 import com.skyd.anivu.ext.toDateTimeString
 import com.skyd.anivu.ext.toUri
 import com.skyd.anivu.model.bean.MediaBean
-import com.skyd.anivu.ui.component.AniVuImage
-import com.skyd.anivu.ui.component.rememberAniVuImageLoader
+import com.skyd.anivu.ui.component.PodAuraImage
+import com.skyd.anivu.ui.component.rememberPodAuraImageLoader
 import com.skyd.anivu.ui.local.LocalMediaShowThumbnail
 import java.util.Locale
 
@@ -118,7 +118,7 @@ fun Media1Item(
             }
             if (data.isMedia && LocalMediaShowThumbnail.current) {
                 if (showThumbnail) {
-                    AniVuImage(
+                    PodAuraImage(
                         modifier = Modifier.fillMaxSize(),
                         model = remember(data.file.path) {
                             ImageRequest.Builder(context)
@@ -128,7 +128,7 @@ fun Media1Item(
                                 .crossfade(true)
                                 .build()
                         },
-                        imageLoader = rememberAniVuImageLoader(listener = object : EventListener() {
+                        imageLoader = rememberPodAuraImageLoader(listener = object : EventListener() {
                             override fun onError(request: ImageRequest, result: ErrorResult) {
                                 showThumbnail = false
                             }

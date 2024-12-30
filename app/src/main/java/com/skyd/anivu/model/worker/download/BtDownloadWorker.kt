@@ -178,7 +178,7 @@ class BtDownloadWorker(context: Context, parameters: WorkerParameters) :
                 settings = sessionParams.settings,
             ).setString(
                 settings_pack.string_types.user_agent.swigValue(),
-                "${applicationContext.getAppName() ?: "AniVu"}/${applicationContext.getAppVersionName()}"
+                "${applicationContext.getAppName() ?: "PodAura"}/${applicationContext.getAppVersionName()}"
             )
 
             start(sessionParams)

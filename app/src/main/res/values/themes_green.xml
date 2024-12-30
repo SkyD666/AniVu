@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="Theme.Green" parent="Base.Theme.AniVu">
+    <style name="Theme.Green" parent="Base.Theme.PodAura">
         <item name="colorPrimary">@color/md_primary_green</item>
         <item name="colorOnPrimary">@color/md_onPrimary_green</item>
         <item name="colorPrimaryContainer">@color/md_primaryContainer_green</item>
@@ -49,5 +49,5 @@
         <item name="colorSurfaceContainerHighest">@color/md_surfaceContainerHighest_green</item>
     </style>
 
-    <style name="Theme.AniVu.Green" parent="Theme.Green" />
+    <style name="Theme.PodAura.Green" parent="Theme.Green" />
 </resources>

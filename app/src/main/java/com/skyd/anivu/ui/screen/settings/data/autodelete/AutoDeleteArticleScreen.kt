@@ -36,8 +36,8 @@ import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleFrequenc
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepFavoritePreference
 import com.skyd.anivu.model.preference.data.autodelete.AutoDeleteArticleKeepUnreadPreference
 import com.skyd.anivu.model.preference.data.autodelete.UseAutoDeletePreference
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.BannerItem
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.SwitchSettingsItem
@@ -62,8 +62,8 @@ fun AutoDeleteScreen() {
 
     Scaffold(
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.auto_delete_screen_name)) },
             )

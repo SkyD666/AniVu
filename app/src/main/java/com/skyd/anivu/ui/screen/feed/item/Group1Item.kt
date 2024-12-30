@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.skyd.anivu.R
 import com.skyd.anivu.model.bean.group.GroupVo
 import com.skyd.anivu.model.bean.group.GroupVo.Companion.isDefaultGroup
-import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
 import com.skyd.anivu.ui.local.LocalFeedDefaultGroupExpand
 
 
@@ -78,7 +78,7 @@ fun Group1Item(
             label = "expand icon rotate",
         )
 
-        AniVuIconButton(
+        PodAuraIconButton(
             onClick = { onExpandChange(data, !isExpanded) },
             imageVector = Icons.Outlined.KeyboardArrowUp,
             contentDescription = stringResource(if (isExpanded) R.string.collapse else R.string.expend),

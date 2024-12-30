@@ -47,7 +47,7 @@ import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.model.preference.SettingsProvider
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
-import com.skyd.anivu.ui.theme.AniVuTheme
+import com.skyd.anivu.ui.theme.PodAuraTheme
 
 
 /**
@@ -86,7 +86,7 @@ class CrashActivity : ComponentActivity() {
                 LocalWindowSizeClass provides calculateWindowSizeClass(this)
             ) {
                 SettingsProvider {
-                    AniVuTheme(darkTheme = LocalDarkMode.current) {
+                    PodAuraTheme(darkTheme = LocalDarkMode.current) {
                         CrashScreen(
                             message = message,
                             onReport = {

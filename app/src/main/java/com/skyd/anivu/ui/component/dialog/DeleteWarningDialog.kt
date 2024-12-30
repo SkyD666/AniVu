@@ -20,7 +20,7 @@ fun DeleteWarningDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit
 ) {
-    AniVuDialog(
+    PodAuraDialog(
         visible = visible,
         onDismissRequest = onDismissRequest,
         icon = { Icon(imageVector = Icons.Outlined.Warning, contentDescription = null) },

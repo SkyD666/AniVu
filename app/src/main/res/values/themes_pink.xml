@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
-    <style name="Base.Theme.AniVu" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.PodAura" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">
             shortEdges
         </item>
@@ -8,13 +8,13 @@
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
     </style>
 
-    <style name="Theme.AniVu.NoActionBar.Splash" parent="Theme.SplashScreen">
-        <item name="postSplashScreenTheme">@style/Theme.AniVu.Pink</item>
+    <style name="Theme.PodAura.NoActionBar.Splash" parent="Theme.SplashScreen">
+        <item name="postSplashScreenTheme">@style/Theme.PodAura.Pink</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="windowSplashScreenBackground">@color/splash_background</item>
     </style>
 
-    <style name="Theme.Pink" parent="Base.Theme.AniVu">
+    <style name="Theme.Pink" parent="Base.Theme.PodAura">
         <item name="colorPrimary">@color/md_primary_pink</item>
         <item name="colorOnPrimary">@color/md_onPrimary_pink</item>
         <item name="colorPrimaryContainer">@color/md_primaryContainer_pink</item>
@@ -63,9 +63,9 @@
         <item name="colorSurfaceContainerHighest">@color/md_surfaceContainerHighest_pink</item>
     </style>
 
-    <style name="Theme.AniVu.Pink" parent="Theme.Pink" />
+    <style name="Theme.PodAura.Pink" parent="Theme.Pink" />
 
-    <style name="Theme.AniVu.Player" parent="Base.Theme.AniVu">
+    <style name="Theme.PodAura.Player" parent="Base.Theme.PodAura">
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActionBar">false</item>
         <item name="android:windowFullscreen">true</item>

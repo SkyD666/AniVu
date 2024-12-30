@@ -74,14 +74,14 @@ import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.toEncodedUrl
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.repository.ArticleSort
-import com.skyd.anivu.ui.component.AniVuFloatingActionButton
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuTopBar
+import com.skyd.anivu.ui.component.PodAuraFloatingActionButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
 import com.skyd.anivu.ui.component.BackIcon
 import com.skyd.anivu.ui.component.CircularProgressPlaceholder
 import com.skyd.anivu.ui.component.EmptyPlaceholder
 import com.skyd.anivu.ui.component.ErrorPlaceholder
-import com.skyd.anivu.ui.component.dialog.AniVuDialog
+import com.skyd.anivu.ui.component.dialog.PodAuraDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.local.LocalArticleItemMinWidth
 import com.skyd.anivu.ui.local.LocalArticleListTonalElevation
@@ -145,7 +145,7 @@ fun ArticleScreen(
 ) {
     val navController = LocalNavController.current
     if (feedUrls.isEmpty() && articleIds.isEmpty()) {
-        AniVuDialog(
+        PodAuraDialog(
             visible = true,
             text = { Text(text = stringResource(id = R.string.article_screen_feed_url_illegal)) },
             confirmButton = {
@@ -187,7 +187,7 @@ private fun ArticleContentScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
+            PodAuraTopBar(
                 title = { Text(text = stringResource(R.string.article_screen_name)) },
                 navigationIcon = {
                     if (onBackClick == DefaultBackClick) BackIcon()
@@ -215,7 +215,7 @@ private fun ArticleContentScreen(
                                 label = "topBarRefreshAnimate",
                             ).value
                         } else 0f
-                        AniVuIconButton(
+                        PodAuraIconButton(
                             onClick = { dispatch(ArticleIntent.Refresh(feedUrls)) },
                             imageVector = Icons.Outlined.Refresh,
                             contentDescription = stringResource(id = R.string.refresh),
@@ -231,7 +231,7 @@ private fun ArticleContentScreen(
                         onFilterRead = { dispatch(ArticleIntent.FilterRead(it)) },
                         onSort = { dispatch(ArticleIntent.UpdateSort(it)) },
                     )
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = {
                             openSearchScreen(
                                 navController = navController,
@@ -254,7 +254,7 @@ private fun ArticleContentScreen(
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
-                AniVuFloatingActionButton(
+                PodAuraFloatingActionButton(
                     onClick = { scope.launch { listState.animateScrollToItem(0) } },
                     onSizeWithSinglePaddingChanged = { _, height -> fabHeight = height },
                     contentDescription = stringResource(R.string.to_top),

@@ -38,9 +38,9 @@ import com.skyd.anivu.R
 import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.CategorySettingsItem
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
@@ -73,8 +73,8 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.data_screen_name)) },
             )
@@ -108,7 +108,7 @@ fun DataScreen(viewModel: DataViewModel = hiltViewModel()) {
                         )
                     }
                 ) {
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = {
                             MediaLibLocationPreference.put(
                                 context,

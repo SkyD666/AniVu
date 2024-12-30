@@ -61,10 +61,10 @@ import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.model.bean.MediaGroupBean
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
 import com.skyd.anivu.ui.activity.player.PlayActivity
-import com.skyd.anivu.ui.component.AniVuFloatingActionButton
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraFloatingActionButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.local.LocalMediaShowGroupTab
@@ -111,8 +111,8 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Small,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Small,
                 title = {
                     val title = stringResource(R.string.media_screen_name)
                     Text(
@@ -136,19 +136,19 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                     only(sides)
                 },
                 actions = {
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = {
                             openFilePicker(navController = navController, path = path)
                         },
                         imageVector = Icons.Outlined.MyLocation,
                         contentDescription = stringResource(id = R.string.data_screen_media_lib_location),
                     )
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = { dispatch(MediaIntent.Refresh(path)) },
                         imageVector = Icons.Outlined.Refresh,
                         contentDescription = stringResource(id = R.string.refresh),
                     )
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = { openMoreMenu = true },
                         imageVector = Icons.Outlined.MoreVert,
                         contentDescription = stringResource(R.string.more),
@@ -185,7 +185,7 @@ fun MediaScreen(path: String, viewModel: MediaViewModel = hiltViewModel()) {
                         contentDescription = stringResource(id = R.string.open_file),
                     )
                 }
-                AniVuFloatingActionButton(
+                PodAuraFloatingActionButton(
                     onClick = {
                         openEditGroupDialog = uiState.groups[pagerState.currentPage].first
                     },

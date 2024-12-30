@@ -32,7 +32,7 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ext.fileSize
 import com.skyd.anivu.ext.toPercentage
 import com.skyd.anivu.model.bean.download.bt.BtDownloadInfoBean
-import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
 
 @Composable
 fun BtDownloadItem(
@@ -169,7 +169,7 @@ fun BtDownloadItem(
                     )
                 }
             }
-            AniVuIconButton(
+            PodAuraIconButton(
                 enabled = pauseButtonEnabled,
                 onClick = {
                     when (data.downloadState) {
@@ -189,7 +189,7 @@ fun BtDownloadItem(
                 imageVector = pauseButtonIcon,
                 contentDescription = pauseButtonContentDescription,
             )
-            AniVuIconButton(
+            PodAuraIconButton(
                 enabled = cancelButtonEnabled,
                 onClick = {
                     onCancel(data)

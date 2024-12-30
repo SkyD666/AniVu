@@ -14,6 +14,6 @@ fun ContentValues.gallery(
     }
     put(
         MediaStore.Images.Media.RELATIVE_PATH,
-        Environment.DIRECTORY_PICTURES + "/AniVu"
+        Environment.DIRECTORY_PICTURES + "/PodAura"
     )
 }

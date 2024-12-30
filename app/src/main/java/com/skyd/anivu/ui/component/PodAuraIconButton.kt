@@ -25,17 +25,17 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 
-enum class AniVuIconButtonStyle {
+enum class PodAuraIconButtonStyle {
     Normal, Filled, FilledTonal, Outlined
 }
 
 @Composable
-fun AniVuIconButton(
+fun PodAuraIconButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     painter: Painter,
     tint: Color? = null,
-    style: AniVuIconButtonStyle = AniVuIconButtonStyle.Normal,
+    style: PodAuraIconButtonStyle = PodAuraIconButtonStyle.Normal,
     contentDescription: String? = null,
     rotate: Float = 0f,
     enabled: Boolean = true,
@@ -52,7 +52,7 @@ fun AniVuIconButton(
             )
         }
         when (style) {
-            AniVuIconButtonStyle.Normal -> IconButton(
+            PodAuraIconButtonStyle.Normal -> IconButton(
                 modifier = it,
                 onClick = onClick,
                 enabled = enabled,
@@ -61,7 +61,7 @@ fun AniVuIconButton(
                 content = icon,
             )
 
-            AniVuIconButtonStyle.Filled -> FilledIconButton(
+            PodAuraIconButtonStyle.Filled -> FilledIconButton(
                 modifier = it,
                 onClick = onClick,
                 enabled = enabled,
@@ -70,7 +70,7 @@ fun AniVuIconButton(
                 content = icon,
             )
 
-            AniVuIconButtonStyle.FilledTonal -> FilledTonalIconButton(
+            PodAuraIconButtonStyle.FilledTonal -> FilledTonalIconButton(
                 modifier = it,
                 onClick = onClick,
                 enabled = enabled,
@@ -79,7 +79,7 @@ fun AniVuIconButton(
                 content = icon,
             )
 
-            AniVuIconButtonStyle.Outlined -> OutlinedIconButton(
+            PodAuraIconButtonStyle.Outlined -> OutlinedIconButton(
                 modifier = it,
                 onClick = onClick,
                 enabled = enabled,
@@ -109,19 +109,19 @@ fun AniVuIconButton(
 }
 
 @Composable
-fun AniVuIconButton(
+fun PodAuraIconButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     imageVector: ImageVector,
     tint: Color? = null,
-    style: AniVuIconButtonStyle = AniVuIconButtonStyle.Normal,
+    style: PodAuraIconButtonStyle = PodAuraIconButtonStyle.Normal,
     contentDescription: String? = null,
     rotate: Float = 0f,
     enabled: Boolean = true,
     colors: IconButtonColors? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
-    AniVuIconButton(
+    PodAuraIconButton(
         modifier = modifier,
         onClick = onClick,
         painter = rememberVectorPainter(image = imageVector),
@@ -136,7 +136,7 @@ fun AniVuIconButton(
 }
 
 @Composable
-fun AniVuIconToggleButton(
+fun PodAuraIconToggleButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,

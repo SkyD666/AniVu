@@ -71,8 +71,8 @@ import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.model.bean.article.ArticleWithFeed
 import com.skyd.anivu.model.bean.feed.FeedViewBean
-import com.skyd.anivu.ui.component.AniVuFloatingActionButton
-import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.PodAuraFloatingActionButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
 import com.skyd.anivu.ui.component.BackIcon
 import com.skyd.anivu.ui.component.CircularProgressPlaceholder
 import com.skyd.anivu.ui.component.EmptyPlaceholder
@@ -151,7 +151,7 @@ fun SearchScreen(
                 enter = fadeIn(),
                 exit = fadeOut(),
             ) {
-                AniVuFloatingActionButton(
+                PodAuraFloatingActionButton(
                     onClick = { scope.launch { searchResultListState.animateScrollToItem(0) } },
                     onSizeWithSinglePaddingChanged = { width, height ->
                         fabWidth = width
@@ -299,7 +299,7 @@ fun TrailingIcon(
     onClick: (() -> Unit)? = null
 ) {
     if (showClearButton) {
-        AniVuIconButton(
+        PodAuraIconButton(
             imageVector = Icons.Outlined.Clear,
             contentDescription = stringResource(R.string.clear_input_text),
             onClick = { onClick?.invoke() }

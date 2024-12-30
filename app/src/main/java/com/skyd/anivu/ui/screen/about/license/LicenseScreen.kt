@@ -27,8 +27,8 @@ import com.skyd.anivu.R
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.model.bean.LicenseBean
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 
 
 const val LICENSE_SCREEN_ROUTE = "licenseScreen"
@@ -38,8 +38,8 @@ fun LicenseScreen() {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 title = { Text(text = stringResource(R.string.license_screen_name)) },
                 scrollBehavior = scrollBehavior,
             )

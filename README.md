@@ -1,27 +1,27 @@
 <div align="center">
     <div>
-        <img src="doc/image/AniVu.svg" style="height: 210px"/>
+        <img src="doc/image/PodAura.svg" style="height: 210px"/>
     </div>
-    <h1>🥰 AniVu</h1>
-    <p>(<b>A</b> <b>N</b>ew <b>I</b>ntegration <b>View</b>)</p>
+    <h1>🥰 PodAura</h1>
+    <p><b>P</b>odcasts <b>O</b>rganized <b>D</b>iversely with <b>A</b>udio-Video <b>U</b>nification for <b>R</b>ich <b>A</b>ccess</p>
     <p>
-        <a href="https://github.com/SkyD666/AniVu/actions" style="text-decoration:none">
-            <img src="https://img.shields.io/github/actions/workflow/status/SkyD666/AniVu/pre_release.yml?branch=master&style=for-the-badge" alt="GitHub Workflow Status"  />
+        <a href="https://github.com/SkyD666/PodAura/actions" style="text-decoration:none">
+            <img src="https://img.shields.io/github/actions/workflow/status/SkyD666/PodAura/pre_release.yml?branch=master&style=for-the-badge" alt="GitHub Workflow Status"  />
         </a>
-        <a href="https://github.com/SkyD666/AniVu/releases/latest" style="text-decoration:none">
-            <img src="https://img.shields.io/github/v/release/SkyD666/AniVu?display_name=release&style=for-the-badge" alt="GitHub release (latest by date)"/>
+        <a href="https://github.com/SkyD666/PodAura/releases/latest" style="text-decoration:none">
+            <img src="https://img.shields.io/github/v/release/SkyD666/PodAura?display_name=release&style=for-the-badge" alt="GitHub release (latest by date)"/>
         </a>
         <a href="https://f-droid.org/packages/com.skyd.anivu/" style="text-decoration:none">
             <img src="https://img.shields.io/f-droid/v/com.skyd.anivu?style=for-the-badge&logo=F-Droid&color=1976d2" alt="F-Droid Version"/>
         </a>
-        <a href="https://github.com/SkyD666/AniVu/releases/latest" style="text-decoration:none" >
-            <img src="https://img.shields.io/github/downloads/SkyD666/AniVu/total?style=for-the-badge" alt="GitHub all downloads"/>
+        <a href="https://github.com/SkyD666/PodAura/releases/latest" style="text-decoration:none" >
+            <img src="https://img.shields.io/github/downloads/SkyD666/PodAura/total?style=for-the-badge" alt="GitHub all downloads"/>
         </a>
         <a href="https://www.android.com/versions/nougat-7-0" style="text-decoration:none" >
             <img src="https://img.shields.io/badge/Android 7.0+-brightgreen?style=for-the-badge&logo=android&logoColor=white" alt="Support platform"/>
         </a>
-        <a href="https://github.com/SkyD666/AniVu/blob/master/LICENSE" style="text-decoration:none" >
-            <img src="https://img.shields.io/github/license/SkyD666/AniVu?style=for-the-badge" alt="GitHub license"/>
+        <a href="https://github.com/SkyD666/PodAura/blob/master/LICENSE" style="text-decoration:none" >
+            <img src="https://img.shields.io/github/license/SkyD666/PodAura?style=for-the-badge" alt="GitHub license"/>
         </a>
         <a href="https://t.me/SkyD666Chat" style="text-decoration:none" >
             <img src="https://img.shields.io/badge/Telegram-2CA5E0?logo=telegram&logoColor=white&style=for-the-badge" alt="Telegram"/>
@@ -34,12 +34,14 @@
         An <b>all-in-one Podcast tool</b> for <b>RSS subscription and updates</b>, <b>media downloads</b> and <b>playback</b>.
     </p>
     <p>
-        AniVu utilizes the <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> architecture and fully adopts the <b><a href="https://m3.material.io/">Material You</a></b> design style. All pages are developed using <b>Jetpack Compose</b>.
+        PodAura utilizes the <b><a href="https://developer.android.com/topic/architecture#recommended-app-arch">MVI</a></b> architecture and fully adopts the <b><a href="https://m3.material.io/">Material You</a></b> design style. All pages are developed using <b>Jetpack Compose</b>.
     </p>
     <p>
         <b><a href="doc/readme/README-zh-rCN.md">简体中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="doc/readme/README-zh-rTW.md">正體中文</a></b>&nbsp&nbsp&nbsp|&nbsp&nbsp&nbsp<b><a href="https://crowdin.com/project/anivu">Help us translate</a></b>
     </p>
 </div>
+
+
 
 <a href="https://f-droid.org/packages/com.skyd.anivu"><img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>
 
@@ -95,7 +97,7 @@ If you are interested, please help us **translate**, thank you.
 
 ## ✨ Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=SkyD666/AniVu)](https://star-history.com/?repos=SkyD666/AniVu#SkyD666/AniVu&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=SkyD666/PodAura)](https://star-history.com/?repos=SkyD666/PodAura#SkyD666/PodAura&Date)
 
 ## 🎈 Other works
 

@@ -22,7 +22,7 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 25
-        versionName = "2.1-rc04"
+        versionName = "2.1-rc05"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -69,7 +69,7 @@ android {
             .forEach { output ->
                 val abi = output.getFilter(FilterConfiguration.FilterType.ABI.name) ?: "universal"
                 output.outputFileName =
-                    "AniVu_${versionName}_${abi}_${buildType.name}_${flavorName}.apk"
+                    "PodAura_${versionName}_${abi}_${buildType.name}_${flavorName}.apk"
             }
     }
 

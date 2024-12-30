@@ -43,9 +43,9 @@ import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.model.bean.group.GroupVo
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.ReorderableLazyListState
@@ -65,12 +65,12 @@ fun ReorderGroupScreen(viewModel: ReorderGroupViewModel = hiltViewModel()) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Small,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Small,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.reorder_group_screen_name)) },
                 actions = {
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = { dispatcher(ReorderGroupIntent.Reset) },
                         imageVector = Icons.Outlined.Restore,
                         contentDescription = stringResource(id = R.string.reset),
@@ -180,7 +180,7 @@ private fun LazyItemScope.ReorderableGroup(
                         .weight(1f),
                     style = MaterialTheme.typography.titleMedium,
                 )
-                AniVuIconButton(
+                PodAuraIconButton(
                     modifier = Modifier.draggableHandle(
                         onDragStarted = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)

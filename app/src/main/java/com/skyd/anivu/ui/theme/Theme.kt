@@ -17,18 +17,18 @@ import com.skyd.anivu.ui.local.LocalAmoledDarkMode
 import com.skyd.anivu.ui.local.LocalTheme
 
 @Composable
-fun AniVuTheme(
+fun PodAuraTheme(
     darkTheme: Int,
     content: @Composable () -> Unit
 ) {
-    AniVuTheme(
+    PodAuraTheme(
         darkTheme = DarkModePreference.inDark(darkTheme),
         content = content
     )
 }
 
 @Composable
-fun AniVuTheme(
+fun PodAuraTheme(
     darkTheme: Boolean,
     colors: Map<String, ColorScheme> = extractAllColors(darkTheme),
     content: @Composable () -> Unit

@@ -43,7 +43,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AniVu.Pink"
+        android:theme="@style/Theme.PodAura.Pink"
         tools:targetApi="31">
         <profileable
             android:enabled="true"
@@ -68,7 +68,7 @@
             android:name=".ui.activity.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.AniVu.NoActionBar.Splash"
+            android:theme="@style/Theme.PodAura.NoActionBar.Splash"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -83,7 +83,7 @@
 
                 <data
                     android:host="download.screen"
-                    android:scheme="anivu" />
+                    android:scheme="podaura" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -93,7 +93,7 @@
 
                 <data
                     android:host="article.screen"
-                    android:scheme="anivu" />
+                    android:scheme="podaura" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -160,7 +160,7 @@
             android:launchMode="singleTask"
             android:screenOrientation="userLandscape"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Theme.AniVu.Player">
+            android:theme="@style/Theme.PodAura.Player">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

@@ -46,12 +46,12 @@ import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.toEncodedUrl
 import com.skyd.anivu.model.bean.feed.FeedBean
-import com.skyd.anivu.ui.component.AniVuFloatingActionButton
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraFloatingActionButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.ClipboardTextField
-import com.skyd.anivu.ui.component.dialog.AniVuDialog
+import com.skyd.anivu.ui.component.dialog.PodAuraDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 
@@ -83,14 +83,14 @@ fun RequestHeadersScreen(feedUrl: String, viewModel: RequestHeadersViewModel = h
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Small,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Small,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.request_headers_screen_name)) },
             )
         },
         floatingActionButton = {
-            AniVuFloatingActionButton(
+            PodAuraFloatingActionButton(
                 onClick = { openAddDialog = true },
                 onSizeWithSinglePaddingChanged = { _, height -> fabHeight = height },
                 contentDescription = stringResource(R.string.add),
@@ -153,7 +153,7 @@ private fun AddHeaderDialog(
     var key by rememberSaveable { mutableStateOf("") }
     var value by rememberSaveable { mutableStateOf("") }
 
-    AniVuDialog(
+    PodAuraDialog(
         onDismissRequest = onDismissRequest,
         icon = { Icon(imageVector = Icons.Outlined.Http, contentDescription = null) },
         title = { Text(text = stringResource(id = R.string.add)) },
@@ -277,7 +277,7 @@ private fun HeaderItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
-            AniVuIconButton(
+            PodAuraIconButton(
                 onClick = { onRemove(key) },
                 imageVector = Icons.Outlined.Close,
                 contentDescription = stringResource(id = R.string.remove),

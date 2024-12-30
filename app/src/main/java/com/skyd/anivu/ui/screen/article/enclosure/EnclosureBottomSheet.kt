@@ -42,7 +42,7 @@ import com.skyd.anivu.model.preference.rss.ParseLinkTagAsEnclosurePreference
 import com.skyd.anivu.model.repository.download.DownloadStarter
 import com.skyd.anivu.model.worker.download.doIfMagnetOrTorrentLink
 import com.skyd.anivu.ui.activity.player.PlayActivity
-import com.skyd.anivu.ui.component.AniVuIconButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
 
 fun getEnclosuresList(
     context: Context,
@@ -157,7 +157,7 @@ private fun EnclosureItem(
         }
         Spacer(modifier = Modifier.width(12.dp))
         if (enclosure.isMedia) {
-            AniVuIconButton(
+            PodAuraIconButton(
                 onClick = {
                     try {
                         PlayActivity.play(
@@ -173,7 +173,7 @@ private fun EnclosureItem(
                 contentDescription = stringResource(id = R.string.play),
             )
         }
-        AniVuIconButton(
+        PodAuraIconButton(
             onClick = { onDownload(enclosure) },
             imageVector = Icons.Outlined.Download,
             contentDescription = stringResource(id = R.string.download),
@@ -203,7 +203,7 @@ private fun LinkEnclosureItem(
         )
         Spacer(modifier = Modifier.width(12.dp))
         if (enclosure.isMedia) {
-            AniVuIconButton(
+            PodAuraIconButton(
                 onClick = {
                     try {
                         PlayActivity.play(
@@ -220,7 +220,7 @@ private fun LinkEnclosureItem(
             )
         }
         if (isMagnetOrTorrent) {
-            AniVuIconButton(
+            PodAuraIconButton(
                 onClick = { onDownload(enclosure) },
                 imageVector = Icons.Outlined.Download,
                 contentDescription = stringResource(id = R.string.download),

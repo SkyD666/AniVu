@@ -42,7 +42,7 @@ import com.skyd.anivu.base.mvi.MviEventListener
 import com.skyd.anivu.base.mvi.getDispatcher
 import com.skyd.anivu.model.bean.UpdateBean
 import com.skyd.anivu.model.preference.IgnoreUpdateVersionPreference
-import com.skyd.anivu.ui.component.dialog.AniVuDialog
+import com.skyd.anivu.ui.component.dialog.PodAuraDialog
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.local.LocalIgnoreUpdateVersion
 import okhttp3.internal.toLongOrDefault
@@ -124,7 +124,7 @@ private fun NewerDialog(
         onDismissRequest()
     }
 
-    AniVuDialog(
+    PodAuraDialog(
         onDismissRequest = onDismissRequest,
         visible = visible,
         icon = { Icon(imageVector = Icons.Outlined.Update, contentDescription = null) },
@@ -222,7 +222,7 @@ private fun NoUpdateDialog(
         onDismissRequest()
     }
 
-    AniVuDialog(
+    PodAuraDialog(
         onDismissRequest = onDismissRequest,
         visible = visible,
         icon = { Icon(imageVector = Icons.Outlined.Update, contentDescription = null) },

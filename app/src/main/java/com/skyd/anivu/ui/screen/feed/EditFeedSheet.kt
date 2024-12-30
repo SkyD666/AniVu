@@ -69,8 +69,8 @@ import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.readable
 import com.skyd.anivu.model.bean.feed.FeedViewBean
 import com.skyd.anivu.model.bean.group.GroupVo
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.dialog.AniVuDialog
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.dialog.PodAuraDialog
 import com.skyd.anivu.ui.component.dialog.DeleteWarningDialog
 import com.skyd.anivu.ui.component.dialog.TextFieldDialog
 import com.skyd.anivu.ui.component.showToast
@@ -182,7 +182,7 @@ fun EditFeedSheet(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = stringResource(id = R.string.feed_screen_rss_title))
                 Spacer(modifier = Modifier.weight(1f))
-                AniVuIconButton(
+                PodAuraIconButton(
                     onClick = {
                         onNicknameChange(null)
                         nickname = feed.title
@@ -212,7 +212,7 @@ fun EditFeedSheet(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(text = stringResource(id = R.string.feed_screen_rss_description))
                 Spacer(modifier = Modifier.weight(1f))
-                AniVuIconButton(
+                PodAuraIconButton(
                     onClick = {
                         onCustomDescriptionChange(null)
                         customDescription = feed.description
@@ -543,7 +543,7 @@ private fun EditIconDialog(
     onNetwork: () -> Unit,
     onRemove: () -> Unit,
 ) {
-    AniVuDialog(
+    PodAuraDialog(
         onDismissRequest = onDismissRequest,
         icon = { Icon(imageVector = Icons.Outlined.Image, contentDescription = null) },
         title = { Text(text = stringResource(id = R.string.feed_screen_rss_edit_icon)) },

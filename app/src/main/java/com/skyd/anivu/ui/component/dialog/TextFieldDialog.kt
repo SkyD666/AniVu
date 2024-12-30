@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import com.skyd.anivu.R
-import com.skyd.anivu.ui.component.AniVuTextFieldStyle
+import com.skyd.anivu.ui.component.PodAuraTextFieldStyle
 import com.skyd.anivu.ui.component.ClipboardTextField
 import com.skyd.anivu.ui.component.DefaultTrailingIcon
 import com.skyd.anivu.ui.local.LocalTextFieldStyle
@@ -25,7 +25,7 @@ fun TextFieldDialog(
     readOnly: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     singleLine: Boolean = maxLines == 1,
-    style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
+    style: PodAuraTextFieldStyle = PodAuraTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     icon: @Composable (() -> Unit)? = null,
     titleText: String? = null,
     value: String = "",
@@ -76,7 +76,7 @@ fun TextFieldDialog(
     readOnly: Boolean = false,
     maxLines: Int = Int.MAX_VALUE,
     singleLine: Boolean = maxLines == 1,
-    style: AniVuTextFieldStyle = AniVuTextFieldStyle.toEnum(LocalTextFieldStyle.current),
+    style: PodAuraTextFieldStyle = PodAuraTextFieldStyle.toEnum(LocalTextFieldStyle.current),
     icon: @Composable (() -> Unit)? = null,
     title: @Composable (() -> Unit)? = null,
     value: String = "",
@@ -95,7 +95,7 @@ fun TextFieldDialog(
 ) {
     val focusManager = LocalFocusManager.current
 
-    AniVuDialog(
+    PodAuraDialog(
         modifier = modifier,
         visible = visible,
         onDismissRequest = onDismissRequest,

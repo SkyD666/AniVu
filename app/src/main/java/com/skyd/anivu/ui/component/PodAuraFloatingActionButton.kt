@@ -27,17 +27,17 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-enum class AniVuFloatingActionButtonStyle {
+enum class PodAuraFloatingActionButtonStyle {
     Normal, Extended, Large, Small
 }
 
 @Composable
-fun AniVuFloatingActionButton(
+fun PodAuraFloatingActionButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     onSizeWithSinglePaddingChanged: ((width: Dp, height: Dp) -> Unit)? = null,
     elevation: FloatingActionButtonElevation = FloatingActionButtonDefaults.elevation(),
-    style: AniVuFloatingActionButtonStyle = AniVuFloatingActionButtonStyle.Normal,
+    style: PodAuraFloatingActionButtonStyle = PodAuraFloatingActionButtonStyle.Normal,
     contentDescription: String? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable RowScope.() -> Unit
@@ -54,7 +54,7 @@ fun AniVuFloatingActionButton(
         }
 
         when (style) {
-            AniVuFloatingActionButtonStyle.Normal -> FloatingActionButton(
+            PodAuraFloatingActionButtonStyle.Normal -> FloatingActionButton(
                 modifier = newModifier,
                 onClick = onClick,
                 elevation = elevation,
@@ -62,7 +62,7 @@ fun AniVuFloatingActionButton(
                 content = { Row { content() } },
             )
 
-            AniVuFloatingActionButtonStyle.Extended -> ExtendedFloatingActionButton(
+            PodAuraFloatingActionButtonStyle.Extended -> ExtendedFloatingActionButton(
                 modifier = newModifier,
                 onClick = onClick,
                 elevation = elevation,
@@ -70,7 +70,7 @@ fun AniVuFloatingActionButton(
                 content = { Row { content() } },
             )
 
-            AniVuFloatingActionButtonStyle.Large -> LargeFloatingActionButton(
+            PodAuraFloatingActionButtonStyle.Large -> LargeFloatingActionButton(
                 modifier = newModifier,
                 onClick = onClick,
                 elevation = elevation,
@@ -78,7 +78,7 @@ fun AniVuFloatingActionButton(
                 content = { Row { content() } },
             )
 
-            AniVuFloatingActionButtonStyle.Small -> SmallFloatingActionButton(
+            PodAuraFloatingActionButtonStyle.Small -> SmallFloatingActionButton(
                 modifier = newModifier,
                 onClick = onClick,
                 elevation = elevation,
@@ -107,7 +107,7 @@ fun AniVuFloatingActionButton(
 }
 
 @Composable
-fun AniVuExtendedFloatingActionButton(
+fun PodAuraExtendedFloatingActionButton(
     modifier: Modifier = Modifier,
     text: @Composable () -> Unit,
     icon: @Composable () -> Unit,
@@ -172,7 +172,7 @@ fun BottomHideExtendedFloatingActionButton(
         enter = slideInVertically { with(density) { 40.dp.roundToPx() } } + fadeIn(),
         exit = slideOutVertically { with(density) { 40.dp.roundToPx() } } + fadeOut(),
     ) {
-        AniVuExtendedFloatingActionButton(
+        PodAuraExtendedFloatingActionButton(
             modifier = modifier,
             text = text,
             icon = icon,

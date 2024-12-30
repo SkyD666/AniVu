@@ -54,9 +54,9 @@ import com.skyd.anivu.ext.navigate
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.toEncodedUrl
 import com.skyd.anivu.model.preference.data.medialib.MediaLibLocationPreference
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.util.fileicon.getFileIcon
 import kotlinx.coroutines.CoroutineScope
@@ -155,8 +155,8 @@ fun FilePickerScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Small,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Small,
                 scrollBehavior = scrollBehavior,
                 title = {
                     Text(
@@ -167,14 +167,14 @@ fun FilePickerScreen(
                     )
                 },
                 navigationIcon = {
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = { navController.popBackStackWithLifecycle() },
                         imageVector = Icons.Outlined.Close,
                         contentDescription = stringResource(id = R.string.close),
                     )
                 },
                 actions = {
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = { dispatch(FilePickerIntent.NewLocation(Const.INTERNAL_STORAGE)) },
                         imageVector = Icons.Outlined.PhoneAndroid,
                         contentDescription = stringResource(id = R.string.file_picker_screen_internal_storage),

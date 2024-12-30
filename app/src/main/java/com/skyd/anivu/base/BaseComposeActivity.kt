@@ -11,7 +11,7 @@ import com.skyd.anivu.model.preference.SettingsProvider
 import com.skyd.anivu.model.preference.appearance.ThemePreference
 import com.skyd.anivu.ui.local.LocalDarkMode
 import com.skyd.anivu.ui.local.LocalWindowSizeClass
-import com.skyd.anivu.ui.theme.AniVuTheme
+import com.skyd.anivu.ui.theme.PodAuraTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -27,7 +27,7 @@ open class BaseComposeActivity : AppCompatActivity() {
         CompositionLocalProvider(
             LocalWindowSizeClass provides calculateWindowSizeClass(this@BaseComposeActivity)
         ) {
-            SettingsProvider { AniVuTheme(darkTheme = LocalDarkMode.current, content) }
+            SettingsProvider { PodAuraTheme(darkTheme = LocalDarkMode.current, content) }
         }
     }
 

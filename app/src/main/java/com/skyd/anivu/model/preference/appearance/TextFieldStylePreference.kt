@@ -8,7 +8,7 @@ import com.skyd.anivu.base.BasePreference
 import com.skyd.anivu.ext.dataStore
 import com.skyd.anivu.ext.getOrDefault
 import com.skyd.anivu.ext.put
-import com.skyd.anivu.ui.component.AniVuTextFieldStyle
+import com.skyd.anivu.ui.component.PodAuraTextFieldStyle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,9 +16,9 @@ import kotlinx.coroutines.launch
 object TextFieldStylePreference : BasePreference<String> {
     private const val TEXT_FIELD_STYLE = "textFieldStyle"
 
-    val values = AniVuTextFieldStyle.entries.map { it.value }
+    val values = PodAuraTextFieldStyle.entries.map { it.value }
 
-    override val default = AniVuTextFieldStyle.Normal.value
+    override val default = PodAuraTextFieldStyle.Normal.value
 
     val key = stringPreferencesKey(TEXT_FIELD_STYLE)
 
@@ -34,8 +34,8 @@ object TextFieldStylePreference : BasePreference<String> {
         context: Context,
         value: String = context.dataStore.getOrDefault(this),
     ): String = when (value) {
-        AniVuTextFieldStyle.Normal.value -> context.getString(R.string.normal_text_field_style)
-        AniVuTextFieldStyle.Outlined.value -> context.getString(R.string.outlined_text_field_style)
+        PodAuraTextFieldStyle.Normal.value -> context.getString(R.string.normal_text_field_style)
+        PodAuraTextFieldStyle.Outlined.value -> context.getString(R.string.outlined_text_field_style)
         else -> context.getString(R.string.unknown)
     }
 }

@@ -97,14 +97,14 @@ import com.skyd.anivu.model.bean.article.EnclosureBean
 import com.skyd.anivu.model.bean.article.RssMediaBean
 import com.skyd.anivu.model.preference.appearance.read.ReadTextSizePreference
 import com.skyd.anivu.ui.activity.player.PlayActivity
-import com.skyd.anivu.ui.component.AniVuFloatingActionButton
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuImage
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraFloatingActionButton
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.PodAuraImage
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.component.html.HtmlText
-import com.skyd.anivu.ui.component.rememberAniVuImageLoader
+import com.skyd.anivu.ui.component.rememberPodAuraImageLoader
 import com.skyd.anivu.ui.local.LocalReadContentTonalElevation
 import com.skyd.anivu.ui.local.LocalReadTextSize
 import com.skyd.anivu.ui.local.LocalReadTopBarTonalElevation
@@ -146,8 +146,8 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Small,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Small,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.read_screen_name)) },
                 colors = TopAppBarDefaults.topAppBarColors().copy(
@@ -159,7 +159,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                     ),
                 ),
                 actions = {
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         enabled = uiState.articleState is ArticleState.Success,
                         onClick = {
                             val articleState = uiState.articleState
@@ -180,7 +180,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                     )
                     val isFavorite = (uiState.articleState as? ArticleState.Success)
                         ?.article?.articleWithEnclosure?.article?.isFavorite == true
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         enabled = uiState.articleState is ArticleState.Success,
                         onClick = {
                             val articleState = uiState.articleState
@@ -200,7 +200,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
                             else R.string.article_screen_favorite
                         ),
                     )
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         enabled = uiState.articleState is ArticleState.Success,
                         onClick = { openMoreMenu = true },
                         imageVector = Icons.Outlined.MoreVert,
@@ -224,7 +224,7 @@ fun ReadScreen(articleId: String, viewModel: ReadViewModel = hiltViewModel()) {
             )
         },
         floatingActionButton = {
-            AniVuFloatingActionButton(
+            PodAuraFloatingActionButton(
                 onSizeWithSinglePaddingChanged = { _, height -> fabHeight = height },
                 onClick = {
                     val articleState = uiState.articleState
@@ -602,9 +602,9 @@ private fun MediaCover(
             var realImage by rememberSaveable(enclosure) {
                 mutableStateOf(if (context.isWifi() && enclosure.isVideo) enclosure.url else cover)
             }
-            AniVuImage(
+            PodAuraImage(
                 modifier = Modifier.fillMaxHeight(),
-                imageLoader = rememberAniVuImageLoader(
+                imageLoader = rememberPodAuraImageLoader(
                     listener = object : EventListener() {
                         override fun onError(request: ImageRequest, result: ErrorResult) {
                             if (cover != null && realImage != cover) {

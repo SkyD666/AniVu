@@ -17,9 +17,9 @@ import androidx.navigation.NavOptions
 import com.skyd.anivu.R
 import com.skyd.anivu.ext.popBackStackWithLifecycle
 import com.skyd.anivu.ext.toEncodedUrl
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
-import com.skyd.anivu.ui.component.dialog.AniVuDialog
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
+import com.skyd.anivu.ui.component.dialog.PodAuraDialog
 import com.skyd.anivu.ui.local.LocalNavController
 import com.skyd.anivu.ui.screen.media.list.MediaList
 
@@ -42,7 +42,7 @@ fun openSubMediaScreen(
 fun SubMediaScreenRoute(path: String?) {
     val navController = LocalNavController.current
     if (path.isNullOrBlank()) {
-        AniVuDialog(
+        PodAuraDialog(
             icon = {
                 Icon(imageVector = Icons.Outlined.WarningAmber, contentDescription = null)
             },
@@ -70,8 +70,8 @@ private fun SubMediaScreen(path: String) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = {
                     Text(

@@ -38,9 +38,9 @@ import com.skyd.anivu.ext.plus
 import com.skyd.anivu.ext.safeLaunch
 import com.skyd.anivu.ext.showSnackbar
 import com.skyd.anivu.model.preference.data.OpmlExportDirPreference
-import com.skyd.anivu.ui.component.AniVuExtendedFloatingActionButton
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
+import com.skyd.anivu.ui.component.PodAuraExtendedFloatingActionButton
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
 import com.skyd.anivu.ui.component.BaseSettingsItem
 import com.skyd.anivu.ui.component.dialog.WaitingDialog
 import com.skyd.anivu.ui.local.LocalOpmlExportDir
@@ -75,14 +75,14 @@ fun ExportOpmlScreen(viewModel: ExportOpmlViewModel = hiltViewModel()) {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.export_opml_screen_name)) },
             )
         },
         floatingActionButton = {
-            AniVuExtendedFloatingActionButton(
+            PodAuraExtendedFloatingActionButton(
                 text = { Text(text = stringResource(R.string.export_opml_screen_export)) },
                 icon = { Icon(imageVector = Icons.Default.Done, contentDescription = null) },
                 onClick = {

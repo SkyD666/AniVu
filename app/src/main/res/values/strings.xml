@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">AniVu</string>
+    <string name="app_name">PodAura</string>
     <string name="feed_screen_name">Feed</string>
     <string name="media_screen_name">Media</string>
     <string name="more_screen_name">More</string>
@@ -46,7 +46,7 @@
     <string name="player_long_press_playback_speed">Fast forwarding…</string>
     <string name="about_screen_name">About</string>
     <string name="app_short_description">All-in-one Android podcast app for RSS, media dl &amp; play.</string>
-    <string name="app_tech_stack_description">AniVu utilizes the MVI architecture and fully adopts the Material You design style. All pages are developed using Android View and Compose.</string>
+    <string name="app_tech_stack_description">PodAura utilizes the MVI architecture and fully adopts the Material You design style. All pages are developed using Android View and Compose.</string>
     <string name="about_screen_visit_github">GitHub repository</string>
     <string name="about_screen_join_telegram">Telegram group</string>
     <string name="about_screen_join_discord">Discord server</string>
@@ -291,7 +291,7 @@
     <string name="data_screen_media_lib_location">Storage location</string>
     <string name="storage_permission_request_screen_first_tip">Resource download and media browsing require storage permission, please grant the permission.</string>
     <string name="storage_permission_request_screen_rationale">Application can\'t be launched without storage permission, please grant the permission</string>
-    <string name="storage_permission_request_screen_title">AniVu requires storage access</string>
+    <string name="storage_permission_request_screen_title">PodAura requires storage access</string>
     <string name="storage_permission_request_screen_request_permission">Request permission</string>
     <string name="file_picker_screen_open_file">Open file</string>
     <string name="file_picker_screen_open_folder">Open a folder</string>
@@ -321,7 +321,7 @@
     <string name="player_config_screen_max_back_cache_size">Max back cache size</string>
     <string name="torrent_download_channel_name">BT download task</string>
     <string name="download_channel_name">Download task</string>
-    <string name="download_channel_description">AniVu download task notification</string>
+    <string name="download_channel_description">PodAura download task notification</string>
     <string name="player_seek_fast">Fast, but not precise</string>
     <string name="player_seek_exact">Precise, but slow</string>
     <string name="player_config_screen_seek_option">Seek option</string>

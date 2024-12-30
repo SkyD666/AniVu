@@ -31,7 +31,7 @@ fun SliderDialog(
     confirmButton: @Composable () -> Unit,
     dismissButton: @Composable (() -> Unit)? = null,
 ) {
-    AniVuDialog(
+    PodAuraDialog(
         onDismissRequest = onDismissRequest,
         icon = icon,
         title = title,

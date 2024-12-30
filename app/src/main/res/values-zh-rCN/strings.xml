@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">AniVu</string>
+    <string name="app_name">PodAura</string>
     <string name="feed_screen_name">订阅</string>
     <string name="media_screen_name">媒体</string>
     <string name="more_screen_name">更多</string>
@@ -45,7 +45,7 @@
     <string name="player_long_press_playback_speed">倍速播放中…</string>
     <string name="about_screen_name">关于</string>
     <string name="app_short_description">一个集 RSS 订阅与更新、媒体下载与播放为一体的播客应用。</string>
-    <string name="app_tech_stack_description">AniVu 使用 MVI 架构，完全采用 Material You 设计风格。使用 Android View 和 Compose 混合开发。</string>
+    <string name="app_tech_stack_description">PodAura 使用 MVI 架构，完全采用 Material You 设计风格。使用 Android View 和 Compose 混合开发。</string>
     <string name="about_screen_visit_github">访问 GitHub 仓库</string>
     <string name="about_screen_join_telegram">加入 Telegram 群组</string>
     <string name="about_screen_join_discord">加入 Discord 服务器</string>
@@ -284,7 +284,7 @@
     <string name="data_screen_media_lib_location">存储位置</string>
     <string name="storage_permission_request_screen_first_tip">资源下载与媒体浏览需要存储权限，请授予权限。</string>
     <string name="storage_permission_request_screen_rationale">没有存储权限无法运行应用程序，请授予权限。</string>
-    <string name="storage_permission_request_screen_title">AniVu 需要存储访问</string>
+    <string name="storage_permission_request_screen_title">PodAura 需要存储访问</string>
     <string name="storage_permission_request_screen_request_permission">授予权限</string>
     <string name="file_picker_screen_open_file">打开文件</string>
     <string name="file_picker_screen_open_folder">打开文件夹</string>
@@ -314,7 +314,7 @@
     <string name="player_config_screen_max_back_cache_size">最大保留缓存大小</string>
     <string name="torrent_download_channel_name">BT 下载任务</string>
     <string name="download_channel_name">下载任务</string>
-    <string name="download_channel_description">AniVu 下载任务通知</string>
+    <string name="download_channel_description">PodAura 下载任务通知</string>
     <string name="player_seek_fast">快，但不精确</string>
     <string name="player_seek_exact">精确，但慢</string>
     <string name="player_config_screen_seek_option">进度调整选项</string>

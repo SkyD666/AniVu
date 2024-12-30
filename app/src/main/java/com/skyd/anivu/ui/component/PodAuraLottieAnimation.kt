@@ -11,7 +11,7 @@ import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
 
 @Composable
-fun AniVuLottieAnimation(
+fun PodAuraLottieAnimation(
     modifier: Modifier = Modifier,
     @androidx.annotation.RawRes resId: Int,
     contentScale: ContentScale = ContentScale.Inside,

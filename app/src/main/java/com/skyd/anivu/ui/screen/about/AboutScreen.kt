@@ -71,11 +71,11 @@ import com.skyd.anivu.ext.isCompact
 import com.skyd.anivu.ext.openBrowser
 import com.skyd.anivu.ext.plus
 import com.skyd.anivu.model.bean.OtherWorksBean
-import com.skyd.anivu.ui.component.AniVuIconButton
-import com.skyd.anivu.ui.component.AniVuImage
-import com.skyd.anivu.ui.component.AniVuTopBar
-import com.skyd.anivu.ui.component.AniVuTopBarStyle
-import com.skyd.anivu.ui.component.dialog.AniVuDialog
+import com.skyd.anivu.ui.component.PodAuraIconButton
+import com.skyd.anivu.ui.component.PodAuraImage
+import com.skyd.anivu.ui.component.PodAuraTopBar
+import com.skyd.anivu.ui.component.PodAuraTopBarStyle
+import com.skyd.anivu.ui.component.dialog.PodAuraDialog
 import com.skyd.anivu.ui.component.shape.CloverShape
 import com.skyd.anivu.ui.component.shape.CurlyCornerShape
 import com.skyd.anivu.ui.component.shape.SquircleShape
@@ -102,17 +102,17 @@ fun AboutScreen() {
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
-            AniVuTopBar(
-                style = AniVuTopBarStyle.Large,
+            PodAuraTopBar(
+                style = PodAuraTopBarStyle.Large,
                 scrollBehavior = scrollBehavior,
                 title = { Text(text = stringResource(R.string.about_screen_name)) },
                 actions = {
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         imageVector = Icons.Outlined.Balance,
                         contentDescription = stringResource(id = R.string.license_screen_name),
                         onClick = { navController.navigate(LICENSE_SCREEN_ROUTE) }
                     )
-                    AniVuIconButton(
+                    PodAuraIconButton(
                         onClick = { openUpdateDialog = true },
                         imageVector = Icons.Outlined.Update,
                         contentDescription = stringResource(id = R.string.update_check)
@@ -318,7 +318,7 @@ private fun HelpArea(
 @Composable
 private fun SponsorDialog(visible: Boolean, onClose: () -> Unit) {
     val context = LocalContext.current
-    AniVuDialog(
+    PodAuraDialog(
         visible = visible,
         onDismissRequest = onClose,
         icon = { Icon(imageVector = Icons.Outlined.Coffee, contentDescription = null) },
@@ -379,7 +379,7 @@ private fun ButtonArea() {
             ),
             contentAlignment = Alignment.Center
         ) {
-            AniVuIconButton(
+            PodAuraIconButton(
                 painter = painterResource(id = R.drawable.ic_github_24),
                 contentDescription = stringResource(id = R.string.about_screen_visit_github),
                 onClick = { Const.GITHUB_REPO.openBrowser(context) }
@@ -392,7 +392,7 @@ private fun ButtonArea() {
             ),
             contentAlignment = Alignment.Center
         ) {
-            AniVuIconButton(
+            PodAuraIconButton(
                 painter = painterResource(id = R.drawable.ic_telegram_24),
                 contentDescription = stringResource(id = R.string.about_screen_join_telegram),
                 onClick = { Const.TELEGRAM_GROUP.openBrowser(context) }
@@ -405,7 +405,7 @@ private fun ButtonArea() {
             ),
             contentAlignment = Alignment.Center
         ) {
-            AniVuIconButton(
+            PodAuraIconButton(
                 painter = painterResource(id = R.drawable.ic_discord_24),
                 contentDescription = stringResource(id = R.string.about_screen_join_discord),
                 onClick = { Const.DISCORD_SERVER.openBrowser(context) }
@@ -458,7 +458,7 @@ private fun OtherWorksItem(
                 .padding(15.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                AniVuImage(
+                PodAuraImage(
                     modifier = Modifier
                         .size(30.dp)
                         .aspectRatio(1f),
