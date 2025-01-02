@@ -210,7 +210,7 @@ private fun IconArea() {
             modifier = Modifier.aspectRatio(1f),
             contentScale = ContentScale.Crop,
             alignment = Alignment.Center,
-            painter = painterResource(id = R.drawable.ic_icon_2_24),
+            painter = painterResource(id = R.drawable.ic_icon_24),
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
             contentDescription = null
         )

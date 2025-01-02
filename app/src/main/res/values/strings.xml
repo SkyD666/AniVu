@@ -137,10 +137,11 @@
     <string name="appearance_screen_theme_category">Theme</string>
     <string name="appearance_screen_description">Configure theme, appearance</string>
     <string name="theme_dynamic">Dynamic</string>
-    <string name="theme_pink">Pink</string>
+    <string name="theme_pink">Bocchi</string>
     <string name="theme_green">Green</string>
-    <string name="theme_blue">Blue</string>
-    <string name="theme_yellow">Yellow</string>
+    <string name="theme_blue">Ryo</string>
+    <string name="theme_yellow">Nijika</string>
+    <string name="theme_red">Kita</string>
     <string name="theme_purple">Purple</string>
     <string name="player_forward_85s" translatable="false">+85s</string>
     <string name="player_config_screen_appearance_category">Appearance</string>

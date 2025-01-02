@@ -299,7 +299,7 @@ class BtDownloadWorker(context: Context, parameters: WorkerParameters) :
             .setContentTitle(title)
             .setTicker(title)
             .setContentText(progress.toPercentage())
-            .setSmallIcon(R.drawable.ic_icon_2_24)
+            .setSmallIcon(R.drawable.ic_icon_24)
             .setOngoing(true)
             .setProgress(100, (progress * 100).toInt(), false)
             // Add the cancel action to the notification which can be used to cancel the worker

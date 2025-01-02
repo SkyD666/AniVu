@@ -83,7 +83,7 @@ object ArticleNotificationManager {
         )
 
         val builder = NotificationCompat.Builder(appContext, CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_icon_2_24)
+            .setSmallIcon(R.drawable.ic_icon_24)
             .setContentTitle(appContext.getString(R.string.article_notification_new_articles))
             .setContentText(
                 appContext.getString(R.string.article_notification_content_text, content)

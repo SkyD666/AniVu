@@ -43,7 +43,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PodAura.Pink"
+        android:theme="@style/Theme.PodAura"
         tools:targetApi="31">
         <profileable
             android:enabled="true"

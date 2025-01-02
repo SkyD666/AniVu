@@ -37,7 +37,7 @@ class PlayerNotificationManager(
                 .setMediaSession(sessionManager.mediaSession.sessionToken)
             return NotificationCompat.Builder(context, CHANNEL_ID)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                .setSmallIcon(R.drawable.ic_icon_2_24)
+                .setSmallIcon(R.drawable.ic_icon_24)
                 .setStyle(style)
                 .setPriority(NotificationCompat.PRIORITY_LOW)
                 .setContentIntent(openActivityPendingIntent)

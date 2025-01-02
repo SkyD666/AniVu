@@ -18,7 +18,7 @@ class DownloadManager private constructor(context: Context) {
         NotificationConfig(
             channelName = context.getString(R.string.download_channel_name),
             channelDescription = context.getString(R.string.download_channel_description),
-            smallIcon = R.drawable.ic_icon_2_24,
+            smallIcon = R.drawable.ic_icon_24,
             importance = NotificationManager.IMPORTANCE_LOW,
             pauseText = R.string.download_pause,
             resumeText = R.string.download_resume,
